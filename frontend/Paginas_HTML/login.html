@@ -145,16 +145,11 @@
                 });
 
                 console.log('Status da resposta:', response.status);
-                const data = await response.json();
-                console.log('Dados da resposta:', data);
-
-                if (response.ok && data.token) {
-                    // Armazena o token e dados do usuário
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('userData', JSON.stringify(data.user));
-                    
-                    // Redireciona imediatamente
-                    window.location.href = 'home.html';
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
                 } else {
                     // Mostra mensagem de erro
                     errorMessage.textContent = data.message || 'Credenciais inválidas';
