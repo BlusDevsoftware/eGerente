@@ -294,8 +294,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="colaboradorModal">
-        <div class="modal-content">
+    <div class="modal" id="colaboradorModal" style="display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
             <div class="modal-header">
                 <h2>Novo Colaborador</h2>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
@@ -305,7 +305,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Código</label>
-                            <input type="text" name="codigo" readonly disabled>
+                            <input type="text" id="codigo" name="codigo" readonly disabled>
                             <small class="form-text text-muted">Gerado automaticamente</small>
                         </div>
                         <div class="form-group">
