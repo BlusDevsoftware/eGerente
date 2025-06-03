@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Comissões - Serviços</title>
+    <title>Serviços - Gestor de Comissões</title>
+    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
     <link rel="stylesheet" href="../Paginas_CSS/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="api-config.js"></script>
@@ -262,4 +263,21 @@
                         <td colspan="7" style="text-align: center; padding: 20px;">
                             Nenhum serviço cadastrado
                         </td>
-                    `
+                    `;
+                    tbody.appendChild(tr);
+                    return;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar serviços:', error);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="7" style="text-align: center; padding: 20px; color: #dc3545;">
+                        Erro ao carregar serviços.
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+    </script>
+</body>
+</html>
