@@ -1,44 +1,72 @@
 // Configuração da API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://e-gerente-backend-gateway.vercel.app/api';
+const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
 
-// Função para fazer requisições HTTP
-async function apiRequest(endpoint, options = {}) {
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
-            credentials: 'include' // Importante para enviar cookies de autenticação
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('API request failed:', error);
-        throw error;
-    }
-}
-
-// Funções auxiliares para cada método HTTP
 const api = {
-    get: (endpoint) => apiRequest(endpoint),
-    post: (endpoint, data) => apiRequest(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(data)
-    }),
-    put: (endpoint, data) => apiRequest(endpoint, {
-        method: 'PUT',
-        body: JSON.stringify(data)
-    }),
-    delete: (endpoint) => apiRequest(endpoint, {
-        method: 'DELETE'
-    })
+    async get(endpoint) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Erro na requisição GET:', error);
+            throw error;
+        }
+    },
+
+    async post(endpoint, data) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Erro na requisição POST:', error);
+            throw error;
+        }
+    },
+
+    async put(endpoint, data) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Erro na requisição PUT:', error);
+            throw error;
+        }
+    },
+
+    async delete(endpoint) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Erro na requisição DELETE:', error);
+            throw error;
+        }
+    }
 };
 
 export default api; 
