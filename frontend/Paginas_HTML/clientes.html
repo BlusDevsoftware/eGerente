@@ -183,6 +183,7 @@
         </div>
     </div>
 
+    <script src="../Paginas_JS/codigos.js"></script>
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -194,11 +195,11 @@
 
         // Modal functions
         function openModal() {
-            document.getElementById('clienteModal').style.display = 'flex';
+            window.openModal('cliente');
         }
 
         function closeModal() {
-            document.getElementById('clienteModal').style.display = 'none';
+            window.closeModal('cliente');
         }
 
         // Close modal when clicking outside
@@ -235,8 +236,13 @@
             const form = document.getElementById('clienteForm');
             const formData = new FormData(form);
             
+            // Salvar o último código usado
+            const codigo = document.getElementById('codigo').value;
+            window.salvarUltimoCodigo('cliente', codigo);
+            
             // Enviando apenas os campos que o backend espera
             const cliente = {
+                codigo: codigo,
                 codigo_crm: formData.get('codigo_crm'),
                 nome: formData.get('nome'),
                 email: formData.get('email') || null,
@@ -244,73 +250,16 @@
                 status: formData.get('status') || 'ativo'
             };
             
-            // Armazenamos estes campos no localStorage para referência futura
-            // mesmo que o backend não os armazene ainda
-            const clienteCompleto = {
-                ...cliente,
-                tipo: formData.get('tipo'),
-                documento: formData.get('documento')
-            };
+            // Aqui você implementaria a lógica para enviar os dados para o backend
+            console.log('Salvando cliente:', cliente);
             
-            // Armazenar localmente para uso futuro quando o backend for atualizado
-            try {
-                let clientesLocais = JSON.parse(localStorage.getItem('clientesLocais') || '[]');
-                clientesLocais.push(clienteCompleto);
-                localStorage.setItem('clientesLocais', JSON.stringify(clientesLocais));
-            } catch (e) {
-                console.warn('Não foi possível salvar dados localmente:', e);
-            }
-
-            console.log('Enviando para API:', cliente); // Log para depuração
-            
-            try {
-                const result = await ClientesApi.createCliente(cliente);
-                
-                console.log('Resposta da API:', result); // Log para depuração
-
-                // Verifica se a API retornou um erro explícito (menos comum com ApiClient, mas seguro verificar)
-                if (result && result.message && result.status && result.status >= 400) {
-                     throw new Error(result.message || 'Erro retornado pela API.');
-                }
-                 // Verifica se a API retornou um erro explícito padrão do backend
-                if (result && result.message && !result.id) { // Assumindo que um sucesso sempre retorna um objeto com 'id'
-                    throw new Error(result.message + (result.details ? ` (${result.details})` : ''));
-                }
-                 // Verificação antiga (menos provável com ApiClient atual)
-                if (result && result.error) {
-                     throw new Error(result.error);
-                }
-
-                
-                alert('Cliente salvo com sucesso!');
-                closeModal();
-                // Tenta chamar loadClientes() para atualizar a lista sem recarregar a página
-                if (typeof loadClientes === 'function') {
-                    loadClientes();
-                } else {
-                    console.warn('Função loadClientes não encontrada, recarregando a página.');
-                    location.reload(); // Fallback
-                }
-            } catch (error) {
-                console.error('Erro ao salvar cliente:', error); // Log detalhado do erro
-                // Tenta exibir a mensagem de erro da API, se disponível
-                const errorMessage = error.response ? (await error.response.json()).message : error.message;
-                alert('Erro ao salvar cliente: ' + (errorMessage || 'Verifique o console para detalhes.'));
-            }
+            // Limpar formulário e fechar modal
+            form.reset();
+            closeModal();
         }
 
-        // Adicionar evento de submit ao formulário
+        // Adicionar event listener para o formulário
         document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
-
-        // Verificação de autenticação
-        function checkAuth() {
-            const token = AuthService.token;
-            if (!token) {
-                window.location.href = 'index.html';
-                return false;
-            }
-            return token;
-        }
     </script>
 
     <script src="api-config.js"></script>

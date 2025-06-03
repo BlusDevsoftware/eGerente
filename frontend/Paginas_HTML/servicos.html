@@ -180,6 +180,7 @@
         </div>
     </div>
 
+    <script src="../Paginas_JS/codigos.js"></script>
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -191,11 +192,11 @@
 
         // Modal functions
         function openModal() {
-            document.getElementById('servicoModal').style.display = 'flex';
+            window.openModal('servico');
         }
 
         function closeModal() {
-            document.getElementById('servicoModal').style.display = 'none';
+            window.closeModal('servico');
         }
 
         // Close modal when clicking outside
@@ -206,78 +207,36 @@
             }
         }
 
-        // Verificação de autenticação
-        function checkAuth() {
-            const token = AuthService.token;
-            if (!token) {
-                window.location.href = 'index.html';
-                return false;
-            }
-            return token;
+        // Função para salvar o serviço
+        async function salvarServico(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('servicoForm');
+            const formData = new FormData(form);
+            
+            // Salvar o último código usado
+            const codigo = document.getElementById('codigo').value;
+            window.salvarUltimoCodigo('servico', codigo);
+            
+            // Enviando apenas os campos que o backend espera
+            const servico = {
+                codigo: codigo,
+                nome: formData.get('nome'),
+                descricao: formData.get('descricao') || null,
+                preco: formData.get('preco') || null,
+                status: formData.get('status') || 'ativo'
+            };
+            
+            // Aqui você implementaria a lógica para enviar os dados para o backend
+            console.log('Salvando serviço:', servico);
+            
+            // Limpar formulário e fechar modal
+            form.reset();
+            closeModal();
         }
 
-        // Função para carregar serviços
-        async function carregarServicos() {
-            const token = checkAuth();
-            if (!token) return;
-
-            const tbody = document.querySelector('table tbody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Carregando...</span>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            try {
-                console.log('Iniciando carregamento de serviços...');
-                const response = await ServicosApi.getServicos();
-                
-                if (response.error) {
-                    throw new Error(response.error);
-                }
-                
-                const data = response;
-                console.log('Resposta da API:', data);
-
-                tbody.innerHTML = '';
-
-                if (!data || !Array.isArray(data)) {
-                    console.error('Resposta inválida da API:', data);
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td colspan="7" style="text-align: center; padding: 20px; color: #dc3545;">
-                            Erro ao carregar serviços. Resposta inválida da API.
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                    return;
-                }
-
-                if (data.length === 0) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td colspan="7" style="text-align: center; padding: 20px;">
-                            Nenhum serviço cadastrado
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                    return;
-                }
-            } catch (error) {
-                console.error('Erro ao carregar serviços:', error);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td colspan="7" style="text-align: center; padding: 20px; color: #dc3545;">
-                        Erro ao carregar serviços.
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
-        }
+        // Adicionar event listener para o formulário
+        document.getElementById('servicoForm').addEventListener('submit', salvarServico);
     </script>
 </body>
 </html>
