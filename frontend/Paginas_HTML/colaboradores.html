@@ -277,6 +277,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Código</th>
                         <th>Nome</th>
                         <th>Email</th>
                         <th>Telefone</th>
@@ -436,6 +437,59 @@
                 this.parentElement.classList.toggle('active');
             });
         });
+
+        // Função para carregar os colaboradores na tabela
+        function carregarColaboradores() {
+            const tbody = document.querySelector('tbody');
+            // Aqui você faria uma chamada para a API para buscar os dados
+            // Por enquanto, vamos usar dados de exemplo
+            const colaboradores = [
+                {
+                    codigo: '00001',
+                    nome: 'João Silva',
+                    email: 'joao@email.com',
+                    telefone: '(11) 99999-9999',
+                    cargo: 'Desenvolvedor',
+                    data_admissao: '2024-01-01',
+                    status: 'ativo'
+                },
+                {
+                    codigo: '00002',
+                    nome: 'Maria Santos',
+                    email: 'maria@email.com',
+                    telefone: '(11) 98888-8888',
+                    cargo: 'Designer',
+                    data_admissao: '2024-01-15',
+                    status: 'ativo'
+                }
+            ];
+
+            tbody.innerHTML = colaboradores.map(colaborador => `
+                <tr>
+                    <td>${colaborador.codigo}</td>
+                    <td>${colaborador.nome}</td>
+                    <td>${colaborador.email}</td>
+                    <td>${colaborador.telefone}</td>
+                    <td>${colaborador.cargo}</td>
+                    <td>${new Date(colaborador.data_admissao).toLocaleDateString()}</td>
+                    <td><span class="status ${colaborador.status}">${colaborador.status}</span></td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="viewColaborador('${colaborador.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editColaborador('${colaborador.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteColaborador('${colaborador.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Carregar colaboradores quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarColaboradores);
 
         // Modal functions
         function openModal() {
