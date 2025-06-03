@@ -1,5 +1,5 @@
 // Configuração da API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gateway-egerente.vercel.app/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://e-gerente-backend-gateway.vercel.app/api';
 
 // Função para fazer requisições HTTP
 async function apiRequest(endpoint, options = {}) {
