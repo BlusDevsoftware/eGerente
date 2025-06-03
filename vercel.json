@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/Paginas_HTML/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/Paginas_HTML/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/Paginas_HTML/index.html"
+    }
+  ]
+} 
