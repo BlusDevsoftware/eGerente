@@ -82,4 +82,30 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.addEventListener('submit', addUser);
     }
+
+    // Adicionar event listeners para os submenus
+    const submenuTriggers = document.querySelectorAll('.submenu-trigger');
+    
+    submenuTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const submenu = this.nextElementSibling;
+            const icon = this.querySelector('.submenu-icon');
+            
+            // Toggle do submenu
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+            
+            // Rotacionar o ícone
+            icon.style.transform = submenu.style.display === 'block' ? 'rotate(180deg)' : 'rotate(0)';
+        });
+    });
+
+    // Expandir o submenu ativo
+    const activeSubmenu = document.querySelector('.submenu a.active').closest('.submenu');
+    if (activeSubmenu) {
+        activeSubmenu.style.display = 'block';
+        const trigger = activeSubmenu.previousElementSibling;
+        const icon = trigger.querySelector('.submenu-icon');
+        icon.style.transform = 'rotate(180deg)';
+    }
 }); 
