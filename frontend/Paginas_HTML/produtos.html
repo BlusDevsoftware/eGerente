@@ -163,111 +163,138 @@
     </div>
 
     <script src="../Paginas_JS/codigos.js"></script>
-    <script>
-        // Toggle submenu
-        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
-            trigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                this.parentElement.classList.toggle('active');
-            });
-        });
+    <script type="module">
+        import api from '../js/config/api.js';
 
-        // Função para carregar os produtos na tabela
-        function carregarProdutos() {
-            const tbody = document.querySelector('tbody');
-            // Aqui você faria uma chamada para a API para buscar os dados
-            // Por enquanto, vamos usar dados de exemplo
-            const produtos = [
-                {
-                    codigo: '00001',
-                    nome: 'Notebook Dell',
-                    preco: 3500.00,
-                    status: 'ativo'
-                },
-                {
-                    codigo: '00002',
-                    nome: 'Monitor LG 24"',
-                    preco: 899.90,
-                    status: 'ativo'
-                }
-            ];
+        // Função para carregar produtos
+        async function carregarProdutos() {
+            try {
+                const produtos = await api.get('/produtos');
+                const tbody = document.querySelector('#produtosTable tbody');
+                tbody.innerHTML = '';
 
-            tbody.innerHTML = produtos.map(produto => `
-                <tr>
-                    <td>${produto.codigo}</td>
-                    <td>${produto.nome}</td>
-                    <td>R$ ${produto.preco.toFixed(2)}</td>
-                    <td><span class="status ${produto.status}">${produto.status}</span></td>
-                    <td class="actions">
-                        <button class="action-btn view-btn" onclick="viewProduto('${produto.codigo}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="action-btn edit-btn" onclick="editProduto('${produto.codigo}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete-btn" onclick="deleteProduto('${produto.codigo}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Carregar produtos quando a página carregar
-        document.addEventListener('DOMContentLoaded', carregarProdutos);
-
-        // Modal functions
-        function openModal() {
-            // Gerar código sequencial
-            const codigoInput = document.getElementById('codigo');
-            const ultimoCodigo = localStorage.getItem('ultimoCodigoProduto') || '00000';
-            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
-            codigoInput.value = novoCodigo;
-            
-            document.getElementById('produtoModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('produtoModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('produtoModal');
-            if (event.target == modal) {
-                closeModal();
+                produtos.forEach(produto => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${produto.codigo}</td>
+                        <td>${produto.nome}</td>
+                        <td>${produto.categoria}</td>
+                        <td>R$ ${produto.preco.toFixed(2)}</td>
+                        <td>${produto.estoque}</td>
+                        <td>${produto.estoqueMinimo}</td>
+                        <td>${produto.fornecedor}</td>
+                        <td>
+                            <span class="badge ${produto.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
+                                ${produto.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editarProduto(${produto.codigo})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirProduto(${produto.codigo})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                alert('Erro ao carregar produtos');
             }
         }
 
-        // Função para salvar o produto
+        // Função para salvar produto
         async function salvarProduto(event) {
             event.preventDefault();
-            
-            const form = document.getElementById('produtoForm');
+            const form = event.target;
             const formData = new FormData(form);
-            
-            // Salvar o último código usado
-            const codigo = document.getElementById('codigo').value;
-            localStorage.setItem('ultimoCodigoProduto', codigo);
-            
-            // Enviando apenas os campos que o backend espera
             const produto = {
-                codigo: codigo,
                 nome: formData.get('nome'),
+                categoria: formData.get('categoria'),
                 preco: parseFloat(formData.get('preco')),
-                status: formData.get('status') || 'ativo'
+                estoque: parseInt(formData.get('estoque')),
+                estoqueMinimo: parseInt(formData.get('estoqueMinimo')),
+                fornecedor: formData.get('fornecedor'),
+                status: formData.get('status')
             };
-            
-            // Aqui você implementaria a lógica para enviar os dados para o backend
-            console.log('Salvando produto:', produto);
-            
-            // Limpar formulário e fechar modal
-            form.reset();
-            closeModal();
+
+            try {
+                if (form.dataset.codigo) {
+                    // Atualizar produto existente
+                    await api.put(`/produtos/${form.dataset.codigo}`, produto);
+                } else {
+                    // Criar novo produto
+                    await api.post('/produtos', produto);
+                }
+
+                // Fechar modal e recarregar lista
+                const modal = bootstrap.Modal.getInstance(document.getElementById('produtoModal'));
+                modal.hide();
+                carregarProdutos();
+            } catch (error) {
+                console.error('Erro ao salvar produto:', error);
+                alert('Erro ao salvar produto');
+            }
         }
 
-        // Adicionar event listener para o formulário
-        document.getElementById('produtoForm').addEventListener('submit', salvarProduto);
+        // Função para editar produto
+        async function editarProduto(codigo) {
+            try {
+                const produto = await api.get(`/produtos/${codigo}`);
+                const form = document.getElementById('produtoForm');
+                
+                // Preencher formulário
+                form.dataset.codigo = produto.codigo;
+                form.nome.value = produto.nome;
+                form.categoria.value = produto.categoria;
+                form.preco.value = produto.preco;
+                form.estoque.value = produto.estoque;
+                form.estoqueMinimo.value = produto.estoqueMinimo;
+                form.fornecedor.value = produto.fornecedor;
+                form.status.value = produto.status;
+
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById('produtoModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Erro ao carregar produto:', error);
+                alert('Erro ao carregar produto');
+            }
+        }
+
+        // Função para excluir produto
+        async function excluirProduto(codigo) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                return;
+            }
+
+            try {
+                await api.delete(`/produtos/${codigo}`);
+                carregarProdutos();
+            } catch (error) {
+                console.error('Erro ao excluir produto:', error);
+                alert('Erro ao excluir produto');
+            }
+        }
+
+        // Função para abrir modal de novo produto
+        function novoProduto() {
+            const form = document.getElementById('produtoForm');
+            form.reset();
+            delete form.dataset.codigo;
+            
+            const modal = new bootstrap.Modal(document.getElementById('produtoModal'));
+            modal.show();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarProdutos();
+            document.getElementById('produtoForm').addEventListener('submit', salvarProduto);
+        });
     </script>
 </body>
 </html> 
+

@@ -602,90 +602,129 @@
         </div>
     </div>
 
-    <script>
-        // Toggle submenu
-        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
-            trigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                this.parentElement.classList.toggle('active');
-            });
-        });
+    <script type="module">
+        import api from '../js/config/api.js';
 
-        // Modal functions
-        function openModal() {
-            // Gerar código sequencial
-            const codigoInput = document.getElementById('codigo');
-            const ultimoCodigo = localStorage.getItem('ultimoCodigoUsuario') || '00000';
-            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
-            codigoInput.value = novoCodigo;
-            
-            document.getElementById('usuarioModal').style.display = 'flex';
-        }
+        // Função para carregar usuários
+        async function carregarUsuarios() {
+            try {
+                const usuarios = await api.get('/usuarios');
+                const tbody = document.querySelector('#usuariosTable tbody');
+                tbody.innerHTML = '';
 
-        function closeModal() {
-            document.getElementById('usuarioModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('usuarioModal');
-            if (event.target == modal) {
-                closeModal();
+                usuarios.forEach(usuario => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${usuario.codigo}</td>
+                        <td>${usuario.nome}</td>
+                        <td>${usuario.email}</td>
+                        <td>${usuario.tipo}</td>
+                        <td>
+                            <span class="badge ${usuario.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
+                                ${usuario.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editarUsuario(${usuario.codigo})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirUsuario(${usuario.codigo})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                alert('Erro ao carregar usuários');
             }
         }
 
-        // Toast notification system
-        function showToast(message, type = 'success') {
-            const container = document.querySelector('.toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            let icon = '';
-            switch(type) {
-                case 'success':
-                    icon = 'check-circle';
-                    break;
-                case 'error':
-                    icon = 'times-circle';
-                    break;
-                case 'warning':
-                    icon = 'exclamation-circle';
-                    break;
-            }
-            
-            toast.innerHTML = `
-                <i class="fas fa-${icon} icon"></i>
-                <span class="message">${message}</span>
-                <span class="close-toast">&times;</span>
-            `;
-            
-            container.appendChild(toast);
-            
-            // Close button functionality
-            toast.querySelector('.close-toast').addEventListener('click', () => {
-                toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
-                setTimeout(() => toast.remove(), 300);
-            });
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
-                    setTimeout(() => toast.remove(), 300);
+        // Função para salvar usuário
+        async function salvarUsuario(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const usuario = {
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                senha: formData.get('senha'),
+                tipo: formData.get('tipo'),
+                status: formData.get('status')
+            };
+
+            try {
+                if (form.dataset.codigo) {
+                    // Atualizar usuário existente
+                    await api.put(`/usuarios/${form.dataset.codigo}`, usuario);
+                } else {
+                    // Criar novo usuário
+                    await api.post('/usuarios', usuario);
                 }
-            }, 5000);
+
+                // Fechar modal e recarregar lista
+                const modal = bootstrap.Modal.getInstance(document.getElementById('usuarioModal'));
+                modal.hide();
+                carregarUsuarios();
+            } catch (error) {
+                console.error('Erro ao salvar usuário:', error);
+                alert('Erro ao salvar usuário');
+            }
         }
 
-        // Form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Função para editar usuário
+        async function editarUsuario(codigo) {
+            try {
+                const usuario = await api.get(`/usuarios/${codigo}`);
+                const form = document.getElementById('usuarioForm');
+                
+                // Preencher formulário
+                form.dataset.codigo = usuario.codigo;
+                form.nome.value = usuario.nome;
+                form.email.value = usuario.email;
+                form.senha.value = ''; // Limpar senha
+                form.tipo.value = usuario.tipo;
+                form.status.value = usuario.status;
+
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById('usuarioModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Erro ao carregar usuário:', error);
+                alert('Erro ao carregar usuário');
+            }
+        }
+
+        // Função para excluir usuário
+        async function excluirUsuario(codigo) {
+            if (!confirm('Tem certeza que deseja excluir este usuário?')) {
+                return;
+            }
+
+            try {
+                await api.delete(`/usuarios/${codigo}`);
+                carregarUsuarios();
+            } catch (error) {
+                console.error('Erro ao excluir usuário:', error);
+                alert('Erro ao excluir usuário');
+            }
+        }
+
+        // Função para abrir modal de novo usuário
+        function novoUsuario() {
+            const form = document.getElementById('usuarioForm');
+            form.reset();
+            delete form.dataset.codigo;
             
-            // Salvar o último código usado
-            const codigo = document.getElementById('codigo').value;
-            localStorage.setItem('ultimoCodigoUsuario', codigo);
-            
-            showToast('Usuário cadastrado com sucesso!', 'success');
-            closeModal();
+            const modal = new bootstrap.Modal(document.getElementById('usuarioModal'));
+            modal.show();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarUsuarios();
+            document.getElementById('usuarioForm').addEventListener('submit', salvarUsuario);
         });
     </script>
 </body>

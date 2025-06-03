@@ -1,20 +1,20 @@
 # eGerente Gateway API
 
-Gateway API para o sistema eGerente, integrando com o Supabase.
+Gateway API para o sistema eGerente, responsável por gerenciar as requisições entre o frontend e o banco de dados Supabase.
 
 ## Requisitos
 
-- Node.js 14+
+- Node.js 18 ou superior
 - Conta no Supabase
-- PostgreSQL (gerenciado pelo Supabase)
+- PostgreSQL
 
 ## Instalação
 
 1. Clone o repositório
 2. Instale as dependências:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 3. Configure as variáveis de ambiente:
    - Copie o arquivo `.env.example` para `.env`
    - Preencha as variáveis com suas credenciais do Supabase
@@ -22,99 +22,121 @@ Gateway API para o sistema eGerente, integrando com o Supabase.
 ## Configuração do Supabase
 
 1. Crie um novo projeto no Supabase
-2. Crie as seguintes tabelas:
+2. Execute os seguintes comandos SQL para criar as tabelas necessárias:
 
-### Usuários
 ```sql
-create table usuarios (
-  id uuid default uuid_generate_v4() primary key,
-  codigo varchar(5) unique not null,
-  nome varchar(100) not null,
-  email varchar(100) unique not null,
-  senha varchar(100) not null,
-  nivel varchar(20) not null,
-  status varchar(20) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tabela de usuários
+CREATE TABLE usuarios (
+    codigo SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(100) NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
-```
 
-### Colaboradores
-```sql
-create table colaboradores (
-  id uuid default uuid_generate_v4() primary key,
-  codigo varchar(5) unique not null,
-  nome varchar(100) not null,
-  email varchar(100) unique not null,
-  telefone varchar(20),
-  cargo varchar(50) not null,
-  status varchar(20) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tabela de colaboradores
+CREATE TABLE colaboradores (
+    codigo SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    telefone VARCHAR(20),
+    cargo VARCHAR(50) NOT NULL,
+    departamento VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
-```
 
-### Clientes
-```sql
-create table clientes (
-  id uuid default uuid_generate_v4() primary key,
-  codigo varchar(5) unique not null,
-  nome varchar(100) not null,
-  tipo varchar(2) not null,
-  email varchar(100),
-  telefone varchar(20),
-  status varchar(20) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tabela de clientes
+CREATE TABLE clientes (
+    codigo SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo VARCHAR(2) NOT NULL,
+    email VARCHAR(100),
+    telefone VARCHAR(20),
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
-```
 
-### Produtos
-```sql
-create table produtos (
-  id uuid default uuid_generate_v4() primary key,
-  codigo varchar(5) unique not null,
-  nome varchar(100) not null,
-  preco decimal(10,2) not null,
-  status varchar(20) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tabela de produtos
+CREATE TABLE produtos (
+    codigo SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    estoque INTEGER NOT NULL,
+    estoqueMinimo INTEGER NOT NULL,
+    fornecedor VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
-```
 
-### Serviços
-```sql
-create table servicos (
-  id uuid default uuid_generate_v4() primary key,
-  codigo varchar(5) unique not null,
-  nome varchar(100) not null,
-  preco decimal(10,2) not null,
-  duracao varchar(20) not null,
-  status varchar(20) not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tabela de serviços
+CREATE TABLE servicos (
+    codigo SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    duracao INTEGER NOT NULL,
+    responsavel VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 ```
 
 ## Executando o projeto
 
-1. Em desenvolvimento:
-   ```bash
-   npm run dev
-   ```
+### Desenvolvimento
+```bash
+npm run dev
+```
 
-2. Em produção:
-   ```bash
-   npm start
-   ```
+### Produção
+```bash
+npm start
+```
 
 ## Endpoints
 
 ### Usuários
-- GET /api/usuarios - Lista todos os usuários
-- GET /api/usuarios/:codigo - Busca um usuário pelo código
-- POST /api/usuarios - Cria um novo usuário
-- PUT /api/usuarios/:codigo - Atualiza um usuário
-- DELETE /api/usuarios/:codigo - Exclui um usuário
+- `GET /api/usuarios` - Lista todos os usuários
+- `GET /api/usuarios/:codigo` - Busca um usuário pelo código
+- `POST /api/usuarios` - Cria um novo usuário
+- `PUT /api/usuarios/:codigo` - Atualiza um usuário
+- `DELETE /api/usuarios/:codigo` - Exclui um usuário
+
+### Colaboradores
+- `GET /api/colaboradores` - Lista todos os colaboradores
+- `GET /api/colaboradores/:codigo` - Busca um colaborador pelo código
+- `POST /api/colaboradores` - Cria um novo colaborador
+- `PUT /api/colaboradores/:codigo` - Atualiza um colaborador
+- `DELETE /api/colaboradores/:codigo` - Exclui um colaborador
+
+### Clientes
+- `GET /api/clientes` - Lista todos os clientes
+- `GET /api/clientes/:codigo` - Busca um cliente pelo código
+- `POST /api/clientes` - Cria um novo cliente
+- `PUT /api/clientes/:codigo` - Atualiza um cliente
+- `DELETE /api/clientes/:codigo` - Exclui um cliente
+
+### Produtos
+- `GET /api/produtos` - Lista todos os produtos
+- `GET /api/produtos/:codigo` - Busca um produto pelo código
+- `POST /api/produtos` - Cria um novo produto
+- `PUT /api/produtos/:codigo` - Atualiza um produto
+- `DELETE /api/produtos/:codigo` - Exclui um produto
+
+### Serviços
+- `GET /api/servicos` - Lista todos os serviços
+- `GET /api/servicos/:codigo` - Busca um serviço pelo código
+- `POST /api/servicos` - Cria um novo serviço
+- `PUT /api/servicos/:codigo` - Atualiza um serviço
+- `DELETE /api/servicos/:codigo` - Exclui um serviço
 
 ## Segurança
 
 - CORS habilitado
-- Rate limiting
-- Helmet para headers de segurança
-- Autenticação via Supabase (a ser implementada) 
+- Rate limiting (100 requisições por IP a cada 15 minutos)
+- Helmet para segurança HTTP
+- Autenticação via Supabase 

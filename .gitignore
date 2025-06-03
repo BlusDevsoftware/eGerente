@@ -3,6 +3,8 @@ node_modules/
 
 # Ambiente
 .env
+.env.local
+.env.*.local
 
 # Logs
 logs
@@ -17,4 +19,8 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
-*.swo 
+*.swo
+
+# Build
+dist/
+build/ 

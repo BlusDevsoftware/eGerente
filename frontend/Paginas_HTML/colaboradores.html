@@ -429,122 +429,134 @@
     <div class="toast-container"></div>
 
     <script src="../Paginas_JS/codigos.js"></script>
-    <script>
-        // Toggle submenu
-        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
-            trigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                this.parentElement.classList.toggle('active');
-            });
-        });
+    <script type="module">
+        import api from '../js/config/api.js';
 
-        // Função para carregar os colaboradores na tabela
-        function carregarColaboradores() {
-            const tbody = document.querySelector('tbody');
-            // Aqui você faria uma chamada para a API para buscar os dados
-            // Por enquanto, vamos usar dados de exemplo
-            const colaboradores = [
-                {
-                    codigo: '00001',
-                    nome: 'João Silva',
-                    email: 'joao@email.com',
-                    telefone: '(11) 99999-9999',
-                    cargo: 'Desenvolvedor',
-                    data_admissao: '2024-01-01',
-                    status: 'ativo'
-                },
-                {
-                    codigo: '00002',
-                    nome: 'Maria Santos',
-                    email: 'maria@email.com',
-                    telefone: '(11) 98888-8888',
-                    cargo: 'Designer',
-                    data_admissao: '2024-01-15',
-                    status: 'ativo'
-                }
-            ];
+        // Função para carregar colaboradores
+        async function carregarColaboradores() {
+            try {
+                const colaboradores = await api.get('/colaboradores');
+                const tbody = document.querySelector('#colaboradoresTable tbody');
+                tbody.innerHTML = '';
 
-            tbody.innerHTML = colaboradores.map(colaborador => `
-                <tr>
-                    <td>${colaborador.codigo}</td>
-                    <td>${colaborador.nome}</td>
-                    <td>${colaborador.email}</td>
-                    <td>${colaborador.telefone}</td>
-                    <td>${colaborador.cargo}</td>
-                    <td>${new Date(colaborador.data_admissao).toLocaleDateString()}</td>
-                    <td><span class="status ${colaborador.status}">${colaborador.status}</span></td>
-                    <td class="actions">
-                        <button class="action-btn view-btn" onclick="viewColaborador('${colaborador.codigo}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="action-btn edit-btn" onclick="editColaborador('${colaborador.codigo}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete-btn" onclick="deleteColaborador('${colaborador.codigo}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Carregar colaboradores quando a página carregar
-        document.addEventListener('DOMContentLoaded', carregarColaboradores);
-
-        // Modal functions
-        function openModal() {
-            // Gerar código sequencial
-            const codigoInput = document.getElementById('codigo');
-            const ultimoCodigo = localStorage.getItem('ultimoCodigoColaborador') || '00000';
-            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
-            codigoInput.value = novoCodigo;
-            
-            document.getElementById('colaboradorModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('colaboradorModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('colaboradorModal');
-            if (event.target == modal) {
-                closeModal();
+                colaboradores.forEach(colaborador => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${colaborador.codigo}</td>
+                        <td>${colaborador.nome}</td>
+                        <td>${colaborador.email}</td>
+                        <td>${colaborador.telefone}</td>
+                        <td>${colaborador.cargo}</td>
+                        <td>${colaborador.departamento}</td>
+                        <td>
+                            <span class="badge ${colaborador.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
+                                ${colaborador.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="editarColaborador(${colaborador.codigo})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirColaborador(${colaborador.codigo})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar colaboradores:', error);
+                alert('Erro ao carregar colaboradores');
             }
         }
 
-        // Função para salvar o colaborador
+        // Função para salvar colaborador
         async function salvarColaborador(event) {
             event.preventDefault();
-            
-            const form = document.getElementById('colaboradorForm');
+            const form = event.target;
             const formData = new FormData(form);
-            
-            // Salvar o último código usado
-            const codigo = document.getElementById('codigo').value;
-            localStorage.setItem('ultimoCodigoColaborador', codigo);
-            
-            // Enviando apenas os campos que o backend espera
             const colaborador = {
-                codigo: codigo,
                 nome: formData.get('nome'),
-                email: formData.get('email') || null,
-                telefone: formData.get('telefone') || null,
-                cargo: formData.get('cargo') || null,
-                status: formData.get('status') || 'ativo'
+                email: formData.get('email'),
+                telefone: formData.get('telefone'),
+                cargo: formData.get('cargo'),
+                departamento: formData.get('departamento'),
+                status: formData.get('status')
             };
-            
-            // Aqui você implementaria a lógica para enviar os dados para o backend
-            console.log('Salvando colaborador:', colaborador);
-            
-            // Limpar formulário e fechar modal
-            form.reset();
-            closeModal();
+
+            try {
+                if (form.dataset.codigo) {
+                    // Atualizar colaborador existente
+                    await api.put(`/colaboradores/${form.dataset.codigo}`, colaborador);
+                } else {
+                    // Criar novo colaborador
+                    await api.post('/colaboradores', colaborador);
+                }
+
+                // Fechar modal e recarregar lista
+                const modal = bootstrap.Modal.getInstance(document.getElementById('colaboradorModal'));
+                modal.hide();
+                carregarColaboradores();
+            } catch (error) {
+                console.error('Erro ao salvar colaborador:', error);
+                alert('Erro ao salvar colaborador');
+            }
         }
 
-        // Adicionar event listener para o formulário
-        document.getElementById('colaboradorForm').addEventListener('submit', salvarColaborador);
+        // Função para editar colaborador
+        async function editarColaborador(codigo) {
+            try {
+                const colaborador = await api.get(`/colaboradores/${codigo}`);
+                const form = document.getElementById('colaboradorForm');
+                
+                // Preencher formulário
+                form.dataset.codigo = colaborador.codigo;
+                form.nome.value = colaborador.nome;
+                form.email.value = colaborador.email;
+                form.telefone.value = colaborador.telefone;
+                form.cargo.value = colaborador.cargo;
+                form.departamento.value = colaborador.departamento;
+                form.status.value = colaborador.status;
+
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById('colaboradorModal'));
+                modal.show();
+            } catch (error) {
+                console.error('Erro ao carregar colaborador:', error);
+                alert('Erro ao carregar colaborador');
+            }
+        }
+
+        // Função para excluir colaborador
+        async function excluirColaborador(codigo) {
+            if (!confirm('Tem certeza que deseja excluir este colaborador?')) {
+                return;
+            }
+
+            try {
+                await api.delete(`/colaboradores/${codigo}`);
+                carregarColaboradores();
+            } catch (error) {
+                console.error('Erro ao excluir colaborador:', error);
+                alert('Erro ao excluir colaborador');
+            }
+        }
+
+        // Função para abrir modal de novo colaborador
+        function novoColaborador() {
+            const form = document.getElementById('colaboradorForm');
+            form.reset();
+            delete form.dataset.codigo;
+            
+            const modal = new bootstrap.Modal(document.getElementById('colaboradorModal'));
+            modal.show();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarColaboradores();
+            document.getElementById('colaboradorForm').addEventListener('submit', salvarColaborador);
+        });
     </script>
 </body>
 </html> 
