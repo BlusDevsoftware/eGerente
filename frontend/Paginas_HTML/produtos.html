@@ -107,6 +107,8 @@
                         <th>Categoria</th>
                         <th>Preço</th>
                         <th>Estoque</th>
+                        <th>Estoque Mínimo</th>
+                        <th>Fornecedor</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -118,6 +120,8 @@
                         <td>Eletrônicos</td>
                         <td>R$ 1.999,00</td>
                         <td>15</td>
+                        <td>5</td>
+                        <td>Dell Computadores</td>
                         <td><span class="status active">Ativo</span></td>
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
@@ -131,6 +135,8 @@
                         <td>Eletrônicos</td>
                         <td>R$ 3.499,00</td>
                         <td>8</td>
+                        <td>3</td>
+                        <td>Dell Computadores</td>
                         <td><span class="status inactive">Inativo</span></td>
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
@@ -223,13 +229,75 @@
             });
         });
 
+        // Função para carregar os produtos na tabela
+        function carregarProdutos() {
+            const tbody = document.querySelector('tbody');
+            // Aqui você faria uma chamada para a API para buscar os dados
+            // Por enquanto, vamos usar dados de exemplo
+            const produtos = [
+                {
+                    codigo: '00001',
+                    nome: 'Notebook Dell',
+                    categoria: 'Eletrônicos',
+                    preco: 3500.00,
+                    estoque: 10,
+                    estoqueMinimo: 5,
+                    fornecedor: 'Dell Computadores',
+                    status: 'ativo'
+                },
+                {
+                    codigo: '00002',
+                    nome: 'Monitor LG 24"',
+                    categoria: 'Eletrônicos',
+                    preco: 899.90,
+                    estoque: 15,
+                    estoqueMinimo: 3,
+                    fornecedor: 'LG Electronics',
+                    status: 'ativo'
+                }
+            ];
+
+            tbody.innerHTML = produtos.map(produto => `
+                <tr>
+                    <td>${produto.codigo}</td>
+                    <td>${produto.nome}</td>
+                    <td>${produto.categoria}</td>
+                    <td>R$ ${produto.preco.toFixed(2)}</td>
+                    <td>${produto.estoque}</td>
+                    <td>${produto.estoqueMinimo}</td>
+                    <td>${produto.fornecedor}</td>
+                    <td><span class="status ${produto.status}">${produto.status}</span></td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="viewProduto('${produto.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editProduto('${produto.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteProduto('${produto.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Carregar produtos quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarProdutos);
+
         // Modal functions
         function openModal() {
-            window.openModal('produto');
+            // Gerar código sequencial
+            const codigoInput = document.getElementById('codigo');
+            const ultimoCodigo = localStorage.getItem('ultimoCodigoProduto') || '00000';
+            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
+            codigoInput.value = novoCodigo;
+            
+            document.getElementById('produtoModal').style.display = 'flex';
         }
 
         function closeModal() {
-            window.closeModal('produto');
+            document.getElementById('produtoModal').style.display = 'none';
         }
 
         // Close modal when clicking outside
@@ -249,14 +317,17 @@
             
             // Salvar o último código usado
             const codigo = document.getElementById('codigo').value;
-            window.salvarUltimoCodigo('produto', codigo);
+            localStorage.setItem('ultimoCodigoProduto', codigo);
             
             // Enviando apenas os campos que o backend espera
             const produto = {
                 codigo: codigo,
                 nome: formData.get('nome'),
-                descricao: formData.get('descricao') || null,
-                preco: formData.get('preco') || null,
+                categoria: formData.get('categoria'),
+                preco: parseFloat(formData.get('preco')),
+                estoque: parseInt(formData.get('estoque')),
+                estoqueMinimo: parseInt(formData.get('estoqueMinimo')),
+                fornecedor: formData.get('fornecedor'),
                 status: formData.get('status') || 'ativo'
             };
             
