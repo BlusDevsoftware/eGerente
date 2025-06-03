@@ -4,9 +4,9 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'API de Autenticação BluePay',
+            title: 'API de Autenticação e-Gerente',
             version: '1.0.0',
-            description: 'Documentação da API de autenticação do sistema BluePay',
+            description: 'Documentação da API de autenticação do sistema e-Gerente',
         },
         servers: [
             {

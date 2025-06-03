@@ -1,7 +1,7 @@
 {
   "name": "auth-api-bluepay",
   "version": "1.0.0",
-  "description": "API de autenticação para o sistema BluePay",
+  "description": "API de autenticação para o sistema e-Gerente",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
