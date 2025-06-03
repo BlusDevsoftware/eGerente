@@ -195,11 +195,17 @@
 
         // Modal functions
         function openModal() {
-            window.openModal('cliente');
+            // Gerar código sequencial
+            const codigoInput = document.getElementById('codigo');
+            const ultimoCodigo = localStorage.getItem('ultimoCodigoCliente') || '00000';
+            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
+            codigoInput.value = novoCodigo;
+            
+            document.getElementById('clienteModal').style.display = 'flex';
         }
 
         function closeModal() {
-            window.closeModal('cliente');
+            document.getElementById('clienteModal').style.display = 'none';
         }
 
         // Close modal when clicking outside
@@ -238,7 +244,7 @@
             
             // Salvar o último código usado
             const codigo = document.getElementById('codigo').value;
-            window.salvarUltimoCodigo('cliente', codigo);
+            localStorage.setItem('ultimoCodigoCliente', codigo);
             
             // Enviando apenas os campos que o backend espera
             const cliente = {
