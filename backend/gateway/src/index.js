@@ -4,6 +4,10 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const cors = require('cors');
 const usuarioRoutes = require('./routes/usuarioRoutes');
+const colaboradorRoutes = require('./routes/colaboradorRoutes');
+const clienteRoutes = require('./routes/clienteRoutes');
+const produtoRoutes = require('./routes/produtoRoutes');
+const servicoRoutes = require('./routes/servicoRoutes');
 
 const app = express();
 
@@ -19,8 +23,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Rotas de usuários
+// Rotas
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/colaboradores', colaboradorRoutes);
+app.use('/api/clientes', clienteRoutes);
+app.use('/api/produtos', produtoRoutes);
+app.use('/api/servicos', servicoRoutes);
 
 // Configuração dos serviços
 const services = {
@@ -66,5 +74,5 @@ app.get('/health', (req, res) => {
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Gateway API rodando na porta ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 }); 
