@@ -102,6 +102,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Código</th>
                         <th>Nome/Razão Social</th>
                         <th>Tipo</th>
                         <th>Email</th>
@@ -192,6 +193,56 @@
                 this.parentElement.classList.toggle('active');
             });
         });
+
+        // Função para carregar os clientes na tabela
+        function carregarClientes() {
+            const tbody = document.querySelector('tbody');
+            // Aqui você faria uma chamada para a API para buscar os dados
+            // Por enquanto, vamos usar dados de exemplo
+            const clientes = [
+                {
+                    codigo: '00001',
+                    nome: 'João Silva',
+                    tipo: 'PF',
+                    email: 'joao@email.com',
+                    telefone: '(11) 99999-9999',
+                    status: 'ativo'
+                },
+                {
+                    codigo: '00002',
+                    nome: 'Empresa XYZ Ltda',
+                    tipo: 'PJ',
+                    email: 'contato@xyz.com',
+                    telefone: '(11) 3333-3333',
+                    status: 'ativo'
+                }
+            ];
+
+            tbody.innerHTML = clientes.map(cliente => `
+                <tr>
+                    <td>${cliente.codigo}</td>
+                    <td>${cliente.nome}</td>
+                    <td>${cliente.tipo}</td>
+                    <td>${cliente.email}</td>
+                    <td>${cliente.telefone}</td>
+                    <td><span class="status ${cliente.status}">${cliente.status}</span></td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="viewCliente('${cliente.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editCliente('${cliente.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteCliente('${cliente.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Carregar clientes quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarClientes);
 
         // Modal functions
         function openModal() {
