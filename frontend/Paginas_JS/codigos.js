@@ -16,13 +16,19 @@ function openModal(tipo) {
         codigoInput.value = gerarCodigo(tipo);
     }
     
-    modal.style.display = 'flex';
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error(`Modal ${tipo}Modal não encontrado`);
+    }
 }
 
 // Função para fechar modal
 function closeModal(tipo) {
     const modal = document.getElementById(`${tipo}Modal`);
-    modal.style.display = 'none';
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Função para salvar o último código usado
