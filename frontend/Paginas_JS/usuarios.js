@@ -1,6 +1,13 @@
 // Funções para gerenciar o modal
 function openModal() {
     const modal = document.getElementById('userModal');
+    
+    // Gerar código sequencial
+    const codigoInput = document.getElementById('codigo');
+    const ultimoCodigo = localStorage.getItem('ultimoCodigoUsuario') || '00000';
+    const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
+    codigoInput.value = novoCodigo;
+    
     modal.style.display = 'flex';
 }
 
@@ -22,6 +29,10 @@ function addUser(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+    
+    // Salvar o último código usado
+    const codigo = document.getElementById('codigo').value;
+    localStorage.setItem('ultimoCodigoUsuario', codigo);
     
     // Aqui você implementaria a lógica para enviar os dados para o backend
     console.log('Adicionando usuário:', Object.fromEntries(formData));
@@ -58,11 +69,12 @@ function filterUsers() {
     const rows = document.querySelectorAll('tbody tr');
     
     rows.forEach(row => {
-        const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-        const status = row.querySelector('td:nth-child(4)').textContent;
+        const codigo = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
         const level = row.querySelector('td:nth-child(3)').textContent;
+        const status = row.querySelector('td:nth-child(4)').textContent;
         
-        const matchesSearch = name.includes(searchTerm);
+        const matchesSearch = codigo.includes(searchTerm) || name.includes(searchTerm);
         const matchesStatus = statusFilter === 'all' || status === statusFilter;
         const matchesLevel = levelFilter === 'all' || level === levelFilter;
         
