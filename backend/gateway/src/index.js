@@ -3,12 +3,14 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const cors = require('cors');
+const usuarioRoutes = require('./routes/usuarioRoutes');
 
 const app = express();
 
 // Configurações de segurança
 app.use(helmet());
 app.use(cors());
+app.use(express.json());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -17,12 +19,11 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Rotas de usuários
+app.use('/api/usuarios', usuarioRoutes);
+
 // Configuração dos serviços
 const services = {
-    auth: {
-        url: process.env.AUTH_API_URL || 'https://auth-api-bluepay.vercel.app',
-        path: '/api/auth'
-    },
     clientes: {
         url: process.env.CLIENTES_API_URL || 'https://clientes-api-bluepay.vercel.app',
         path: '/api/clientes'
