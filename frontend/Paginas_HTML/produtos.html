@@ -104,46 +104,13 @@
                     <tr>
                         <th>Código</th>
                         <th>Nome</th>
-                        <th>Categoria</th>
                         <th>Preço</th>
-                        <th>Estoque</th>
-                        <th>Estoque Mínimo</th>
-                        <th>Fornecedor</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>001</td>
-                        <td>Smartphone XYZ</td>
-                        <td>Eletrônicos</td>
-                        <td>R$ 1.999,00</td>
-                        <td>15</td>
-                        <td>5</td>
-                        <td>Dell Computadores</td>
-                        <td><span class="status active">Ativo</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>002</td>
-                        <td>Notebook ABC</td>
-                        <td>Eletrônicos</td>
-                        <td>R$ 3.499,00</td>
-                        <td>8</td>
-                        <td>3</td>
-                        <td>Dell Computadores</td>
-                        <td><span class="status inactive">Inativo</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
+                    <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -170,33 +137,8 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="categoria" required>
-                                <option value="">Selecione...</option>
-                                <option value="eletronicos">Eletrônicos</option>
-                                <option value="roupas">Roupas</option>
-                                <option value="alimentos">Alimentos</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label>Preço</label>
                             <input type="number" step="0.01" min="0" id="preco" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Estoque</label>
-                            <input type="number" min="0" id="estoque" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Estoque Mínimo</label>
-                            <input type="number" min="0" id="estoqueMinimo" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Fornecedor</label>
-                            <input type="text" id="fornecedor">
                         </div>
                         <div class="form-group">
                             <label>Status</label>
@@ -238,21 +180,13 @@
                 {
                     codigo: '00001',
                     nome: 'Notebook Dell',
-                    categoria: 'Eletrônicos',
                     preco: 3500.00,
-                    estoque: 10,
-                    estoqueMinimo: 5,
-                    fornecedor: 'Dell Computadores',
                     status: 'ativo'
                 },
                 {
                     codigo: '00002',
                     nome: 'Monitor LG 24"',
-                    categoria: 'Eletrônicos',
                     preco: 899.90,
-                    estoque: 15,
-                    estoqueMinimo: 3,
-                    fornecedor: 'LG Electronics',
                     status: 'ativo'
                 }
             ];
@@ -261,11 +195,7 @@
                 <tr>
                     <td>${produto.codigo}</td>
                     <td>${produto.nome}</td>
-                    <td>${produto.categoria}</td>
                     <td>R$ ${produto.preco.toFixed(2)}</td>
-                    <td>${produto.estoque}</td>
-                    <td>${produto.estoqueMinimo}</td>
-                    <td>${produto.fornecedor}</td>
                     <td><span class="status ${produto.status}">${produto.status}</span></td>
                     <td class="actions">
                         <button class="action-btn view-btn" onclick="viewProduto('${produto.codigo}')">
@@ -323,11 +253,7 @@
             const produto = {
                 codigo: codigo,
                 nome: formData.get('nome'),
-                categoria: formData.get('categoria'),
                 preco: parseFloat(formData.get('preco')),
-                estoque: parseInt(formData.get('estoque')),
-                estoqueMinimo: parseInt(formData.get('estoqueMinimo')),
-                fornecedor: formData.get('fornecedor'),
                 status: formData.get('status') || 'ativo'
             };
             
