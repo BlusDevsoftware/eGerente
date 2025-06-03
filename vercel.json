@@ -4,9 +4,25 @@
     {
       "src": "frontend/Paginas_HTML/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/Imagens/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/Paginas_CSS/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/Imagens/(.*)",
+      "dest": "/frontend/Imagens/$1"
+    },
+    {
+      "src": "/Paginas_CSS/(.*)",
+      "dest": "/frontend/Paginas_CSS/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/frontend/Paginas_HTML/$1"
