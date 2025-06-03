@@ -193,7 +193,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 12px;
-    background-color: #dc3545;
+    background-color: #ff6b00;
     color: white;
     text-decoration: none;
     border-radius: 10px;
@@ -201,7 +201,8 @@ body {
 }
 
 .logout-button a:hover {
-    background-color: #c82333;
+    background-color: #e05e00;
+    color: white;
 }
 
 .logout-button i {
