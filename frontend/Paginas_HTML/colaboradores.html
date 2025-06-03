@@ -266,7 +266,7 @@
                     <option value="inativo">Inativo</option>
                 </select>
             </div>
-            <button class="btn-primary" onclick="window.openModal('colaborador')">
+            <button class="btn-primary" onclick="openModal()">
                 <i class="fas fa-plus"></i>
                 Novo Colaborador
             </button>
@@ -439,11 +439,17 @@
 
         // Modal functions
         function openModal() {
-            window.openModal('colaborador');
+            // Gerar código sequencial
+            const codigoInput = document.getElementById('codigo');
+            const ultimoCodigo = localStorage.getItem('ultimoCodigoColaborador') || '00000';
+            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
+            codigoInput.value = novoCodigo;
+            
+            document.getElementById('colaboradorModal').style.display = 'flex';
         }
 
         function closeModal() {
-            window.closeModal('colaborador');
+            document.getElementById('colaboradorModal').style.display = 'none';
         }
 
         // Close modal when clicking outside
@@ -463,7 +469,7 @@
             
             // Salvar o último código usado
             const codigo = document.getElementById('codigo').value;
-            window.salvarUltimoCodigo('colaborador', codigo);
+            localStorage.setItem('ultimoCodigoColaborador', codigo);
             
             // Enviando apenas os campos que o backend espera
             const colaborador = {
