@@ -1,26 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const {
-    listarColaboradores,
-    buscarColaborador,
-    criarColaborador,
-    atualizarColaborador,
-    excluirColaborador
-} = require('../controllers/colaboradorController');
+const colaboradorController = require('../controllers/colaboradorController');
 
 // Listar todos os colaboradores
-router.get('/', listarColaboradores);
+router.get('/colaboradores', colaboradorController.listarColaboradores);
 
 // Buscar colaborador por código
-router.get('/:codigo', buscarColaborador);
+router.get('/colaboradores/:codigo', colaboradorController.buscarColaborador);
 
 // Criar novo colaborador
-router.post('/', criarColaborador);
+router.post('/colaboradores', colaboradorController.criarColaborador);
 
 // Atualizar colaborador
-router.put('/:codigo', atualizarColaborador);
+router.put('/colaboradores/:codigo', colaboradorController.atualizarColaborador);
 
 // Excluir colaborador
-router.delete('/:codigo', excluirColaborador);
+router.delete('/colaboradores/:codigo', colaboradorController.excluirColaborador);
 
 module.exports = router; 

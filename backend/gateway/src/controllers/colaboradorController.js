@@ -5,7 +5,7 @@ const listarColaboradores = async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('colaboradores')
-            .select('*, usuarios(*)')
+            .select('*')
             .order('codigo', { ascending: true });
 
         if (error) throw error;
@@ -23,7 +23,7 @@ const buscarColaborador = async (req, res) => {
         const { codigo } = req.params;
         const { data, error } = await supabase
             .from('colaboradores')
-            .select('*, usuarios(*)')
+            .select('*')
             .eq('codigo', codigo)
             .single();
 
@@ -42,45 +42,39 @@ const buscarColaborador = async (req, res) => {
 // Criar novo colaborador
 const criarColaborador = async (req, res) => {
     try {
-        const { nome, email, telefone, cargo, departamento, status, senha } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, usuario_vinculado } = req.body;
 
-        // Primeiro, criar o usuário
-        const { data: usuarioData, error: usuarioError } = await supabase
-            .from('usuarios')
-            .insert([
-                {
-                    nome,
-                    email,
-                    senha, // TODO: Implementar hash da senha
-                    tipo: 'colaborador',
-                    status
-                }
-            ])
-            .select()
-            .single();
+        // Gerar código único
+        const { data: ultimoColaborador } = await supabase
+            .from('colaboradores')
+            .select('codigo')
+            .order('codigo', { ascending: false })
+            .limit(1);
 
-        if (usuarioError) throw usuarioError;
+        const novoCodigo = ultimoColaborador && ultimoColaborador.length > 0 
+            ? ultimoColaborador[0].codigo + 1 
+            : 1;
 
-        // Depois, criar o colaborador
-        const { data: colaboradorData, error: colaboradorError } = await supabase
+        const { data, error } = await supabase
             .from('colaboradores')
             .insert([
                 {
-                    usuario_id: usuarioData.codigo,
+                    codigo: novoCodigo,
                     nome,
                     email,
                     telefone,
                     cargo,
-                    departamento,
-                    status
+                    data_admissao,
+                    status,
+                    usuario_vinculado
                 }
             ])
             .select()
             .single();
 
-        if (colaboradorError) throw colaboradorError;
+        if (error) throw error;
 
-        res.status(201).json(colaboradorData);
+        res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar colaborador:', error);
         res.status(500).json({ error: 'Erro ao criar colaborador' });
@@ -91,34 +85,8 @@ const criarColaborador = async (req, res) => {
 const atualizarColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
-        const { nome, email, telefone, cargo, departamento, status, senha } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, usuario_vinculado } = req.body;
 
-        // Buscar o colaborador para obter o usuario_id
-        const { data: colaborador, error: buscaError } = await supabase
-            .from('colaboradores')
-            .select('usuario_id')
-            .eq('codigo', codigo)
-            .single();
-
-        if (buscaError) throw buscaError;
-        if (!colaborador) {
-            return res.status(404).json({ error: 'Colaborador não encontrado' });
-        }
-
-        // Atualizar o usuário
-        const { error: usuarioError } = await supabase
-            .from('usuarios')
-            .update({
-                nome,
-                email,
-                senha: senha ? senha : undefined, // Só atualiza a senha se for fornecida
-                status
-            })
-            .eq('codigo', colaborador.usuario_id);
-
-        if (usuarioError) throw usuarioError;
-
-        // Atualizar o colaborador
         const { data, error } = await supabase
             .from('colaboradores')
             .update({
@@ -126,14 +94,18 @@ const atualizarColaborador = async (req, res) => {
                 email,
                 telefone,
                 cargo,
-                departamento,
-                status
+                data_admissao,
+                status,
+                usuario_vinculado
             })
             .eq('codigo', codigo)
             .select()
             .single();
 
         if (error) throw error;
+        if (!data) {
+            return res.status(404).json({ error: 'Colaborador não encontrado' });
+        }
 
         res.json(data);
     } catch (error) {
@@ -146,34 +118,12 @@ const atualizarColaborador = async (req, res) => {
 const excluirColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
-
-        // Buscar o colaborador para obter o usuario_id
-        const { data: colaborador, error: buscaError } = await supabase
-            .from('colaboradores')
-            .select('usuario_id')
-            .eq('codigo', codigo)
-            .single();
-
-        if (buscaError) throw buscaError;
-        if (!colaborador) {
-            return res.status(404).json({ error: 'Colaborador não encontrado' });
-        }
-
-        // Excluir o colaborador
-        const { error: colaboradorError } = await supabase
+        const { error } = await supabase
             .from('colaboradores')
             .delete()
             .eq('codigo', codigo);
 
-        if (colaboradorError) throw colaboradorError;
-
-        // Excluir o usuário
-        const { error: usuarioError } = await supabase
-            .from('usuarios')
-            .delete()
-            .eq('codigo', colaborador.usuario_id);
-
-        if (usuarioError) throw usuarioError;
+        if (error) throw error;
 
         res.status(204).send();
     } catch (error) {
