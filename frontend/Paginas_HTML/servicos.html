@@ -105,15 +105,13 @@
                     <tr>
                         <th>Código</th>
                         <th>Nome</th>
-                        <th>Categoria</th>
                         <th>Valor</th>
-                        <th>Duração</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Os dados serão carregados dinamicamente -->
+                    <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -141,23 +139,8 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="categoria" name="categoria" required>
-                                <option value="">Selecione...</option>
-                                <option value="consultoria">Consultoria</option>
-                                <option value="manutencao">Manutenção</option>
-                                <option value="suporte">Suporte</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label>Valor</label>
                             <input type="number" id="valor" name="valor" step="0.01" min="0" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Duração</label>
-                            <input type="text" id="duracao" name="duracao" placeholder="Ex: 2h" required>
                         </div>
                         <div class="form-group">
                             <label>Status</label>
@@ -165,6 +148,12 @@
                                 <option value="ativo">Ativo</option>
                                 <option value="inativo">Inativo</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Duração</label>
+                            <input type="text" id="duracao" name="duracao" placeholder="Ex: 2h" required>
                         </div>
                     </div>
                     <div class="form-group">
@@ -190,13 +179,63 @@
             });
         });
 
+        // Função para carregar os serviços na tabela
+        function carregarServicos() {
+            const tbody = document.querySelector('tbody');
+            // Aqui você faria uma chamada para a API para buscar os dados
+            // Por enquanto, vamos usar dados de exemplo
+            const servicos = [
+                {
+                    codigo: '00001',
+                    nome: 'Manutenção de Computador',
+                    preco: 150.00,
+                    status: 'ativo'
+                },
+                {
+                    codigo: '00002',
+                    nome: 'Formatação de Sistema',
+                    preco: 80.00,
+                    status: 'ativo'
+                }
+            ];
+
+            tbody.innerHTML = servicos.map(servico => `
+                <tr>
+                    <td>${servico.codigo}</td>
+                    <td>${servico.nome}</td>
+                    <td>R$ ${servico.preco.toFixed(2)}</td>
+                    <td><span class="status ${servico.status}">${servico.status}</span></td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="viewServico('${servico.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editServico('${servico.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteServico('${servico.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Carregar serviços quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarServicos);
+
         // Modal functions
         function openModal() {
-            window.openModal('servico');
+            // Gerar código sequencial
+            const codigoInput = document.getElementById('codigo');
+            const ultimoCodigo = localStorage.getItem('ultimoCodigoServico') || '00000';
+            const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
+            codigoInput.value = novoCodigo;
+            
+            document.getElementById('servicoModal').style.display = 'flex';
         }
 
         function closeModal() {
-            window.closeModal('servico');
+            document.getElementById('servicoModal').style.display = 'none';
         }
 
         // Close modal when clicking outside
@@ -216,14 +255,13 @@
             
             // Salvar o último código usado
             const codigo = document.getElementById('codigo').value;
-            window.salvarUltimoCodigo('servico', codigo);
+            localStorage.setItem('ultimoCodigoServico', codigo);
             
             // Enviando apenas os campos que o backend espera
             const servico = {
                 codigo: codigo,
                 nome: formData.get('nome'),
-                descricao: formData.get('descricao') || null,
-                preco: formData.get('preco') || null,
+                preco: parseFloat(formData.get('valor')),
                 status: formData.get('status') || 'ativo'
             };
             
