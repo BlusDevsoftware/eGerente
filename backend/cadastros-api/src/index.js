@@ -18,12 +18,34 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Rota raiz
+app.get('/', (req, res) => {
+    res.json({
+        message: 'API de Cadastros do eGerente',
+        version: '1.0.0',
+        endpoints: {
+            colaboradores: '/api/cadastros/colaboradores',
+            clientes: '/api/cadastros/clientes',
+            produtos: '/api/cadastros/produtos',
+            servicos: '/api/cadastros/servicos'
+        }
+    });
+});
+
 // Rotas
 app.use('/api/cadastros', cadastroRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
+});
+
+// Tratamento de erros 404
+app.use((req, res) => {
+    res.status(404).json({
+        error: 'Rota não encontrada',
+        message: 'A rota solicitada não existe'
+    });
 });
 
 // Inicialização do servidor
