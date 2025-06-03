@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Comissões - Manutenção BD</title>
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;"><h1><span class="orange">Blue</span><span class="highlight">Manager</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="home.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
+                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
+                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
+                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
+                    <li><a href="usuarios.html"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html" class="active"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Manutenção do Banco de Dados</h1>
+                <p>Backup, otimização e limpeza</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Database Status -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Tamanho do BD</h3>
+                    <p>2.5 GB</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Último Backup</h3>
+                    <p>Hoje, 08:30</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Performance</h3>
+                    <p>98%</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Integridade</h3>
+                    <p>100%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Options -->
+        <div class="maintenance-container">
+            <div class="maintenance-section">
+                <h2>Backup</h2>
+                <div class="maintenance-options">
+                    <div class="option-card">
+                        <i class="fas fa-download"></i>
+                        <h3>Backup Completo</h3>
+                        <p>Realiza backup de todos os dados do sistema</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Iniciar Backup
+                        </button>
+                    </div>
+                    <div class="option-card">
+                        <i class="fas fa-history"></i>
+                        <h3>Histórico de Backups</h3>
+                        <p>Visualiza e gerencia backups anteriores</p>
+                        <button class="btn-secondary">
+                            <i class="fas fa-list"></i>
+                            Ver Histórico
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="maintenance-section">
+                <h2>Otimização</h2>
+                <div class="maintenance-options">
+                    <div class="option-card">
+                        <i class="fas fa-broom"></i>
+                        <h3>Limpeza de Cache</h3>
+                        <p>Remove dados temporários e cache</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Limpar Cache
+                        </button>
+                    </div>
+                    <div class="option-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Otimização de Tabelas</h3>
+                        <p>Melhora a performance do banco de dados</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Otimizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="maintenance-section">
+                <h2>Diagnóstico</h2>
+                <div class="maintenance-options">
+                    <div class="option-card">
+                        <i class="fas fa-search"></i>
+                        <h3>Verificação de Integridade</h3>
+                        <p>Verifica a integridade dos dados</p>
+                        <button class="btn-primary">
+                            <i class="fas fa-play"></i>
+                            Verificar
+                        </button>
+                    </div>
+                    <div class="option-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Log de Erros</h3>
+                        <p>Visualiza registros de erros do sistema</p>
+                        <button class="btn-secondary">
+                            <i class="fas fa-list"></i>
+                            Ver Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Comissões - Relatório Dinâmico</title>
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;"><h1><span class="orange">Blue</span><span class="highlight">Manager</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="home.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
+                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
+                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
+                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
+                    <li><a href="usuarios.html"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html" class="active"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Relatório Dinâmico</h1>
+                <p>Análise avançada de comissões</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Advanced Filters -->
+        <div class="advanced-filters">
+            <div class="filter-group">
+                <div class="date-range">
+                    <label>Período</label>
+                    <input type="date" placeholder="Data Inicial">
+                    <input type="date" placeholder="Data Final">
+                </div>
+                <select>
+                    <option value="">Colaborador</option>
+                    <option value="todos">Todos</option>
+                    <option value="joao">João Silva</option>
+                    <option value="maria">Maria Santos</option>
+                </select>
+                <select>
+                    <option value="">Tipo</option>
+                    <option value="produtos">Produtos</option>
+                    <option value="servicos">Serviços</option>
+                    <option value="ambos">Ambos</option>
+                </select>
+                <select>
+                    <option value="">Status</option>
+                    <option value="pago">Pago</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+                <div class="value-range">
+                    <label>Faixa de Valor</label>
+                    <input type="number" placeholder="Mínimo">
+                    <input type="number" placeholder="Máximo">
+                </div>
+            </div>
+            <button class="btn-primary">
+                <i class="fas fa-search"></i>
+                Gerar Relatório
+            </button>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <h3>Comissões por Status</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Top 5 Colaboradores</h3>
+                <canvas id="colaboradoresChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Evolução Mensal</h3>
+                <canvas id="evolucaoChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Resultados</h2>
+                <div class="table-actions">
+                    <button class="btn-secondary">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                    <button class="btn-secondary">
+                        <i class="fas fa-print"></i>
+                        Imprimir
+                    </button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Colaborador</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Comissão</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2024-02-20</td>
+                        <td>João Silva</td>
+                        <td>Produto</td>
+                        <td>R$ 3.000,00</td>
+                        <td>R$ 300,00</td>
+                        <td><span class="status paid">Pago</span></td>
+                        <td>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2024-02-19</td>
+                        <td>Maria Santos</td>
+                        <td>Serviço</td>
+                        <td>R$ 2.500,00</td>
+                        <td>R$ 250,00</td>
+                        <td><span class="status pending">Pendente</span></td>
+                        <td>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Status Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Pago', 'Pendente', 'Cancelado'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Colaboradores Chart
+        const colaboradoresCtx = document.getElementById('colaboradoresChart').getContext('2d');
+        new Chart(colaboradoresCtx, {
+            type: 'bar',
+            data: {
+                labels: ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Lima'],
+                datasets: [{
+                    label: 'Comissões',
+                    data: [12000, 9500, 8000, 7500, 7000],
+                    backgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        // Evolução Chart
+        const evolucaoCtx = document.getElementById('evolucaoChart').getContext('2d');
+        new Chart(evolucaoCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Comissões',
+                    data: [15000, 18000, 22000, 20000, 25000, 28000],
+                    borderColor: '#007bff',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+</body>
+</html> 

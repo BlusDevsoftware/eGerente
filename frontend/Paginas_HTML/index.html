@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Comissões - Dashboard</title>
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="orange">Blue</span><span class="highlight">Manager</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="javascript:void(0)" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
+                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
+                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
+                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
+                    <li><a href="usuarios.html"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Bem-vindo, Admin</h1>
+                <p>Visualize suas informações e estatísticas</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Total de Colaboradores</h3>
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-value">150</div>
+                <div class="card-change">+12% este mês</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Comissões do Mês</h3>
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="card-value">R$ 45.000</div>
+                <div class="card-change">+8% este mês</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Vendas do Mês</h3>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-value">R$ 180.000</div>
+                <div class="card-change negative">-3% este mês</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pagamentos Pendentes</h3>
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-value">R$ 15.000</div>
+                <div class="card-change">5 pendentes</div>
+            </div>
+        </div>
+
+        <!-- Latest Commissions -->
+        <div class="latest-commissions">
+            <h2>Últimas Comissões</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Colaborador</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>João Silva</td>
+                        <td>R$ 1.500,00</td>
+                        <td>15/03/2024</td>
+                        <td><span class="status pending">Pendente</span></td>
+                        <td>
+                            <button class="action-btn view-btn">Ver</button>
+                            <button class="action-btn edit-btn">Editar</button>
+                            <button class="action-btn delete-btn">Excluir</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Maria Santos</td>
+                        <td>R$ 2.300,00</td>
+                        <td>14/03/2024</td>
+                        <td><span class="status paid">Pago</span></td>
+                        <td>
+                            <button class="action-btn view-btn">Ver</button>
+                            <button class="action-btn edit-btn">Editar</button>
+                            <button class="action-btn delete-btn">Excluir</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Pedro Oliveira</td>
+                        <td>R$ 1.800,00</td>
+                        <td>13/03/2024</td>
+                        <td><span class="status cancelled">Cancelado</span></td>
+                        <td>
+                            <button class="action-btn view-btn">Ver</button>
+                            <button class="action-btn edit-btn">Editar</button>
+                            <button class="action-btn delete-btn">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Função para inicializar o estado dos menus
+        function initializeMenus() {
+            // Encontra o item de menu ativo atual
+            const currentPath = window.location.pathname;
+            const currentPage = currentPath.split('/').pop() || 'home.html';
+            
+            // Procura o link correspondente à página atual
+            document.querySelectorAll('.submenu a').forEach(link => {
+                if (link.getAttribute('href') === currentPage) {
+                    // Marca o link como ativo
+                    link.classList.add('active');
+                    // Abre o submenu pai
+                    const parentMenu = link.closest('.has-submenu');
+                    if (parentMenu) {
+                        parentMenu.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Toggle apenas o menu clicado
+                const parentMenu = this.closest('.has-submenu');
+                parentMenu.classList.toggle('active');
+            });
+        });
+
+        // Previne que cliques nos itens do submenu fechem o menu
+        document.querySelectorAll('.submenu a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Remove active de todos os outros links
+                document.querySelectorAll('.submenu a').forEach(otherLink => {
+                    otherLink.classList.remove('active');
+                });
+                
+                // Adiciona active ao link clicado
+                this.classList.add('active');
+                
+                // Mantém o submenu pai aberto
+                const parentMenu = this.closest('.has-submenu');
+                if (parentMenu) {
+                    parentMenu.classList.add('active');
+                }
+            });
+        });
+
+        // Inicializa os menus quando a página carrega
+        document.addEventListener('DOMContentLoaded', initializeMenus);
+    </script>
+</body>
+</html> 

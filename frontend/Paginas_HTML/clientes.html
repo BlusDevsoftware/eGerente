@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Comissões - Clientes</title>
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="orange">Blue</span><span class="highlight">Manager</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="home.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
+                    <li><a href="clientes.html" class="active"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
+                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
+                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
+                    <li><a href="usuarios.html"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
+                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Clientes</h1>
+                <p>Gerencie os clientes do sistema</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar cliente...">
+            </div>
+            <div class="filter-options">
+                <select>
+                    <option value="">Tipo de Cliente</option>
+                    <option value="pf">Pessoa Física</option>
+                    <option value="pj">Pessoa Jurídica</option>
+                </select>
+                <select>
+                    <option value="">Status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                Novo Cliente
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome/Razão Social</th>
+                        <th>Tipo</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="clienteModal" style="display: none; align-items: center; justify-content: center;">
+        <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
+            <div class="modal-header">
+                <h2>Novo Cliente</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clienteForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="codigo">Código</label>
+                            <input type="text" id="codigo" name="codigo" readonly disabled>
+                            <small class="form-text text-muted">Gerado automaticamente</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_crm">Código CRM</label>
+                            <input type="text" id="codigo_crm" name="codigo_crm" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Cliente</label>
+                            <select id="tipo" name="tipo" required onchange="toggleTipoCliente(this.value)" autocomplete="off">
+                                <option value="">Selecione...</option>
+                                <option value="pf">Pessoa Física</option>
+                                <option value="pj">Pessoa Jurídica</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status" required autocomplete="off">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="nomeLabel" for="nome">Nome Completo</label>
+                            <input type="text" id="nome" name="nome" required autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label id="documentoLabel" for="documento">CPF</label>
+                            <input type="text" id="documento" name="documento" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="telefone">Telefone</label>
+                            <input type="tel" id="telefone" name="telefone" autocomplete="tel">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle submenu
+        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('clienteModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('clienteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('clienteModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Toggle tipo de cliente
+        function toggleTipoCliente(tipo) {
+            const nomeLabel = document.getElementById('nomeLabel');
+            const documentoLabel = document.getElementById('documentoLabel');
+            const documentoInput = document.getElementById('documento');
+
+            if (tipo === 'pf') {
+                nomeLabel.textContent = 'Nome Completo';
+                documentoLabel.textContent = 'CPF';
+                documentoInput.maxLength = 11;
+                documentoInput.setAttribute('autocomplete', 'off');
+            } else if (tipo === 'pj') {
+                nomeLabel.textContent = 'Razão Social';
+                documentoLabel.textContent = 'CNPJ';
+                documentoInput.maxLength = 14;
+                documentoInput.setAttribute('autocomplete', 'off');
+            }
+        }
+
+        // Função para salvar o cliente
+        async function salvarCliente(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('clienteForm');
+            const formData = new FormData(form);
+            
+            // Enviando apenas os campos que o backend espera
+            const cliente = {
+                codigo_crm: formData.get('codigo_crm'),
+                nome: formData.get('nome'),
+                email: formData.get('email') || null,
+                telefone: formData.get('telefone') || null,
+                status: formData.get('status') || 'ativo'
+            };
+            
+            // Armazenamos estes campos no localStorage para referência futura
+            // mesmo que o backend não os armazene ainda
+            const clienteCompleto = {
+                ...cliente,
+                tipo: formData.get('tipo'),
+                documento: formData.get('documento')
+            };
+            
+            // Armazenar localmente para uso futuro quando o backend for atualizado
+            try {
+                let clientesLocais = JSON.parse(localStorage.getItem('clientesLocais') || '[]');
+                clientesLocais.push(clienteCompleto);
+                localStorage.setItem('clientesLocais', JSON.stringify(clientesLocais));
+            } catch (e) {
+                console.warn('Não foi possível salvar dados localmente:', e);
+            }
+
+            console.log('Enviando para API:', cliente); // Log para depuração
+            
+            try {
+                const result = await ClientesApi.createCliente(cliente);
+                
+                console.log('Resposta da API:', result); // Log para depuração
+
+                // Verifica se a API retornou um erro explícito (menos comum com ApiClient, mas seguro verificar)
+                if (result && result.message && result.status && result.status >= 400) {
+                     throw new Error(result.message || 'Erro retornado pela API.');
+                }
+                 // Verifica se a API retornou um erro explícito padrão do backend
+                if (result && result.message && !result.id) { // Assumindo que um sucesso sempre retorna um objeto com 'id'
+                    throw new Error(result.message + (result.details ? ` (${result.details})` : ''));
+                }
+                 // Verificação antiga (menos provável com ApiClient atual)
+                if (result && result.error) {
+                     throw new Error(result.error);
+                }
+
+                
+                alert('Cliente salvo com sucesso!');
+                closeModal();
+                // Tenta chamar loadClientes() para atualizar a lista sem recarregar a página
+                if (typeof loadClientes === 'function') {
+                    loadClientes();
+                } else {
+                    console.warn('Função loadClientes não encontrada, recarregando a página.');
+                    location.reload(); // Fallback
+                }
+            } catch (error) {
+                console.error('Erro ao salvar cliente:', error); // Log detalhado do erro
+                // Tenta exibir a mensagem de erro da API, se disponível
+                const errorMessage = error.response ? (await error.response.json()).message : error.message;
+                alert('Erro ao salvar cliente: ' + (errorMessage || 'Verifique o console para detalhes.'));
+            }
+        }
+
+        // Adicionar evento de submit ao formulário
+        document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
+
+        // Verificação de autenticação
+        function checkAuth() {
+            const token = AuthService.token;
+            if (!token) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            return token;
+        }
+    </script>
+
+    <script src="api-config.js"></script>
+    <script src="clientes.js"></script>
+</body>
+</html> 

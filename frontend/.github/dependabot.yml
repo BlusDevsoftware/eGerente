@@ -1,0 +1,96 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `frontend` directory
+    directory: "/frontend"
+    # Check for updates once a week
+    schedule:
+      interval: "weekly"
+    # Specify labels for pull requests for version updates
+    labels:
+      - "dependencies"
+      - "npm"
+    # Limit the number of open pull requests for version updates
+    open-pull-requests-limit: 10
+    # Allow up-to-date branches to be rebased
+    rebase-strategy: "auto"
+    # Specify the version update strategy
+    versioning-strategy: "auto"
+    # Group all minor and patch updates together
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+    # Set reviewers for pull requests
+    reviewers:
+      - "team-leads"
+    # Set assignees for pull requests
+    assignees:
+      - "team-leads"
+    # Set milestone for pull requests
+    milestone: 1
+    # Set commit message prefix
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+    # Set labels for pull requests
+    labels:
+      - "dependencies"
+      - "npm"
+    # Set target branch for pull requests
+    target-branch: "main"
+    # Set allowed updates
+    allowed-updates:
+      # Allow all updates
+      - match:
+          update-type: "all"
+    # Set ignored updates
+    ignore:
+      # Ignore major version updates
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # Set security updates
+    security-updates-only: false
+    # Set vulnerability alerts
+    vulnerability-alerts:
+      enabled: true
+    # Set security advisories
+    security-advisories:
+      enabled: true
+    # Set security updates
+    security-updates:
+      enabled: true
+    # Set security updates strategy
+    security-updates-strategy: "auto"
+    # Set security updates schedule
+    security-updates-schedule:
+      interval: "daily"
+    # Set security updates labels
+    security-updates-labels:
+      - "security"
+      - "dependencies"
+    # Set security updates reviewers
+    security-updates-reviewers:
+      - "security-team"
+    # Set security updates assignees
+    security-updates-assignees:
+      - "security-team"
+    # Set security updates milestone
+    security-updates-milestone: 1
+    # Set security updates commit message prefix
+    security-updates-commit-message:
+      prefix: "security"
+      include: "scope"
+    # Set security updates target branch
+    security-updates-target-branch: "main"
+    # Set security updates allowed updates
+    security-updates-allowed-updates:
+      # Allow all updates
+      - match:
+          update-type: "all"
+    # Set security updates ignored updates
+    security-updates-ignore:
+      # Ignore major version updates
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"] 
