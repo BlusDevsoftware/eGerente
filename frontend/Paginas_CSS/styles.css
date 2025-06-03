@@ -198,6 +198,7 @@ body {
     text-decoration: none;
     border-radius: 10px;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .logout-button a:hover {
@@ -207,6 +208,16 @@ body {
 
 .logout-button i {
     margin-right: 10px;
+}
+
+.logout-button a span {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .logout-button a span {
+        display: inline;
+    }
 }
 
 /* Main Content */
