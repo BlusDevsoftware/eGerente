@@ -2,7 +2,7 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const cors = require('cors');
+const corsMiddleware = require('./middleware/cors');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const colaboradorRoutes = require('./routes/colaboradorRoutes');
 const clienteRoutes = require('./routes/clienteRoutes');
@@ -13,7 +13,7 @@ const app = express();
 
 // Configurações de segurança
 app.use(helmet());
-app.use(cors());
+app.use(corsMiddleware);
 app.use(express.json());
 
 // Rate limiting

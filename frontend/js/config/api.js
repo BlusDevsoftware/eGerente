@@ -1,5 +1,5 @@
 // Configuração da API
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://gateway-egerente.vercel.app/api';
 
 // Função para fazer requisições HTTP
 async function apiRequest(endpoint, options = {}) {
@@ -9,7 +9,8 @@ async function apiRequest(endpoint, options = {}) {
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers
-            }
+            },
+            credentials: 'include' // Importante para enviar cookies de autenticação
         });
 
         if (!response.ok) {
