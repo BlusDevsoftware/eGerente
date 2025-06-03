@@ -197,10 +197,11 @@ body {
     font-weight: 500;
     transition: all 0.3s ease;
     border-radius: 8px;
+    background-color: #ff6b00;
 }
 
 .logout-button a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ff8533;
 }
 
 .logout-button i {
@@ -846,10 +847,11 @@ textarea {
     font-weight: 500;
     transition: all 0.3s ease;
     border-radius: 8px;
+    background-color: #ff6b00;
 }
 
 .logout-button a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #ff8533;
 }
 
 .logout-button a i {
