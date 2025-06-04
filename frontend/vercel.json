@@ -9,23 +9,23 @@
     "routes": [
         {
             "src": "/js/(.*)",
-            "dest": "/frontend/js/$1"
+            "dest": "/js/$1"
         },
         {
             "src": "/Paginas_JS/(.*)",
-            "dest": "/frontend/Paginas_JS/$1"
+            "dest": "/Paginas_JS/$1"
         },
         {
             "src": "/Paginas_CSS/(.*)",
-            "dest": "/frontend/Paginas_CSS/$1"
+            "dest": "/Paginas_CSS/$1"
         },
         {
             "src": "/Imagens/(.*)",
-            "dest": "/frontend/Imagens/$1"
+            "dest": "/Imagens/$1"
         },
         {
             "src": "/(.*)",
-            "dest": "/frontend/$1"
+            "dest": "/$1"
         }
     ],
     "headers": [
