@@ -9,67 +9,79 @@
   "routes": [
     {
       "src": "/",
-      "dest": "/Paginas_HTML/index.html"
+      "dest": "/frontend/Paginas_HTML/index.html"
     },
     {
       "src": "/usuarios",
-      "dest": "/Paginas_HTML/usuarios.html"
+      "dest": "/frontend/Paginas_HTML/usuarios.html"
     },
     {
       "src": "/usuarios.html",
-      "dest": "/Paginas_HTML/usuarios.html"
+      "dest": "/frontend/Paginas_HTML/usuarios.html"
     },
     {
       "src": "/colaboradores",
-      "dest": "/Paginas_HTML/colaboradores.html"
+      "dest": "/frontend/Paginas_HTML/colaboradores.html"
     },
     {
       "src": "/colaboradores.html",
-      "dest": "/Paginas_HTML/colaboradores.html"
+      "dest": "/frontend/Paginas_HTML/colaboradores.html"
     },
     {
       "src": "/produtos",
-      "dest": "/Paginas_HTML/produtos.html"
+      "dest": "/frontend/Paginas_HTML/produtos.html"
     },
     {
       "src": "/produtos.html",
-      "dest": "/Paginas_HTML/produtos.html"
+      "dest": "/frontend/Paginas_HTML/produtos.html"
     },
     {
       "src": "/servicos",
-      "dest": "/Paginas_HTML/servicos.html"
+      "dest": "/frontend/Paginas_HTML/servicos.html"
     },
     {
       "src": "/servicos.html",
-      "dest": "/Paginas_HTML/servicos.html"
+      "dest": "/frontend/Paginas_HTML/servicos.html"
     },
     {
       "src": "/clientes",
-      "dest": "/Paginas_HTML/clientes.html"
+      "dest": "/frontend/Paginas_HTML/clientes.html"
     },
     {
       "src": "/clientes.html",
-      "dest": "/Paginas_HTML/clientes.html"
+      "dest": "/frontend/Paginas_HTML/clientes.html"
     },
     {
       "src": "/perfis",
-      "dest": "/Paginas_HTML/perfis.html"
+      "dest": "/frontend/Paginas_HTML/perfis.html"
     },
     {
       "src": "/perfis.html",
-      "dest": "/Paginas_HTML/perfis.html"
+      "dest": "/frontend/Paginas_HTML/perfis.html"
     },
     {
       "src": "/parametros",
-      "dest": "/Paginas_HTML/parametros.html"
+      "dest": "/frontend/Paginas_HTML/parametros.html"
     },
     {
       "src": "/parametros.html",
-      "dest": "/Paginas_HTML/parametros.html"
+      "dest": "/frontend/Paginas_HTML/parametros.html"
+    },
+    {
+      "src": "/Paginas_CSS/(.*)",
+      "dest": "/frontend/Paginas_CSS/$1"
+    },
+    {
+      "src": "/Paginas_JS/(.*)",
+      "dest": "/frontend/Paginas_JS/$1"
+    },
+    {
+      "src": "/Imagens/(.*)",
+      "dest": "/frontend/Imagens/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/frontend/$1"
     }
   ]
 } 
