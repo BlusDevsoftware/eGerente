@@ -24,8 +24,24 @@
       "dest": "/frontend/Paginas_JS/$1"
     },
     {
-      "src": "/Paginas_HTML/(.*)",
-      "dest": "/frontend/Paginas_HTML/$1"
+      "src": "/usuarios",
+      "dest": "/frontend/Paginas_HTML/usuarios.html"
+    },
+    {
+      "src": "/colaboradores",
+      "dest": "/frontend/Paginas_HTML/colaboradores.html"
+    },
+    {
+      "src": "/produtos",
+      "dest": "/frontend/Paginas_HTML/produtos.html"
+    },
+    {
+      "src": "/servicos",
+      "dest": "/frontend/Paginas_HTML/servicos.html"
+    },
+    {
+      "src": "/clientes",
+      "dest": "/frontend/Paginas_HTML/clientes.html"
     },
     {
       "src": "/",
