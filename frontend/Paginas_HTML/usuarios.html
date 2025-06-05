@@ -4,33 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuários</title>
-    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
-    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <link rel="icon" type="image/png" href="/Imagens/bluedev-logo.png">
+    <link rel="stylesheet" href="/Paginas_CSS/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../js/config/api.js" type="module"></script>
-    <script src="../Paginas_JS/usuarios.js" type="module"></script>
-    <script>
-        // Funções de Modal
-        function openModal() {
-            const modal = document.getElementById('usuarioModal');
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('usuarioModal');
-            modal.style.display = 'none';
-        }
-
-        function closeViewModal() {
-            const modal = document.getElementById('viewModal');
-            modal.style.display = 'none';
-        }
-
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            modal.style.display = 'none';
-        }
-    </script>
+    <script src="/js/config/api.js" type="module"></script>
+    <script src="/Paginas_JS/usuarios.js" type="module"></script>
     <style>
         .toast-container {
             position: fixed;
@@ -214,42 +192,42 @@
 <body>
     <div class="sidebar">
         <div class="logo">
-            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo">
+            <img src="/Imagens/bluedev-logo.png" alt="BlueDev Logo">
             <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
         </div>
         <ul class="nav-menu">
-            <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="/index.html"><i class="fas fa-home"></i> Dashboard</a></li>
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-user-plus"></i> Cadastros <i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="colaboradores.html"><i class="fas fa-users"></i> Colaboradores</a></li>
-                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i> Clientes</a></li>
-                    <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
-                    <li><a href="servicos.html"><i class="fas fa-cogs"></i> Serviços</a></li>
-                    <li><a href="usuarios.html" class="active"><i class="fas fa-user-shield"></i> Usuários</a></li>
+                    <li><a href="/colaboradores.html"><i class="fas fa-users"></i> Colaboradores</a></li>
+                    <li><a href="/clientes.html"><i class="fas fa-user-tie"></i> Clientes</a></li>
+                    <li><a href="/produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+                    <li><a href="/servicos.html"><i class="fas fa-cogs"></i> Serviços</a></li>
+                    <li><a href="/usuarios.html" class="active"><i class="fas fa-user-shield"></i> Usuários</a></li>
                 </ul>
             </li>
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-hand-holding-usd"></i> Comissões <i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i> Lançar</a></li>
-                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i> Movimento</a></li>
-                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i> Consulta</a></li>
+                    <li><a href="/lancar-comissao.html"><i class="fas fa-plus-circle"></i> Lançar</a></li>
+                    <li><a href="/movimento-comissao.html"><i class="fas fa-exchange-alt"></i> Movimento</a></li>
+                    <li><a href="/consulta-comissao.html"><i class="fas fa-search"></i> Consulta</a></li>
                 </ul>
             </li>
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-chart-bar"></i> Relatórios <i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i> Recebimento</a></li>
-                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i> Conferência</a></li>
-                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+                    <li><a href="/recebimento.html"><i class="fas fa-money-bill-wave"></i> Recebimento</a></li>
+                    <li><a href="/conferencia.html"><i class="fas fa-check-circle"></i> Conferência</a></li>
+                    <li><a href="/dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
                 </ul>
             </li>
             <li class="has-submenu">
                 <a href="#"><i class="fas fa-cog"></i> Configurações <i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="perfis.html"><i class="fas fa-user-tag"></i> Perfis de Acesso</a></li>
-                    <li><a href="parametros.html"><i class="fas fa-sliders-h"></i> Parâmetros</a></li>
+                    <li><a href="/perfis.html"><i class="fas fa-user-tag"></i> Perfis de Acesso</a></li>
+                    <li><a href="/parametros.html"><i class="fas fa-sliders-h"></i> Parâmetros</a></li>
                 </ul>
             </li>
         </ul>
@@ -303,7 +281,9 @@
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
             </select>
-            <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Novo Usuário</button>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fas fa-plus"></i> Novo Usuário
+            </button>
         </div>
         <div class="table-container">
             <table class="styled-table" id="usuariosTable">
@@ -400,5 +380,27 @@
         </div>
     </div>
     <div class="toast-container"></div>
+    <script>
+        // Funções de Modal
+        function openModal() {
+            const modal = document.getElementById('usuarioModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('usuarioModal');
+            modal.style.display = 'none';
+        }
+
+        function closeViewModal() {
+            const modal = document.getElementById('viewModal');
+            modal.style.display = 'none';
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+        }
+    </script>
 </body>
 </html> 
