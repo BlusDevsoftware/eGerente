@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://e-gerente-7dsxgysgw-bluedevs-projects.vercel.app';
+const API_BASE_URL = 'https://e-gerente.vercel.app';
 
 const api = {
     async get(endpoint) {
