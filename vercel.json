@@ -8,24 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
-    },
-    {
-      "src": "/css/(.*)",
-      "dest": "/css/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/Paginas_JS/(.*)",
-      "dest": "/Paginas_JS/$1"
-    },
-    {
-      "src": "/Paginas_HTML/(.*)",
-      "dest": "/Paginas_HTML/$1"
+      "src": "/",
+      "dest": "/Paginas_HTML/index.html"
     },
     {
       "src": "/usuarios",
@@ -68,8 +52,20 @@
       "dest": "/Paginas_HTML/clientes.html"
     },
     {
-      "src": "/",
-      "dest": "/Paginas_HTML/index.html"
+      "src": "/perfis",
+      "dest": "/Paginas_HTML/perfis.html"
+    },
+    {
+      "src": "/perfis.html",
+      "dest": "/Paginas_HTML/perfis.html"
+    },
+    {
+      "src": "/parametros",
+      "dest": "/Paginas_HTML/parametros.html"
+    },
+    {
+      "src": "/parametros.html",
+      "dest": "/Paginas_HTML/parametros.html"
     },
     {
       "src": "/(.*)",
