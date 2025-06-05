@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="/Imagens/bluedev-logo.png">
     <link rel="stylesheet" href="/Paginas_CSS/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="/js/config/api.js" type="module"></script>
+    <script src="/Paginas_JS/config/api.js" type="module"></script>
     <script src="/Paginas_JS/usuarios.js" type="module"></script>
     <style>
         .toast-container {
@@ -380,27 +380,12 @@
         </div>
     </div>
     <div class="toast-container"></div>
-    <script>
-        // Funções de Modal
-        function openModal() {
-            const modal = document.getElementById('usuarioModal');
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('usuarioModal');
-            modal.style.display = 'none';
-        }
-
-        function closeViewModal() {
-            const modal = document.getElementById('viewModal');
-            modal.style.display = 'none';
-        }
-
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            modal.style.display = 'none';
-        }
+    <script type="module">
+        import { openModal, closeModal, closeViewModal, closeDeleteModal } from '/Paginas_JS/usuarios.js';
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.closeViewModal = closeViewModal;
+        window.closeDeleteModal = closeDeleteModal;
     </script>
 </body>
 </html> 

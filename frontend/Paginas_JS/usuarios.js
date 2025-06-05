@@ -1,22 +1,22 @@
-import api from '../js/config/api.js';
+import api from './config/api.js';
 
 // Funções de Modal
-function openModal() {
+export function openModal() {
     const modal = document.getElementById('usuarioModal');
     modal.style.display = 'flex';
 }
 
-function closeModal() {
+export function closeModal() {
     const modal = document.getElementById('usuarioModal');
     modal.style.display = 'none';
 }
 
-function closeViewModal() {
+export function closeViewModal() {
     const modal = document.getElementById('viewModal');
     modal.style.display = 'none';
 }
 
-function closeDeleteModal() {
+export function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
     modal.style.display = 'none';
 }
@@ -185,15 +185,20 @@ function mostrarToast(mensagem, tipo) {
 document.addEventListener('DOMContentLoaded', carregarUsuarios);
 
 // Exportar funções para uso global
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.closeViewModal = closeViewModal;
-window.closeDeleteModal = closeDeleteModal;
-window.visualizarUsuario = visualizarUsuario;
-window.editarUsuario = editarUsuario;
-window.excluirUsuario = excluirUsuario;
-window.confirmarExclusao = (codigo) => {
+export function visualizarUsuario(codigo) {
+    // ... existing code ...
+}
+
+export function editarUsuario(codigo) {
+    // ... existing code ...
+}
+
+export function excluirUsuario(codigo) {
+    // ... existing code ...
+}
+
+export function confirmarExclusao(codigo) {
     const modal = document.getElementById('deleteModal');
     modal.style.display = 'flex';
     document.getElementById('confirmDeleteBtn').onclick = () => excluirUsuario(codigo);
-}; 
+} 
