@@ -24,6 +24,10 @@
       "dest": "/frontend/Paginas_JS/$1"
     },
     {
+      "src": "/Paginas_HTML/(.*)",
+      "dest": "/frontend/Paginas_HTML/$1"
+    },
+    {
       "src": "/usuarios",
       "dest": "/frontend/Paginas_HTML/usuarios.html"
     },
