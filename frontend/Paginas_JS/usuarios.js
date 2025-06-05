@@ -76,7 +76,7 @@ async function criarUsuario(event) {
 }
 
 // Função para visualizar usuário
-async function visualizarUsuario(codigo) {
+export async function visualizarUsuario(codigo) {
     try {
         const usuario = await api.get(`/usuarios/${codigo}`);
         const modal = document.getElementById('viewModal');
@@ -113,7 +113,7 @@ async function visualizarUsuario(codigo) {
 }
 
 // Função para editar usuário
-async function editarUsuario(codigo) {
+export async function editarUsuario(codigo) {
     try {
         const usuario = await api.get(`/usuarios/${codigo}`);
         const form = document.getElementById('usuarioForm');
@@ -151,7 +151,7 @@ async function editarUsuario(codigo) {
 }
 
 // Função para excluir usuário
-async function excluirUsuario(codigo) {
+export async function excluirUsuario(codigo) {
     try {
         await api.delete(`/usuarios/${codigo}`);
         mostrarToast('Usuário excluído com sucesso!', 'success');
@@ -184,19 +184,7 @@ function mostrarToast(mensagem, tipo) {
 // Carregar usuários quando a página carregar
 document.addEventListener('DOMContentLoaded', carregarUsuarios);
 
-// Exportar funções para uso global
-export function visualizarUsuario(codigo) {
-    // ... existing code ...
-}
-
-export function editarUsuario(codigo) {
-    // ... existing code ...
-}
-
-export function excluirUsuario(codigo) {
-    // ... existing code ...
-}
-
+// Função para confirmar exclusão
 export function confirmarExclusao(codigo) {
     const modal = document.getElementById('deleteModal');
     modal.style.display = 'flex';
