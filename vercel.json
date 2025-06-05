@@ -28,7 +28,15 @@
       "dest": "/frontend/Paginas_HTML/usuarios.html"
     },
     {
+      "src": "/usuarios.html",
+      "dest": "/frontend/Paginas_HTML/usuarios.html"
+    },
+    {
       "src": "/colaboradores",
+      "dest": "/frontend/Paginas_HTML/colaboradores.html"
+    },
+    {
+      "src": "/colaboradores.html",
       "dest": "/frontend/Paginas_HTML/colaboradores.html"
     },
     {
@@ -36,11 +44,23 @@
       "dest": "/frontend/Paginas_HTML/produtos.html"
     },
     {
+      "src": "/produtos.html",
+      "dest": "/frontend/Paginas_HTML/produtos.html"
+    },
+    {
       "src": "/servicos",
       "dest": "/frontend/Paginas_HTML/servicos.html"
     },
     {
+      "src": "/servicos.html",
+      "dest": "/frontend/Paginas_HTML/servicos.html"
+    },
+    {
       "src": "/clientes",
+      "dest": "/frontend/Paginas_HTML/clientes.html"
+    },
+    {
+      "src": "/clientes.html",
       "dest": "/frontend/Paginas_HTML/clientes.html"
     },
     {
