@@ -3,86 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Usuários - eGerente</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <title>Usuários - Gestor de Comissões</title>
+    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
+    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="../js/config/api.js" type="module"></script>
+    <script src="../Paginas_JS/usuarios.js" type="module"></script>
+    <script>
+        // Funções de Modal
+        function openModal() {
+            const modal = document.getElementById('usuarioModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('usuarioModal');
+            modal.style.display = 'none';
+        }
+
+        function closeViewModal() {
+            const modal = document.getElementById('viewModal');
+            modal.style.display = 'none';
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+        }
+    </script>
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .toast.error {
+            border-left: 4px solid #f44336;
+        }
+
+        .toast.info {
+            border-left: 4px solid #2196F3;
+        }
+
+        .toast button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: auto;
+            padding: 0 5px;
+        }
+
+        .toast button:hover {
+            color: #333;
+        }
+
+        .view-details {
+            padding: 20px;
+        }
+        
+        .detail-row {
+            margin-bottom: 15px;
+            display: flex;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .detail-row strong {
+            width: 200px;
+            color: #666;
+        }
+        
+        .detail-row span {
+            flex: 1;
+            color: #333;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            margin: 0 2px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .view-btn {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: #198754;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .action-btn i {
+            font-size: 14px;
+        }
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .status.ativo {
+            background-color: #e8f5e9;
+            color: #4CAF50;
+        }
+
+        .status.inativo {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        .delete-confirmation {
+            max-width: 400px;
+        }
+
+        .delete-icon {
+            text-align: center;
+            font-size: 48px;
+            color: #dc3545;
+            margin: 20px 0;
+        }
+
+        .delete-message {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .delete-warning {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .modal-content.delete-confirmation .form-actions {
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <img src="/assets/images/logo.png" alt="eGerente Logo">
-            </div>
-            <nav class="menu">
-                <ul>
-                    <li>
-                        <a href="#" class="submenu-trigger">
-                            <i class="fas fa-users"></i>
-                            <span>Usuários</span>
-                            <i class="fas fa-chevron-down submenu-icon"></i>
-                        </a>
-                        <ul class="submenu">
-                            <li><a href="/usuarios" class="active">Gerenciar Usuários</a></li>
-                            <li><a href="/perfis">Perfis de Acesso</a></li>
-                        </ul>
-                    </li>
-                    <!-- Outros itens do menu aqui -->
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
+            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
+                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
+                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
+                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
+                    <li><a href="usuarios.html" class="active"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
                 </ul>
-            </nav>
-        </aside>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-chart-bar"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="recebimento.html"><i class="fas fa-money-bill-wave"></i><span>Recebimento</span></a></li>
+                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
+                    <li><a href="dinamico.html"><i class="fas fa-chart-line"></i><span>Dinâmico</span><span class="beta-tag">beta</span></a></li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="perfis.html"><i class="fas fa-user-tag"></i><span>Perfis de Acesso</span></a></li>
+                    <li><a href="parametros.html"><i class="fas fa-sliders-h"></i><span>Parâmetros</span></a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="content-header">
-                <h1>Gerenciamento de Usuários</h1>
-                <div class="header-actions">
-                    <button class="btn-primary" onclick="openModal()">
-                        <i class="fas fa-plus"></i> Novo Usuário
-                    </button>
-                </div>
-            </header>
-
-            <!-- Filtros -->
-            <div class="filters">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Buscar usuários...">
-                </div>
-                <div class="filter-group">
-                    <select id="statusFilter">
-                        <option value="all">Todos os Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                    <select id="perfilFilter">
-                        <option value="all">Todos os Perfis</option>
-                        <option value="admin">Administrador</option>
-                        <option value="gerente">Gerente</option>
-                        <option value="usuario">Usuário</option>
-                    </select>
-                </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1>Gerenciamento de Usuários</h1>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Novo Usuário
+                </button>
             </div>
+        </div>
 
-            <!-- Tabela de Usuários -->
-            <div class="table-container">
-                <table id="usuariosTable">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Perfil</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dados serão carregados via JavaScript -->
-                    </tbody>
-                </table>
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar usuários...">
             </div>
-        </main>
+            <div class="filter-group">
+                <select id="statusFilter">
+                    <option value="all">Todos os Status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+                <select id="perfilFilter">
+                    <option value="all">Todos os Perfis</option>
+                    <option value="admin">Administrador</option>
+                    <option value="gerente">Gerente</option>
+                    <option value="usuario">Usuário</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabela de Usuários -->
+        <div class="table-container">
+            <table id="usuariosTable">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados serão carregados via JavaScript -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Modal de Usuário -->
@@ -146,14 +369,19 @@
 
     <!-- Modal de Confirmação de Exclusão -->
     <div id="deleteModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content delete-confirmation">
             <div class="modal-header">
                 <h2>Confirmar Exclusão</h2>
                 <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir este usuário?</p>
-                <p>Esta ação não pode ser desfeita.</p>
+            <div class="delete-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="delete-message">
+                Tem certeza que deseja excluir este usuário?
+            </div>
+            <div class="delete-warning">
+                Esta ação não pode ser desfeita.
             </div>
             <div class="form-actions">
                 <button class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
@@ -164,9 +392,5 @@
 
     <!-- Container para mensagens toast -->
     <div class="toast-container"></div>
-
-    <!-- Scripts -->
-    <script type="module" src="/js/config/api.js"></script>
-    <script type="module" src="/Paginas_JS/usuarios.js"></script>
 </body>
 </html> 
