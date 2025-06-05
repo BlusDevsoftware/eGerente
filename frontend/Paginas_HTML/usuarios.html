@@ -3,729 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Comissões - Usuários</title>
-    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
-    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <title>Gerenciamento de Usuários - eGerente</title>
+    <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Estilos específicos para a página de usuários */
-        .user-management {
-            display: grid;
-            gap: 20px;
-        }
-
-        .user-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .stat-card i {
-            font-size: 2em;
-            color: #007bff;
-            margin-bottom: 10px;
-        }
-
-        .stat-card h3 {
-            font-size: 1.5em;
-            margin: 10px 0;
-            color: #2d3436;
-        }
-
-        .stat-card p {
-            color: #636e72;
-            font-size: 0.9em;
-        }
-
-        .filters-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 250px;
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px 10px 40px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #636e72;
-        }
-
-        .filter-options {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-options select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            min-width: 150px;
-        }
-
-        .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 15px;
-            background: #f8f9fa;
-            color: #2d3436;
-            font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
-            color: #2d3436;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status.active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status.inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .action-btn i {
-            font-size: 14px;
-        }
-
-        .view-btn {
-            background: #0d6efd;
-            color: white;
-        }
-
-        .edit-btn {
-            background: #198754;
-            color: white;
-        }
-
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-
-        /* Estilos do Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            color: #2d3436;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #636e72;
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            color: #2d3436;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .form-group small {
-            color: #636e72;
-            font-size: 12px;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-primary:hover,
-        .btn-secondary:hover {
-            opacity: 0.8;
-        }
-
-        /* Toast Container */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .toast {
-            background: white;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            max-width: 400px;
-            animation: slideIn 0.3s ease-in-out;
-        }
-
-        .toast.success {
-            border-left: 4px solid #28a745;
-        }
-
-        .toast.error {
-            border-left: 4px solid #dc3545;
-        }
-
-        .toast.warning {
-            border-left: 4px solid #ffc107;
-        }
-
-        .toast .icon {
-            font-size: 20px;
-        }
-
-        .toast.success .icon {
-            color: #28a745;
-        }
-
-        .toast.error .icon {
-            color: #dc3545;
-        }
-
-        .toast.warning .icon {
-            color: #ffc107;
-        }
-
-        .toast .message {
-            flex: 1;
-            color: #2d3436;
-        }
-
-        .toast .close-toast {
-            color: #636e72;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Toast Container -->
-    <div class="toast-container"></div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
-            <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-user-plus"></i><span>Cadastros</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="colaboradores.html"><i class="fas fa-users"></i><span>Colaboradores</span></a></li>
-                    <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
-                    <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
-                    <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
-                    <li><a href="usuarios.html" class="active"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
-                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
-                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-chart-line"></i><span>Relatórios</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="dinamico.html"><i class="fas fa-chart-bar"></i><span>Dinâmico</span></a></li>
-                    <li><a href="conferencia.html"><i class="fas fa-check-circle"></i><span>Conferência</span></a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#" class="submenu-trigger"><i class="fas fa-cog"></i><span>Configurações</span><i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="manutencao-bd.html"><i class="fas fa-database"></i><span>Manutenção BD</span></a></li>
-                    <li><a href="sincronizar.html"><i class="fas fa-sync"></i><span>Sincronizar</span></a></li>
-                </ul>
-            </li>
-        </ul>
-        <div class="logout-button">
-            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="welcome-text">
-                <h1>Usuários</h1>
-                <p>Gerencie os usuários do sistema</p>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../assets/images/logo.png" alt="eGerente Logo">
             </div>
-            <div class="user-info">
-                <div class="notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </div>
-                <div class="user-avatar">A</div>
-            </div>
-        </div>
+            <nav class="menu">
+                <ul>
+                    <li>
+                        <a href="#" class="submenu-trigger">
+                            <i class="fas fa-users"></i>
+                            <span>Usuários</span>
+                            <i class="fas fa-chevron-down submenu-icon"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="usuarios.html" class="active">Gerenciar Usuários</a></li>
+                            <li><a href="perfis.html">Perfis de Acesso</a></li>
+                        </ul>
+                    </li>
+                    <!-- Outros itens do menu aqui -->
+                </ul>
+            </nav>
+        </aside>
 
-        <!-- User Management Section -->
-        <div class="user-management">
-            <!-- User Stats -->
-            <div class="user-stats">
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <h3>150</h3>
-                    <p>Total de Usuários</p>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Gerenciamento de Usuários</h1>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="openModal()">
+                        <i class="fas fa-plus"></i> Novo Usuário
+                    </button>
                 </div>
-                <div class="stat-card">
-                    <i class="fas fa-user-check"></i>
-                    <h3>120</h3>
-                    <p>Usuários Ativos</p>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-user-clock"></i>
-                    <h3>30</h3>
-                    <p>Usuários Inativos</p>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-user-shield"></i>
-                    <h3>5</h3>
-                    <p>Administradores</p>
-                </div>
-            </div>
+            </header>
 
-            <!-- Filters -->
-            <div class="filters-container">
+            <!-- Filtros -->
+            <div class="filters">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar usuário...">
+                    <input type="text" id="searchInput" placeholder="Buscar usuários...">
                 </div>
-                <div class="filter-options">
-                    <select>
-                        <option value="">Nível de Acesso</option>
-                        <option value="admin">Administrador</option>
-                        <option value="manager">Gerente</option>
-                        <option value="user">Usuário</option>
-                    </select>
-                    <select>
-                        <option value="">Status</option>
+                <div class="filter-group">
+                    <select id="statusFilter">
+                        <option value="all">Todos os Status</option>
                         <option value="ativo">Ativo</option>
                         <option value="inativo">Inativo</option>
                     </select>
+                    <select id="perfilFilter">
+                        <option value="all">Todos os Perfis</option>
+                        <option value="admin">Administrador</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="usuario">Usuário</option>
+                    </select>
                 </div>
-                <button class="btn-primary" onclick="openModal()">
-                    <i class="fas fa-plus"></i>
-                    Novo Usuário
-                </button>
             </div>
 
-            <!-- Table -->
+            <!-- Tabela de Usuários -->
             <div class="table-container">
-                <table>
+                <table id="usuariosTable">
                     <thead>
                         <tr>
                             <th>Código</th>
                             <th>Nome</th>
-                            <th>Nível de Acesso</th>
+                            <th>Email</th>
+                            <th>Perfil</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>00001</td>
-                            <td>João Silva</td>
-                            <td>Administrador</td>
-                            <td><span class="status active">Ativo</span></td>
-                            <td class="actions">
-                                <button class="action-btn view-btn" onclick="viewUser(1)"><i class="fas fa-eye"></i> Ver</button>
-                                <button class="action-btn edit-btn" onclick="editUser(1)"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="action-btn delete-btn" onclick="deleteUser(1)"><i class="fas fa-trash"></i> Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>00002</td>
-                            <td>Maria Santos</td>
-                            <td>Usuário</td>
-                            <td><span class="status active">Ativo</span></td>
-                            <td class="actions">
-                                <button class="action-btn view-btn" onclick="viewUser(2)"><i class="fas fa-eye"></i> Ver</button>
-                                <button class="action-btn edit-btn" onclick="editUser(2)"><i class="fas fa-edit"></i> Editar</button>
-                                <button class="action-btn delete-btn" onclick="deleteUser(2)"><i class="fas fa-trash"></i> Excluir</button>
-                            </td>
-                        </tr>
+                        <!-- Dados serão carregados via JavaScript -->
                     </tbody>
                 </table>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- Modal -->
-    <div class="modal" id="usuarioModal">
+    <!-- Modal de Usuário -->
+    <div id="usuarioModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Novo Usuário</h2>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Código</label>
-                            <input type="text" id="codigo" name="codigo" readonly disabled>
-                            <small class="form-text text-muted">Gerado automaticamente</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Nome</label>
-                            <input type="text" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Senha</label>
-                            <input type="password" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Confirmar Senha</label>
-                            <input type="password" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nível de Acesso</label>
-                            <select required>
-                                <option value="">Selecione...</option>
-                                <option value="admin">Administrador</option>
-                                <option value="manager">Gerente</option>
-                                <option value="user">Usuário</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select required>
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
-                        <button type="submit" class="btn-primary">Salvar</button>
-                    </div>
-                </form>
+            <form id="usuarioForm" onsubmit="criarUsuario(event)">
+                <div class="form-group">
+                    <label for="codigo">Código</label>
+                    <input type="text" id="codigo" name="codigo" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="perfil">Perfil</label>
+                    <select id="perfil" name="perfil" required>
+                        <option value="admin">Administrador</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="usuario">Usuário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Usuário</h2>
+                <button class="close-btn" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div class="view-details">
+                <!-- Detalhes serão carregados via JavaScript -->
+            </div>
+            <div class="form-actions">
+                <button class="btn-secondary" onclick="closeViewModal()">Fechar</button>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import api from '../js/config/api.js';
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Exclusão</h2>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este usuário?</p>
+                <p>Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="form-actions">
+                <button class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button id="confirmDeleteBtn" class="btn-danger">Excluir</button>
+            </div>
+        </div>
+    </div>
 
-        // Função para carregar usuários
-        async function carregarUsuarios() {
-            try {
-                const usuarios = await api.get('/usuarios');
-                const tbody = document.querySelector('#usuariosTable tbody');
-                tbody.innerHTML = '';
+    <!-- Container para mensagens toast -->
+    <div class="toast-container"></div>
 
-                usuarios.forEach(usuario => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${usuario.codigo}</td>
-                        <td>${usuario.nome}</td>
-                        <td>${usuario.email}</td>
-                        <td>${usuario.tipo}</td>
-                        <td>
-                            <span class="badge ${usuario.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                                ${usuario.status}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="editarUsuario(${usuario.codigo})">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirUsuario(${usuario.codigo})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error('Erro ao carregar usuários:', error);
-                alert('Erro ao carregar usuários');
-            }
-        }
-
-        // Função para salvar usuário
-        async function salvarUsuario(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const usuario = {
-                nome: formData.get('nome'),
-                email: formData.get('email'),
-                senha: formData.get('senha'),
-                tipo: formData.get('tipo'),
-                status: formData.get('status')
-            };
-
-            try {
-                if (form.dataset.codigo) {
-                    // Atualizar usuário existente
-                    await api.put(`/usuarios/${form.dataset.codigo}`, usuario);
-                } else {
-                    // Criar novo usuário
-                    await api.post('/usuarios', usuario);
-                }
-
-                // Fechar modal e recarregar lista
-                const modal = bootstrap.Modal.getInstance(document.getElementById('usuarioModal'));
-                modal.hide();
-                carregarUsuarios();
-            } catch (error) {
-                console.error('Erro ao salvar usuário:', error);
-                alert('Erro ao salvar usuário');
-            }
-        }
-
-        // Função para editar usuário
-        async function editarUsuario(codigo) {
-            try {
-                const usuario = await api.get(`/usuarios/${codigo}`);
-                const form = document.getElementById('usuarioForm');
-                
-                // Preencher formulário
-                form.dataset.codigo = usuario.codigo;
-                form.nome.value = usuario.nome;
-                form.email.value = usuario.email;
-                form.senha.value = ''; // Limpar senha
-                form.tipo.value = usuario.tipo;
-                form.status.value = usuario.status;
-
-                // Abrir modal
-                const modal = new bootstrap.Modal(document.getElementById('usuarioModal'));
-                modal.show();
-            } catch (error) {
-                console.error('Erro ao carregar usuário:', error);
-                alert('Erro ao carregar usuário');
-            }
-        }
-
-        // Função para excluir usuário
-        async function excluirUsuario(codigo) {
-            if (!confirm('Tem certeza que deseja excluir este usuário?')) {
-                return;
-            }
-
-            try {
-                await api.delete(`/usuarios/${codigo}`);
-                carregarUsuarios();
-            } catch (error) {
-                console.error('Erro ao excluir usuário:', error);
-                alert('Erro ao excluir usuário');
-            }
-        }
-
-        // Função para abrir modal de novo usuário
-        function novoUsuario() {
-            const form = document.getElementById('usuarioForm');
-            form.reset();
-            delete form.dataset.codigo;
-            
-            const modal = new bootstrap.Modal(document.getElementById('usuarioModal'));
-            modal.show();
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarUsuarios();
-            document.getElementById('usuarioForm').addEventListener('submit', salvarUsuario);
-        });
-    </script>
+    <!-- Scripts -->
+    <script type="module" src="../js/config/api.js"></script>
+    <script type="module" src="../Paginas_JS/usuarios.js"></script>
 </body>
 </html> 

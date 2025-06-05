@@ -1,123 +1,199 @@
-// Funções para gerenciar o modal
+import api from '../js/config/api.js';
+
+// Funções de Modal
 function openModal() {
-    const modal = document.getElementById('userModal');
-    
-    // Gerar código sequencial
-    const codigoInput = document.getElementById('codigo');
-    const ultimoCodigo = localStorage.getItem('ultimoCodigoUsuario') || '00000';
-    const novoCodigo = String(parseInt(ultimoCodigo) + 1).padStart(5, '0');
-    codigoInput.value = novoCodigo;
-    
+    const modal = document.getElementById('usuarioModal');
     modal.style.display = 'flex';
 }
 
 function closeModal() {
-    const modal = document.getElementById('userModal');
+    const modal = document.getElementById('usuarioModal');
     modal.style.display = 'none';
 }
 
-// Fechar modal ao clicar fora dele
-window.onclick = function(event) {
-    const modal = document.getElementById('userModal');
-    if (event.target === modal) {
-        closeModal();
+function closeViewModal() {
+    const modal = document.getElementById('viewModal');
+    modal.style.display = 'none';
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.style.display = 'none';
+}
+
+// Função para carregar usuários
+async function carregarUsuarios() {
+    try {
+        const usuarios = await api.get('/usuarios');
+        const tbody = document.querySelector('#usuariosTable tbody');
+        tbody.innerHTML = '';
+
+        usuarios.forEach(usuario => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${usuario.codigo}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>${usuario.perfil}</td>
+                <td><span class="status ${usuario.status}">${usuario.status}</span></td>
+                <td class="actions">
+                    <button class="action-btn view-btn" onclick="visualizarUsuario(${usuario.codigo})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit-btn" onclick="editarUsuario(${usuario.codigo})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="confirmarExclusao(${usuario.codigo})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        mostrarToast('Erro ao carregar usuários', 'error');
     }
 }
 
-// Funções para gerenciar usuários
-function addUser(event) {
+// Função para criar usuário
+async function criarUsuario(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    
-    // Salvar o último código usado
-    const codigo = document.getElementById('codigo').value;
-    localStorage.setItem('ultimoCodigoUsuario', codigo);
-    
-    // Aqui você implementaria a lógica para enviar os dados para o backend
-    console.log('Adicionando usuário:', Object.fromEntries(formData));
-    
-    // Limpar formulário e fechar modal
-    form.reset();
-    closeModal();
-}
+    const dados = Object.fromEntries(formData.entries());
 
-function editUser(userId) {
-    // Aqui você implementaria a lógica para carregar os dados do usuário
-    console.log('Editando usuário:', userId);
-    openModal();
-}
-
-function deleteUser(userId) {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        // Aqui você implementaria a lógica para excluir o usuário
-        console.log('Excluindo usuário:', userId);
+    try {
+        await api.post('/usuarios', dados);
+        mostrarToast('Usuário criado com sucesso!', 'success');
+        closeModal();
+        form.reset();
+        carregarUsuarios();
+    } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+        mostrarToast('Erro ao criar usuário', 'error');
     }
 }
 
-function viewUser(userId) {
-    // Aqui você implementaria a lógica para visualizar os detalhes do usuário
-    console.log('Visualizando usuário:', userId);
-}
-
-// Funções para filtros e busca
-function filterUsers() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value;
-    const levelFilter = document.getElementById('levelFilter').value;
-    
-    const rows = document.querySelectorAll('tbody tr');
-    
-    rows.forEach(row => {
-        const codigo = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-        const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-        const level = row.querySelector('td:nth-child(3)').textContent;
-        const status = row.querySelector('td:nth-child(4)').textContent;
+// Função para visualizar usuário
+async function visualizarUsuario(codigo) {
+    try {
+        const usuario = await api.get(`/usuarios/${codigo}`);
+        const modal = document.getElementById('viewModal');
+        const content = document.querySelector('.view-details');
         
-        const matchesSearch = codigo.includes(searchTerm) || name.includes(searchTerm);
-        const matchesStatus = statusFilter === 'all' || status === statusFilter;
-        const matchesLevel = levelFilter === 'all' || level === levelFilter;
+        content.innerHTML = `
+            <div class="detail-row">
+                <strong>Código:</strong>
+                <span>${usuario.codigo}</span>
+            </div>
+            <div class="detail-row">
+                <strong>Nome:</strong>
+                <span>${usuario.nome}</span>
+            </div>
+            <div class="detail-row">
+                <strong>Email:</strong>
+                <span>${usuario.email}</span>
+            </div>
+            <div class="detail-row">
+                <strong>Perfil:</strong>
+                <span>${usuario.perfil}</span>
+            </div>
+            <div class="detail-row">
+                <strong>Status:</strong>
+                <span class="status ${usuario.status}">${usuario.status}</span>
+            </div>
+        `;
         
-        row.style.display = matchesSearch && matchesStatus && matchesLevel ? '' : 'none';
-    });
-}
-
-// Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    // Adicionar event listeners
-    document.getElementById('searchInput').addEventListener('input', filterUsers);
-    document.getElementById('statusFilter').addEventListener('change', filterUsers);
-    document.getElementById('levelFilter').addEventListener('change', filterUsers);
-    
-    // Adicionar event listener para o formulário
-    const form = document.getElementById('userForm');
-    if (form) {
-        form.addEventListener('submit', addUser);
+        modal.style.display = 'flex';
+    } catch (error) {
+        console.error('Erro ao buscar usuário:', error);
+        mostrarToast('Erro ao buscar usuário', 'error');
     }
+}
 
-    // Adicionar event listeners para os submenus
-    const submenuTriggers = document.querySelectorAll('.submenu-trigger');
-    
-    submenuTriggers.forEach(trigger => {
-        trigger.addEventListener('click', function(e) {
+// Função para editar usuário
+async function editarUsuario(codigo) {
+    try {
+        const usuario = await api.get(`/usuarios/${codigo}`);
+        const form = document.getElementById('usuarioForm');
+        
+        // Preencher o formulário com os dados do usuário
+        form.codigo.value = usuario.codigo;
+        form.nome.value = usuario.nome;
+        form.email.value = usuario.email;
+        form.perfil.value = usuario.perfil;
+        form.status.value = usuario.status;
+        
+        // Alterar o comportamento do formulário para atualização
+        form.onsubmit = async (e) => {
             e.preventDefault();
-            const submenu = this.nextElementSibling;
-            const icon = this.querySelector('.submenu-icon');
+            const formData = new FormData(form);
+            const dados = Object.fromEntries(formData.entries());
             
-            // Toggle do submenu
-            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-            
-            // Rotacionar o ícone
-            icon.style.transform = submenu.style.display === 'block' ? 'rotate(180deg)' : 'rotate(0)';
-        });
-    });
-
-    // Expandir o submenu ativo
-    const activeSubmenu = document.querySelector('.submenu a.active').closest('.submenu');
-    if (activeSubmenu) {
-        activeSubmenu.style.display = 'block';
-        const trigger = activeSubmenu.previousElementSibling;
-        const icon = trigger.querySelector('.submenu-icon');
-        icon.style.transform = 'rotate(180deg)';
+            try {
+                await api.put(`/usuarios/${codigo}`, dados);
+                mostrarToast('Usuário atualizado com sucesso!', 'success');
+                closeModal();
+                form.reset();
+                carregarUsuarios();
+            } catch (error) {
+                console.error('Erro ao atualizar usuário:', error);
+                mostrarToast('Erro ao atualizar usuário', 'error');
+            }
+        };
+        
+        openModal();
+    } catch (error) {
+        console.error('Erro ao buscar usuário:', error);
+        mostrarToast('Erro ao buscar usuário', 'error');
     }
-}); 
+}
+
+// Função para excluir usuário
+async function excluirUsuario(codigo) {
+    try {
+        await api.delete(`/usuarios/${codigo}`);
+        mostrarToast('Usuário excluído com sucesso!', 'success');
+        closeDeleteModal();
+        carregarUsuarios();
+    } catch (error) {
+        console.error('Erro ao excluir usuário:', error);
+        mostrarToast('Erro ao excluir usuário', 'error');
+    }
+}
+
+// Função para mostrar toast
+function mostrarToast(mensagem, tipo) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = `
+        <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${mensagem}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    document.querySelector('.toast-container').appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Carregar usuários quando a página carregar
+document.addEventListener('DOMContentLoaded', carregarUsuarios);
+
+// Exportar funções para uso global
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.closeViewModal = closeViewModal;
+window.closeDeleteModal = closeDeleteModal;
+window.visualizarUsuario = visualizarUsuario;
+window.editarUsuario = editarUsuario;
+window.excluirUsuario = excluirUsuario;
+window.confirmarExclusao = (codigo) => {
+    const modal = document.getElementById('deleteModal');
+    modal.style.display = 'flex';
+    document.getElementById('confirmDeleteBtn').onclick = () => excluirUsuario(codigo);
+}; 
