@@ -23,6 +23,8 @@
     { "src": "/comissoes", "dest": "/frontend/src/comissoes.html" },
     { "src": "/sincronizar", "dest": "/frontend/src/sincronizar.html" },
     { "src": "/login", "dest": "/frontend/src/login.html" },
+    { "src": "/assets/(.*)", "dest": "/frontend/src/assets/$1" },
+    { "src": "/styles/(.*)", "dest": "/frontend/src/styles/$1" },
     { "src": "/(.*)", "dest": "/frontend/src/$1" }
   ]
 } 
