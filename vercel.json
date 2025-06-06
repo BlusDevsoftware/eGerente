@@ -2,86 +2,27 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/**/*",
+      "src": "frontend/src/**/*",
       "use": "@vercel/static"
     }
   ],
   "routes": [
-    {
-      "src": "/",
-      "dest": "/frontend/Paginas_HTML/index.html"
-    },
-    {
-      "src": "/usuarios",
-      "dest": "/frontend/Paginas_HTML/usuarios.html"
-    },
-    {
-      "src": "/usuarios.html",
-      "dest": "/frontend/Paginas_HTML/usuarios.html"
-    },
-    {
-      "src": "/colaboradores",
-      "dest": "/frontend/Paginas_HTML/colaboradores.html"
-    },
-    {
-      "src": "/colaboradores.html",
-      "dest": "/frontend/Paginas_HTML/colaboradores.html"
-    },
-    {
-      "src": "/produtos",
-      "dest": "/frontend/Paginas_HTML/produtos.html"
-    },
-    {
-      "src": "/produtos.html",
-      "dest": "/frontend/Paginas_HTML/produtos.html"
-    },
-    {
-      "src": "/servicos",
-      "dest": "/frontend/Paginas_HTML/servicos.html"
-    },
-    {
-      "src": "/servicos.html",
-      "dest": "/frontend/Paginas_HTML/servicos.html"
-    },
-    {
-      "src": "/clientes",
-      "dest": "/frontend/Paginas_HTML/clientes.html"
-    },
-    {
-      "src": "/clientes.html",
-      "dest": "/frontend/Paginas_HTML/clientes.html"
-    },
-    {
-      "src": "/perfis",
-      "dest": "/frontend/Paginas_HTML/perfis.html"
-    },
-    {
-      "src": "/perfis.html",
-      "dest": "/frontend/Paginas_HTML/perfis.html"
-    },
-    {
-      "src": "/parametros",
-      "dest": "/frontend/Paginas_HTML/parametros.html"
-    },
-    {
-      "src": "/parametros.html",
-      "dest": "/frontend/Paginas_HTML/parametros.html"
-    },
-    {
-      "src": "/Paginas_CSS/(.*)",
-      "dest": "/frontend/Paginas_CSS/$1"
-    },
-    {
-      "src": "/Paginas_JS/(.*)",
-      "dest": "/frontend/Paginas_JS/$1"
-    },
-    {
-      "src": "/Imagens/(.*)",
-      "dest": "/frontend/Imagens/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
+    { "src": "/", "dest": "/frontend/src/index.html" },
+    { "src": "/usuarios", "dest": "/frontend/src/usuarios.html" },
+    { "src": "/colaboradores", "dest": "/frontend/src/colaboradores.html" },
+    { "src": "/produtos", "dest": "/frontend/src/produtos.html" },
+    { "src": "/servicos", "dest": "/frontend/src/servicos.html" },
+    { "src": "/clientes", "dest": "/frontend/src/clientes.html" },
+    { "src": "/conferencia", "dest": "/frontend/src/conferencia.html" },
+    { "src": "/consulta-comissao", "dest": "/frontend/src/consulta-comissao.html" },
+    { "src": "/dinamico", "dest": "/frontend/src/dinamico.html" },
+    { "src": "/lancar-comissao", "dest": "/frontend/src/lancar-comissao.html" },
+    { "src": "/manutencao-bd", "dest": "/frontend/src/manutencao-bd.html" },
+    { "src": "/movimento-comissao", "dest": "/frontend/src/movimento-comissao.html" },
+    { "src": "/recebimento", "dest": "/frontend/src/recebimento.html" },
+    { "src": "/comissoes", "dest": "/frontend/src/comissoes.html" },
+    { "src": "/sincronizar", "dest": "/frontend/src/sincronizar.html" },
+    { "src": "/login", "dest": "/frontend/src/login.html" },
+    { "src": "/(.*)", "dest": "/frontend/src/$1" }
   ]
 } 
