@@ -190,158 +190,141 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <img src="/Imagens/bluedev-logo.png" alt="BlueDev Logo">
-            <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="/Imagens/bluedev-logo.png" alt="BlueDev Logo">
+                <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="has-submenu">
+                    <a href="#"><i class="fas fa-user-plus"></i> Cadastros <i class="fas fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="/colaboradores.html"><i class="fas fa-users"></i> Colaboradores</a></li>
+                        <li><a href="/clientes.html"><i class="fas fa-user-tie"></i> Clientes</a></li>
+                        <li><a href="/produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+                        <li><a href="/servicos.html"><i class="fas fa-cogs"></i> Serviços</a></li>
+                        <li><a href="/usuarios.html" class="active"><i class="fas fa-user-shield"></i> Usuários</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#"><i class="fas fa-hand-holding-usd"></i> Comissões <i class="fas fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="/lancar-comissao.html"><i class="fas fa-plus-circle"></i> Lançar</a></li>
+                        <li><a href="/movimento-comissao.html"><i class="fas fa-exchange-alt"></i> Movimento</a></li>
+                        <li><a href="/consulta-comissao.html"><i class="fas fa-search"></i> Consulta</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#"><i class="fas fa-chart-bar"></i> Relatórios <i class="fas fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="/recebimento.html"><i class="fas fa-money-bill-wave"></i> Recebimento</a></li>
+                        <li><a href="/conferencia.html"><i class="fas fa-check-circle"></i> Conferência</a></li>
+                        <li><a href="/dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#"><i class="fas fa-cog"></i> Configurações <i class="fas fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="/perfis.html"><i class="fas fa-user-tag"></i> Perfis de Acesso</a></li>
+                        <li><a href="/parametros.html"><i class="fas fa-sliders-h"></i> Parâmetros</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <ul class="nav-menu">
-            <li><a href="/index.html"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li class="has-submenu">
-                <a href="#"><i class="fas fa-user-plus"></i> Cadastros <i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="/colaboradores.html"><i class="fas fa-users"></i> Colaboradores</a></li>
-                    <li><a href="/clientes.html"><i class="fas fa-user-tie"></i> Clientes</a></li>
-                    <li><a href="/produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
-                    <li><a href="/servicos.html"><i class="fas fa-cogs"></i> Serviços</a></li>
-                    <li><a href="/usuarios.html" class="active"><i class="fas fa-user-shield"></i> Usuários</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#"><i class="fas fa-hand-holding-usd"></i> Comissões <i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="/lancar-comissao.html"><i class="fas fa-plus-circle"></i> Lançar</a></li>
-                    <li><a href="/movimento-comissao.html"><i class="fas fa-exchange-alt"></i> Movimento</a></li>
-                    <li><a href="/consulta-comissao.html"><i class="fas fa-search"></i> Consulta</a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#"><i class="fas fa-chart-bar"></i> Relatórios <i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="/recebimento.html"><i class="fas fa-money-bill-wave"></i> Recebimento</a></li>
-                    <li><a href="/conferencia.html"><i class="fas fa-check-circle"></i> Conferência</a></li>
-                    <li><a href="/dinamico.html"><i class="fas fa-chart-line"></i> Dinâmico <span class="beta-tag">beta</span></a></li>
-                </ul>
-            </li>
-            <li class="has-submenu">
-                <a href="#"><i class="fas fa-cog"></i> Configurações <i class="fas fa-chevron-down submenu-icon"></i></a>
-                <ul class="submenu">
-                    <li><a href="/perfis.html"><i class="fas fa-user-tag"></i> Perfis de Acesso</a></li>
-                    <li><a href="/parametros.html"><i class="fas fa-sliders-h"></i> Parâmetros</a></li>
-                </ul>
-            </li>
-        </ul>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="welcome-text">
+                    <h1>Usuários</h1>
+                    <p>Gerencie os usuários do sistema</p>
+                </div>
+                <div class="user-info">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Total de Usuários</h3>
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-value" id="totalUsuarios">150</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Usuários Ativos</h3>
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="card-value" id="usuariosAtivos">120</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Usuários Inativos</h3>
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="card-value" id="usuariosInativos">30</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Administradores</h3>
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="card-value" id="usuariosAdmin">5</div>
+                </div>
+            </div>
+
+            <!-- User Table -->
+            <div class="latest-commissions">
+                <div class="table-header">
+                    <h2>Lista de Usuários</h2>
+                    <div class="table-actions">
+                        <button class="btn-primary" id="addUserBtn">
+                            <i class="fas fa-plus"></i> Novo Usuário
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Dados dos usuários serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="main-content">
-        <div class="content-header">
-            <div>
-                <h2>Usuários</h2>
-                <span class="subtitle">Gerencie os usuários do sistema</span>
-            </div>
-            <div class="user-actions">
-                <span class="notification"><i class="fas fa-bell"></i><span class="badge">3</span></span>
-                <span class="user-avatar">A</span>
-            </div>
-        </div>
-        <div class="cards-row">
-            <div class="summary-card">
-                <i class="fas fa-users"></i>
-                <div class="summary-value" id="totalUsuarios">150</div>
-                <div class="summary-label">Total de Usuários</div>
-            </div>
-            <div class="summary-card">
-                <i class="fas fa-user-check"></i>
-                <div class="summary-value" id="usuariosAtivos">120</div>
-                <div class="summary-label">Usuários Ativos</div>
-            </div>
-            <div class="summary-card">
-                <i class="fas fa-user-clock"></i>
-                <div class="summary-value" id="usuariosInativos">30</div>
-                <div class="summary-label">Usuários Inativos</div>
-            </div>
-            <div class="summary-card">
-                <i class="fas fa-user-shield"></i>
-                <div class="summary-value" id="usuariosAdmin">5</div>
-                <div class="summary-label">Administradores</div>
-            </div>
-        </div>
-        <div class="filters-row">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Buscar usuário...">
-            </div>
-            <select id="perfilFilter">
-                <option value="">Nível de Acesso</option>
-                <option value="admin">Administrador</option>
-                <option value="gerente">Gerente</option>
-                <option value="usuario">Usuário</option>
-            </select>
-            <select id="statusFilter">
-                <option value="">Status</option>
-                <option value="ativo">Ativo</option>
-                <option value="inativo">Inativo</option>
-            </select>
-            <button class="btn-primary" onclick="openModal()">
-                <i class="fas fa-plus"></i> Novo Usuário
-            </button>
-        </div>
-        <div class="table-container">
-            <table class="styled-table" id="usuariosTable">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nome</th>
-                        <th>Nível de Acesso</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dados serão carregados via JavaScript -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- Modais e Toasts permanecem iguais -->
-    <div id="usuarioModal" class="modal">
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="userModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Novo Usuário</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h2>Detalhes do Usuário</h2>
+                <button class="close-modal">&times;</button>
             </div>
-            <form id="usuarioForm" onsubmit="criarUsuario(event)">
-                <div class="form-group">
-                    <label for="codigo">Código</label>
-                    <input type="text" id="codigo" name="codigo" required readonly>
-                </div>
-                <div class="form-group">
-                    <label for="nome">Nome</label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="perfil">Perfil</label>
-                    <select id="perfil" name="perfil" required>
-                        <option value="admin">Administrador</option>
-                        <option value="gerente">Gerente</option>
-                        <option value="usuario">Usuário</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" required>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn-primary">Salvar</button>
-                </div>
-            </form>
+            <div class="modal-body">
+                <!-- Conteúdo do modal será inserido via JavaScript -->
+            </div>
         </div>
     </div>
     <div id="viewModal" class="modal">
@@ -379,7 +362,6 @@
             </div>
         </div>
     </div>
-    <div class="toast-container"></div>
     <script type="module">
         import { openModal, closeModal, closeViewModal, closeDeleteModal } from '/Paginas_JS/usuarios.js';
         window.openModal = openModal;
