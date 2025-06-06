@@ -112,20 +112,22 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 250px;
-    background-color: #1e3c72;
+    width: 280px;
+    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
     color: white;
     position: fixed;
     height: 100vh;
     overflow-y: auto;
     transition: all 0.3s ease;
     z-index: 1000;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-    padding: 20px;
+    padding: 25px 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .logo h1 {
@@ -133,59 +135,83 @@ body {
     font-size: 24px;
     font-weight: 600;
     margin: 0;
+    letter-spacing: 0.5px;
 }
 
 .logo .orange {
     color: #ff6b00;
+    font-weight: 700;
 }
 
 .logo .highlight {
-    color: #007bff;
+    color: #4dabf7;
+    font-weight: 700;
 }
 
 .nav-menu {
     list-style: none;
-    padding: 0;
+    padding: 15px 0;
     margin: 0;
 }
 
 .nav-menu li {
-    margin: 5px 0;
+    margin: 2px 0;
+    padding: 0 10px;
 }
 
 .nav-menu a {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 12px 15px;
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .nav-menu a:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
+    transform: translateX(5px);
 }
 
 .nav-menu a.active {
-    background-color: #007bff;
+    background: linear-gradient(90deg, #4dabf7 0%, #007bff 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 
 .nav-menu i {
-    margin-right: 10px;
+    margin-right: 12px;
     width: 20px;
     text-align: center;
+    font-size: 1.1em;
 }
 
 .submenu {
     display: none;
     background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 5px 0;
+    padding: 5px;
 }
 
 .submenu a {
-    padding-left: 50px;
-    font-size: 0.9em;
+    padding: 10px 15px 10px 45px;
+    font-size: 0.95em;
+    opacity: 0.9;
+}
+
+.submenu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.submenu a.active {
+    background: linear-gradient(90deg, #4dabf7 0%, #007bff 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 
 .submenu-trigger {
@@ -194,14 +220,28 @@ body {
 
 .submenu-icon {
     transition: transform 0.3s ease;
+    font-size: 0.8em;
+    opacity: 0.7;
 }
 
 .has-submenu.active .submenu {
     display: block;
+    animation: slideDown 0.3s ease;
 }
 
 .has-submenu.active .submenu-icon {
     transform: rotate(180deg);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Main Content */
@@ -690,7 +730,7 @@ textarea {
     }
 
     .sidebar {
-        width: 60px;
+        width: 70px;
     }
 
     .sidebar .logo h1 {
@@ -702,15 +742,16 @@ textarea {
     }
 
     .main-content {
-        margin-left: 60px;
+        margin-left: 70px;
     }
 
     .submenu {
         position: absolute;
-        left: 60px;
-        width: 200px;
-        background-color: #1e3c72;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        left: 70px;
+        width: 220px;
+        background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 0 8px 8px 0;
     }
 
     .submenu a {
@@ -836,17 +877,20 @@ textarea {
 .logout-button a {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 12px 20px;
     color: white;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
     border-radius: 8px;
-    background-color: #ff6b00;
+    background: linear-gradient(90deg, #ff6b00 0%, #ff8533 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
 }
 
 .logout-button a:hover {
-    background: #ff8533;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
 }
 
 .logout-button a i {
