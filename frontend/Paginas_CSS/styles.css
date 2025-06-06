@@ -110,6 +110,100 @@ body {
     background-color: #f8f9fa;
 }
 
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #1e3c72;
+    color: white;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.logo {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo h1 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.logo .orange {
+    color: #ff6b00;
+}
+
+.logo .highlight {
+    color: #007bff;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu li {
+    margin: 5px 0;
+}
+
+.nav-menu a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.nav-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-menu a.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.nav-menu i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.submenu {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.submenu a {
+    padding-left: 50px;
+    font-size: 0.9em;
+}
+
+.submenu-trigger {
+    justify-content: space-between;
+}
+
+.submenu-icon {
+    transition: transform 0.3s ease;
+}
+
+.has-submenu.active .submenu {
+    display: block;
+}
+
+.has-submenu.active .submenu-icon {
+    transform: rotate(180deg);
+}
+
 /* Main Content */
 .main-content {
     flex: 1;
@@ -596,24 +690,31 @@ textarea {
     }
 
     .sidebar {
-        width: 70px;
-        padding: 10px;
+        width: 60px;
     }
 
-    .logo h1 {
+    .sidebar .logo h1 {
         display: none;
     }
 
-    .nav-menu a span {
+    .sidebar span {
         display: none;
-    }
-
-    .nav-menu a i {
-        margin-right: 0;
     }
 
     .main-content {
-        margin-left: 70px;
+        margin-left: 60px;
+    }
+
+    .submenu {
+        position: absolute;
+        left: 60px;
+        width: 200px;
+        background-color: #1e3c72;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .submenu a {
+        padding: 12px 20px;
     }
 }
 
@@ -736,16 +837,16 @@ textarea {
     display: flex;
     align-items: center;
     padding: 12px 20px;
-    color: white !important;
+    color: white;
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
     border-radius: 8px;
-    background-color: #ff6b00 !important;
+    background-color: #ff6b00;
 }
 
 .logout-button a:hover {
-    background: #ff8533 !important;
+    background: #ff8533;
 }
 
 .logout-button a i {
@@ -755,22 +856,6 @@ textarea {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .submenu {
-        padding-left: 10px;
-    }
-
-    .submenu a span {
-        display: none;
-    }
-
-    .submenu a i {
-        margin-right: 0;
-    }
-
-    .beta-tag {
-        display: none;
-    }
-
     .logout-button {
         bottom: 10px;
         left: 10px;

@@ -37,6 +37,41 @@ function salvarUltimoCodigo(tipo, codigo) {
     localStorage.setItem(chave, codigo);
 }
 
+// Menu lateral
+document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona evento de clique para os itens do menu com submenu
+    const submenuTriggers = document.querySelectorAll('.submenu-trigger');
+    submenuTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('active');
+        });
+    });
+
+    // Adiciona classe active ao item do menu atual
+    const currentPath = window.location.pathname;
+    const menuItems = document.querySelectorAll('.nav-menu a');
+    menuItems.forEach(item => {
+        if (item.getAttribute('href') === currentPath.split('/').pop()) {
+            item.classList.add('active');
+            // Se estiver em um submenu, abre o menu pai
+            const parentSubmenu = item.closest('.has-submenu');
+            if (parentSubmenu) {
+                parentSubmenu.classList.add('active');
+            }
+        }
+    });
+});
+
+// Função de logout
+function logout() {
+    // Limpa o token de autenticação
+    localStorage.removeItem('token');
+    // Redireciona para a página de login
+    window.location.href = 'login.html';
+}
+
 // Exportar funções para uso em outros arquivos
 window.gerarCodigo = gerarCodigo;
 window.openModal = openModal;
