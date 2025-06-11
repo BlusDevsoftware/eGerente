@@ -116,6 +116,8 @@ body {
     background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
     color: white;
     position: fixed;
+    left: 0;
+    top: 0;
     height: 100vh;
     overflow-y: auto;
     transition: all 0.3s ease;
