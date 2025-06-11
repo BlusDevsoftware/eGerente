@@ -4,6 +4,7 @@ const cors = require('cors');
 const allowedOrigins = [
     'http://localhost:3000', // Desenvolvimento local
     'https://egerente.vercel.app', // Frontend no Vercel
+    'https://e-gerente-1whnopkfd-bluedevs-projects.vercel.app', // Novo domínio do frontend
     process.env.FRONTEND_URL // URL do frontend configurada em variável de ambiente
 ];
 
