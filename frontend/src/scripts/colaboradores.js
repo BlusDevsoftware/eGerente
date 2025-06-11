@@ -57,57 +57,67 @@ async function criarColaborador(event) {
 // Função para visualizar colaborador
 async function visualizarColaborador(codigo) {
     try {
-        const colaborador = await api.get(`/colaboradores/${codigo}`);
-        const modal = document.getElementById('viewModal');
-        const content = document.getElementById('viewContent');
+        const response = await api.get(`/colaboradores/${codigo}`);
+        const colaborador = response;
         
-        content.innerHTML = `
+        const viewContent = document.getElementById('viewContent');
+        viewContent.innerHTML = `
             <div class="view-row">
                 <div class="view-group">
-                    <label>Código</label>
-                    <p>${colaborador.codigo}</p>
+                    <div class="view-label">Código</div>
+                    <div class="view-value">${colaborador.codigo}</div>
                 </div>
                 <div class="view-group">
-                    <label>Status</label>
-                    <p>${colaborador.status}</p>
+                    <div class="view-label">Status</div>
+                    <div class="view-value">
+                        <span class="view-status ${colaborador.status === 'Ativo' ? 'active' : 'inactive'}">
+                            ${colaborador.status}
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="view-row">
                 <div class="view-group">
-                    <label>Nome Completo</label>
-                    <p>${colaborador.nome}</p>
+                    <div class="view-label">Nome</div>
+                    <div class="view-value">${colaborador.nome}</div>
                 </div>
                 <div class="view-group">
-                    <label>Email</label>
-                    <p>${colaborador.email}</p>
-                </div>
-            </div>
-            <div class="view-row">
-                <div class="view-group">
-                    <label>Telefone</label>
-                    <p>${colaborador.telefone}</p>
-                </div>
-                <div class="view-group">
-                    <label>Cargo</label>
-                    <p>${colaborador.cargo}</p>
+                    <div class="view-label">Cargo</div>
+                    <div class="view-value">${colaborador.cargo}</div>
                 </div>
             </div>
             <div class="view-row">
                 <div class="view-group">
-                    <label>Data de Admissão</label>
-                    <p>${colaborador.data_admissao ? new Date(colaborador.data_admissao).toLocaleDateString() : 'Não informada'}</p>
+                    <div class="view-label">Email</div>
+                    <div class="view-value">${colaborador.email}</div>
                 </div>
                 <div class="view-group">
-                    <label>Usuário Vinculado</label>
-                    <p>${colaborador.usuario_vinculado || 'Não vinculado'}</p>
+                    <div class="view-label">Telefone</div>
+                    <div class="view-value">${colaborador.telefone}</div>
+                </div>
+            </div>
+            <div class="view-row">
+                <div class="view-group">
+                    <div class="view-label">Departamento</div>
+                    <div class="view-value">${colaborador.departamento}</div>
+                </div>
+                <div class="view-group">
+                    <div class="view-label">Data de Admissão</div>
+                    <div class="view-value">${colaborador.data_admissao ? new Date(colaborador.data_admissao).toLocaleDateString() : 'Não informada'}</div>
+                </div>
+            </div>
+            <div class="view-row">
+                <div class="view-group">
+                    <div class="view-label">Usuário Vinculado</div>
+                    <div class="view-value">${colaborador.usuario_vinculado || 'Não vinculado'}</div>
                 </div>
             </div>
         `;
         
-        modal.style.display = 'flex';
+        document.getElementById('viewModal').style.display = 'flex';
     } catch (error) {
         console.error('Erro ao buscar colaborador:', error);
-        mostrarToast('Erro ao buscar colaborador', 'error');
+        mostrarToast('Erro ao buscar detalhes do colaborador', 'error');
     }
 }
 
@@ -244,4 +254,5 @@ document.addEventListener('DOMContentLoaded', () => {
 window.visualizarColaborador = visualizarColaborador;
 window.editarColaborador = editarColaborador;
 window.excluirColaborador = excluirColaborador;
+window.confirmarExclusao = confirmarExclusao; 
 window.confirmarExclusao = confirmarExclusao; 

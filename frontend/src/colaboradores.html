@@ -388,14 +388,14 @@
 
     <!-- Modal de Visualização -->
     <div id="viewModal" class="modal">
-        <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
+        <div class="modal-content" style="max-width: 600px; width: 90%;">
             <div class="modal-header">
                 <h2>Detalhes do Colaborador</h2>
-                <button class="close-modal" onclick="closeViewModal()">&times;</button>
+                <span class="close" onclick="closeViewModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <div id="viewContent" class="view-details">
-                    <!-- Conteúdo será preenchido via JavaScript -->
+                <div id="viewContent" class="view-content">
+                    <!-- O conteúdo será preenchido dinamicamente -->
                 </div>
             </div>
         </div>
