@@ -155,10 +155,14 @@ async function editarColaborador(codigo) {
 // Função para excluir colaborador
 async function excluirColaborador(codigo) {
     try {
-        await api.delete(`/colaboradores/${codigo}`);
-        mostrarToast('Colaborador excluído com sucesso!', 'success');
-        closeDeleteModal();
-        carregarColaboradores();
+        const response = await api.delete(`/colaboradores/${codigo}`);
+        if (response && response.message) {
+            mostrarToast('Colaborador excluído com sucesso!', 'success');
+            closeDeleteModal();
+            carregarColaboradores();
+        } else {
+            throw new Error('Resposta inválida do servidor');
+        }
     } catch (error) {
         console.error('Erro ao excluir colaborador:', error);
         mostrarToast('Erro ao excluir colaborador', 'error');

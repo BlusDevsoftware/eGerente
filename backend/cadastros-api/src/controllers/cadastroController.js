@@ -165,7 +165,7 @@ const excluirRegistro = async (req, res) => {
             throw error;
         }
 
-        res.status(204).send();
+        res.json({ message: 'Registro excluído com sucesso' });
     } catch (error) {
         console.error(`Erro ao excluir registro da tabela ${req.params.tabela}:`, error);
         res.status(500).json({ 
