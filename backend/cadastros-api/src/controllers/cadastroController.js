@@ -53,9 +53,14 @@ const criarRegistro = async (req, res) => {
             .order('codigo', { ascending: false })
             .limit(1);
 
-        const novoCodigo = ultimoRegistro && ultimoRegistro.length > 0 
-            ? ultimoRegistro[0].codigo + 1 
-            : 1;
+        let novoCodigo;
+        if (ultimoRegistro && ultimoRegistro.length > 0) {
+            // Extrair o número do último código (remover zeros à esquerda)
+            const ultimoNumero = parseInt(ultimoRegistro[0].codigo);
+            novoCodigo = (ultimoNumero + 1).toString().padStart(5, '0');
+        } else {
+            novoCodigo = '00001';
+        }
 
         // Preparar dados para inserção
         const dadosParaInserir = {
