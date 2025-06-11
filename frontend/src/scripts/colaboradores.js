@@ -170,9 +170,32 @@ function mostrarToast(mensagem, tipo) {
     }, 3000);
 }
 
+// Função para carregar a lista de usuários
+async function carregarUsuarios() {
+    try {
+        const usuarios = await api.get('/usuarios');
+        const select = document.querySelector('select[name="usuario_vinculado"]');
+        
+        // Limpar opções existentes
+        select.innerHTML = '<option value="">Selecione um usuário</option>';
+        
+        // Adicionar usuários
+        usuarios.forEach(usuario => {
+            const option = document.createElement('option');
+            option.value = usuario.codigo;
+            option.textContent = `${usuario.nome} (${usuario.email})`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        mostrarToast('Erro ao carregar lista de usuários', 'error');
+    }
+}
+
 // Carregar colaboradores quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
     carregarColaboradores();
+    carregarUsuarios();
     
     // Adicionar evento de submit ao formulário
     const form = document.getElementById('colaboradorForm');
