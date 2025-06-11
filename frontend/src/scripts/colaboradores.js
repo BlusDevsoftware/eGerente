@@ -14,7 +14,7 @@ async function carregarColaboradores() {
                 <td>${colaborador.telefone}</td>
                 <td>${colaborador.cargo}</td>
                 <td>${colaborador.data_admissao}</td>
-                <td><span class="status ${colaborador.status}">${colaborador.status}</span></td>
+                <td><span class="status ${colaborador.status.toLowerCase()}">${colaborador.status}</span></td>
                 <td class="actions">
                     <button class="action-btn view-btn" onclick="visualizarColaborador(${colaborador.codigo})">
                         <i class="fas fa-eye"></i>
