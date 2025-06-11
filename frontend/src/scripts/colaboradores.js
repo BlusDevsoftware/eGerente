@@ -1,7 +1,7 @@
 // Função para carregar colaboradores
 async function carregarColaboradores() {
     try {
-        const colaboradores = await api.get('/colaboradores/colaboradores');
+        const colaboradores = await api.get('/colaboradores');
         const tbody = document.querySelector('.table-container table tbody');
         tbody.innerHTML = '';
 
@@ -43,7 +43,7 @@ async function criarColaborador(event) {
     const dados = Object.fromEntries(formData.entries());
 
     try {
-        await api.post('/colaboradores/colaboradores', dados);
+        await api.post('/colaboradores', dados);
         mostrarToast('Colaborador criado com sucesso!', 'success');
         closeModal('colaborador');
         form.reset();
@@ -57,7 +57,7 @@ async function criarColaborador(event) {
 // Função para visualizar colaborador
 async function visualizarColaborador(codigo) {
     try {
-        const response = await api.get(`/colaboradores/colaboradores/${codigo}`);
+        const response = await api.get(`/colaboradores/${codigo}`);
         const colaborador = response;
         
         const viewContent = document.getElementById('viewContent');
@@ -124,7 +124,7 @@ async function visualizarColaborador(codigo) {
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
-        const colaborador = await api.get(`/colaboradores/colaboradores/${codigo}`);
+        const colaborador = await api.get(`/colaboradores/${codigo}`);
         const form = document.getElementById('colaboradorForm');
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('.modal-header h2');
@@ -151,7 +151,7 @@ async function editarColaborador(codigo) {
             try {
                 // Garantir que o código seja uma string com 5 dígitos
                 const codigoStr = codigo.toString().padStart(5, '0');
-                await api.put(`/colaboradores/colaboradores/${codigoStr}`, dados);
+                await api.put(`/colaboradores/${codigoStr}`, dados);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 closeModal();
                 form.reset();
@@ -178,7 +178,7 @@ async function excluirColaborador(codigo) {
         const codigoStr = codigo.toString().padStart(5, '0');
         console.log('Tentando excluir colaborador com código:', codigoStr);
         
-        const response = await api.delete(`/colaboradores/colaboradores/${codigoStr}`);
+        const response = await api.delete(`/colaboradores/${codigoStr}`);
         console.log('Resposta da exclusão:', response);
         
         if (response && response.message) {
