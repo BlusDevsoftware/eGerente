@@ -15,22 +15,26 @@
         // Funções de Modal - Escopo Global
         window.openModal = function() {
             const modal = document.getElementById('colaboradorModal');
-            modal.style.display = 'flex';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
         window.closeModal = function() {
             const modal = document.getElementById('colaboradorModal');
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         window.closeViewModal = function() {
             const modal = document.getElementById('viewModal');
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         window.closeDeleteModal = function() {
             const modal = document.getElementById('deleteModal');
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     </script>
     <style>
@@ -323,8 +327,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="colaboradorModal" style="display: none; align-items: center; justify-content: center;">
-        <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
+    <div class="modal" id="colaboradorModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2>Novo Colaborador</h2>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
