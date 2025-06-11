@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colaboradores - Gestor de Comissões</title>
-    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
-    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <title>Gestor de Comissões - Colaboradores</title>
+    <link rel="icon" type="image/png" href="assets/images/bluedev-logo.png">
+    <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../js/config/api.js" type="module"></script>
-    <script src="../Paginas_JS/colaboradores.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         // Funções de Modal
         function openModal() {
@@ -215,7 +214,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <img src="assets/images/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
             <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
         </div>
         <ul class="nav-menu">
@@ -451,134 +450,7 @@
     <!-- Toast Container -->
     <div class="toast-container"></div>
 
-    <script type="module">
-        import api from '../js/config/api.js';
-
-        // Função para carregar colaboradores
-        async function carregarColaboradores() {
-            try {
-                const colaboradores = await api.get('/colaboradores');
-                const tbody = document.querySelector('#colaboradoresTable tbody');
-                tbody.innerHTML = '';
-
-                colaboradores.forEach(colaborador => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${colaborador.codigo}</td>
-                        <td>${colaborador.nome}</td>
-                        <td>${colaborador.email}</td>
-                        <td>${colaborador.telefone}</td>
-                        <td>${colaborador.cargo}</td>
-                        <td>${colaborador.departamento}</td>
-                        <td>
-                            <span class="badge ${colaborador.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                                ${colaborador.status}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="editarColaborador(${colaborador.codigo})">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirColaborador(${colaborador.codigo})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error('Erro ao carregar colaboradores:', error);
-                alert('Erro ao carregar colaboradores');
-            }
-        }
-
-        // Função para salvar colaborador
-        async function salvarColaborador(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const colaborador = {
-                nome: formData.get('nome'),
-                email: formData.get('email'),
-                telefone: formData.get('telefone'),
-                cargo: formData.get('cargo'),
-                departamento: formData.get('departamento'),
-                status: formData.get('status')
-            };
-
-            try {
-                if (form.dataset.codigo) {
-                    // Atualizar colaborador existente
-                    await api.put(`/colaboradores/${form.dataset.codigo}`, colaborador);
-                } else {
-                    // Criar novo colaborador
-                    await api.post('/colaboradores', colaborador);
-                }
-
-                // Fechar modal e recarregar lista
-                const modal = bootstrap.Modal.getInstance(document.getElementById('colaboradorModal'));
-                modal.hide();
-                carregarColaboradores();
-            } catch (error) {
-                console.error('Erro ao salvar colaborador:', error);
-                alert('Erro ao salvar colaborador');
-            }
-        }
-
-        // Função para editar colaborador
-        async function editarColaborador(codigo) {
-            try {
-                const colaborador = await api.get(`/colaboradores/${codigo}`);
-                const form = document.getElementById('colaboradorForm');
-                
-                // Preencher formulário
-                form.dataset.codigo = colaborador.codigo;
-                form.nome.value = colaborador.nome;
-                form.email.value = colaborador.email;
-                form.telefone.value = colaborador.telefone;
-                form.cargo.value = colaborador.cargo;
-                form.departamento.value = colaborador.departamento;
-                form.status.value = colaborador.status;
-
-                // Abrir modal
-                const modal = new bootstrap.Modal(document.getElementById('colaboradorModal'));
-                modal.show();
-            } catch (error) {
-                console.error('Erro ao carregar colaborador:', error);
-                alert('Erro ao carregar colaborador');
-            }
-        }
-
-        // Função para excluir colaborador
-        async function excluirColaborador(codigo) {
-            if (!confirm('Tem certeza que deseja excluir este colaborador?')) {
-                return;
-            }
-
-            try {
-                await api.delete(`/colaboradores/${codigo}`);
-                carregarColaboradores();
-            } catch (error) {
-                console.error('Erro ao excluir colaborador:', error);
-                alert('Erro ao excluir colaborador');
-            }
-        }
-
-        // Função para abrir modal de novo colaborador
-        function novoColaborador() {
-            const form = document.getElementById('colaboradorForm');
-            form.reset();
-            delete form.dataset.codigo;
-            
-            const modal = new bootstrap.Modal(document.getElementById('colaboradorModal'));
-            modal.show();
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarColaboradores();
-            document.getElementById('colaboradorForm').addEventListener('submit', salvarColaborador);
-        });
-    </script>
+    <script src="scripts/config/api.js"></script>
+    <script src="scripts/colaboradores.js"></script>
 </body>
 </html> 

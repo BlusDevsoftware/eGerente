@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuários - Gestor de Comissões</title>
-    <link rel="icon" type="image/png" href="../Imagens/bluedev-logo.png">
-    <link rel="stylesheet" href="../Paginas_CSS/styles.css">
+    <title>Gestor de Comissões - Usuários</title>
+    <link rel="icon" type="image/png" href="assets/images/bluedev-logo.png">
+    <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../js/config/api.js"></script>
-    <script src="../Paginas_JS/codigos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         .toast-container {
             position: fixed;
@@ -194,7 +193,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-                <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+                <img src="assets/images/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
                 <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
             </div>
             <ul class="nav-menu">
@@ -364,12 +363,7 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        import { openModal, closeModal, closeViewModal, closeDeleteModal } from '../Paginas_JS/usuarios.js';
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-        window.closeViewModal = closeViewModal;
-        window.closeDeleteModal = closeDeleteModal;
-    </script>
+    <script src="scripts/config/api.js"></script>
+    <script src="scripts/usuarios.js"></script>
 </body>
 </html> 
