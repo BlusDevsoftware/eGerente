@@ -10,6 +10,28 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/config/api.js"></script>
     <script src="scripts/produtos.js"></script>
+    <script>
+        // Funções de Modal - Escopo Global
+        window.openModal = function() {
+            const modal = document.getElementById('produtoModal');
+            modal.style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            const modal = document.getElementById('produtoModal');
+            modal.style.display = 'none';
+        }
+
+        window.closeViewModal = function() {
+            const modal = document.getElementById('viewModal');
+            modal.style.display = 'none';
+        }
+
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'none';
+        }
+    </script>
 </head>
 <body>
     <!-- Sidebar -->

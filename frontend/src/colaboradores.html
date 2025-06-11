@@ -8,24 +8,26 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script src="scripts/colaboradores.js"></script>
     <script>
-        // Funções de Modal
-        function openModal() {
+        // Funções de Modal - Escopo Global
+        window.openModal = function() {
             const modal = document.getElementById('colaboradorModal');
             modal.style.display = 'flex';
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             const modal = document.getElementById('colaboradorModal');
             modal.style.display = 'none';
         }
 
-        function closeViewModal() {
+        window.closeViewModal = function() {
             const modal = document.getElementById('viewModal');
             modal.style.display = 'none';
         }
 
-        function closeDeleteModal() {
+        window.closeDeleteModal = function() {
             const modal = document.getElementById('deleteModal');
             modal.style.display = 'none';
         }
@@ -449,8 +451,5 @@
 
     <!-- Toast Container -->
     <div class="toast-container"></div>
-
-    <script src="scripts/config/api.js"></script>
-    <script src="scripts/colaboradores.js"></script>
 </body>
 </html> 
