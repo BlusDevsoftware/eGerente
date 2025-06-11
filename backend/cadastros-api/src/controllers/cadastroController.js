@@ -57,18 +57,42 @@ const criarRegistro = async (req, res) => {
             ? ultimoRegistro[0].codigo + 1 
             : 1;
 
+        // Preparar dados para inserção
+        const dadosParaInserir = {
+            ...dados,
+            codigo: novoCodigo
+        };
+
+        // Se for a tabela colaboradores, adicionar departamento padrão e tratar usuario_vinculado
+        if (tabela === 'colaboradores') {
+            dadosParaInserir.departamento = 'Geral';
+            
+            // Converter usuario_vinculado vazio para null
+            if (dadosParaInserir.usuario_vinculado === '') {
+                dadosParaInserir.usuario_vinculado = null;
+            } else if (dadosParaInserir.usuario_vinculado) {
+                dadosParaInserir.usuario_vinculado = parseInt(dadosParaInserir.usuario_vinculado);
+            }
+        }
+
         const { data, error } = await supabase
             .from(tabela)
-            .insert([{ ...dados, codigo: novoCodigo }])
+            .insert([dadosParaInserir])
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error(`Erro ao inserir na tabela ${tabela}:`, error);
+            throw error;
+        }
 
         res.status(201).json(data);
     } catch (error) {
         console.error(`Erro ao criar registro na tabela ${req.params.tabela}:`, error);
-        res.status(500).json({ error: `Erro ao criar registro na tabela ${req.params.tabela}` });
+        res.status(500).json({ 
+            error: `Erro ao criar registro na tabela ${req.params.tabela}`,
+            details: error.message 
+        });
     }
 };
 
