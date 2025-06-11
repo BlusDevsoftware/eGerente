@@ -171,7 +171,13 @@ function mostrarToast(mensagem, tipo) {
 }
 
 // Carregar colaboradores quando a página carregar
-document.addEventListener('DOMContentLoaded', carregarColaboradores);
+document.addEventListener('DOMContentLoaded', () => {
+    carregarColaboradores();
+    
+    // Adicionar evento de submit ao formulário
+    const form = document.getElementById('colaboradorForm');
+    form.addEventListener('submit', criarColaborador);
+});
 
 // Exportar funções para uso global
 window.visualizarColaborador = visualizarColaborador;
