@@ -18,7 +18,7 @@ const listarRegistros = async (req, res) => {
     }
 };
 
-// Função genérica para buscar registro por código
+// Função genérica para buscar registro
 const buscarRegistro = async (req, res) => {
     try {
         const { tabela, codigo } = req.params;
@@ -28,7 +28,10 @@ const buscarRegistro = async (req, res) => {
             .eq('codigo', codigo)
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error(`Erro ao buscar registro da tabela ${tabela}:`, error);
+            throw error;
+        }
         if (!data) {
             return res.status(404).json({ error: 'Registro não encontrado' });
         }
@@ -36,7 +39,10 @@ const buscarRegistro = async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error(`Erro ao buscar registro da tabela ${req.params.tabela}:`, error);
-        res.status(500).json({ error: `Erro ao buscar registro da tabela ${req.params.tabela}` });
+        res.status(500).json({ 
+            error: `Erro ao buscar registro da tabela ${req.params.tabela}`,
+            details: error.message 
+        });
     }
 };
 
@@ -107,6 +113,15 @@ const atualizarRegistro = async (req, res) => {
         const { tabela, codigo } = req.params;
         const dados = req.body;
 
+        // Se for a tabela colaboradores, tratar usuario_vinculado
+        if (tabela === 'colaboradores') {
+            if (dados.usuario_vinculado === '') {
+                dados.usuario_vinculado = null;
+            } else if (dados.usuario_vinculado) {
+                dados.usuario_vinculado = parseInt(dados.usuario_vinculado);
+            }
+        }
+
         const { data, error } = await supabase
             .from(tabela)
             .update(dados)
@@ -114,7 +129,10 @@ const atualizarRegistro = async (req, res) => {
             .select()
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error(`Erro ao atualizar registro da tabela ${tabela}:`, error);
+            throw error;
+        }
         if (!data) {
             return res.status(404).json({ error: 'Registro não encontrado' });
         }
@@ -122,7 +140,10 @@ const atualizarRegistro = async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error(`Erro ao atualizar registro da tabela ${req.params.tabela}:`, error);
-        res.status(500).json({ error: `Erro ao atualizar registro da tabela ${req.params.tabela}` });
+        res.status(500).json({ 
+            error: `Erro ao atualizar registro da tabela ${req.params.tabela}`,
+            details: error.message 
+        });
     }
 };
 
@@ -135,12 +156,18 @@ const excluirRegistro = async (req, res) => {
             .delete()
             .eq('codigo', codigo);
 
-        if (error) throw error;
+        if (error) {
+            console.error(`Erro ao excluir registro da tabela ${tabela}:`, error);
+            throw error;
+        }
 
         res.status(204).send();
     } catch (error) {
         console.error(`Erro ao excluir registro da tabela ${req.params.tabela}:`, error);
-        res.status(500).json({ error: `Erro ao excluir registro da tabela ${req.params.tabela}` });
+        res.status(500).json({ 
+            error: `Erro ao excluir registro da tabela ${req.params.tabela}`,
+            details: error.message 
+        });
     }
 };
 

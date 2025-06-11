@@ -387,66 +387,32 @@
     </div>
 
     <!-- Modal de Visualização -->
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
+    <div id="viewModal" class="modal">
+        <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
             <div class="modal-header">
                 <h2>Detalhes do Colaborador</h2>
                 <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="view-details">
-                    <div class="detail-row">
-                        <strong>Código:</strong>
-                        <span id="view-codigo"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Nome:</strong>
-                        <span id="view-nome"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Email:</strong>
-                        <span id="view-email"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Telefone:</strong>
-                        <span id="view-telefone"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Cargo:</strong>
-                        <span id="view-cargo"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Data de Admissão:</strong>
-                        <span id="view-data-admissao"></span>
-                    </div>
-                    <div class="detail-row">
-                        <strong>Status:</strong>
-                        <span id="view-status"></span>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeViewModal()">Fechar</button>
+                <div id="viewContent" class="view-details">
+                    <!-- Conteúdo será preenchido via JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
-    <div class="modal" id="deleteModal">
-        <div class="modal-content delete-confirmation">
+    <!-- Modal de Exclusão -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content" style="width: 400px; margin: auto;">
             <div class="modal-header">
                 <h2>Confirmar Exclusão</h2>
                 <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="delete-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <p class="delete-message">Tem certeza que deseja excluir o colaborador <span id="deleteItemName"></span>?</p>
-                <p class="delete-warning">Esta ação não poderá ser desfeita.</p>
+                <p>Tem certeza que deseja excluir este colaborador?</p>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
-                    <button type="button" class="btn-danger" onclick="confirmDelete()">Excluir</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn-danger">Excluir</button>
                 </div>
             </div>
         </div>

@@ -59,36 +59,48 @@ async function visualizarColaborador(codigo) {
     try {
         const colaborador = await api.get(`/colaboradores/${codigo}`);
         const modal = document.getElementById('viewModal');
-        const content = document.querySelector('.view-details');
+        const content = document.getElementById('viewContent');
         
         content.innerHTML = `
-            <div class="detail-row">
-                <strong>Código:</strong>
-                <span>${colaborador.codigo}</span>
+            <div class="view-row">
+                <div class="view-group">
+                    <label>Código</label>
+                    <p>${colaborador.codigo}</p>
+                </div>
+                <div class="view-group">
+                    <label>Status</label>
+                    <p>${colaborador.status}</p>
+                </div>
             </div>
-            <div class="detail-row">
-                <strong>Nome:</strong>
-                <span>${colaborador.nome}</span>
+            <div class="view-row">
+                <div class="view-group">
+                    <label>Nome Completo</label>
+                    <p>${colaborador.nome}</p>
+                </div>
+                <div class="view-group">
+                    <label>Email</label>
+                    <p>${colaborador.email}</p>
+                </div>
             </div>
-            <div class="detail-row">
-                <strong>Email:</strong>
-                <span>${colaborador.email}</span>
+            <div class="view-row">
+                <div class="view-group">
+                    <label>Telefone</label>
+                    <p>${colaborador.telefone}</p>
+                </div>
+                <div class="view-group">
+                    <label>Cargo</label>
+                    <p>${colaborador.cargo}</p>
+                </div>
             </div>
-            <div class="detail-row">
-                <strong>Telefone:</strong>
-                <span>${colaborador.telefone}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Cargo:</strong>
-                <span>${colaborador.cargo}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Data de Admissão:</strong>
-                <span>${colaborador.data_admissao}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Status:</strong>
-                <span class="status ${colaborador.status}">${colaborador.status}</span>
+            <div class="view-row">
+                <div class="view-group">
+                    <label>Data de Admissão</label>
+                    <p>${colaborador.data_admissao ? new Date(colaborador.data_admissao).toLocaleDateString() : 'Não informada'}</p>
+                </div>
+                <div class="view-group">
+                    <label>Usuário Vinculado</label>
+                    <p>${colaborador.usuario_vinculado || 'Não vinculado'}</p>
+                </div>
             </div>
         `;
         
@@ -113,6 +125,7 @@ async function editarColaborador(codigo) {
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
         form.status.value = colaborador.status;
+        form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
         
         // Alterar o comportamento do formulário para atualização
         form.onsubmit = async (e) => {
@@ -206,8 +219,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.visualizarColaborador = visualizarColaborador;
 window.editarColaborador = editarColaborador;
 window.excluirColaborador = excluirColaborador;
-window.confirmarExclusao = (codigo) => {
-    const modal = document.getElementById('deleteModal');
-    modal.style.display = 'flex';
-    document.getElementById('confirmDeleteBtn').onclick = () => excluirColaborador(codigo);
-}; 
+window.confirmarExclusao = confirmarExclusao; 
