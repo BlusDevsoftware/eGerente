@@ -126,6 +126,11 @@ async function editarColaborador(codigo) {
     try {
         const colaborador = await api.get(`/colaboradores/${codigo}`);
         const form = document.getElementById('colaboradorForm');
+        const modal = document.getElementById('colaboradorModal');
+        const modalTitle = modal.querySelector('.modal-header h2');
+        
+        // Atualizar título do modal
+        modalTitle.textContent = 'Editar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
         form.codigo.value = colaborador.codigo;
@@ -146,7 +151,7 @@ async function editarColaborador(codigo) {
             try {
                 await api.put(`/colaboradores/${codigo}`, dados);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
-                closeModal('colaborador');
+                closeModal();
                 form.reset();
                 carregarColaboradores();
             } catch (error) {
@@ -155,7 +160,9 @@ async function editarColaborador(codigo) {
             }
         };
         
-        openModal('colaborador');
+        // Exibir o modal
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     } catch (error) {
         console.error('Erro ao buscar colaborador:', error);
         mostrarToast('Erro ao buscar colaborador', 'error');
