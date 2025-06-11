@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://e-gerente.vercel.app/api';
+const API_BASE_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
 
 const api = {
     async get(endpoint) {
