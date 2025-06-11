@@ -10,6 +10,10 @@
 body {
     background-color: #f8f9fa;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    position: relative;
 }
 
 /* Estilos da Página de Login */
@@ -116,6 +120,8 @@ body {
     background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
     color: white;
     position: fixed;
+    left: 0;
+    top: 0;
     height: 100vh;
     overflow-y: auto;
     transition: all 0.3s ease;
@@ -249,11 +255,12 @@ body {
 .main-content {
     flex: 1;
     margin-left: 280px;
-    padding: 30px;
-    transition: margin-left 0.3s ease;
-    background-color: #f8f9fa;
+    padding: 20px;
     min-height: 100vh;
+    background-color: #f8f9fa;
+    transition: margin-left 0.3s ease;
     position: relative;
+    width: calc(100% - 280px);
 }
 
 .main-content::before {
@@ -752,7 +759,7 @@ textarea {
 
     .main-content {
         margin-left: 70px;
-        padding: 20px;
+        width: calc(100% - 70px);
     }
 
     .main-content::before {
@@ -1651,4 +1658,4 @@ tr:hover {
 .btn-primary:hover,
 .btn-secondary:hover {
     opacity: 0.8;
-} 
+}

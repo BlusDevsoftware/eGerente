@@ -6,14 +6,14 @@
     <title>Gestor de Comissões - Lançar Comissão</title>
     <link rel="icon" type="image/png" href="assets/images/bluedev-logo.png">
     <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="../Imagens/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;"><h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+            <img src="assets/images/bluedev-logo.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
         </div>
         <ul class="nav-menu">
             <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
@@ -28,7 +28,7 @@
                 </ul>
             </li>
             <li class="has-submenu">
-                <a href="#" class="submenu-trigger active"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
                     <li><a href="lancar-comissao.html" class="active"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
                     <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
@@ -62,7 +62,7 @@
         <div class="header">
             <div class="welcome-text">
                 <h1>Lançar Comissão</h1>
-                <p>Registre uma nova comissão para um colaborador</p>
+                <p>Registre novas comissões no sistema</p>
             </div>
             <div class="user-info">
                 <div class="notifications">
@@ -73,136 +73,10 @@
             </div>
         </div>
 
-        <!-- Commission Form -->
-        <div class="commission-form">
-            <div class="form-card">
-                <form id="commissionForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="colaborador">Colaborador</label>
-                            <select id="colaborador" required>
-                                <option value="">Selecione um colaborador</option>
-                                <option value="1">João Silva</option>
-                                <option value="2">Maria Santos</option>
-                                <option value="3">Pedro Oliveira</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo">Tipo de Venda</label>
-                            <select id="tipo" required>
-                                <option value="">Selecione o tipo</option>
-                                <option value="produto">Produto</option>
-                                <option value="servico">Serviço</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="valor">Valor da Comissão</label>
-                            <div class="input-group">
-                                <span class="input-prefix">R$</span>
-                                <input type="number" id="valor" step="0.01" required placeholder="0,00">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="dataVenda">Data da Venda</label>
-                            <input type="date" id="dataVenda" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="dataPagamento">Data de Pagamento</label>
-                            <input type="date" id="dataPagamento" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="observacoes">Observações</label>
-                            <textarea id="observacoes" rows="3" placeholder="Adicione observações se necessário"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="window.location.href='index.html'">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save"></i> Lançar Comissão
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Recent Commissions -->
-        <div class="recent-commissions">
-            <h2>Últimos Lançamentos</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Colaborador</th>
-                        <th>Tipo</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>15/03/2024</td>
-                        <td>João Silva</td>
-                        <td>Produto</td>
-                        <td>R$ 1.500,00</td>
-                        <td><span class="status pending">Pendente</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>14/03/2024</td>
-                        <td>Maria Santos</td>
-                        <td>Serviço</td>
-                        <td>R$ 2.300,00</td>
-                        <td><span class="status paid">Pago</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Conteúdo da página -->
+        <div class="content">
+            <!-- Resto do conteúdo da página -->
         </div>
     </div>
-
-    <script>
-        // Toggle submenu
-        document.querySelectorAll('.submenu-trigger').forEach(trigger => {
-            trigger.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Fecha todos os outros submenus
-                document.querySelectorAll('.has-submenu').forEach(item => {
-                    if (item !== this.parentElement) {
-                        item.classList.remove('active');
-                    }
-                });
-                
-                // Toggle do submenu atual
-                this.parentElement.classList.toggle('active');
-            });
-        });
-
-        // Form submission
-        document.getElementById('commissionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Aqui você pode adicionar a lógica para enviar os dados do formulário
-            alert('Comissão lançada com sucesso!');
-            this.reset();
-        });
-    </script>
 </body>
 </html> 
