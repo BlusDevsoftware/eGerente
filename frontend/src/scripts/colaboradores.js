@@ -205,6 +205,21 @@ async function carregarUsuarios() {
     }
 }
 
+// Função para confirmar exclusão
+function confirmarExclusao(codigo) {
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Remover event listener anterior se existir
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Adicionar novo event listener
+    newConfirmBtn.addEventListener('click', () => excluirColaborador(codigo));
+    
+    modal.style.display = 'flex';
+}
+
 // Carregar colaboradores quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
     carregarColaboradores();

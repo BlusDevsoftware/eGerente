@@ -22,10 +22,14 @@ const listarRegistros = async (req, res) => {
 const buscarRegistro = async (req, res) => {
     try {
         const { tabela, codigo } = req.params;
+        
+        // Garantir que o código seja tratado como string
+        const codigoStr = codigo.toString().padStart(5, '0');
+        
         const { data, error } = await supabase
             .from(tabela)
             .select('*')
-            .eq('codigo', codigo)
+            .eq('codigo', codigoStr)
             .single();
 
         if (error) {
