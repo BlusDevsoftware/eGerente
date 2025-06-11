@@ -23,7 +23,7 @@ COMMENT ON COLUMN usuarios.updated_at IS 'Data da última atualização do regis
 
 -- Criar tabela de colaboradores
 CREATE TABLE colaboradores (
-    codigo SERIAL PRIMARY KEY,
+    codigo VARCHAR(5) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     telefone VARCHAR(20),
@@ -38,7 +38,7 @@ CREATE TABLE colaboradores (
 
 -- Adicionar comentários nas colunas da tabela colaboradores
 COMMENT ON TABLE colaboradores IS 'Tabela de colaboradores do sistema';
-COMMENT ON COLUMN colaboradores.codigo IS 'Código único do colaborador';
+COMMENT ON COLUMN colaboradores.codigo IS 'Código único do colaborador (5 dígitos)';
 COMMENT ON COLUMN colaboradores.nome IS 'Nome completo do colaborador';
 COMMENT ON COLUMN colaboradores.email IS 'Email do colaborador';
 COMMENT ON COLUMN colaboradores.telefone IS 'Telefone do colaborador';
