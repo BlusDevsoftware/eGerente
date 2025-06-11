@@ -58,116 +58,88 @@ async function criarColaborador(event) {
 async function visualizarColaborador(codigo) {
     try {
         const response = await api.get(`/colaboradores/${codigo}`);
-        const colaborador = response;
+        const colaborador = response.data;
+
+        const modal = document.getElementById('colaboradorModal');
+        const modalTitle = modal.querySelector('#modalTitle');
+        const form = document.getElementById('colaboradorForm');
+
+        modalTitle.textContent = 'Visualizar Colaborador';
         
-        const viewContent = document.getElementById('viewContent');
-        viewContent.innerHTML = `
-            <div class="view-row">
-                <div class="view-group">
-                    <div class="view-label">Código</div>
-                    <div class="view-value">${colaborador.codigo}</div>
-                </div>
-                <div class="view-group">
-                    <div class="view-label">Status</div>
-                    <div class="view-value">
-                        <span class="view-status ${colaborador.status === 'Ativo' ? 'active' : 'inactive'}">
-                            ${colaborador.status}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="view-row">
-                <div class="view-group">
-                    <div class="view-label">Nome</div>
-                    <div class="view-value">${colaborador.nome}</div>
-                </div>
-                <div class="view-group">
-                    <div class="view-label">Cargo</div>
-                    <div class="view-value">${colaborador.cargo}</div>
-                </div>
-            </div>
-            <div class="view-row">
-                <div class="view-group">
-                    <div class="view-label">Email</div>
-                    <div class="view-value">${colaborador.email}</div>
-                </div>
-                <div class="view-group">
-                    <div class="view-label">Telefone</div>
-                    <div class="view-value">${colaborador.telefone}</div>
-                </div>
-            </div>
-            <div class="view-row">
-                <div class="view-group">
-                    <div class="view-label">Departamento</div>
-                    <div class="view-value">${colaborador.departamento}</div>
-                </div>
-                <div class="view-group">
-                    <div class="view-label">Data de Admissão</div>
-                    <div class="view-value">${colaborador.data_admissao ? new Date(colaborador.data_admissao).toLocaleDateString() : 'Não informada'}</div>
-                </div>
-            </div>
-            <div class="view-row">
-                <div class="view-group">
-                    <div class="view-label">Usuário Vinculado</div>
-                    <div class="view-value">${colaborador.usuario_vinculado || 'Não vinculado'}</div>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('viewModal').style.display = 'flex';
+        // Preencher o formulário com os dados do colaborador
+        form.codigo.value = colaborador.codigo;
+        form.status.value = colaborador.status;
+        form.nome.value = colaborador.nome;
+        form.email.value = colaborador.email;
+        form.telefone.value = colaborador.telefone;
+        form.cargo.value = colaborador.cargo;
+        form.data_admissao.value = colaborador.data_admissao;
+        form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
+
+        // Desabilitar todos os campos
+        Array.from(form.elements).forEach(element => {
+            element.disabled = true;
+        });
+
+        // Mostrar o modal com animação
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // Configurar o evento de submit do formulário
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            closeModal();
+        };
     } catch (error) {
-        console.error('Erro ao buscar colaborador:', error);
-        mostrarToast('Erro ao buscar detalhes do colaborador', 'error');
+        showMessage('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
 
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
-        const colaborador = await api.get(`/colaboradores/${codigo}`);
-        const form = document.getElementById('colaboradorForm');
+        const response = await api.get(`/colaboradores/${codigo}`);
+        const colaborador = response.data;
+
         const modal = document.getElementById('colaboradorModal');
-        const modalTitle = modal.querySelector('.modal-header h2');
-        
-        // Atualizar título do modal
+        const modalTitle = modal.querySelector('#modalTitle');
+        const form = document.getElementById('colaboradorForm');
+
         modalTitle.textContent = 'Editar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
         form.codigo.value = colaborador.codigo;
+        form.status.value = colaborador.status;
         form.nome.value = colaborador.nome;
         form.email.value = colaborador.email;
         form.telefone.value = colaborador.telefone;
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
-        form.status.value = colaborador.status;
         form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
-        
-        // Alterar o comportamento do formulário para atualização
+
+        // Mostrar o modal com animação
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // Configurar o evento de submit do formulário
         form.onsubmit = async (e) => {
             e.preventDefault();
-            const formData = new FormData(form);
-            const dados = Object.fromEntries(formData.entries());
-            
             try {
-                // Garantir que o código seja uma string com 5 dígitos
-                const codigoStr = codigo.toString().padStart(5, '0');
-                await api.put(`/colaboradores/${codigoStr}`, dados);
-                mostrarToast('Colaborador atualizado com sucesso!', 'success');
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                await api.put(`/colaboradores/${codigo}`, data);
+                showMessage('Colaborador atualizado com sucesso!', 'success');
                 closeModal();
-                form.reset();
                 carregarColaboradores();
             } catch (error) {
-                console.error('Erro ao atualizar colaborador:', error);
-                mostrarToast('Erro ao atualizar colaborador', 'error');
+                showMessage('Erro ao atualizar colaborador: ' + error.message, 'error');
             }
         };
-        
-        // Exibir o modal
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
     } catch (error) {
-        console.error('Erro ao buscar colaborador:', error);
-        mostrarToast('Erro ao buscar colaborador', 'error');
+        showMessage('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
 
