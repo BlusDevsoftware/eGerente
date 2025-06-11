@@ -48,4 +48,5 @@ const api = {
     }
 };
 
-export default api; 
+// Tornar a API disponível globalmente
+window.api = api; 

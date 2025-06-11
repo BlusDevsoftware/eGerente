@@ -1,5 +1,3 @@
-import api from '../js/config/api.js';
-
 // Função para carregar colaboradores
 async function carregarColaboradores() {
     try {
