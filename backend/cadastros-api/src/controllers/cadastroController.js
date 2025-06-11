@@ -155,17 +155,29 @@ const atualizarRegistro = async (req, res) => {
 const excluirRegistro = async (req, res) => {
     try {
         const { tabela, codigo } = req.params;
-        const { error } = await supabase
+        
+        // Garantir que o código seja tratado como string
+        const codigoStr = codigo.toString().padStart(5, '0');
+        
+        console.log(`Tentando excluir registro da tabela ${tabela} com código ${codigoStr}`);
+        
+        const { data, error } = await supabase
             .from(tabela)
             .delete()
-            .eq('codigo', codigo);
+            .eq('codigo', codigoStr)
+            .select();
 
         if (error) {
             console.error(`Erro ao excluir registro da tabela ${tabela}:`, error);
             throw error;
         }
 
-        res.json({ message: 'Registro excluído com sucesso' });
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: 'Registro não encontrado' });
+        }
+
+        console.log(`Registro excluído com sucesso:`, data);
+        res.json({ message: 'Registro excluído com sucesso', data });
     } catch (error) {
         console.error(`Erro ao excluir registro da tabela ${req.params.tabela}:`, error);
         res.status(500).json({ 
