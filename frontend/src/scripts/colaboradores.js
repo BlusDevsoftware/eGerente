@@ -46,7 +46,7 @@ async function criarColaborador(event) {
         email: formData.get('email'),
         telefone: formData.get('telefone'),
         cargo: formData.get('cargo'),
-        data_contratacao: formData.get('data_contratacao') || new Date().toISOString().split('T')[0],
+        data_admissao: formData.get('data_admissao') || new Date().toISOString().split('T')[0],
         status: formData.get('status')
     };
 
@@ -144,7 +144,7 @@ async function editarColaborador(codigo) {
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
                 cargo: formData.get('cargo'),
-                data_contratacao: formData.get('data_contratacao') || new Date().toISOString().split('T')[0],
+                data_admissao: formData.get('data_admissao') || new Date().toISOString().split('T')[0],
                 status: formData.get('status')
             };
 
