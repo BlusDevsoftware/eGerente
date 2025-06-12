@@ -51,7 +51,7 @@ async function criarColaborador(event) {
     };
 
     try {
-        const response = await api.post('/colaboradores', colaborador);
+        await api.post('/colaboradores', colaborador);
         mostrarToast('Colaborador criado com sucesso!', 'success');
         form.reset();
         carregarColaboradores();
