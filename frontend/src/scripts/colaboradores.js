@@ -155,6 +155,7 @@ async function editarColaborador(codigo) {
             const formData = new FormData(form);
             
             const colaborador = {
+                codigo: form.codigo.value, // Usando o código exato do formulário
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
@@ -165,7 +166,7 @@ async function editarColaborador(codigo) {
 
             try {
                 console.log('Dados sendo enviados para edição:', colaborador);
-                const response = await api.put(`/colaboradores/${codigo}`, colaborador);
+                const response = await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
                 console.log('Resposta da API:', response);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 carregarColaboradores();
