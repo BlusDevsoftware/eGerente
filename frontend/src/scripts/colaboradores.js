@@ -108,11 +108,9 @@ async function visualizarColaborador(codigo) {
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
-        console.log('Editando colaborador com código:', codigo);
         const response = await api.get(`/colaboradores/${codigo}`);
         // A resposta já é o objeto do colaborador, não precisa acessar .data
         const colaborador = response;
-        console.log('Dados do colaborador carregados:', colaborador);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -165,7 +163,6 @@ async function editarColaborador(codigo) {
             }
         };
     } catch (error) {
-        console.error('Erro ao carregar dados do colaborador:', error);
         mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
