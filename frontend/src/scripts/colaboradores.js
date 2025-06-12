@@ -61,8 +61,6 @@ async function criarColaborador(event) {
         console.error('Erro ao criar colaborador:', error);
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
-        } else {
-            mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
         }
     }
 }
