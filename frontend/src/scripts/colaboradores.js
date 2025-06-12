@@ -53,10 +53,10 @@ async function criarColaborador(event) {
     try {
         // Verificar se o email já existe
         const colaboradores = await api.get('/colaboradores');
-        const emailExiste = colaboradores.some(c => c.email === colaborador.email);
+        const colaboradorExistente = colaboradores.find(c => c.email === colaborador.email);
         
-        if (emailExiste) {
-            mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+        if (colaboradorExistente) {
+            mostrarToast(`Este email já está cadastrado para o colaborador: ${colaboradorExistente.nome}`, 'error');
             return;
         }
 
@@ -164,15 +164,6 @@ async function editarColaborador(codigo) {
             };
 
             try {
-                // Verificar se o email já existe em outro colaborador
-                const colaboradores = await api.get('/colaboradores');
-                const emailExiste = colaboradores.some(c => c.email === colaborador.email && c.codigo !== parseInt(codigo));
-                
-                if (emailExiste) {
-                    mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
-                    return;
-                }
-
                 console.log('Dados sendo enviados para edição:', colaborador);
                 const response = await api.put(`/colaboradores/${parseInt(codigo)}`, colaborador);
                 console.log('Resposta da API:', response);
