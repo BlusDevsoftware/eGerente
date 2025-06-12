@@ -16,7 +16,8 @@ const api = {
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('Resposta não é JSON');
             }
-            return await response.json();
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Erro na requisição GET:', error);
             throw error;
@@ -40,7 +41,8 @@ const api = {
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('Resposta não é JSON');
             }
-            return await response.json();
+            const responseData = await response.json();
+            return responseData;
         } catch (error) {
             console.error('Erro na requisição POST:', error);
             throw error;
@@ -64,7 +66,8 @@ const api = {
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('Resposta não é JSON');
             }
-            return await response.json();
+            const responseData = await response.json();
+            return responseData;
         } catch (error) {
             console.error('Erro na requisição PUT:', error);
             throw error;
@@ -87,7 +90,8 @@ const api = {
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error('Resposta não é JSON');
             }
-            return await response.json();
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('Erro na requisição DELETE:', error);
             throw error;

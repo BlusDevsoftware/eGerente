@@ -58,7 +58,8 @@ async function criarColaborador(event) {
 async function visualizarColaborador(codigo) {
     try {
         const response = await api.get(`/colaboradores/${codigo}`);
-        const colaborador = response.data;
+        // A resposta já é o objeto do colaborador, não precisa acessar .data
+        const colaborador = response;
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -100,7 +101,8 @@ async function visualizarColaborador(codigo) {
 async function editarColaborador(codigo) {
     try {
         const response = await api.get(`/colaboradores/${codigo}`);
-        const colaborador = response.data;
+        // A resposta já é o objeto do colaborador, não precisa acessar .data
+        const colaborador = response;
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
