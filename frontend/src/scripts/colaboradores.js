@@ -46,7 +46,6 @@ async function criarColaborador(event) {
         email: formData.get('email'),
         telefone: formData.get('telefone'),
         cargo: formData.get('cargo'),
-        departamento: formData.get('departamento'),
         data_contratacao: formData.get('data_contratacao'),
         status: formData.get('status')
     };
@@ -145,7 +144,6 @@ async function editarColaborador(codigo) {
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
                 cargo: formData.get('cargo'),
-                departamento: formData.get('departamento'),
                 data_contratacao: formData.get('data_contratacao'),
                 status: formData.get('status')
             };
