@@ -48,8 +48,7 @@ async function criarColaborador(event) {
         cargo: formData.get('cargo'),
         departamento: formData.get('departamento'),
         data_contratacao: formData.get('data_contratacao'),
-        status: formData.get('status'),
-        comissao: parseFloat(formData.get('comissao')) || 0
+        status: formData.get('status')
     };
 
     try {
@@ -148,8 +147,7 @@ async function editarColaborador(codigo) {
                 cargo: formData.get('cargo'),
                 departamento: formData.get('departamento'),
                 data_contratacao: formData.get('data_contratacao'),
-                status: formData.get('status'),
-                comissao: parseFloat(formData.get('comissao')) || 0
+                status: formData.get('status')
             };
 
             try {
