@@ -43,14 +43,14 @@ async function criarColaborador(event) {
     const dados = Object.fromEntries(formData.entries());
 
     try {
-        await api.post('/colaboradores', dados);
+        await api.post('/cadastros/colaboradores', dados);
         mostrarToast('Colaborador criado com sucesso!', 'success');
         closeModal('colaborador');
         form.reset();
         carregarColaboradores();
     } catch (error) {
         console.error('Erro ao criar colaborador:', error);
-        mostrarToast('Erro ao criar colaborador', 'error');
+        mostrarToast('Erro ao criar colaborador: ' + error.message, 'error');
     }
 }
 
@@ -99,7 +99,7 @@ async function visualizarColaborador(codigo) {
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
-        const response = await api.get(`/colaboradores/${codigo}`);
+        const response = await api.get(`/cadastros/colaboradores/${codigo}`);
         const colaborador = response.data;
 
         const modal = document.getElementById('colaboradorModal');
@@ -130,16 +130,16 @@ async function editarColaborador(codigo) {
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
                 
-                await api.put(`/colaboradores/${codigo}`, data);
-                showMessage('Colaborador atualizado com sucesso!', 'success');
+                await api.put(`/cadastros/colaboradores/${codigo}`, data);
+                mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 closeModal();
                 carregarColaboradores();
             } catch (error) {
-                showMessage('Erro ao atualizar colaborador: ' + error.message, 'error');
+                mostrarToast('Erro ao atualizar colaborador: ' + error.message, 'error');
             }
         };
     } catch (error) {
-        showMessage('Erro ao carregar dados do colaborador: ' + error.message, 'error');
+        mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
 
