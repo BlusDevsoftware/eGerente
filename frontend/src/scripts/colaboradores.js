@@ -157,9 +157,7 @@ async function editarColaborador(codigo) {
                 form.reset();
                 closeModal();
             } catch (error) {
-                if (error.data?.details?.includes('colaboradores_email_key')) {
-                    mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
-                } else if (error.status === 404) {
+                if (error.status === 404) {
                     mostrarToast('Colaborador não encontrado.', 'error');
                 } else if (error.data?.details?.includes('multiple (or no) rows returned')) {
                     mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
