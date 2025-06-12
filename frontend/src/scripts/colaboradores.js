@@ -59,7 +59,11 @@ async function criarColaborador(event) {
         carregarColaboradores();
     } catch (error) {
         console.error('Erro ao criar colaborador:', error);
-        mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
+        if (error.data?.details?.includes('colaboradores_email_key')) {
+            mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+        } else {
+            mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
+        }
     }
 }
 
@@ -155,10 +159,14 @@ async function editarColaborador(codigo) {
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 carregarColaboradores();
                 form.reset();
-                form.classList.add('hidden');
+                closeModal();
             } catch (error) {
                 console.error('Erro ao atualizar colaborador:', error);
-                mostrarToast('Erro ao atualizar colaborador. Por favor, tente novamente.', 'error');
+                if (error.data?.details?.includes('colaboradores_email_key')) {
+                    mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+                } else {
+                    mostrarToast('Erro ao atualizar colaborador. Por favor, tente novamente.', 'error');
+                }
             }
         };
     } catch (error) {
