@@ -75,12 +75,12 @@ async function del(endpoint) {
 }
 
 // Exporta as funções da API
-export const api = {
+const api = {
     get,
     post,
     put,
     delete: del
 };
 
-// Tornar a API disponível globalmente
+// Torna a API disponível globalmente
 window.api = api; 
