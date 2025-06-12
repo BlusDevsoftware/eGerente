@@ -51,14 +51,11 @@ async function criarColaborador(event) {
     };
 
     try {
-        console.log('Dados sendo enviados:', colaborador);
         const response = await api.post('/colaboradores', colaborador);
-        console.log('Resposta da API:', response);
         mostrarToast('Colaborador criado com sucesso!', 'success');
         form.reset();
         carregarColaboradores();
     } catch (error) {
-        console.error('Erro ao criar colaborador:', error);
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
         }
@@ -144,7 +141,7 @@ async function editarColaborador(codigo) {
             const formData = new FormData(form);
             
             const colaborador = {
-                codigo: form.codigo.value, // Usando o código exato do formulário
+                codigo: form.codigo.value,
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
@@ -154,21 +151,16 @@ async function editarColaborador(codigo) {
             };
 
             try {
-                console.log('Dados sendo enviados para edição:', colaborador);
                 const response = await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
-                console.log('Resposta da API:', response);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 carregarColaboradores();
                 form.reset();
                 closeModal();
             } catch (error) {
-                console.error('Erro ao atualizar colaborador:', error);
                 if (error.data?.details?.includes('colaboradores_email_key')) {
                     mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
                 } else if (error.data?.details?.includes('multiple (or no) rows returned')) {
                     mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
-                } else {
-                    mostrarToast('Erro ao atualizar colaborador. Por favor, tente novamente.', 'error');
                 }
             }
         };
@@ -270,5 +262,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.visualizarColaborador = visualizarColaborador;
 window.editarColaborador = editarColaborador;
 window.excluirColaborador = excluirColaborador;
-window.confirmarExclusao = confirmarExclusao; 
 window.confirmarExclusao = confirmarExclusao; 
