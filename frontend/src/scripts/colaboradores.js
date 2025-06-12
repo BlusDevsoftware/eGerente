@@ -38,8 +38,7 @@ async function carregarColaboradores() {
 // Função para criar colaborador
 async function criarColaborador(event) {
     event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
+    const formData = new FormData(event.target);
     
     const colaborador = {
         nome: formData.get('nome'),
@@ -53,11 +52,14 @@ async function criarColaborador(event) {
     try {
         await api.post('/colaboradores', colaborador);
         mostrarToast('Colaborador criado com sucesso!', 'success');
-        form.reset();
         carregarColaboradores();
+        event.target.reset();
+        closeModal();
     } catch (error) {
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+        } else if (error.status === 500) {
+            mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
         }
     }
 }
