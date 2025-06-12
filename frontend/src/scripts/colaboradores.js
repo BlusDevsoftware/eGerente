@@ -165,7 +165,7 @@ async function editarColaborador(codigo) {
 
             try {
                 console.log('Dados sendo enviados para edição:', colaborador);
-                const response = await api.put(`/colaboradores/${parseInt(codigo)}`, colaborador);
+                const response = await api.put(`/colaboradores/${codigo}`, colaborador);
                 console.log('Resposta da API:', response);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
                 carregarColaboradores();
