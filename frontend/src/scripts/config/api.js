@@ -3,6 +3,7 @@ const API_BASE_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cad
 const api = {
     async get(endpoint) {
         try {
+            console.log(`GET ${API_BASE_URL}${endpoint}`);
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -10,6 +11,12 @@ const api = {
                 }
             });
             if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Erro na resposta:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: errorData
+                });
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const contentType = response.headers.get('content-type');
@@ -26,6 +33,7 @@ const api = {
 
     async post(endpoint, data) {
         try {
+            console.log(`POST ${API_BASE_URL}${endpoint}`, data);
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -35,6 +43,12 @@ const api = {
                 body: JSON.stringify(data),
             });
             if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Erro na resposta:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: errorData
+                });
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const contentType = response.headers.get('content-type');
@@ -51,6 +65,7 @@ const api = {
 
     async put(endpoint, data) {
         try {
+            console.log(`PUT ${API_BASE_URL}${endpoint}`, data);
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'PUT',
                 headers: {
@@ -60,6 +75,12 @@ const api = {
                 body: JSON.stringify(data),
             });
             if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Erro na resposta:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: errorData
+                });
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const contentType = response.headers.get('content-type');
@@ -76,6 +97,7 @@ const api = {
 
     async delete(endpoint) {
         try {
+            console.log(`DELETE ${API_BASE_URL}${endpoint}`);
             const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 method: 'DELETE',
                 headers: {
@@ -84,6 +106,12 @@ const api = {
                 }
             });
             if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Erro na resposta:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: errorData
+                });
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const contentType = response.headers.get('content-type');

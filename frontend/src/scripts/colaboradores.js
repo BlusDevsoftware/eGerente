@@ -40,17 +40,28 @@ async function criarColaborador(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    const dados = Object.fromEntries(formData.entries());
+    
+    const colaborador = {
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        telefone: formData.get('telefone'),
+        cargo: formData.get('cargo'),
+        departamento: formData.get('departamento'),
+        data_contratacao: formData.get('data_contratacao'),
+        status: formData.get('status'),
+        comissao: parseFloat(formData.get('comissao')) || 0
+    };
 
     try {
-        await api.post('/colaboradores', dados);
+        console.log('Dados sendo enviados:', colaborador);
+        const response = await api.post('/colaboradores', colaborador);
+        console.log('Resposta da API:', response);
         mostrarToast('Colaborador criado com sucesso!', 'success');
-        closeModal('colaborador');
         form.reset();
         carregarColaboradores();
     } catch (error) {
         console.error('Erro ao criar colaborador:', error);
-        mostrarToast('Erro ao criar colaborador: ' + error.message, 'error');
+        mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -126,18 +137,32 @@ async function editarColaborador(codigo) {
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
-        form.onsubmit = async (e) => {
-            e.preventDefault();
+        form.onsubmit = async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            
+            const colaborador = {
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                telefone: formData.get('telefone'),
+                cargo: formData.get('cargo'),
+                departamento: formData.get('departamento'),
+                data_contratacao: formData.get('data_contratacao'),
+                status: formData.get('status'),
+                comissao: parseFloat(formData.get('comissao')) || 0
+            };
+
             try {
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
-                
-                await api.put(`/colaboradores/${codigo}`, data);
+                console.log('Dados sendo enviados para edição:', colaborador);
+                const response = await api.put(`/colaboradores/${codigo}`, colaborador);
+                console.log('Resposta da API:', response);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
-                closeModal();
                 carregarColaboradores();
+                form.reset();
+                form.classList.add('hidden');
             } catch (error) {
-                mostrarToast('Erro ao atualizar colaborador: ' + error.message, 'error');
+                console.error('Erro ao atualizar colaborador:', error);
+                mostrarToast('Erro ao atualizar colaborador. Por favor, tente novamente.', 'error');
             }
         };
     } catch (error) {
