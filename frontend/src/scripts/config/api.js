@@ -26,11 +26,11 @@ async function post(endpoint, data) {
             body: JSON.stringify(data)
         });
 
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            throw { status: response.status, data: errorData };
+            throw { status: response.status, data: responseData };
         }
-        return await response.json();
+        return responseData;
     } catch (error) {
         throw error;
     }
@@ -47,11 +47,11 @@ async function put(endpoint, data) {
             body: JSON.stringify(data)
         });
 
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            throw { status: response.status, data: errorData };
+            throw { status: response.status, data: responseData };
         }
-        return await response.json();
+        return responseData;
     } catch (error) {
         throw error;
     }
@@ -64,11 +64,11 @@ async function del(endpoint) {
             method: 'DELETE'
         });
 
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            throw { status: response.status, data: errorData };
+            throw { status: response.status, data: responseData };
         }
-        return await response.json();
+        return responseData;
     } catch (error) {
         throw error;
     }
