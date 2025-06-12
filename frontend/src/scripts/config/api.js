@@ -5,11 +5,11 @@ const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastro
 async function get(endpoint) {
     try {
         const response = await fetch(`${API_URL}${endpoint}`);
+        const responseData = await response.json();
         if (!response.ok) {
-            const errorData = await response.json();
-            throw { status: response.status, data: errorData };
+            throw { status: response.status, data: responseData };
         }
-        return await response.json();
+        return responseData;
     } catch (error) {
         throw error;
     }
@@ -27,9 +27,11 @@ async function post(endpoint, data) {
         });
 
         const responseData = await response.json();
+
         if (!response.ok) {
             throw { status: response.status, data: responseData };
         }
+
         return responseData;
     } catch (error) {
         throw error;
@@ -48,9 +50,11 @@ async function put(endpoint, data) {
         });
 
         const responseData = await response.json();
+
         if (!response.ok) {
             throw { status: response.status, data: responseData };
         }
+
         return responseData;
     } catch (error) {
         throw error;
