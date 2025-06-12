@@ -60,6 +60,8 @@ async function criarColaborador(event) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
         } else if (error.status === 500) {
             mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
+        } else {
+            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
         }
     }
 }
