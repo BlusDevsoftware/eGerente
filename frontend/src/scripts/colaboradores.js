@@ -51,15 +51,6 @@ async function criarColaborador(event) {
     };
 
     try {
-        // Verificar se o email já existe
-        const colaboradores = await api.get('/colaboradores');
-        const colaboradorExistente = colaboradores.find(c => c.email === colaborador.email);
-        
-        if (colaboradorExistente) {
-            mostrarToast(`Este email já está cadastrado para o colaborador: ${colaboradorExistente.nome}`, 'error');
-            return;
-        }
-
         console.log('Dados sendo enviados:', colaborador);
         const response = await api.post('/colaboradores', colaborador);
         console.log('Resposta da API:', response);
