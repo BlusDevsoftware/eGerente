@@ -51,6 +51,15 @@ async function criarColaborador(event) {
     };
 
     try {
+        // Verificar se o email já existe
+        const colaboradores = await api.get('/colaboradores');
+        const emailExiste = colaboradores.some(c => c.email === colaborador.email);
+        
+        if (emailExiste) {
+            mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+            return;
+        }
+
         console.log('Dados sendo enviados:', colaborador);
         const response = await api.post('/colaboradores', colaborador);
         console.log('Resposta da API:', response);
@@ -61,8 +70,6 @@ async function criarColaborador(event) {
         console.error('Erro ao criar colaborador:', error);
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
-        } else if (error.data?.details?.includes('multiple (or no) rows returned')) {
-            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
         } else {
             mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
         }
@@ -148,7 +155,6 @@ async function editarColaborador(codigo) {
             const formData = new FormData(form);
             
             const colaborador = {
-                codigo: parseInt(codigo), // Convertendo para número inteiro
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
@@ -158,6 +164,15 @@ async function editarColaborador(codigo) {
             };
 
             try {
+                // Verificar se o email já existe em outro colaborador
+                const colaboradores = await api.get('/colaboradores');
+                const emailExiste = colaboradores.some(c => c.email === colaborador.email && c.codigo !== parseInt(codigo));
+                
+                if (emailExiste) {
+                    mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
+                    return;
+                }
+
                 console.log('Dados sendo enviados para edição:', colaborador);
                 const response = await api.put(`/colaboradores/${parseInt(codigo)}`, colaborador);
                 console.log('Resposta da API:', response);
