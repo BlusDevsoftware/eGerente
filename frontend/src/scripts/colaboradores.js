@@ -144,6 +144,7 @@ async function editarColaborador(codigo) {
             const formData = new FormData(form);
             
             const colaborador = {
+                codigo: formData.get('codigo'),
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
