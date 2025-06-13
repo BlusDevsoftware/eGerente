@@ -2,27 +2,41 @@
 function openModal() {
     const modal = document.getElementById('userModal');
     if (!modal) {
+        console.error('Modal não encontrado');
         mostrarToast('Modal de usuário não encontrado!', 'error');
         return;
     }
-    const modalTitle = document.getElementById('modalTitle');
-    const form = document.getElementById('usuarioForm');
     
     // Resetar o formulário
+    const form = document.getElementById('usuarioForm');
     if (form) {
         form.reset();
         form.codigo.value = '';
-        modalTitle.textContent = 'Novo Usuário';
-        // Configurar o evento de submit para criação
-        form.onsubmit = criarUsuario;
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Novo Usuário';
+        
+        // Garantir que os campos de senha sejam obrigatórios para novo usuário
+        form.senha.setAttribute('required', 'required');
+        form.confirmar_senha.setAttribute('required', 'required');
     }
     
+    // Mostrar o modal
     modal.style.display = 'flex';
+    modal.style.opacity = '0';
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.classList.add('show');
+    });
 }
 
 function closeModal() {
     const modal = document.getElementById('userModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
 }
 
 function closeViewModal() {
@@ -44,11 +58,6 @@ let usuarioAtual = null;
 document.addEventListener('DOMContentLoaded', () => {
     carregarUsuarios();
     setupEventListeners();
-    // Configurar botão de novo usuário
-    const addUserBtn = document.getElementById('addUserBtn');
-    if (addUserBtn) {
-        addUserBtn.addEventListener('click', openModal);
-    }
 });
 
 // Configurar event listeners
