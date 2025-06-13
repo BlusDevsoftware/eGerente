@@ -141,7 +141,6 @@ function atualizarTabela(usuarios) {
             <td>${usuario.codigo_usuario}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
-            <td>${usuario.perfil}</td>
             <td>
                 <span class="status ${usuario.status}">
                     ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
@@ -197,7 +196,6 @@ async function criarUsuario(data) {
             nome: data.nome,
             email: data.email,
             senha: data.senha,
-            perfil: data.perfil,
             status: data.status || 'ativo',
             codigo: gerarCodigoUsuario()
         };
@@ -244,10 +242,6 @@ async function visualizarUsuario(codigo) {
                 <span>${usuario.email}</span>
             </div>
             <div class="detail-row">
-                <strong>Perfil:</strong>
-                <span>${usuario.perfil}</span>
-            </div>
-            <div class="detail-row">
                 <strong>Status:</strong>
                 <span class="status ${usuario.status}">
                     ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
@@ -272,7 +266,6 @@ async function editarUsuario(codigo) {
         form.codigo_usuario.value = usuario.codigo_usuario;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
-        form.perfil.value = usuario.perfil;
         form.status.value = usuario.status;
         
         // Remover required dos campos de senha
