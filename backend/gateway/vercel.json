@@ -11,11 +11,5 @@
       "src": "/(.*)",
       "dest": "src/index.js"
     }
-  ],
-  "env": {
-    "CLIENTES_API_URL": "https://clientes-api-bluepay.vercel.app",
-    "COLABORADORES_API_URL": "https://colaboradores-api-bluepay.vercel.app",
-    "SERVICOS_API_URL": "https://servicos-api-bluepay.vercel.app",
-    "FRONTEND_URL": "https://egerente.vercel.app"
-  }
+  ]
 } 
