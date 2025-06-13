@@ -149,20 +149,31 @@ async function editarColaborador(codigo) {
                 telefone: formData.get('telefone'),
                 cargo: formData.get('cargo'),
                 data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
-                status: formData.get('status')
+                status: formData.get('status'),
+                usuario_vinculado: formData.get('usuario_vinculado') || null
             };
 
             try {
-                await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
-                mostrarToast('Colaborador atualizado com sucesso!', 'success');
-                carregarColaboradores();
-                form.reset();
-                closeModal();
+                console.log('Enviando dados para atualização:', colaborador);
+                const response = await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
+                console.log('Resposta da atualização:', response);
+                
+                if (response) {
+                    mostrarToast('Colaborador atualizado com sucesso!', 'success');
+                    carregarColaboradores();
+                    form.reset();
+                    closeModal();
+                } else {
+                    throw new Error('Resposta inválida do servidor');
+                }
             } catch (error) {
+                console.error('Erro ao atualizar colaborador:', error);
                 if (error.status === 404) {
                     mostrarToast('Colaborador não encontrado.', 'error');
                 } else if (error.data?.details?.includes('multiple (or no) rows returned')) {
                     mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
+                } else {
+                    mostrarToast('Erro ao atualizar colaborador: ' + (error.data?.message || error.message), 'error');
                 }
             }
         };
