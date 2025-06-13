@@ -158,9 +158,7 @@ async function editarColaborador(codigo) {
             };
 
             try {
-                console.log('Enviando dados para atualização:', colaborador);
                 const response = await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
-                console.log('Resposta da atualização:', response);
                 
                 if (response) {
                     mostrarToast('Colaborador atualizado com sucesso!', 'success');
