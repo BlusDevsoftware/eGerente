@@ -2,27 +2,28 @@ const cors = require('cors');
 
 // Lista de origens permitidas
 const allowedOrigins = [
-    'http://localhost:3000', // Desenvolvimento local
-    'https://egerente.vercel.app', // Frontend no Vercel
-    'https://e-gerente-1whnopkfd-bluedevs-projects.vercel.app', // Novo domínio do frontend
-    process.env.FRONTEND_URL // URL do frontend configurada em variável de ambiente
+    'https://e-gerente.vercel.app',
+    'https://e-gerente-5lhcje1mq-bluedevs-projects.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5000'
 ];
 
 // Configuração do CORS
 const corsOptions = {
     origin: function (origin, callback) {
-        // Permite requisições sem origem (como mobile apps ou curl)
+        // Permite requisições sem origin (como mobile apps ou curl)
         if (!origin) return callback(null, true);
         
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.log('Origin bloqueada:', origin);
+            callback(new Error('Não permitido pelo CORS'));
         }
     },
-    credentials: true, // Permite cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 };
 
 module.exports = cors(corsOptions); 
