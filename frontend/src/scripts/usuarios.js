@@ -186,19 +186,32 @@ function filtrarPorStatus(status) {
 // Criar usuário
 async function criarUsuario(data) {
     try {
+        // Validar senhas
         if (data.senha !== data.confirmar_senha) {
             mostrarToast('As senhas não coincidem', 'error');
             return;
         }
 
-        // Gerar código do usuário
-        data.codigo_usuario = gerarCodigoUsuario();
+        // Preparar dados para envio
+        const usuarioData = {
+            nome: data.nome,
+            email: data.email,
+            senha: data.senha,
+            perfil: data.perfil,
+            status: data.status || 'ativo',
+            codigo_usuario: gerarCodigoUsuario()
+        };
 
-        const response = await api.post('/usuarios', data);
+        console.log('Enviando dados:', usuarioData);
+
+        const response = await api.post('/cadastros/usuarios', usuarioData);
+        console.log('Resposta da API:', response);
+        
         mostrarToast('Usuário criado com sucesso', 'success');
         closeModal();
         carregarUsuarios();
     } catch (error) {
+        console.error('Erro ao criar usuário:', error);
         if (error.data?.details?.includes('usuarios_email_key')) {
             mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
         } else if (error.status === 500) {
