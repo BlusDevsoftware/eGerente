@@ -204,7 +204,7 @@ async function criarUsuario(data) {
 
         console.log('Enviando dados:', usuarioData);
 
-        const response = await api.post('/cadastros/usuarios', usuarioData);
+        const response = await api.post('/usuarios', usuarioData);
         console.log('Resposta da API:', response);
         
         mostrarToast('Usuário criado com sucesso', 'success');
