@@ -1,4 +1,4 @@
-import api from './config/api.js';
+import api from '../services/api.js';
 
 // Funções de Modal
 export function openModal() {
@@ -99,7 +99,7 @@ function gerarCodigoUsuario() {
 async function carregarUsuarios() {
     try {
         const response = await api.get('/usuarios');
-        usuarios = response.data;
+        usuarios = response;
         atualizarTabela(usuarios);
     } catch (error) {
         mostrarToast('Erro ao carregar usuários', 'error');
@@ -175,7 +175,13 @@ async function criarUsuario(data) {
         closeModal();
         carregarUsuarios();
     } catch (error) {
-        mostrarToast('Erro ao criar usuário', 'error');
+        if (error.data?.details?.includes('usuarios_email_key')) {
+            mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
+        } else if (error.status === 500) {
+            mostrarToast('Erro ao criar usuário. Por favor, tente novamente.', 'error');
+        } else {
+            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
+        }
     }
 }
 
@@ -183,7 +189,7 @@ async function criarUsuario(data) {
 async function visualizarUsuario(codigo) {
     try {
         const response = await api.get(`/usuarios/${codigo}`);
-        const usuario = response.data;
+        const usuario = response;
         
         const viewDetails = document.querySelector('.view-details');
         viewDetails.innerHTML = `
@@ -221,7 +227,7 @@ async function visualizarUsuario(codigo) {
 async function editarUsuario(codigo) {
     try {
         const response = await api.get(`/usuarios/${codigo}`);
-        const usuario = response.data;
+        const usuario = response;
         
         const form = document.getElementById('usuarioForm');
         form.codigo.value = usuario.codigo;
