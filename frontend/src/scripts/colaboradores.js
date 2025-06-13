@@ -117,7 +117,7 @@ async function editarColaborador(codigo) {
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
-        const form = document.getElementById('colaboradorForm');
+        let form = document.getElementById('colaboradorForm');
 
         modalTitle.textContent = 'Editar Colaborador';
         
