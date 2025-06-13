@@ -82,6 +82,19 @@ function setupEventListeners() {
     });
 }
 
+// Gerar código do usuário
+function gerarCodigoUsuario() {
+    const ultimoUsuario = usuarios.length > 0 ? usuarios[usuarios.length - 1] : null;
+    let proximoNumero = 1;
+    
+    if (ultimoUsuario && ultimoUsuario.codigo_usuario) {
+        const ultimoNumero = parseInt(ultimoUsuario.codigo_usuario);
+        proximoNumero = ultimoNumero + 1;
+    }
+    
+    return proximoNumero.toString().padStart(5, '0');
+}
+
 // Carregar usuários
 async function carregarUsuarios() {
     try {
@@ -101,6 +114,7 @@ function atualizarTabela(usuarios) {
     usuarios.forEach(usuario => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+            <td>${usuario.codigo_usuario}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
             <td>${usuario.perfil}</td>
@@ -129,7 +143,8 @@ function atualizarTabela(usuarios) {
 function filtrarUsuarios(termo) {
     const filtrados = usuarios.filter(usuario => 
         usuario.nome.toLowerCase().includes(termo) ||
-        usuario.email.toLowerCase().includes(termo)
+        usuario.email.toLowerCase().includes(termo) ||
+        usuario.codigo_usuario.includes(termo)
     );
     atualizarTabela(filtrados);
 }
@@ -152,6 +167,9 @@ async function criarUsuario(data) {
             return;
         }
 
+        // Gerar código do usuário
+        data.codigo_usuario = gerarCodigoUsuario();
+
         const response = await api.post('/usuarios', data);
         mostrarToast('Usuário criado com sucesso', 'success');
         closeModal();
@@ -169,6 +187,10 @@ async function visualizarUsuario(codigo) {
         
         const viewDetails = document.querySelector('.view-details');
         viewDetails.innerHTML = `
+            <div class="detail-row">
+                <strong>Código:</strong>
+                <span>${usuario.codigo_usuario}</span>
+            </div>
             <div class="detail-row">
                 <strong>Nome:</strong>
                 <span>${usuario.nome}</span>
@@ -203,6 +225,7 @@ async function editarUsuario(codigo) {
         
         const form = document.getElementById('usuarioForm');
         form.codigo.value = usuario.codigo;
+        form.codigo_usuario.value = usuario.codigo_usuario;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
         form.perfil.value = usuario.perfil;
