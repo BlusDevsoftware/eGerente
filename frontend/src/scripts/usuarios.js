@@ -1,60 +1,73 @@
 // Funções de Modal
 function openModal() {
     const modal = document.getElementById('userModal');
+    if (!modal) {
+        mostrarToast('Modal de usuário não encontrado!', 'error');
+        return;
+    }
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('usuarioForm');
     
     // Resetar o formulário
-    form.reset();
-    form.codigo.value = '';
-    modalTitle.textContent = 'Novo Usuário';
-    
-    // Configurar o evento de submit para criação
-    form.onsubmit = criarUsuario;
+    if (form) {
+        form.reset();
+        form.codigo.value = '';
+        modalTitle.textContent = 'Novo Usuário';
+        // Configurar o evento de submit para criação
+        form.onsubmit = criarUsuario;
+    }
     
     modal.style.display = 'flex';
 }
 
 function closeModal() {
     const modal = document.getElementById('userModal');
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
 }
 
 function closeViewModal() {
     const modal = document.getElementById('viewModal');
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
 }
 
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
 }
 
 // Funções de manipulação de usuários
 let usuarios = [];
 let usuarioAtual = null;
 
-// Carregar usuários ao iniciar a página
+// Carregar usuários ao iniciar a página e configurar listeners
+// (Apenas um DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', () => {
     carregarUsuarios();
     setupEventListeners();
+    // Configurar botão de novo usuário
+    const addUserBtn = document.getElementById('addUserBtn');
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', openModal);
+    }
 });
 
 // Configurar event listeners
 function setupEventListeners() {
     // Form de usuário
     const form = document.getElementById('usuarioForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
-        if (data.codigo) {
-            editarUsuario(data);
-        } else {
-            criarUsuario(data);
-        }
-    });
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (data.codigo) {
+                editarUsuario(data);
+            } else {
+                criarUsuario(data);
+            }
+        });
+    }
 
     // Botão de fechar modal
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -67,17 +80,21 @@ function setupEventListeners() {
 
     // Busca
     const searchInput = document.querySelector('.search-box input');
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        filtrarUsuarios(searchTerm);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filtrarUsuarios(searchTerm);
+        });
+    }
 
     // Filtro de status
     const statusFilter = document.querySelector('.filter-options select');
-    statusFilter.addEventListener('change', (e) => {
-        const status = e.target.value;
-        filtrarPorStatus(status);
-    });
+    if (statusFilter) {
+        statusFilter.addEventListener('change', (e) => {
+            const status = e.target.value;
+            filtrarPorStatus(status);
+        });
+    }
 }
 
 // Gerar código do usuário
@@ -291,14 +308,6 @@ function mostrarToast(mensagem, tipo = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-
-// Carregar usuários quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    carregarUsuarios();
-    
-    // Configurar botão de novo usuário
-    document.getElementById('addUserBtn').addEventListener('click', openModal);
-});
 
 // Adicionar funções ao escopo global
 window.openModal = openModal;
