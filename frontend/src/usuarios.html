@@ -13,43 +13,36 @@
     <script src="scripts/config/api.js"></script>
     <script src="scripts/usuarios.js"></script>
     <script>
-        // Funções de Modal - Escopo Global
+        // Funções de modal
         window.openModal = function() {
-            const modal = document.getElementById('usuarioModal');
-            const modalTitle = modal.querySelector('#modalTitle');
-            modalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Novo Usuário';
+            const modal = document.getElementById('userModal');
             modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
-            document.body.style.overflow = 'hidden';
-        }
+            document.getElementById('usuarioForm').reset();
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Novo Usuário';
+            document.getElementById('senha').setAttribute('required', '');
+            document.getElementById('confirmar_senha').setAttribute('required', '');
+        };
 
         window.closeModal = function() {
-            const modal = document.getElementById('usuarioModal');
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                const form = document.getElementById('usuarioForm');
-                form.reset();
-            }, 300);
-        }
+            document.getElementById('userModal').style.display = 'none';
+        };
 
         window.closeViewModal = function() {
-            const modal = document.getElementById('viewModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+            document.getElementById('viewModal').style.display = 'none';
+        };
 
         window.closeDeleteModal = function() {
-            const modal = document.getElementById('deleteModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+            document.getElementById('deleteModal').style.display = 'none';
+        };
 
-        // Funções de Usuário - Escopo Global
+        // Funções de usuário
+        window.carregarUsuarios = carregarUsuarios;
+        window.criarUsuario = criarUsuario;
         window.visualizarUsuario = visualizarUsuario;
         window.editarUsuario = editarUsuario;
         window.confirmarExclusao = confirmarExclusao;
+        window.excluirUsuario = excluirUsuario;
+        window.mostrarToast = mostrarToast;
     </script>
     <style>
         .toast-container {

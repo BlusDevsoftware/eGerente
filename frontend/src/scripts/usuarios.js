@@ -1,5 +1,5 @@
 // Funções de Modal
-export function openModal() {
+function openModal() {
     const modal = document.getElementById('userModal');
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('usuarioForm');
@@ -15,17 +15,17 @@ export function openModal() {
     modal.style.display = 'flex';
 }
 
-export function closeModal() {
+function closeModal() {
     const modal = document.getElementById('userModal');
     modal.style.display = 'none';
 }
 
-export function closeViewModal() {
+function closeViewModal() {
     const modal = document.getElementById('viewModal');
     modal.style.display = 'none';
 }
 
-export function closeDeleteModal() {
+function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
     modal.style.display = 'none';
 }
@@ -298,4 +298,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Configurar botão de novo usuário
     document.getElementById('addUserBtn').addEventListener('click', openModal);
-}); 
+});
+
+// Adicionar funções ao escopo global
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.closeViewModal = closeViewModal;
+window.closeDeleteModal = closeDeleteModal;
+window.carregarUsuarios = carregarUsuarios;
+window.criarUsuario = criarUsuario;
+window.visualizarUsuario = visualizarUsuario;
+window.editarUsuario = editarUsuario;
+window.confirmarExclusao = confirmarExclusao;
+window.excluirUsuario = excluirUsuario;
+window.mostrarToast = mostrarToast; 
