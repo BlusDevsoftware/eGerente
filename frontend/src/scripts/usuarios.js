@@ -199,7 +199,7 @@ async function criarUsuario(data) {
             senha: data.senha,
             perfil: data.perfil,
             status: data.status || 'ativo',
-            codigo_usuario: gerarCodigoUsuario()
+            codigo: gerarCodigoUsuario()
         };
 
         console.log('Enviando dados:', usuarioData);
@@ -215,6 +215,7 @@ async function criarUsuario(data) {
         if (error.data?.details?.includes('usuarios_email_key')) {
             mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
         } else if (error.status === 500) {
+            console.error('Detalhes do erro:', error.data);
             mostrarToast('Erro ao criar usuário. Por favor, tente novamente.', 'error');
         } else {
             mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
