@@ -2,12 +2,23 @@ import api from './config/api.js';
 
 // Funções de Modal
 export function openModal() {
-    const modal = document.getElementById('usuarioModal');
+    const modal = document.getElementById('userModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const form = document.getElementById('usuarioForm');
+    
+    // Resetar o formulário
+    form.reset();
+    form.codigo.value = '';
+    modalTitle.textContent = 'Novo Usuário';
+    
+    // Configurar o evento de submit para criação
+    form.onsubmit = criarUsuario;
+    
     modal.style.display = 'flex';
 }
 
 export function closeModal() {
-    const modal = document.getElementById('usuarioModal');
+    const modal = document.getElementById('userModal');
     modal.style.display = 'none';
 }
 
@@ -25,31 +36,35 @@ export function closeDeleteModal() {
 async function carregarUsuarios() {
     try {
         const usuarios = await api.get('/usuarios');
-        const tbody = document.querySelector('#usuariosTable tbody');
+        const tbody = document.getElementById('userTableBody');
         tbody.innerHTML = '';
 
         usuarios.forEach(usuario => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${usuario.codigo}</td>
                 <td>${usuario.nome}</td>
                 <td>${usuario.email}</td>
-                <td>${usuario.perfil}</td>
                 <td><span class="status ${usuario.status}">${usuario.status}</span></td>
                 <td class="actions">
-                    <button class="action-btn view-btn" onclick="visualizarUsuario(${usuario.codigo})">
+                    <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn edit-btn" onclick="editarUsuario(${usuario.codigo})">
+                    <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn delete-btn" onclick="confirmarExclusao(${usuario.codigo})">
+                    <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+
+        // Atualizar os cards
+        document.getElementById('totalUsuarios').textContent = usuarios.length;
+        document.getElementById('usuariosAtivos').textContent = usuarios.filter(u => u.status === 'ativo').length;
+        document.getElementById('usuariosInativos').textContent = usuarios.filter(u => u.status === 'inativo').length;
+        document.getElementById('usuariosAdmin').textContent = usuarios.filter(u => u.perfil === 'admin').length;
     } catch (error) {
         console.error('Erro ao carregar usuários:', error);
         mostrarToast('Erro ao carregar usuários', 'error');
@@ -63,6 +78,15 @@ async function criarUsuario(event) {
     const formData = new FormData(form);
     const dados = Object.fromEntries(formData.entries());
 
+    // Validar senhas
+    if (dados.senha !== dados.confirmar_senha) {
+        mostrarToast('As senhas não coincidem', 'error');
+        return;
+    }
+
+    // Remover campo de confirmação de senha
+    delete dados.confirmar_senha;
+
     try {
         await api.post('/usuarios', dados);
         mostrarToast('Usuário criado com sucesso!', 'success');
@@ -71,7 +95,7 @@ async function criarUsuario(event) {
         carregarUsuarios();
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
-        mostrarToast('Erro ao criar usuário', 'error');
+        mostrarToast('Erro ao criar usuário: ' + (error.data?.message || error.message), 'error');
     }
 }
 
@@ -116,6 +140,8 @@ export async function visualizarUsuario(codigo) {
 export async function editarUsuario(codigo) {
     try {
         const usuario = await api.get(`/usuarios/${codigo}`);
+        const modal = document.getElementById('userModal');
+        const modalTitle = document.getElementById('modalTitle');
         const form = document.getElementById('usuarioForm');
         
         // Preencher o formulário com os dados do usuário
@@ -125,11 +151,30 @@ export async function editarUsuario(codigo) {
         form.perfil.value = usuario.perfil;
         form.status.value = usuario.status;
         
-        // Alterar o comportamento do formulário para atualização
+        // Remover required dos campos de senha
+        form.senha.removeAttribute('required');
+        form.confirmar_senha.removeAttribute('required');
+        
+        // Alterar título do modal
+        modalTitle.textContent = 'Editar Usuário';
+        
+        // Configurar o evento de submit para atualização
         form.onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const dados = Object.fromEntries(formData.entries());
+            
+            // Se as senhas estiverem preenchidas, validar
+            if (dados.senha || dados.confirmar_senha) {
+                if (dados.senha !== dados.confirmar_senha) {
+                    mostrarToast('As senhas não coincidem', 'error');
+                    return;
+                }
+            } else {
+                // Se não houver senha nova, remover os campos
+                delete dados.senha;
+                delete dados.confirmar_senha;
+            }
             
             try {
                 await api.put(`/usuarios/${codigo}`, dados);
@@ -139,11 +184,11 @@ export async function editarUsuario(codigo) {
                 carregarUsuarios();
             } catch (error) {
                 console.error('Erro ao atualizar usuário:', error);
-                mostrarToast('Erro ao atualizar usuário', 'error');
+                mostrarToast('Erro ao atualizar usuário: ' + (error.data?.message || error.message), 'error');
             }
         };
         
-        openModal();
+        modal.style.display = 'flex';
     } catch (error) {
         console.error('Erro ao buscar usuário:', error);
         mostrarToast('Erro ao buscar usuário', 'error');
@@ -159,7 +204,7 @@ export async function excluirUsuario(codigo) {
         carregarUsuarios();
     } catch (error) {
         console.error('Erro ao excluir usuário:', error);
-        mostrarToast('Erro ao excluir usuário', 'error');
+        mostrarToast('Erro ao excluir usuário: ' + (error.data?.message || error.message), 'error');
     }
 }
 
@@ -182,7 +227,12 @@ function mostrarToast(mensagem, tipo) {
 }
 
 // Carregar usuários quando a página carregar
-document.addEventListener('DOMContentLoaded', carregarUsuarios);
+document.addEventListener('DOMContentLoaded', () => {
+    carregarUsuarios();
+    
+    // Configurar botão de novo usuário
+    document.getElementById('addUserBtn').addEventListener('click', openModal);
+});
 
 // Função para confirmar exclusão
 export function confirmarExclusao(codigo) {
