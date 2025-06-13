@@ -113,7 +113,6 @@ async function visualizarColaborador(codigo) {
 async function editarColaborador(codigo) {
     try {
         const response = await api.get(`/colaboradores/${codigo}`);
-        // A resposta já é o objeto do colaborador, não precisa acessar .data
         const colaborador = response;
 
         const modal = document.getElementById('colaboradorModal');
@@ -132,13 +131,18 @@ async function editarColaborador(codigo) {
         form.data_admissao.value = colaborador.data_admissao;
         form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
 
+        // Remover qualquer evento de submit anterior
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        form = newForm;
+
         // Mostrar o modal com animação
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
-        form.onsubmit = async (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
             const formData = new FormData(form);
             
@@ -176,7 +180,7 @@ async function editarColaborador(codigo) {
                     mostrarToast('Erro ao atualizar colaborador: ' + (error.data?.message || error.message), 'error');
                 }
             }
-        };
+        });
     } catch (error) {
         mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
