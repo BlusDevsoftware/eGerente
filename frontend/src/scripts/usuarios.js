@@ -1,5 +1,3 @@
-import api from '../services/api.js';
-
 // Funções de Modal
 export function openModal() {
     const modal = document.getElementById('userModal');
