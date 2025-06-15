@@ -124,45 +124,41 @@ function gerarCodigoUsuario() {
 // Carregar usuários
 async function carregarUsuarios() {
     try {
-        const response = await api.get('/usuarios');
-        usuarios = response;
-        atualizarTabela(usuarios);
+        const response = await fetch(`${API_URL}/usuarios`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar usuários');
+        }
+        const usuarios = await response.json();
+        
+        const tbody = document.querySelector('#tabelaUsuarios tbody');
+        tbody.innerHTML = '';
+        
+        usuarios.forEach(usuario => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${usuario.codigo}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>${usuario.tipo}</td>
+                <td>${usuario.status}</td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="visualizarUsuario('${usuario.codigo}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="editarUsuario('${usuario.codigo}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="excluirUsuario('${usuario.codigo}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
         mostrarToast('Erro ao carregar usuários', 'error');
     }
-}
-
-// Atualizar tabela
-function atualizarTabela(usuarios) {
-    const tbody = document.getElementById('userTableBody');
-    tbody.innerHTML = '';
-
-    usuarios.forEach(usuario => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${usuario.codigo.toString().padStart(5, '0')}</td>
-            <td>${usuario.nome}</td>
-            <td>${usuario.email}</td>
-            <td>${usuario.tipo}</td>
-            <td>
-                <span class="status ${usuario.status}">
-                    ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                </span>
-            </td>
-            <td class="actions">
-                <button class="action-btn view-btn" onclick="visualizarUsuario(${usuario.codigo})">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="action-btn edit-btn" onclick="editarUsuario(${usuario.codigo})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="action-btn delete-btn" onclick="confirmarExclusao(${usuario.codigo})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
 }
 
 // Filtrar usuários
@@ -228,6 +224,8 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
+        console.log('Visualizando usuário:', codigo); // Debug
+        
         // Garantir que o código seja uma string de 5 dígitos
         codigo = codigo.toString().padStart(5, '0');
         
@@ -237,6 +235,8 @@ async function visualizarUsuario(codigo) {
             throw new Error('Erro ao buscar dados do usuário');
         }
         const usuario = await response.json();
+        
+        console.log('Dados do usuário:', usuario); // Debug
 
         // Criar o modal se não existir
         let modal = document.getElementById('modalUsuario');
@@ -297,8 +297,11 @@ async function visualizarUsuario(codigo) {
         // Exibir o modal com animação
         modal.style.display = 'block';
         setTimeout(() => {
-            modal.querySelector('.modal-content').style.transform = 'translateY(0)';
-            modal.querySelector('.modal-content').style.opacity = '1';
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.transform = 'translateY(0)';
+                modalContent.style.opacity = '1';
+            }
         }, 10);
 
         // Prevenir scroll do body
@@ -465,12 +468,15 @@ window.excluirUsuario = excluirUsuario;
 window.mostrarToast = mostrarToast;
 
 function fecharModal() {
+    console.log('Fechando modal'); // Debug
     const modal = document.getElementById('modalUsuario');
     if (modal) {
         // Adicionar animação de saída
         const modalContent = modal.querySelector('.modal-content');
-        modalContent.style.transform = 'translateY(-20px)';
-        modalContent.style.opacity = '0';
+        if (modalContent) {
+            modalContent.style.transform = 'translateY(-20px)';
+            modalContent.style.opacity = '0';
+        }
 
         // Remover o modal após a animação
         setTimeout(() => {
