@@ -309,82 +309,140 @@ async function visualizarUsuario(codigo) {
 // Editar usuário
 async function editarUsuario(codigo) {
     try {
-        const response = await api.get(`/usuarios/${codigo}`);
-        const usuario = response;
+        // Garantir que o código seja uma string de 5 dígitos
+        const codigoFormatado = codigo.toString().padStart(5, '0');
         
-        const modal = document.getElementById('usuarioModal');
-        const modalTitle = modal.querySelector('#modalTitle');
-        let form = document.getElementById('usuarioForm');
+        const response = await fetch(`${API_URL}/usuarios/${codigoFormatado}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados do usuário');
+        }
+        const usuario = await response.json();
 
-        modalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuário';
-        
-        // Preencher o formulário com os dados do usuário
-        form.codigo.value = usuario.codigo;
-        form.nome.value = usuario.nome;
-        form.email.value = usuario.email;
-        form.tipo.value = usuario.tipo;
-        form.status.value = usuario.status;
-        
-        // Remover required dos campos de senha
-        form.senha.removeAttribute('required');
-        form.confirmar_senha.removeAttribute('required');
+        // Criar o modal se não existir
+        let modal = document.getElementById('modalUsuario');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalUsuario';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
 
-        // Remover qualquer evento de submit anterior
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        form = newForm;
+        // Criar o conteúdo do modal
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.innerHTML = `
+            <div class="modal-header">
+                <h2>Editar Usuário</h2>
+                <button class="close-button" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formUsuario" class="form">
+                    <div class="form-group">
+                        <label for="codigo">Código:</label>
+                        <input type="text" id="codigo" value="${usuario.codigo}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" value="${usuario.nome}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" value="${usuario.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Nova Senha:</label>
+                        <input type="password" id="senha" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmarSenha">Confirmar Nova Senha:</label>
+                        <input type="password" id="confirmarSenha" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo:</label>
+                        <select id="tipo" required>
+                            <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
+                            <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
+                            <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" required>
+                            <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                            <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarEdicaoUsuario()">Salvar</button>
+            </div>
+        `;
 
-        // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        document.body.style.overflow = 'hidden';
+        // Limpar o modal e adicionar o novo conteúdo
+        modal.innerHTML = '';
+        modal.appendChild(modalContent);
 
-        // Configurar o evento de submit do formulário
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(form);
-            
-            const usuarioData = {
-                codigo: form.codigo.value,
-                nome: formData.get('nome'),
-                email: formData.get('email'),
-                tipo: formData.get('tipo'),
-                status: formData.get('status')
-            };
+        // Exibir o modal com animação
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
 
-            // Adicionar senha apenas se foi preenchida
-            if (formData.get('senha')) {
-                if (formData.get('senha') !== formData.get('confirmar_senha')) {
-                    mostrarToast('As senhas não coincidem', 'error');
-                    return;
-                }
-                usuarioData.senha = formData.get('senha');
-            }
-
-            try {
-                const response = await api.put(`/usuarios/${form.codigo.value}`, usuarioData);
-                
-                if (response) {
-                    mostrarToast('Usuário atualizado com sucesso!', 'success');
-                    carregarUsuarios();
-                    form.reset();
-                    closeModal();
-                } else {
-                    throw new Error('Resposta inválida do servidor');
-                }
-            } catch (error) {
-                console.error('Erro ao atualizar usuário:', error);
-                if (error.status === 404) {
-                    mostrarToast('Usuário não encontrado.', 'error');
-                } else if (error.data?.details?.includes('usuarios_email_key')) {
-                    mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
-                } else {
-                    mostrarToast('Erro ao atualizar usuário: ' + (error.data?.message || error.message), 'error');
-                }
-            }
-        });
     } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
+    }
+}
+
+async function salvarEdicaoUsuario() {
+    try {
+        const form = document.getElementById('formUsuario');
+        const codigo = form.querySelector('#codigo').value;
+        const nome = form.querySelector('#nome').value;
+        const email = form.querySelector('#email').value;
+        const senha = form.querySelector('#senha').value;
+        const confirmarSenha = form.querySelector('#confirmarSenha').value;
+        const tipo = form.querySelector('#tipo').value;
+        const status = form.querySelector('#status').value;
+
+        // Validar senha se fornecida
+        if (senha && senha !== confirmarSenha) {
+            mostrarToast('As senhas não coincidem', 'error');
+            return;
+        }
+
+        const usuarioData = {
+            nome,
+            email,
+            tipo,
+            status
+        };
+
+        // Adicionar senha apenas se fornecida
+        if (senha) {
+            usuarioData.senha = senha;
+        }
+
+        const response = await fetch(`${API_URL}/usuarios/${codigo}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(usuarioData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar usuário');
+        }
+
+        mostrarToast('Usuário atualizado com sucesso!', 'success');
+        fecharModal();
+        carregarUsuarios();
+    } catch (error) {
+        console.error('Erro ao atualizar usuário:', error);
+        mostrarToast('Erro ao atualizar usuário: ' + error.message, 'error');
     }
 }
 
