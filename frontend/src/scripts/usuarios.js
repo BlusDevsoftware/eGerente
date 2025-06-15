@@ -126,6 +126,21 @@ async function carregarUsuarios() {
     try {
         console.log('Carregando usuários...'); // Debug
         
+        // Verificar se a tabela existe
+        const tabela = document.getElementById('tabelaUsuarios');
+        if (!tabela) {
+            console.error('Tabela de usuários não encontrada');
+            return;
+        }
+        
+        // Verificar se o tbody existe, se não, criar
+        let tbody = tabela.querySelector('tbody');
+        if (!tbody) {
+            console.log('Criando elemento tbody...'); // Debug
+            tbody = document.createElement('tbody');
+            tabela.appendChild(tbody);
+        }
+        
         const response = await fetch(`${API_URL}/usuarios`);
         if (!response.ok) {
             throw new Error('Erro ao carregar usuários');
@@ -134,13 +149,15 @@ async function carregarUsuarios() {
         
         console.log('Usuários carregados:', usuarios); // Debug
         
-        const tbody = document.querySelector('#tabelaUsuarios tbody');
-        if (!tbody) {
-            console.error('Elemento tbody não encontrado');
+        // Limpar o tbody
+        tbody.innerHTML = '';
+        
+        if (usuarios.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
+            tbody.appendChild(tr);
             return;
         }
-        
-        tbody.innerHTML = '';
         
         usuarios.forEach(usuario => {
             const tr = document.createElement('tr');

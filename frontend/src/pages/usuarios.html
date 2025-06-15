@@ -1,46 +1,70 @@
-<div class="content">
-    <div class="header">
-        <h1>Gerenciamento de Usuários</h1>
-        <button class="btn btn-primary" onclick="abrirModalCriar()">
-            <i class="fas fa-plus"></i> Novo Usuário
-        </button>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários - eGerente</title>
+    <link rel="stylesheet" href="../styles/usuarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="content">
+        <div class="header">
+            <h1>Gerenciamento de Usuários</h1>
+            <button class="btn btn-primary" onclick="abrirModalCriar()">
+                <i class="fas fa-plus"></i> Novo Usuário
+            </button>
+        </div>
+
+        <div class="filters">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar usuários...">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="filter-group">
+                <select id="tipoFilter">
+                    <option value="">Todos os tipos</option>
+                    <option value="admin">Administrador</option>
+                    <option value="gerente">Gerente</option>
+                    <option value="usuario">Usuário</option>
+                </select>
+                <select id="statusFilter">
+                    <option value="">Todos os status</option>
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="tabelaUsuarios">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Os dados dos usuários serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="filters">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar usuários...">
-            <i class="fas fa-search"></i>
-        </div>
-        <div class="filter-group">
-            <select id="tipoFilter">
-                <option value="">Todos os tipos</option>
-                <option value="admin">Administrador</option>
-                <option value="gerente">Gerente</option>
-                <option value="usuario">Usuário</option>
-            </select>
-            <select id="statusFilter">
-                <option value="">Todos os status</option>
-                <option value="ativo">Ativo</option>
-                <option value="inativo">Inativo</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="table-container">
-        <table id="tabelaUsuarios">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Tipo</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Os dados dos usuários serão inseridos aqui -->
-            </tbody>
-        </table>
-    </div>
-</div> 
+    <!-- Scripts -->
+    <script src="../scripts/config.js"></script>
+    <script src="../scripts/usuarios.js"></script>
+    <script>
+        // Garantir que o DOM esteja carregado antes de executar o código
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado, inicializando...'); // Debug
+            carregarUsuarios();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html> 
