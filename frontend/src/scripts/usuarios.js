@@ -126,10 +126,14 @@ async function carregarUsuarios() {
     try {
         console.log('Carregando usuários...'); // Debug
         
+        // Aguardar um momento para garantir que o DOM esteja carregado
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Verificar se a tabela existe
         const tabela = document.getElementById('tabelaUsuarios');
         if (!tabela) {
             console.error('Tabela de usuários não encontrada');
+            console.log('Elementos disponíveis:', document.body.innerHTML); // Debug
             return;
         }
         

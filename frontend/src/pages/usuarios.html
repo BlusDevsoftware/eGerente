@@ -59,12 +59,26 @@
     <script src="../scripts/config.js"></script>
     <script src="../scripts/usuarios.js"></script>
     <script>
-        // Garantir que o DOM esteja carregado antes de executar o código
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM carregado, inicializando...'); // Debug
+        // Função para verificar se todos os elementos necessários estão presentes
+        function verificarElementos() {
+            const tabela = document.getElementById('tabelaUsuarios');
+            if (!tabela) {
+                console.error('Tabela não encontrada, tentando novamente em 100ms...');
+                setTimeout(verificarElementos, 100);
+                return;
+            }
+            
+            console.log('Todos os elementos encontrados, inicializando...');
             carregarUsuarios();
             setupEventListeners();
-        });
+        }
+
+        // Garantir que o DOM esteja carregado antes de executar o código
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', verificarElementos);
+        } else {
+            verificarElementos();
+        }
     </script>
 </body>
 </html> 
