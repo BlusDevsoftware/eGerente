@@ -112,8 +112,9 @@ function gerarCodigoUsuario() {
     let proximoNumero = 1;
     
     if (ultimoUsuario && ultimoUsuario.codigo) {
-        // Converter para número diretamente, já que o código vem como número
-        proximoNumero = parseInt(ultimoUsuario.codigo) + 1;
+        // Converter para número, remover zeros à esquerda e incrementar
+        const ultimoNumero = parseInt(ultimoUsuario.codigo.toString().replace(/^0+/, ''));
+        proximoNumero = ultimoNumero + 1;
     }
     
     // Garantir que o número tenha 5 dígitos com zeros à esquerda
@@ -169,7 +170,7 @@ function filtrarUsuarios(termo) {
     const filtrados = usuarios.filter(usuario => 
         usuario.nome.toLowerCase().includes(termo) ||
         usuario.email.toLowerCase().includes(termo) ||
-        usuario.codigo_usuario.includes(termo)
+        usuario.codigo.toString().includes(termo)
     );
     atualizarTabela(filtrados);
 }
@@ -203,7 +204,7 @@ async function criarUsuario(data) {
             senha: data.senha,
             tipo: data.tipo || 'user',
             status: data.status || 'ativo',
-            codigo: codigo
+            codigo: codigo.toString() // Garantir que o código seja enviado como string
         };
 
         console.log('Enviando dados:', usuarioData);
