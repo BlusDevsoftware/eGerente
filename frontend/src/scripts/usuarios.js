@@ -228,47 +228,85 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        // Garante que o código seja uma string de 5 dígitos
+        // Garantir que o código seja uma string de 5 dígitos
         codigo = codigo.toString().padStart(5, '0');
         
-        // Busca os dados do usuário
+        // Buscar dados do usuário
         const response = await fetch(`${API_URL}/usuarios/${codigo}`);
         if (!response.ok) {
             throw new Error('Erro ao buscar dados do usuário');
         }
         const usuario = await response.json();
+
+        // Criar o modal se não existir
+        let modal = document.getElementById('modalUsuario');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalUsuario';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+
+        // Criar o conteúdo do modal
+        const modalContent = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Visualizar Usuário</h2>
+                    <button type="button" class="close" onclick="fecharModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="formVisualizarUsuario">
+                        <div class="form-group">
+                            <label for="codigo">Código:</label>
+                            <input type="text" id="codigo" value="${usuario.codigo}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="nome">Nome:</label>
+                            <input type="text" id="nome" value="${usuario.nome}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" value="${usuario.email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo:</label>
+                            <select id="tipo" disabled>
+                                <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
+                                <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
+                                <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" disabled>
+                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+                </div>
+            </div>
+        `;
+
+        // Atualizar o conteúdo do modal
+        modal.innerHTML = modalContent;
         
-        const modal = document.getElementById('modalUsuario');
-        const modalTitle = modal.querySelector('#modalTitle');
-        const form = document.getElementById('formUsuario');
+        // Exibir o modal com animação
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.querySelector('.modal-content').style.transform = 'translateY(0)';
+            modal.querySelector('.modal-content').style.opacity = '1';
+        }, 10);
 
-        modalTitle.textContent = 'Visualizar Usuário';
-        
-        // Preencher o formulário com os dados do usuário
-        form.codigo.value = usuario.codigo;
-        form.nome.value = usuario.nome;
-        form.email.value = usuario.email;
-        form.tipo.value = usuario.tipo;
-        form.status.value = usuario.status;
-
-        // Desabilitar todos os campos
-        Array.from(form.elements).forEach(element => {
-            element.disabled = true;
-        });
-
-        // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
+        // Prevenir scroll do body
         document.body.style.overflow = 'hidden';
 
-        // Configurar o evento de submit do formulário
-        form.onsubmit = (e) => {
-            e.preventDefault();
-            fecharModal();
-        };
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
-        mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
+        mostrarToast('Erro ao carregar dados do usuário', 'error');
     }
 }
 
@@ -429,7 +467,12 @@ window.mostrarToast = mostrarToast;
 function fecharModal() {
     const modal = document.getElementById('modalUsuario');
     if (modal) {
-        modal.classList.remove('show');
+        // Adicionar animação de saída
+        const modalContent = modal.querySelector('.modal-content');
+        modalContent.style.transform = 'translateY(-20px)';
+        modalContent.style.opacity = '0';
+
+        // Remover o modal após a animação
         setTimeout(() => {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
