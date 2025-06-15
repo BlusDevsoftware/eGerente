@@ -204,13 +204,16 @@ async function criarUsuario(data) {
             senha: data.senha,
             tipo: data.tipo || 'user',
             status: data.status || 'ativo',
-            codigo: codigo.toString() // Garantir que o código seja enviado como string
+            codigo: codigo.toString()
         };
 
-        console.log('Enviando dados:', usuarioData);
+        // Log seguro sem dados sensíveis
+        console.log('Criando novo usuário:', { nome: usuarioData.nome, email: usuarioData.email, tipo: usuarioData.tipo });
 
         const response = await api.post('/usuarios', usuarioData);
-        console.log('Resposta da API:', response);
+        
+        // Log seguro da resposta
+        console.log('Usuário criado com sucesso:', { codigo: response.codigo, nome: response.nome, email: response.email });
         
         mostrarToast('Usuário criado com sucesso', 'success');
         closeModal();
@@ -220,7 +223,7 @@ async function criarUsuario(data) {
         if (error.data?.details?.includes('usuarios_email_key')) {
             mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
         } else if (error.status === 500) {
-            console.error('Detalhes do erro:', error.data);
+            console.error('Erro interno do servidor:', error.status);
             mostrarToast('Erro ao criar usuário. Por favor, tente novamente.', 'error');
         } else {
             mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
