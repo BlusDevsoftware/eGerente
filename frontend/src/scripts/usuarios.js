@@ -251,39 +251,32 @@ async function visualizarUsuario(codigo) {
         modalContent.className = 'modal-content';
         modalContent.innerHTML = `
             <div class="modal-header">
-                <h2>Detalhes do Usuário</h2>
+                <h2><i class="fas fa-user"></i> Detalhes do Usuário</h2>
                 <button class="close-button" onclick="fecharModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <form id="formUsuario" class="form">
-                    <div class="form-group">
-                        <label for="codigo">Código:</label>
-                        <input type="text" id="codigo" value="${usuario.codigo}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" value="${usuario.nome}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" value="${usuario.email}" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label for="tipo">Tipo:</label>
-                        <select id="tipo" disabled>
-                            <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
-                            <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
-                            <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Status:</label>
-                        <select id="status" disabled>
-                            <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                            <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-                        </select>
-                    </div>
-                </form>
+            <div class="view-details">
+                <div class="detail-row">
+                    <strong>Código:</strong>
+                    <span>${usuario.codigo}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Nome:</strong>
+                    <span>${usuario.nome}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Email:</strong>
+                    <span>${usuario.email}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Tipo:</strong>
+                    <span>${usuario.tipo === 'admin' ? 'Administrador' : usuario.tipo === 'gerente' ? 'Gerente' : 'Usuário'}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Status:</strong>
+                    <span class="status ${usuario.status === 'ativo' ? 'ativo' : 'inativo'}">
+                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                    </span>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
@@ -295,10 +288,11 @@ async function visualizarUsuario(codigo) {
         modal.appendChild(modalContent);
 
         // Exibir o modal com animação
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
         setTimeout(() => {
             modal.classList.add('show');
         }, 10);
+        document.body.style.overflow = 'hidden';
 
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -332,7 +326,7 @@ async function editarUsuario(codigo) {
         modalContent.className = 'modal-content';
         modalContent.innerHTML = `
             <div class="modal-header">
-                <h2>Editar Usuário</h2>
+                <h2><i class="fas fa-edit"></i> Editar Usuário</h2>
                 <button class="close-button" onclick="fecharModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -385,10 +379,11 @@ async function editarUsuario(codigo) {
         modal.appendChild(modalContent);
 
         // Exibir o modal com animação
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
         setTimeout(() => {
             modal.classList.add('show');
         }, 10);
+        document.body.style.overflow = 'hidden';
 
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
