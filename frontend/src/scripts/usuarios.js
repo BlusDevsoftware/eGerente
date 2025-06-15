@@ -240,15 +240,33 @@ async function visualizarUsuario(codigo) {
         
         // Configura o modal e o formulário
         const modal = document.getElementById('userModal');
+        if (!modal) {
+            throw new Error('Modal não encontrado');
+        }
+
         const form = document.getElementById('userForm');
+        if (!form) {
+            throw new Error('Formulário não encontrado');
+        }
+
         const modalTitle = modal.querySelector('.modal-title');
+        if (!modalTitle) {
+            throw new Error('Título do modal não encontrado');
+        }
         
         // Limpa o formulário e configura os campos
         form.reset();
-        form.querySelector('#codigo').value = usuario.codigo;
-        form.querySelector('#nome').value = usuario.nome;
-        form.querySelector('#email').value = usuario.email;
-        form.querySelector('#tipo').value = usuario.tipo;
+        
+        // Preenche os campos com os dados do usuário
+        const codigoInput = form.querySelector('#codigo');
+        const nomeInput = form.querySelector('#nome');
+        const emailInput = form.querySelector('#email');
+        const tipoInput = form.querySelector('#tipo');
+        
+        if (codigoInput) codigoInput.value = usuario.codigo;
+        if (nomeInput) nomeInput.value = usuario.nome;
+        if (emailInput) emailInput.value = usuario.email;
+        if (tipoInput) tipoInput.value = usuario.tipo;
         
         // Remove os campos de senha do modal de visualização
         const senhaFields = form.querySelectorAll('.senha-fields');
@@ -256,7 +274,9 @@ async function visualizarUsuario(codigo) {
         
         // Remove os botões do modal de visualização
         const modalFooter = modal.querySelector('.modal-footer');
-        modalFooter.style.display = 'none';
+        if (modalFooter) {
+            modalFooter.style.display = 'none';
+        }
         
         // Desabilita todos os campos
         form.querySelectorAll('input, select').forEach(field => {
@@ -273,8 +293,10 @@ async function visualizarUsuario(codigo) {
         
         // Adiciona animação suave
         const modalDialog = modal.querySelector('.modal-dialog');
-        modalDialog.style.transform = 'translate(0, 0)';
-        modalDialog.style.opacity = '1';
+        if (modalDialog) {
+            modalDialog.style.transform = 'translate(0, 0)';
+            modalDialog.style.opacity = '1';
+        }
         
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -297,16 +319,40 @@ async function editarUsuario(codigo) {
         
         // Configura o modal e o formulário
         const modal = document.getElementById('userModal');
+        if (!modal) {
+            throw new Error('Modal não encontrado');
+        }
+
         const form = document.getElementById('userForm');
+        if (!form) {
+            throw new Error('Formulário não encontrado');
+        }
+
         const modalTitle = modal.querySelector('.modal-title');
+        if (!modalTitle) {
+            throw new Error('Título do modal não encontrado');
+        }
+
         const modalFooter = modal.querySelector('.modal-footer');
+        if (!modalFooter) {
+            throw new Error('Rodapé do modal não encontrado');
+        }
         
         // Limpa o formulário e configura os campos
         form.reset();
-        form.querySelector('#codigo').value = usuario.codigo;
-        form.querySelector('#nome').value = usuario.nome;
-        form.querySelector('#email').value = usuario.email;
-        form.querySelector('#tipo').value = usuario.tipo;
+        
+        // Preenche os campos com os dados do usuário
+        const codigoInput = form.querySelector('#codigo');
+        const nomeInput = form.querySelector('#nome');
+        const emailInput = form.querySelector('#email');
+        const tipoInput = form.querySelector('#tipo');
+        const senhaInput = form.querySelector('#senha');
+        const confirmarSenhaInput = form.querySelector('#confirmarSenha');
+        
+        if (codigoInput) codigoInput.value = usuario.codigo;
+        if (nomeInput) nomeInput.value = usuario.nome;
+        if (emailInput) emailInput.value = usuario.email;
+        if (tipoInput) tipoInput.value = usuario.tipo;
         
         // Mostra os campos de senha no modal de edição
         const senhaFields = form.querySelectorAll('.senha-fields');
@@ -321,8 +367,8 @@ async function editarUsuario(codigo) {
         });
         
         // Remove a obrigatoriedade dos campos de senha
-        form.querySelector('#senha').required = false;
-        form.querySelector('#confirmarSenha').required = false;
+        if (senhaInput) senhaInput.required = false;
+        if (confirmarSenhaInput) confirmarSenhaInput.required = false;
         
         // Atualiza o título do modal
         modalTitle.innerHTML = '<i class="fas fa-edit me-2"></i>Editar Usuário';
@@ -334,8 +380,10 @@ async function editarUsuario(codigo) {
         
         // Adiciona animação suave
         const modalDialog = modal.querySelector('.modal-dialog');
-        modalDialog.style.transform = 'translate(0, 0)';
-        modalDialog.style.opacity = '1';
+        if (modalDialog) {
+            modalDialog.style.transform = 'translate(0, 0)';
+            modalDialog.style.opacity = '1';
+        }
         
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
