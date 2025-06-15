@@ -210,10 +210,7 @@ async function criarUsuario(data) {
         // Log seguro sem dados sensíveis
         console.log('Criando novo usuário:', { nome: usuarioData.nome, email: usuarioData.email, tipo: usuarioData.tipo });
 
-        const response = await api.post('/usuarios', usuarioData);
-        
-        // Log seguro da resposta
-        console.log('Usuário criado com sucesso:', { codigo: response.codigo, nome: response.nome, email: response.email });
+        await api.post('/usuarios', usuarioData);
         
         mostrarToast('Usuário criado com sucesso', 'success');
         closeModal();
@@ -277,9 +274,9 @@ async function editarUsuario(codigo) {
         
         const form = document.getElementById('usuarioForm');
         form.codigo.value = usuario.codigo;
-        form.codigo_usuario.value = usuario.codigo_usuario;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
+        form.tipo.value = usuario.tipo;
         form.status.value = usuario.status;
         
         // Remover required dos campos de senha
