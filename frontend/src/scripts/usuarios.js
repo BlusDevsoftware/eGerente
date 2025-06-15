@@ -196,7 +196,7 @@ async function criarUsuario(data) {
             nome: data.nome,
             email: data.email,
             senha: data.senha,
-            tipo: 'user',
+            tipo: data.tipo || 'user', // Usar o valor do formulário ou 'user' como padrão
             status: data.status || 'ativo',
             codigo: gerarCodigoUsuario()
         };
