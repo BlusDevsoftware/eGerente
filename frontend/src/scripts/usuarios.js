@@ -228,38 +228,52 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        const response = await api.get(`/usuarios/${codigo}`);
-        const usuario = response;
-        
-        const modal = document.getElementById('usuarioModal');
-        const modalTitle = modal.querySelector('#modalTitle');
-        const form = document.getElementById('usuarioForm');
+        const response = await fetch(`${API_URL}/usuarios/${codigo}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados do usuário');
+        }
+        const usuario = await response.json();
 
-        modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Usuário';
-        
-        // Preencher o formulário com os dados do usuário
-        form.codigo.value = usuario.codigo;
-        form.nome.value = usuario.nome;
-        form.email.value = usuario.email;
-        form.tipo.value = usuario.tipo;
-        form.status.value = usuario.status;
-        
-        // Desabilitar todos os campos
-        Array.from(form.elements).forEach(element => {
-            element.disabled = true;
-        });
+        // Criar o conteúdo do modal
+        const modalContent = `
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> Detalhes do Usuário</h2>
+                <button class="close-modal" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="view-details">
+                <div class="detail-row">
+                    <strong>Código:</strong>
+                    <span>${usuario.codigo}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Nome:</strong>
+                    <span>${usuario.nome}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Email:</strong>
+                    <span>${usuario.email}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Tipo:</strong>
+                    <span>${usuario.tipo === 'admin' ? 'Administrador' : 'Usuário'}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>Status:</strong>
+                    <span class="status ${usuario.status === 'ativo' ? 'ativo' : 'inativo'}">
+                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                    </span>
+                </div>
+            </div>
+        `;
+
+        // Atualizar o conteúdo do modal
+        const modal = document.getElementById('modal');
+        modal.querySelector('.modal-content').innerHTML = modalContent;
 
         // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        document.body.style.overflow = 'hidden';
-
-        // Configurar o evento de submit do formulário
-        form.onsubmit = (e) => {
-            e.preventDefault();
-            closeModal();
-        };
+        modal.classList.add('show');
     } catch (error) {
+        console.error('Erro ao visualizar usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
     }
 }
@@ -410,4 +424,12 @@ window.visualizarUsuario = visualizarUsuario;
 window.editarUsuario = editarUsuario;
 window.confirmarExclusao = confirmarExclusao;
 window.excluirUsuario = excluirUsuario;
-window.mostrarToast = mostrarToast; 
+window.mostrarToast = mostrarToast;
+
+function fecharModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+} 
