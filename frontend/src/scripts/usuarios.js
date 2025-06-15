@@ -124,23 +124,36 @@ function gerarCodigoUsuario() {
 // Carregar usuários
 async function carregarUsuarios() {
     try {
+        console.log('Carregando usuários...'); // Debug
+        
         const response = await fetch(`${API_URL}/usuarios`);
         if (!response.ok) {
             throw new Error('Erro ao carregar usuários');
         }
         const usuarios = await response.json();
         
+        console.log('Usuários carregados:', usuarios); // Debug
+        
         const tbody = document.querySelector('#tabelaUsuarios tbody');
+        if (!tbody) {
+            console.error('Elemento tbody não encontrado');
+            return;
+        }
+        
         tbody.innerHTML = '';
         
         usuarios.forEach(usuario => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${usuario.codigo}</td>
+                <td>${usuario.codigo.toString().padStart(5, '0')}</td>
                 <td>${usuario.nome}</td>
                 <td>${usuario.email}</td>
                 <td>${usuario.tipo}</td>
-                <td>${usuario.status}</td>
+                <td>
+                    <span class="status ${usuario.status}">
+                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                    </span>
+                </td>
                 <td>
                     <button type="button" class="btn btn-primary btn-sm" onclick="visualizarUsuario('${usuario.codigo}')">
                         <i class="fas fa-eye"></i>
@@ -155,6 +168,8 @@ async function carregarUsuarios() {
             `;
             tbody.appendChild(tr);
         });
+        
+        console.log('Tabela atualizada com sucesso'); // Debug
     } catch (error) {
         console.error('Erro ao carregar usuários:', error);
         mostrarToast('Erro ao carregar usuários', 'error');
