@@ -228,54 +228,54 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        // Garantir que o código seja uma string de 5 dígitos
-        const codigoFormatado = codigo.toString().padStart(5, '0');
+        // Garante que o código seja uma string de 5 dígitos
+        const codigoStr = codigo.toString().padStart(5, '0');
         
-        const response = await fetch(`${API_URL}/usuarios/${codigoFormatado}`);
+        const response = await fetch(`${API_URL}/usuarios/${codigoStr}`);
         if (!response.ok) {
             throw new Error('Erro ao carregar dados do usuário');
         }
+        
         const usuario = await response.json();
-
+        
+        // Configura o modal e o formulário
         const modal = document.getElementById('userModal');
-        if (!modal) {
-            console.error('Modal não encontrado');
-            mostrarToast('Modal de usuário não encontrado!', 'error');
-            return;
-        }
-
-        // Configurar o formulário
-        const form = document.getElementById('usuarioForm');
-        if (form) {
-            form.reset();
-            form.codigo.value = usuario.codigo;
-            form.nome.value = usuario.nome;
-            form.email.value = usuario.email;
-            form.tipo.value = usuario.tipo;
-            form.status.value = usuario.status;
-            
-            // Desabilitar todos os campos
-            Array.from(form.elements).forEach(element => {
-                element.disabled = true;
-            });
-
-            // Remover required dos campos de senha
-            form.senha.removeAttribute('required');
-            form.confirmar_senha.removeAttribute('required');
-            
-            // Atualizar título do modal
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user"></i> Detalhes do Usuário';
-        }
-
-        // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        modal.style.opacity = '0';
-        requestAnimationFrame(() => {
-            modal.style.opacity = '1';
-            modal.classList.add('show');
+        const form = document.getElementById('userForm');
+        const modalTitle = modal.querySelector('.modal-title');
+        
+        // Limpa o formulário e configura os campos
+        form.reset();
+        form.querySelector('#codigo').value = usuario.codigo;
+        form.querySelector('#nome').value = usuario.nome;
+        form.querySelector('#email').value = usuario.email;
+        form.querySelector('#tipo').value = usuario.tipo;
+        
+        // Remove os campos de senha do modal de visualização
+        const senhaFields = form.querySelectorAll('.senha-fields');
+        senhaFields.forEach(field => field.style.display = 'none');
+        
+        // Remove os botões do modal de visualização
+        const modalFooter = modal.querySelector('.modal-footer');
+        modalFooter.style.display = 'none';
+        
+        // Desabilita todos os campos
+        form.querySelectorAll('input, select').forEach(field => {
+            field.disabled = true;
         });
-        document.body.style.overflow = 'hidden';
-
+        
+        // Atualiza o título do modal
+        modalTitle.innerHTML = '<i class="fas fa-eye me-2"></i>Visualizar Usuário';
+        
+        // Exibe o modal com animação
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adiciona animação suave
+        const modalDialog = modal.querySelector('.modal-dialog');
+        modalDialog.style.transform = 'translate(0, 0)';
+        modalDialog.style.opacity = '1';
+        
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
@@ -285,56 +285,58 @@ async function visualizarUsuario(codigo) {
 // Editar usuário
 async function editarUsuario(codigo) {
     try {
-        // Garantir que o código seja uma string de 5 dígitos
-        const codigoFormatado = codigo.toString().padStart(5, '0');
+        // Garante que o código seja uma string de 5 dígitos
+        const codigoStr = codigo.toString().padStart(5, '0');
         
-        const response = await fetch(`${API_URL}/usuarios/${codigoFormatado}`);
+        const response = await fetch(`${API_URL}/usuarios/${codigoStr}`);
         if (!response.ok) {
             throw new Error('Erro ao carregar dados do usuário');
         }
+        
         const usuario = await response.json();
-
+        
+        // Configura o modal e o formulário
         const modal = document.getElementById('userModal');
-        if (!modal) {
-            console.error('Modal não encontrado');
-            mostrarToast('Modal de usuário não encontrado!', 'error');
-            return;
-        }
-
-        // Configurar o formulário
-        const form = document.getElementById('usuarioForm');
-        if (form) {
-            form.reset();
-            form.codigo.value = usuario.codigo;
-            form.nome.value = usuario.nome;
-            form.email.value = usuario.email;
-            form.tipo.value = usuario.tipo;
-            form.status.value = usuario.status;
-            
-            // Habilitar todos os campos exceto código
-            Array.from(form.elements).forEach(element => {
-                if (element.id !== 'codigo') {
-                    element.disabled = false;
-                }
-            });
-
-            // Remover required dos campos de senha
-            form.senha.removeAttribute('required');
-            form.confirmar_senha.removeAttribute('required');
-            
-            // Atualizar título do modal
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Usuário';
-        }
-
-        // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        modal.style.opacity = '0';
-        requestAnimationFrame(() => {
-            modal.style.opacity = '1';
-            modal.classList.add('show');
+        const form = document.getElementById('userForm');
+        const modalTitle = modal.querySelector('.modal-title');
+        const modalFooter = modal.querySelector('.modal-footer');
+        
+        // Limpa o formulário e configura os campos
+        form.reset();
+        form.querySelector('#codigo').value = usuario.codigo;
+        form.querySelector('#nome').value = usuario.nome;
+        form.querySelector('#email').value = usuario.email;
+        form.querySelector('#tipo').value = usuario.tipo;
+        
+        // Mostra os campos de senha no modal de edição
+        const senhaFields = form.querySelectorAll('.senha-fields');
+        senhaFields.forEach(field => field.style.display = 'block');
+        
+        // Mostra os botões no modal de edição
+        modalFooter.style.display = 'flex';
+        
+        // Habilita todos os campos exceto o código
+        form.querySelectorAll('input, select').forEach(field => {
+            field.disabled = field.id === 'codigo';
         });
-        document.body.style.overflow = 'hidden';
-
+        
+        // Remove a obrigatoriedade dos campos de senha
+        form.querySelector('#senha').required = false;
+        form.querySelector('#confirmarSenha').required = false;
+        
+        // Atualiza o título do modal
+        modalTitle.innerHTML = '<i class="fas fa-edit me-2"></i>Editar Usuário';
+        
+        // Exibe o modal com animação
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Adiciona animação suave
+        const modalDialog = modal.querySelector('.modal-dialog');
+        modalDialog.style.transform = 'translate(0, 0)';
+        modalDialog.style.opacity = '1';
+        
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
