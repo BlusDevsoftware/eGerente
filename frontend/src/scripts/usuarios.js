@@ -112,9 +112,8 @@ function gerarCodigoUsuario() {
     let proximoNumero = 1;
     
     if (ultimoUsuario && ultimoUsuario.codigo) {
-        // Remover zeros à esquerda antes de converter para número
-        const ultimoNumero = parseInt(ultimoUsuario.codigo.replace(/^0+/, ''));
-        proximoNumero = ultimoNumero + 1;
+        // Converter para número diretamente, já que o código vem como número
+        proximoNumero = parseInt(ultimoUsuario.codigo) + 1;
     }
     
     // Garantir que o número tenha 5 dígitos com zeros à esquerda
@@ -140,7 +139,7 @@ function atualizarTabela(usuarios) {
     usuarios.forEach(usuario => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${usuario.codigo}</td>
+            <td>${usuario.codigo.toString().padStart(5, '0')}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
             <td>${usuario.tipo}</td>
@@ -238,7 +237,7 @@ async function visualizarUsuario(codigo) {
         viewDetails.innerHTML = `
             <div class="detail-row">
                 <strong>Código:</strong>
-                <span>${usuario.codigo}</span>
+                <span>${usuario.codigo.toString().padStart(5, '0')}</span>
             </div>
             <div class="detail-row">
                 <strong>Nome:</strong>
