@@ -231,35 +231,36 @@ async function visualizarUsuario(codigo) {
         const response = await api.get(`/usuarios/${codigo}`);
         const usuario = response;
         
-        const viewDetails = document.querySelector('.view-details');
-        viewDetails.innerHTML = `
-            <div class="detail-row">
-                <strong>Código:</strong>
-                <span>${usuario.codigo.toString().padStart(5, '0')}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Nome:</strong>
-                <span>${usuario.nome}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Email:</strong>
-                <span>${usuario.email}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Tipo:</strong>
-                <span>${usuario.tipo}</span>
-            </div>
-            <div class="detail-row">
-                <strong>Status:</strong>
-                <span class="status ${usuario.status}">
-                    ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                </span>
-            </div>
-        `;
+        const modal = document.getElementById('usuarioModal');
+        const modalTitle = modal.querySelector('#modalTitle');
+        const form = document.getElementById('usuarioForm');
 
-        document.getElementById('viewModal').style.display = 'flex';
+        modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Usuário';
+        
+        // Preencher o formulário com os dados do usuário
+        form.codigo.value = usuario.codigo;
+        form.nome.value = usuario.nome;
+        form.email.value = usuario.email;
+        form.tipo.value = usuario.tipo;
+        form.status.value = usuario.status;
+        
+        // Desabilitar todos os campos
+        Array.from(form.elements).forEach(element => {
+            element.disabled = true;
+        });
+
+        // Mostrar o modal com animação
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // Configurar o evento de submit do formulário
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            closeModal();
+        };
     } catch (error) {
-        mostrarToast('Erro ao carregar dados do usuário', 'error');
+        mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
     }
 }
 
@@ -269,7 +270,13 @@ async function editarUsuario(codigo) {
         const response = await api.get(`/usuarios/${codigo}`);
         const usuario = response;
         
-        const form = document.getElementById('usuarioForm');
+        const modal = document.getElementById('usuarioModal');
+        const modalTitle = modal.querySelector('#modalTitle');
+        let form = document.getElementById('usuarioForm');
+
+        modalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuário';
+        
+        // Preencher o formulário com os dados do usuário
         form.codigo.value = usuario.codigo;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
@@ -279,13 +286,63 @@ async function editarUsuario(codigo) {
         // Remover required dos campos de senha
         form.senha.removeAttribute('required');
         form.confirmar_senha.removeAttribute('required');
-        
-        const modalTitle = document.getElementById('modalTitle');
-        modalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuário';
-        
-        openModal();
+
+        // Remover qualquer evento de submit anterior
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        form = newForm;
+
+        // Mostrar o modal com animação
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // Configurar o evento de submit do formulário
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            
+            const usuarioData = {
+                codigo: form.codigo.value,
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                tipo: formData.get('tipo'),
+                status: formData.get('status')
+            };
+
+            // Adicionar senha apenas se foi preenchida
+            if (formData.get('senha')) {
+                if (formData.get('senha') !== formData.get('confirmar_senha')) {
+                    mostrarToast('As senhas não coincidem', 'error');
+                    return;
+                }
+                usuarioData.senha = formData.get('senha');
+            }
+
+            try {
+                const response = await api.put(`/usuarios/${form.codigo.value}`, usuarioData);
+                
+                if (response) {
+                    mostrarToast('Usuário atualizado com sucesso!', 'success');
+                    carregarUsuarios();
+                    form.reset();
+                    closeModal();
+                } else {
+                    throw new Error('Resposta inválida do servidor');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar usuário:', error);
+                if (error.status === 404) {
+                    mostrarToast('Usuário não encontrado.', 'error');
+                } else if (error.data?.details?.includes('usuarios_email_key')) {
+                    mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
+                } else {
+                    mostrarToast('Erro ao atualizar usuário: ' + (error.data?.message || error.message), 'error');
+                }
+            }
+        });
     } catch (error) {
-        mostrarToast('Erro ao carregar dados do usuário', 'error');
+        mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
     }
 }
 
@@ -301,11 +358,20 @@ function confirmarExclusao(codigo) {
 // Excluir usuário
 async function excluirUsuario(codigo) {
     try {
-        await api.delete(`/usuarios/${codigo}`);
-        mostrarToast('Usuário excluído com sucesso', 'success');
-        closeDeleteModal();
-        carregarUsuarios();
+        // Garantir que o código seja uma string com 5 dígitos
+        const codigoStr = codigo.toString().padStart(5, '0');
+        
+        const response = await api.delete(`/usuarios/${codigoStr}`);
+        
+        if (response && response.message) {
+            mostrarToast('Usuário excluído com sucesso!', 'success');
+            closeDeleteModal();
+            carregarUsuarios();
+        } else {
+            throw new Error('Resposta inválida do servidor');
+        }
     } catch (error) {
+        console.error('Erro ao excluir usuário:', error);
         mostrarToast('Erro ao excluir usuário', 'error');
     }
 }
