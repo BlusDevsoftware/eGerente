@@ -234,16 +234,6 @@ async function visualizarUsuario(codigo) {
         }
         const usuario = await response.json();
 
-        // Verificar se o modal existe, se não, criar
-        let modal = document.getElementById('modal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'modal';
-            modal.className = 'modal';
-            modal.innerHTML = '<div class="modal-content"></div>';
-            document.body.appendChild(modal);
-        }
-
         // Criar o conteúdo do modal
         const modalContent = `
             <div class="modal-header">
@@ -276,8 +266,23 @@ async function visualizarUsuario(codigo) {
             </div>
         `;
 
-        // Atualizar o conteúdo do modal
-        modal.querySelector('.modal-content').innerHTML = modalContent;
+        // Verificar se o modal existe, se não, criar
+        let modal = document.getElementById('modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modal';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+
+        // Criar ou atualizar o conteúdo do modal
+        const modalContentDiv = document.createElement('div');
+        modalContentDiv.className = 'modal-content';
+        modalContentDiv.innerHTML = modalContent;
+        
+        // Limpar o modal e adicionar o novo conteúdo
+        modal.innerHTML = '';
+        modal.appendChild(modalContentDiv);
 
         // Mostrar o modal com animação
         modal.style.display = 'flex';
