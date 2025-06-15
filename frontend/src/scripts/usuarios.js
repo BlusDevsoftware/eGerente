@@ -237,61 +237,43 @@ async function visualizarUsuario(codigo) {
         }
         const usuario = await response.json();
 
-        // Criar o modal se não existir
-        let modal = document.getElementById('modalUsuario');
+        const modal = document.getElementById('userModal');
         if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'modalUsuario';
-            modal.className = 'modal';
-            document.body.appendChild(modal);
+            console.error('Modal não encontrado');
+            mostrarToast('Modal de usuário não encontrado!', 'error');
+            return;
         }
 
-        // Criar o conteúdo do modal
-        const modalContent = document.createElement('div');
-        modalContent.className = 'modal-content';
-        modalContent.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-user"></i> Detalhes do Usuário</h2>
-                <button class="close-button" onclick="fecharModal()">&times;</button>
-            </div>
-            <div class="view-details">
-                <div class="detail-row">
-                    <strong>Código:</strong>
-                    <span>${usuario.codigo}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Nome:</strong>
-                    <span>${usuario.nome}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Email:</strong>
-                    <span>${usuario.email}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Tipo:</strong>
-                    <span>${usuario.tipo === 'admin' ? 'Administrador' : usuario.tipo === 'gerente' ? 'Gerente' : 'Usuário'}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Status:</strong>
-                    <span class="status ${usuario.status === 'ativo' ? 'ativo' : 'inativo'}">
-                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                    </span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
-            </div>
-        `;
+        // Configurar o formulário
+        const form = document.getElementById('usuarioForm');
+        if (form) {
+            form.reset();
+            form.codigo.value = usuario.codigo;
+            form.nome.value = usuario.nome;
+            form.email.value = usuario.email;
+            form.tipo.value = usuario.tipo;
+            form.status.value = usuario.status;
+            
+            // Desabilitar todos os campos
+            Array.from(form.elements).forEach(element => {
+                element.disabled = true;
+            });
 
-        // Limpar o modal e adicionar o novo conteúdo
-        modal.innerHTML = '';
-        modal.appendChild(modalContent);
+            // Remover required dos campos de senha
+            form.senha.removeAttribute('required');
+            form.confirmar_senha.removeAttribute('required');
+            
+            // Atualizar título do modal
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user"></i> Detalhes do Usuário';
+        }
 
-        // Exibir o modal com animação
+        // Mostrar o modal com animação
         modal.style.display = 'flex';
-        setTimeout(() => {
+        modal.style.opacity = '0';
+        requestAnimationFrame(() => {
+            modal.style.opacity = '1';
             modal.classList.add('show');
-        }, 10);
+        });
         document.body.style.overflow = 'hidden';
 
     } catch (error) {
@@ -312,77 +294,45 @@ async function editarUsuario(codigo) {
         }
         const usuario = await response.json();
 
-        // Criar o modal se não existir
-        let modal = document.getElementById('modalUsuario');
+        const modal = document.getElementById('userModal');
         if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'modalUsuario';
-            modal.className = 'modal';
-            document.body.appendChild(modal);
+            console.error('Modal não encontrado');
+            mostrarToast('Modal de usuário não encontrado!', 'error');
+            return;
         }
 
-        // Criar o conteúdo do modal
-        const modalContent = document.createElement('div');
-        modalContent.className = 'modal-content';
-        modalContent.innerHTML = `
-            <div class="modal-header">
-                <h2><i class="fas fa-edit"></i> Editar Usuário</h2>
-                <button class="close-button" onclick="fecharModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="formUsuario" class="form">
-                    <div class="form-group">
-                        <label for="codigo">Código:</label>
-                        <input type="text" id="codigo" value="${usuario.codigo}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" value="${usuario.nome}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" value="${usuario.email}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="senha">Nova Senha:</label>
-                        <input type="password" id="senha" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmarSenha">Confirmar Nova Senha:</label>
-                        <input type="password" id="confirmarSenha" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="tipo">Tipo:</label>
-                        <select id="tipo" required>
-                            <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
-                            <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
-                            <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Status:</label>
-                        <select id="status" required>
-                            <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                            <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-                <button class="btn btn-primary" onclick="salvarEdicaoUsuario()">Salvar</button>
-            </div>
-        `;
+        // Configurar o formulário
+        const form = document.getElementById('usuarioForm');
+        if (form) {
+            form.reset();
+            form.codigo.value = usuario.codigo;
+            form.nome.value = usuario.nome;
+            form.email.value = usuario.email;
+            form.tipo.value = usuario.tipo;
+            form.status.value = usuario.status;
+            
+            // Habilitar todos os campos exceto código
+            Array.from(form.elements).forEach(element => {
+                if (element.id !== 'codigo') {
+                    element.disabled = false;
+                }
+            });
 
-        // Limpar o modal e adicionar o novo conteúdo
-        modal.innerHTML = '';
-        modal.appendChild(modalContent);
+            // Remover required dos campos de senha
+            form.senha.removeAttribute('required');
+            form.confirmar_senha.removeAttribute('required');
+            
+            // Atualizar título do modal
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Usuário';
+        }
 
-        // Exibir o modal com animação
+        // Mostrar o modal com animação
         modal.style.display = 'flex';
-        setTimeout(() => {
+        modal.style.opacity = '0';
+        requestAnimationFrame(() => {
+            modal.style.opacity = '1';
             modal.classList.add('show');
-        }, 10);
+        });
         document.body.style.overflow = 'hidden';
 
     } catch (error) {
@@ -508,11 +458,19 @@ window.excluirUsuario = excluirUsuario;
 window.mostrarToast = mostrarToast;
 
 function fecharModal() {
-    const modal = document.getElementById('modalUsuario');
+    const modal = document.getElementById('userModal');
     if (modal) {
+        modal.style.opacity = '0';
         modal.classList.remove('show');
         setTimeout(() => {
             modal.style.display = 'none';
+            // Reabilitar todos os campos ao fechar o modal
+            const form = document.getElementById('usuarioForm');
+            if (form) {
+                Array.from(form.elements).forEach(element => {
+                    element.disabled = false;
+                });
+            }
         }, 300);
     }
 } 
