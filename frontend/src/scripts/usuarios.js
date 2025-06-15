@@ -207,9 +207,6 @@ async function criarUsuario(data) {
             codigo: codigo.toString()
         };
 
-        // Log seguro sem dados sensíveis
-        console.log('Criando novo usuário:', { nome: usuarioData.nome, email: usuarioData.email, tipo: usuarioData.tipo });
-
         await api.post('/usuarios', usuarioData);
         
         mostrarToast('Usuário criado com sucesso', 'success');
