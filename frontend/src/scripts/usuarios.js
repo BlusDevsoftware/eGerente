@@ -111,8 +111,8 @@ function gerarCodigoUsuario() {
     const ultimoUsuario = usuarios.length > 0 ? usuarios[usuarios.length - 1] : null;
     let proximoNumero = 1;
     
-    if (ultimoUsuario && ultimoUsuario.codigo_usuario) {
-        const ultimoNumero = parseInt(ultimoUsuario.codigo_usuario);
+    if (ultimoUsuario && ultimoUsuario.codigo) {
+        const ultimoNumero = parseInt(ultimoUsuario.codigo);
         proximoNumero = ultimoNumero + 1;
     }
     
@@ -138,9 +138,10 @@ function atualizarTabela(usuarios) {
     usuarios.forEach(usuario => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${usuario.codigo_usuario}</td>
+            <td>${usuario.codigo || ''}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
+            <td>${usuario.tipo}</td>
             <td>
                 <span class="status ${usuario.status}">
                     ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
@@ -232,7 +233,7 @@ async function visualizarUsuario(codigo) {
         viewDetails.innerHTML = `
             <div class="detail-row">
                 <strong>Código:</strong>
-                <span>${usuario.codigo_usuario}</span>
+                <span>${usuario.codigo || ''}</span>
             </div>
             <div class="detail-row">
                 <strong>Nome:</strong>
@@ -241,6 +242,10 @@ async function visualizarUsuario(codigo) {
             <div class="detail-row">
                 <strong>Email:</strong>
                 <span>${usuario.email}</span>
+            </div>
+            <div class="detail-row">
+                <strong>Tipo:</strong>
+                <span>${usuario.tipo}</span>
             </div>
             <div class="detail-row">
                 <strong>Status:</strong>
