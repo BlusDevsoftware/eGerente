@@ -229,74 +229,80 @@ async function criarUsuario(data) {
 async function visualizarUsuario(codigo) {
     try {
         // Garante que o código seja uma string de 5 dígitos
-        const codigoStr = codigo.toString().padStart(5, '0');
+        codigo = codigo.toString().padStart(5, '0');
         
-        const response = await fetch(`${API_URL}/usuarios/${codigoStr}`);
+        // Busca os dados do usuário
+        const response = await fetch(`${API_URL}/usuarios/${codigo}`);
         if (!response.ok) {
-            throw new Error('Erro ao carregar dados do usuário');
+            throw new Error('Erro ao buscar dados do usuário');
         }
-        
         const usuario = await response.json();
         
-        // Configura o modal e o formulário
-        const modal = document.getElementById('userModal');
+        // Cria o modal se não existir
+        let modal = document.getElementById('modalUsuario');
         if (!modal) {
-            throw new Error('Modal não encontrado');
-        }
-
-        const form = document.getElementById('userForm');
-        if (!form) {
-            throw new Error('Formulário não encontrado');
-        }
-
-        const modalTitle = modal.querySelector('.modal-title');
-        if (!modalTitle) {
-            throw new Error('Título do modal não encontrado');
+            modal = document.createElement('div');
+            modal.id = 'modalUsuario';
+            modal.className = 'modal';
+            document.body.appendChild(modal);
         }
         
-        // Limpa o formulário e configura os campos
-        form.reset();
+        // Cria o conteúdo do modal
+        const modalContent = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Visualizar Usuário</h2>
+                    <button class="close-button" onclick="fecharModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="formUsuario">
+                        <div class="form-group">
+                            <label for="codigo">Código:</label>
+                            <input type="text" id="codigo" name="codigo" value="${usuario.codigo}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="nome">Nome:</label>
+                            <input type="text" id="nome" name="nome" value="${usuario.nome}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail:</label>
+                            <input type="email" id="email" name="email" value="${usuario.email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo:</label>
+                            <select id="tipo" name="tipo" disabled>
+                                <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
+                                <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
+                                <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" disabled>
+                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+                </div>
+            </div>
+        `;
         
-        // Preenche os campos com os dados do usuário
-        const codigoInput = form.querySelector('#codigo');
-        const nomeInput = form.querySelector('#nome');
-        const emailInput = form.querySelector('#email');
-        const tipoInput = form.querySelector('#tipo');
-        
-        if (codigoInput) codigoInput.value = usuario.codigo;
-        if (nomeInput) nomeInput.value = usuario.nome;
-        if (emailInput) emailInput.value = usuario.email;
-        if (tipoInput) tipoInput.value = usuario.tipo;
-        
-        // Remove os campos de senha do modal de visualização
-        const senhaFields = form.querySelectorAll('.senha-fields');
-        senhaFields.forEach(field => field.style.display = 'none');
-        
-        // Remove os botões do modal de visualização
-        const modalFooter = modal.querySelector('.modal-footer');
-        if (modalFooter) {
-            modalFooter.style.display = 'none';
-        }
-        
-        // Desabilita todos os campos
-        form.querySelectorAll('input, select').forEach(field => {
-            field.disabled = true;
-        });
-        
-        // Atualiza o título do modal
-        modalTitle.innerHTML = '<i class="fas fa-eye me-2"></i>Visualizar Usuário';
+        // Limpa o conteúdo anterior do modal
+        modal.innerHTML = modalContent;
         
         // Exibe o modal com animação
         modal.style.display = 'block';
-        modal.classList.add('show');
-        document.body.classList.add('modal-open');
+        setTimeout(() => {
+            modal.querySelector('.modal-content').style.transform = 'translateY(0)';
+            modal.querySelector('.modal-content').style.opacity = '1';
+        }, 10);
         
-        // Adiciona animação suave
-        const modalDialog = modal.querySelector('.modal-dialog');
-        if (modalDialog) {
-            modalDialog.style.transform = 'translate(0, 0)';
-            modalDialog.style.opacity = '1';
-        }
+        // Previne o scroll do body
+        document.body.style.overflow = 'hidden';
         
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -508,19 +514,20 @@ window.excluirUsuario = excluirUsuario;
 window.mostrarToast = mostrarToast;
 
 function fecharModal() {
-    const modal = document.getElementById('userModal');
+    const modal = document.getElementById('modalUsuario');
     if (modal) {
-        modal.style.opacity = '0';
-        modal.classList.remove('show');
+        // Adiciona animação de saída
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.style.transform = 'translateY(-20px)';
+            modalContent.style.opacity = '0';
+        }
+        
+        // Remove o modal após a animação
         setTimeout(() => {
             modal.style.display = 'none';
-            // Reabilitar todos os campos ao fechar o modal
-            const form = document.getElementById('usuarioForm');
-            if (form) {
-                Array.from(form.elements).forEach(element => {
-                    element.disabled = false;
-                });
-            }
+            // Restaura o scroll do body
+            document.body.style.overflow = 'auto';
         }, 300);
     }
 } 
