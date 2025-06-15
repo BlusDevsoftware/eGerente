@@ -234,6 +234,16 @@ async function visualizarUsuario(codigo) {
         }
         const usuario = await response.json();
 
+        // Verificar se o modal existe, se não, criar
+        let modal = document.getElementById('modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modal';
+            modal.className = 'modal';
+            modal.innerHTML = '<div class="modal-content"></div>';
+            document.body.appendChild(modal);
+        }
+
         // Criar o conteúdo do modal
         const modalContent = `
             <div class="modal-header">
@@ -267,11 +277,11 @@ async function visualizarUsuario(codigo) {
         `;
 
         // Atualizar o conteúdo do modal
-        const modal = document.getElementById('modal');
         modal.querySelector('.modal-content').innerHTML = modalContent;
 
         // Mostrar o modal com animação
-        modal.classList.add('show');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
     } catch (error) {
         console.error('Erro ao visualizar usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
@@ -428,8 +438,10 @@ window.mostrarToast = mostrarToast;
 
 function fecharModal() {
     const modal = document.getElementById('modal');
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
 } 
