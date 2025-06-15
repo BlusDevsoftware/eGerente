@@ -112,10 +112,12 @@ function gerarCodigoUsuario() {
     let proximoNumero = 1;
     
     if (ultimoUsuario && ultimoUsuario.codigo) {
-        const ultimoNumero = parseInt(ultimoUsuario.codigo);
+        // Remover zeros à esquerda antes de converter para número
+        const ultimoNumero = parseInt(ultimoUsuario.codigo.replace(/^0+/, ''));
         proximoNumero = ultimoNumero + 1;
     }
     
+    // Garantir que o número tenha 5 dígitos com zeros à esquerda
     return proximoNumero.toString().padStart(5, '0');
 }
 
