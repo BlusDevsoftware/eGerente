@@ -228,67 +228,80 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        const response = await fetch(`${API_URL}/usuarios/${codigo}`);
+        // Garantir que o código seja uma string de 5 dígitos
+        const codigoFormatado = codigo.toString().padStart(5, '0');
+        
+        const response = await fetch(`${API_URL}/usuarios/${codigoFormatado}`);
         if (!response.ok) {
             throw new Error('Erro ao carregar dados do usuário');
         }
         const usuario = await response.json();
 
-        // Criar o conteúdo do modal
-        const modalContent = `
-            <div class="modal-header">
-                <h2><i class="fas fa-user"></i> Detalhes do Usuário</h2>
-                <button class="close-modal" onclick="fecharModal()">&times;</button>
-            </div>
-            <div class="view-details">
-                <div class="detail-row">
-                    <strong>Código:</strong>
-                    <span>${usuario.codigo}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Nome:</strong>
-                    <span>${usuario.nome}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Email:</strong>
-                    <span>${usuario.email}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Tipo:</strong>
-                    <span>${usuario.tipo === 'admin' ? 'Administrador' : 'Usuário'}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>Status:</strong>
-                    <span class="status ${usuario.status === 'ativo' ? 'ativo' : 'inativo'}">
-                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                    </span>
-                </div>
-            </div>
-        `;
-
-        // Verificar se o modal existe, se não, criar
-        let modal = document.getElementById('modal');
+        // Criar o modal se não existir
+        let modal = document.getElementById('modalUsuario');
         if (!modal) {
             modal = document.createElement('div');
-            modal.id = 'modal';
+            modal.id = 'modalUsuario';
             modal.className = 'modal';
             document.body.appendChild(modal);
         }
 
-        // Criar ou atualizar o conteúdo do modal
-        const modalContentDiv = document.createElement('div');
-        modalContentDiv.className = 'modal-content';
-        modalContentDiv.innerHTML = modalContent;
-        
+        // Criar o conteúdo do modal
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.innerHTML = `
+            <div class="modal-header">
+                <h2>Detalhes do Usuário</h2>
+                <button class="close-button" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="formUsuario" class="form">
+                    <div class="form-group">
+                        <label for="codigo">Código:</label>
+                        <input type="text" id="codigo" value="${usuario.codigo}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" value="${usuario.nome}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" value="${usuario.email}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo:</label>
+                        <select id="tipo" disabled>
+                            <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
+                            <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
+                            <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" disabled>
+                            <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
+                            <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+            </div>
+        `;
+
         // Limpar o modal e adicionar o novo conteúdo
         modal.innerHTML = '';
-        modal.appendChild(modalContentDiv);
+        modal.appendChild(modalContent);
 
-        // Mostrar o modal com animação
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
+        // Exibir o modal com animação
+        modal.style.display = 'block';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+
     } catch (error) {
-        console.error('Erro ao visualizar usuário:', error);
+        console.error('Erro ao carregar dados do usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
     }
 }
@@ -442,7 +455,7 @@ window.excluirUsuario = excluirUsuario;
 window.mostrarToast = mostrarToast;
 
 function fecharModal() {
-    const modal = document.getElementById('modal');
+    const modal = document.getElementById('modalUsuario');
     if (modal) {
         modal.classList.remove('show');
         setTimeout(() => {
