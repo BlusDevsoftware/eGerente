@@ -138,7 +138,7 @@ function atualizarTabela(usuarios) {
     usuarios.forEach(usuario => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${usuario.codigo || ''}</td>
+            <td>${usuario.codigo}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
             <td>${usuario.tipo}</td>
@@ -192,14 +192,17 @@ async function criarUsuario(data) {
             return;
         }
 
+        // Gerar código do usuário
+        const codigo = gerarCodigoUsuario();
+
         // Preparar dados para envio
         const usuarioData = {
             nome: data.nome,
             email: data.email,
             senha: data.senha,
-            tipo: data.tipo || 'user', // Usar o valor do formulário ou 'user' como padrão
+            tipo: data.tipo || 'user',
             status: data.status || 'ativo',
-            codigo: gerarCodigoUsuario()
+            codigo: codigo
         };
 
         console.log('Enviando dados:', usuarioData);
@@ -233,7 +236,7 @@ async function visualizarUsuario(codigo) {
         viewDetails.innerHTML = `
             <div class="detail-row">
                 <strong>Código:</strong>
-                <span>${usuario.codigo || ''}</span>
+                <span>${usuario.codigo}</span>
             </div>
             <div class="detail-row">
                 <strong>Nome:</strong>
