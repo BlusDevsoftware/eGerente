@@ -527,21 +527,29 @@ function confirmarExclusao(codigo) {
 // Excluir usuário
 async function excluirUsuario(codigo) {
     try {
-        console.log('Deletando usuário:', codigo); // Debug
+        // Garantir que o código seja uma string com 5 dígitos
+        const codigoStr = codigo.toString().padStart(5, '0');
+        console.log('Tentando excluir usuário com código:', codigoStr); // Debug
 
         // Usar confirm nativo do navegador
         if (!confirm('Tem certeza que deseja excluir este usuário?')) {
+            console.log('Exclusão cancelada pelo usuário');
             return;
         }
 
         // Fazer a requisição DELETE usando api.delete
-        await api.delete(`/usuarios/${codigo}`); // Corrigido o endpoint
+        const response = await api.delete(`/usuarios/${codigoStr}`);
+        console.log('Resposta da exclusão:', response); // Debug
 
-        // Mostrar mensagem de sucesso
-        mostrarToast('Usuário excluído com sucesso!', 'success');
-
-        // Recarregar a lista de usuários
-        await carregarUsuarios();
+        if (response && response.message) {
+            // Mostrar mensagem de sucesso
+            mostrarToast('Usuário excluído com sucesso!', 'success');
+            
+            // Recarregar a lista de usuários
+            await carregarUsuarios();
+        } else {
+            throw new Error('Resposta inválida do servidor');
+        }
 
     } catch (error) {
         console.error('Erro ao excluir usuário:', error);
