@@ -2,7 +2,7 @@
 function openModal() {
     const modal = document.getElementById('userModal');
     if (!modal) {
-        console.error('Modal não encontrado');
+        console.error('Modal de usuário não encontrado');
         mostrarToast('Modal de usuário não encontrado!', 'error');
         return;
     }
@@ -17,6 +17,11 @@ function openModal() {
         // Garantir que os campos de senha sejam obrigatórios para novo usuário
         form.senha.setAttribute('required', 'required');
         form.confirmar_senha.setAttribute('required', 'required');
+
+        // Re-habilitar todos os campos, caso venha de visualização
+        Array.from(form.elements).forEach(element => {
+            element.disabled = false;
+        });
     }
     
     // Mostrar o modal
@@ -26,6 +31,7 @@ function openModal() {
         modal.style.opacity = '1';
         modal.classList.add('show');
     });
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
@@ -35,18 +41,24 @@ function closeModal() {
         modal.classList.remove('show');
         setTimeout(() => {
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            const form = document.getElementById('usuarioForm');
+            if (form) form.reset();
         }, 300);
     }
 }
 
 function closeViewModal() {
-    const modal = document.getElementById('viewModal');
+    // Esta função pode ser removida se o mesmo modal for usado para visualizar e editar
+    const modal = document.getElementById('viewModal'); // Verifique se este modal ainda existe no HTML
     if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
     if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
 // Funções de manipulação de usuários
@@ -54,8 +66,8 @@ let usuarios = [];
 let usuarioAtual = null;
 
 // Carregar usuários ao iniciar a página e configurar listeners
-// (Apenas um DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado, iniciando setup...'); // Debug
     carregarUsuarios();
     setupEventListeners();
 });
@@ -65,15 +77,21 @@ function setupEventListeners() {
     // Form de usuário
     const form = document.getElementById('usuarioForm');
     if (form) {
+        // Remover qualquer evento de submit anterior para evitar duplicação
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        form = newForm;
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
-            
-            if (data.codigo) {
-                editarUsuario(data);
+
+            // Decide se é criação ou edição baseado no campo 'codigo'
+            if (form.codigo.value) { // Se o campo código não estiver vazio, é edição
+                editarUsuarioSubmit(e); // Nova função para lidar com o submit de edição
             } else {
-                criarUsuario(data);
+                criarUsuario(e);
             }
         });
     }
@@ -82,7 +100,7 @@ function setupEventListeners() {
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
             closeModal();
-            closeViewModal();
+            // closeViewModal(); // Remover se não for mais usado
             closeDeleteModal();
         });
     });
@@ -97,11 +115,20 @@ function setupEventListeners() {
     }
 
     // Filtro de status
-    const statusFilter = document.querySelector('.filter-options select');
+    const statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
         statusFilter.addEventListener('change', (e) => {
             const status = e.target.value;
             filtrarPorStatus(status);
+        });
+    }
+
+    // Filtro de tipo
+    const tipoFilter = document.getElementById('tipoFilter');
+    if (tipoFilter) {
+        tipoFilter.addEventListener('change', (e) => {
+            const tipo = e.target.value;
+            filtrarPorTipo(tipo);
         });
     }
 }
@@ -123,46 +150,88 @@ function gerarCodigoUsuario() {
 
 // Carregar usuários
 async function carregarUsuarios() {
-    try {
-        const response = await api.get('/usuarios');
-        usuarios = response;
-        atualizarTabela(usuarios);
-    } catch (error) {
-        mostrarToast('Erro ao carregar usuários', 'error');
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY_MS = 200; // 200ms
+    for (let i = 0; i < MAX_RETRIES; i++) {
+        try {
+            console.log(`Carregando usuários (Tentativa ${i + 1}/${MAX_RETRIES})...`); // Debug
+
+            const tabela = document.getElementById('tabelaUsuarios');
+            if (!tabela) {
+                if (i < MAX_RETRIES - 1) {
+                    console.warn('Tabela de usuários não encontrada, re-tentando...');
+                    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+                    continue;
+                } else {
+                    console.error('Tabela de usuários não encontrada após múltiplas tentativas.');
+                    mostrarToast('Tabela de usuários não encontrada', 'error');
+                    return;
+                }
+            }
+
+            let tbody = tabela.querySelector('tbody');
+            if (!tbody) {
+                console.log('Criando elemento tbody...'); // Debug
+                tbody = document.createElement('tbody');
+                tabela.appendChild(tbody);
+            }
+
+            const response = await api.get('/cadastros/usuarios'); // Corrigido o endpoint
+            console.log('Resposta da API:', response); // Debug
+
+            tbody.innerHTML = '';
+
+            if (!response || response.length === 0) {
+                console.log('Nenhum usuário encontrado na resposta'); // Debug
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
+                tbody.appendChild(tr);
+                return;
+            }
+
+            console.log('Processando usuários encontrados:', response.length); // Debug
+
+            response.forEach(usuario => {
+                console.log('Processando usuário:', usuario); // Debug
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${usuario.codigo.toString().padStart(5, '0')}</td>
+                    <td>${usuario.nome}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.tipo}</td>
+                    <td>
+                        <span class="status ${usuario.status}">
+                            ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            usuarios = response;
+            console.log('Tabela atualizada com sucesso'); // Debug
+            return; // Sai do loop se o carregamento for bem-sucedido
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+            if (i < MAX_RETRIES - 1) {
+                mostrarToast('Erro ao carregar usuários, re-tentando...', 'error');
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+            } else {
+                mostrarToast('Erro ao carregar usuários: ' + error.message, 'error');
+            }
+        }
     }
-}
-
-// Atualizar tabela
-function atualizarTabela(usuarios) {
-    const tbody = document.getElementById('userTableBody');
-    tbody.innerHTML = '';
-
-    usuarios.forEach(usuario => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${usuario.codigo.toString().padStart(5, '0')}</td>
-            <td>${usuario.nome}</td>
-            <td>${usuario.email}</td>
-            <td>${usuario.tipo}</td>
-            <td>
-                <span class="status ${usuario.status}">
-                    ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                </span>
-            </td>
-            <td class="actions">
-                <button class="action-btn view-btn" onclick="visualizarUsuario(${usuario.codigo})">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="action-btn edit-btn" onclick="editarUsuario(${usuario.codigo})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="action-btn delete-btn" onclick="confirmarExclusao(${usuario.codigo})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
 }
 
 // Filtrar usuários
@@ -185,39 +254,94 @@ function filtrarPorStatus(status) {
     atualizarTabela(filtrados);
 }
 
+// Filtrar por tipo
+function filtrarPorTipo(tipo) {
+    if (!tipo) {
+        atualizarTabela(usuarios);
+        return;
+    }
+    const filtrados = usuarios.filter(usuario => usuario.tipo === tipo);
+    atualizarTabela(filtrados);
+}
+
+// Atualizar tabela (reutilizada para filtros)
+function atualizarTabela(usuarios) {
+    const tbody = document.querySelector('#tabelaUsuarios tbody');
+    if (!tbody) {
+        console.error('TBody da tabela de usuários não encontrado para atualização.');
+        return;
+    }
+    tbody.innerHTML = '';
+
+    if (usuarios.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
+        tbody.appendChild(tr);
+        return;
+    }
+
+    usuarios.forEach(usuario => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${usuario.codigo.toString().padStart(5, '0')}</td>
+            <td>${usuario.nome}</td>
+            <td>${usuario.email}</td>
+            <td>${usuario.tipo}</td>
+            <td>
+                <span class="status ${usuario.status}">
+                    ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                </span>
+            </td>
+            <td class="actions">
+                <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
 // Criar usuário
-async function criarUsuario(data) {
+async function criarUsuario(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    // Validar senhas
+    if (formData.get('senha') !== formData.get('confirmar_senha')) {
+        mostrarToast('As senhas não coincidem', 'error');
+        return;
+    }
+
+    // Gerar código do usuário com 5 dígitos
+    const codigo = gerarCodigoUsuario(); // Reutiliza a função existente
+
+    const usuario = {
+        codigo: codigo, // Agora a função gerarCodigoUsuario já retorna a string formatada
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        senha: formData.get('senha'),
+        tipo: formData.get('tipo'),
+        status: formData.get('status')
+    };
+
     try {
-        // Validar senhas
-        if (data.senha !== data.confirmar_senha) {
-            mostrarToast('As senhas não coincidem', 'error');
-            return;
-        }
-
-        // Gerar código do usuário
-        const codigo = gerarCodigoUsuario();
-
-        // Preparar dados para envio
-        const usuarioData = {
-            nome: data.nome,
-            email: data.email,
-            senha: data.senha,
-            tipo: data.tipo || 'user',
-            status: data.status || 'ativo',
-            codigo: codigo.toString()
-        };
-
-        await api.post('/usuarios', usuarioData);
-        
-        mostrarToast('Usuário criado com sucesso', 'success');
-        closeModal();
+        await api.post('/cadastros/usuarios', usuario); // Corrigido o endpoint
+        mostrarToast('Usuário criado com sucesso!', 'success');
         carregarUsuarios();
+        event.target.reset();
+        closeModal();
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
         if (error.data?.details?.includes('usuarios_email_key')) {
             mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
         } else if (error.status === 500) {
-            console.error('Erro interno do servidor:', error.status);
             mostrarToast('Erro ao criar usuário. Por favor, tente novamente.', 'error');
         } else {
             mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
@@ -228,107 +352,19 @@ async function criarUsuario(data) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        // Garantir que o código seja uma string de 5 dígitos
-        codigo = codigo.toString().padStart(5, '0');
-        
-        // Buscar dados do usuário
-        const response = await fetch(`${API_URL}/usuarios/${codigo}`);
-        if (!response.ok) {
-            throw new Error('Erro ao buscar dados do usuário');
-        }
-        const usuario = await response.json();
+        console.log('Visualizando usuário:', codigo); // Debug
 
-        // Criar o modal se não existir
-        let modal = document.getElementById('modalUsuario');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'modalUsuario';
-            modal.className = 'modal';
-            document.body.appendChild(modal);
-        }
+        // Buscar dados do usuário usando api.get
+        const usuario = await api.get(`/cadastros/usuarios/${codigo}`); // Corrigido o endpoint
 
-        // Criar o conteúdo do modal
-        const modalContent = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Visualizar Usuário</h2>
-                    <button type="button" class="close" onclick="fecharModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="formVisualizarUsuario">
-                        <div class="form-group">
-                            <label for="codigo">Código:</label>
-                            <input type="text" id="codigo" value="${usuario.codigo}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="nome">Nome:</label>
-                            <input type="text" id="nome" value="${usuario.nome}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" value="${usuario.email}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo">Tipo:</label>
-                            <select id="tipo" disabled>
-                                <option value="admin" ${usuario.tipo === 'admin' ? 'selected' : ''}>Administrador</option>
-                                <option value="gerente" ${usuario.tipo === 'gerente' ? 'selected' : ''}>Gerente</option>
-                                <option value="usuario" ${usuario.tipo === 'usuario' ? 'selected' : ''}>Usuário</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Status:</label>
-                            <select id="status" disabled>
-                                <option value="ativo" ${usuario.status === 'ativo' ? 'selected' : ''}>Ativo</option>
-                                <option value="inativo" ${usuario.status === 'inativo' ? 'selected' : ''}>Inativo</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
-                </div>
-            </div>
-        `;
+        console.log('Dados do usuário:', usuario); // Debug
 
-        // Atualizar o conteúdo do modal
-        modal.innerHTML = modalContent;
-        
-        // Exibir o modal com animação
-        modal.style.display = 'block';
-        setTimeout(() => {
-            modal.querySelector('.modal-content').style.transform = 'translateY(0)';
-            modal.querySelector('.modal-content').style.opacity = '1';
-        }, 10);
-
-        // Prevenir scroll do body
-        document.body.style.overflow = 'hidden';
-
-    } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
-        mostrarToast('Erro ao carregar dados do usuário', 'error');
-    }
-}
-
-// Editar usuário
-async function editarUsuario(codigo) {
-    try {
-        // Garante que o código seja uma string de 5 dígitos
-        codigo = codigo.toString().padStart(5, '0');
-        
-        // Busca os dados do usuário
-        const response = await fetch(`${API_URL}/usuarios/${codigo}`);
-        if (!response.ok) {
-            throw new Error('Erro ao buscar dados do usuário');
-        }
-        const usuario = await response.json();
-        
-        const modal = document.getElementById('modalUsuario');
+        const modal = document.getElementById('userModal'); // ID correto
         const modalTitle = modal.querySelector('#modalTitle');
-        let form = document.getElementById('formUsuario');
+        const form = document.getElementById('usuarioForm'); // ID correto
 
-        modalTitle.textContent = 'Editar Usuário';
-        
+        modalTitle.textContent = 'Visualizar Usuário';
+
         // Preencher o formulário com os dados do usuário
         form.codigo.value = usuario.codigo;
         form.nome.value = usuario.nome;
@@ -336,65 +372,132 @@ async function editarUsuario(codigo) {
         form.tipo.value = usuario.tipo;
         form.status.value = usuario.status;
 
-        // Remover qualquer evento de submit anterior
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        form = newForm;
+        // Desabilitar todos os campos
+        Array.from(form.elements).forEach(element => {
+            element.disabled = true;
+        });
+
+        // Esconder campos de senha
+        form.senha.parentElement.style.display = 'none';
+        form.confirmar_senha.parentElement.style.display = 'none';
 
         // Mostrar o modal com animação
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
-        // Configurar o evento de submit do formulário
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(form);
-            
-            const usuario = {
-                codigo: form.codigo.value,
-                nome: formData.get('nome'),
-                email: formData.get('email'),
-                tipo: formData.get('tipo'),
-                status: formData.get('status')
-            };
+        // Configurar o evento de submit do formulário para fechar o modal
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            closeModal();
+        };
 
-            // Verifica se uma nova senha foi fornecida
-            const senha = formData.get('senha');
-            const confirmarSenha = formData.get('confirmarSenha');
-            
-            if (senha || confirmarSenha) {
-                if (senha !== confirmarSenha) {
-                    throw new Error('As senhas não coincidem');
-                }
-                usuario.senha = senha;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/usuarios/${usuario.codigo}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(usuario)
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Erro ao atualizar usuário');
-                }
-
-                mostrarToast('Usuário atualizado com sucesso!', 'success');
-                carregarUsuarios();
-                fecharModal();
-            } catch (error) {
-                console.error('Erro ao atualizar usuário:', error);
-                mostrarToast('Erro ao atualizar usuário: ' + error.message, 'error');
-            }
-        });
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
+    }
+}
+
+// Editar usuário (função que abre o modal de edição)
+async function editarUsuario(codigo) {
+    try {
+        console.log('Editando usuário:', codigo); // Debug
+
+        // Buscar dados do usuário usando api.get
+        const usuario = await api.get(`/cadastros/usuarios/${codigo}`); // Corrigido o endpoint
+
+        const modal = document.getElementById('userModal'); // ID correto
+        const modalTitle = modal.querySelector('#modalTitle');
+        let form = document.getElementById('usuarioForm'); // ID correto
+
+        modalTitle.textContent = 'Editar Usuário';
+
+        // Preencher o formulário com os dados do usuário
+        form.codigo.value = usuario.codigo;
+        form.nome.value = usuario.nome;
+        form.email.value = usuario.email;
+        form.tipo.value = usuario.tipo;
+        form.status.value = usuario.status;
+
+        // Reativar e mostrar campos de senha para edição, mas torná-los opcionais
+        form.senha.value = ''; // Limpar para que o usuário insira nova senha se quiser
+        form.confirmar_senha.value = '';
+        form.senha.removeAttribute('required');
+        form.confirmar_senha.removeAttribute('required');
+        form.senha.parentElement.style.display = 'block';
+        form.confirmar_senha.parentElement.style.display = 'block';
+
+        // Re-habilitar todos os campos
+        Array.from(form.elements).forEach(element => {
+            element.disabled = false;
+        });
+
+        // Remover qualquer evento de submit anterior e recriar para evitar duplicação
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        form = newForm; // Atribuir o novo formulário à variável
+
+        // Mostrar o modal com animação
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // O evento de submit será tratado por editarUsuarioSubmit
+        form.onsubmit = (e) => { // Sobrescreve o onsubmit padrão para chamar a função de edição
+            editarUsuarioSubmit(e); // Chama a nova função para o submit
+        };
+
+    } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        mostrarToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
+    }
+}
+
+// Nova função para lidar com o submit do formulário de edição
+async function editarUsuarioSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const usuarioAtualizado = {
+        codigo: form.codigo.value,
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        tipo: formData.get('tipo'),
+        status: formData.get('status')
+    };
+
+    const senha = formData.get('senha');
+    const confirmarSenha = formData.get('confirmar_senha');
+
+    if (senha || confirmarSenha) {
+        if (senha !== confirmarSenha) {
+            mostrarToast('As senhas não coincidem', 'error');
+            return;
+        }
+        usuarioAtualizado.senha = senha;
+    }
+
+    try {
+        const response = await api.put(`/cadastros/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado); // Corrigido o endpoint
+
+        if (response) {
+            mostrarToast('Usuário atualizado com sucesso!', 'success');
+            carregarUsuarios();
+            form.reset();
+            closeModal();
+        } else {
+            throw new Error('Resposta inválida do servidor');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar usuário:', error);
+        if (error.status === 404) {
+            mostrarToast('Usuário não encontrado.', 'error');
+        } else if (error.data?.details?.includes('multiple (or no) rows returned')) {
+            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
+        } else {
+            mostrarToast('Erro ao atualizar usuário: ' + (error.data?.message || error.message), 'error');
+        }
     }
 }
 
@@ -402,7 +505,7 @@ async function editarUsuario(codigo) {
 function confirmarExclusao(codigo) {
     usuarioAtual = codigo;
     document.getElementById('deleteModal').style.display = 'flex';
-    
+
     const confirmBtn = document.getElementById('confirmDeleteBtn');
     confirmBtn.onclick = () => excluirUsuario(codigo);
 }
@@ -412,9 +515,11 @@ async function excluirUsuario(codigo) {
     try {
         // Garantir que o código seja uma string com 5 dígitos
         const codigoStr = codigo.toString().padStart(5, '0');
-        
-        const response = await api.delete(`/usuarios/${codigoStr}`);
-        
+        console.log('Tentando excluir usuário com código:', codigoStr); // Debug
+
+        const response = await api.delete(`/cadastros/usuarios/${codigoStr}`); // Corrigido o endpoint
+        console.log('Resposta da exclusão:', response); // Debug
+
         if (response && response.message) {
             mostrarToast('Usuário excluído com sucesso!', 'success');
             closeDeleteModal();
@@ -429,22 +534,17 @@ async function excluirUsuario(codigo) {
 }
 
 // Mostrar toast
-function mostrarToast(mensagem, tipo = 'info') {
-    const toastContainer = document.querySelector('.toast-container');
+function mostrarToast(mensagem, tipo) {
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    
-    const icon = tipo === 'success' ? 'check-circle' :
-                tipo === 'error' ? 'exclamation-circle' : 'info-circle';
-    
     toast.innerHTML = `
-        <i class="fas fa-${icon}"></i>
+        <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
         <span>${mensagem}</span>
-        <button onclick="this.parentElement.remove()">&times;</button>
+        <button onclick="this.parentElement.remove()">×</button>
     `;
-    
-    toastContainer.appendChild(toast);
-    setTimeout(() => toast.classList.add('show'), 10);
+
+    document.querySelector('.toast-container').appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 100);
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
@@ -460,6 +560,7 @@ window.carregarUsuarios = carregarUsuarios;
 window.criarUsuario = criarUsuario;
 window.visualizarUsuario = visualizarUsuario;
 window.editarUsuario = editarUsuario;
+window.editarUsuarioSubmit = editarUsuarioSubmit; // Exportar nova função
 window.confirmarExclusao = confirmarExclusao;
 window.excluirUsuario = excluirUsuario;
 window.mostrarToast = mostrarToast;
