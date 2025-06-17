@@ -531,9 +531,17 @@ async function excluirUsuario(codigo) {
 
         // Mostrar modal de confirmação
         const confirmModal = document.getElementById('confirmModal');
-        const confirmMessage = document.getElementById('confirmMessage');
-        const confirmButton = document.getElementById('confirmButton');
-        const cancelButton = document.getElementById('cancelButton');
+        if (!confirmModal) {
+            throw new Error('Modal de confirmação não encontrado');
+        }
+
+        const confirmMessage = confirmModal.querySelector('#confirmMessage');
+        const confirmButton = confirmModal.querySelector('#confirmButton');
+        const cancelButton = confirmModal.querySelector('#cancelButton');
+
+        if (!confirmMessage || !confirmButton || !cancelButton) {
+            throw new Error('Elementos do modal de confirmação não encontrados');
+        }
 
         confirmMessage.textContent = 'Tem certeza que deseja excluir este usuário?';
         confirmModal.style.display = 'flex';
