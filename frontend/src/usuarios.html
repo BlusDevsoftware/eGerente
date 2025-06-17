@@ -567,21 +567,23 @@
 
     <!-- Modal de Confirmação de Exclusão -->
     <div id="deleteModal" class="modal">
-        <div class="modal-content delete-confirmation">
+        <div class="modal-content delete-confirmation" style="max-width: 400px; width: 90%; margin: auto; padding: 0;">
             <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
-                <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
+                <h2 style="font-size: 1.3em;"><i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> Confirmar Exclusão</h2>
+                <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
             </div>
-            <div class="delete-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+            <div class="modal-body" style="padding: 24px 24px 0 24px;">
+                <div class="delete-icon" style="font-size: 40px; color: #dc3545; margin-bottom: 10px; text-align: center;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="delete-message" style="text-align: center; font-size: 18px; color: #333; margin-bottom: 8px;">
+                    Tem certeza que deseja excluir este usuário?
+                </div>
+                <div class="delete-warning" style="text-align: center; font-size: 14px; color: #666; margin-bottom: 20px;">
+                    Esta ação não pode ser desfeita.
+                </div>
             </div>
-            <div class="delete-message">
-                Tem certeza que deseja excluir este usuário?
-            </div>
-            <div class="delete-warning">
-                Esta ação não pode ser desfeita.
-            </div>
-            <div class="form-actions">
+            <div class="form-actions" style="display: flex; justify-content: center; gap: 12px; padding: 0 0 24px 0;">
                 <button class="btn-secondary" onclick="closeDeleteModal()">
                     <i class="fas fa-times"></i>
                     Cancelar

@@ -1715,3 +1715,66 @@ tr:hover {
 .close:hover {
     color: #333;
 }
+
+/* Melhorias específicas para o modal de exclusão de usuário */
+.modal-content.delete-confirmation {
+    max-width: 400px;
+    width: 90%;
+    margin: auto;
+    padding: 0;
+}
+.modal-content.delete-confirmation .modal-header {
+    padding: 18px 24px 12px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px 8px 0 0;
+    background: #f8f9fa;
+}
+.modal-content.delete-confirmation .modal-header h2 {
+    font-size: 1.3em;
+    color: #dc3545;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.modal-content.delete-confirmation .close-modal {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.modal-content.delete-confirmation .close-modal:hover {
+    color: #333;
+}
+.modal-content.delete-confirmation .modal-body {
+    padding: 24px 24px 0 24px;
+}
+.modal-content.delete-confirmation .delete-icon {
+    text-align: center;
+    font-size: 40px;
+    color: #dc3545;
+    margin-bottom: 10px;
+}
+.modal-content.delete-confirmation .delete-message {
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 8px;
+}
+.modal-content.delete-confirmation .delete-warning {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+.modal-content.delete-confirmation .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 0 24px 0;
+}
