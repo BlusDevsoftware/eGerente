@@ -43,7 +43,21 @@ function closeModal() {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
             const form = document.getElementById('usuarioForm');
-            if (form) form.reset();
+            if (form) {
+                form.reset();
+                // Re-habilitar todos os campos
+                Array.from(form.elements).forEach(element => {
+                    element.disabled = false;
+                });
+                // Mostrar campos de senha
+                form.senha.parentElement.style.display = 'block';
+                form.confirmar_senha.parentElement.style.display = 'block';
+                // Mostrar botões de ação
+                const formActions = form.querySelector('.form-actions');
+                if (formActions) {
+                    formActions.style.display = 'flex';
+                }
+            }
         }, 300);
     }
 }
@@ -356,7 +370,8 @@ async function visualizarUsuario(codigo) {
         const modalTitle = modal.querySelector('#modalTitle');
         const form = document.getElementById('usuarioForm'); // ID correto
 
-        modalTitle.textContent = 'Visualizar Usuário';
+        // Configurar o título e ícone do modal
+        modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Usuário';
 
         // Preencher o formulário com os dados do usuário
         form.codigo.value = usuario.codigo;
@@ -373,6 +388,12 @@ async function visualizarUsuario(codigo) {
         // Esconder campos de senha
         form.senha.parentElement.style.display = 'none';
         form.confirmar_senha.parentElement.style.display = 'none';
+
+        // Esconder botões de ação do formulário
+        const formActions = form.querySelector('.form-actions');
+        if (formActions) {
+            formActions.style.display = 'none';
+        }
 
         // Mostrar o modal com animação
         modal.style.display = 'flex';
