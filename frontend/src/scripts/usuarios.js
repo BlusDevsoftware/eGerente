@@ -515,45 +515,41 @@ async function editarUsuarioSubmit(event) {
     }
 }
 
-// Confirmar exclusão
+// Função para confirmar exclusão
 function confirmarExclusao(codigo) {
-    usuarioAtual = codigo;
-    document.getElementById('deleteModal').style.display = 'flex';
-
+    const modal = document.getElementById('deleteModal');
     const confirmBtn = document.getElementById('confirmDeleteBtn');
-    confirmBtn.onclick = () => excluirUsuario(codigo);
+    
+    // Remover event listener anterior se existir
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Adicionar novo event listener
+    newConfirmBtn.addEventListener('click', () => excluirUsuario(codigo));
+    
+    modal.style.display = 'flex';
 }
 
-// Excluir usuário
+// Função para excluir usuário
 async function excluirUsuario(codigo) {
     try {
         // Garantir que o código seja uma string com 5 dígitos
         const codigoStr = codigo.toString().padStart(5, '0');
-        console.log('Tentando excluir usuário com código:', codigoStr); // Debug
-
-        // Usar confirm nativo do navegador
-        if (!confirm('Tem certeza que deseja excluir este usuário?')) {
-            console.log('Exclusão cancelada pelo usuário');
-            return;
-        }
-
-        // Fazer a requisição DELETE usando api.delete
+        console.log('Tentando excluir usuário com código:', codigoStr);
+        
         const response = await api.delete(`/usuarios/${codigoStr}`);
-        console.log('Resposta da exclusão:', response); // Debug
-
+        console.log('Resposta da exclusão:', response);
+        
         if (response && response.message) {
-            // Mostrar mensagem de sucesso
             mostrarToast('Usuário excluído com sucesso!', 'success');
-            
-            // Recarregar a lista de usuários
-            await carregarUsuarios();
+            closeDeleteModal();
+            carregarUsuarios();
         } else {
             throw new Error('Resposta inválida do servidor');
         }
-
     } catch (error) {
         console.error('Erro ao excluir usuário:', error);
-        mostrarToast('Erro ao excluir usuário: ' + error.message, 'error');
+        mostrarToast('Erro ao excluir usuário', 'error');
     }
 }
 
