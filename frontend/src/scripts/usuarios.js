@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Configurar event listeners
 function setupEventListeners() {
     // Form de usuário
-    const form = document.getElementById('usuarioForm');
+    let form = document.getElementById('usuarioForm');
     if (form) {
         // Remover qualquer evento de submit anterior para evitar duplicação
         const newForm = form.cloneNode(true);
@@ -115,7 +115,7 @@ function setupEventListeners() {
     }
 
     // Filtro de status
-    const statusFilter = document.getElementById('statusFilter');
+    const statusFilter = document.querySelector('.filter-options select');
     if (statusFilter) {
         statusFilter.addEventListener('change', (e) => {
             const status = e.target.value;
@@ -156,8 +156,8 @@ async function carregarUsuarios() {
         try {
             console.log(`Carregando usuários (Tentativa ${i + 1}/${MAX_RETRIES})...`); // Debug
 
-            const tabela = document.getElementById('tabelaUsuarios');
-            if (!tabela) {
+            const tbody = document.getElementById('userTableBody');
+            if (!tbody) {
                 if (i < MAX_RETRIES - 1) {
                     console.warn('Tabela de usuários não encontrada, re-tentando...');
                     await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
@@ -167,13 +167,6 @@ async function carregarUsuarios() {
                     mostrarToast('Tabela de usuários não encontrada', 'error');
                     return;
                 }
-            }
-
-            let tbody = tabela.querySelector('tbody');
-            if (!tbody) {
-                console.log('Criando elemento tbody...'); // Debug
-                tbody = document.createElement('tbody');
-                tabela.appendChild(tbody);
             }
 
             const response = await api.get('/cadastros/usuarios'); // Corrigido o endpoint
@@ -266,7 +259,7 @@ function filtrarPorTipo(tipo) {
 
 // Atualizar tabela (reutilizada para filtros)
 function atualizarTabela(usuarios) {
-    const tbody = document.querySelector('#tabelaUsuarios tbody');
+    const tbody = document.getElementById('userTableBody');
     if (!tbody) {
         console.error('TBody da tabela de usuários não encontrado para atualização.');
         return;
