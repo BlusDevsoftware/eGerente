@@ -169,7 +169,7 @@ async function carregarUsuarios() {
                 }
             }
 
-            const response = await api.get('/cadastros/usuarios'); // Corrigido o endpoint
+            const response = await api.get('/usuarios'); // Corrigido o endpoint
             console.log('Resposta da API:', response); // Debug
 
             tbody.innerHTML = '';
@@ -325,7 +325,7 @@ async function criarUsuario(event) {
     };
 
     try {
-        await api.post('/cadastros/usuarios', usuario); // Corrigido o endpoint
+        await api.post('/usuarios', usuario); // Corrigido o endpoint
         mostrarToast('Usuário criado com sucesso!', 'success');
         carregarUsuarios();
         event.target.reset();
@@ -348,7 +348,7 @@ async function visualizarUsuario(codigo) {
         console.log('Visualizando usuário:', codigo); // Debug
 
         // Buscar dados do usuário usando api.get
-        const usuario = await api.get(`/cadastros/usuarios/${codigo}`); // Corrigido o endpoint
+        const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
 
         console.log('Dados do usuário:', usuario); // Debug
 
@@ -397,7 +397,7 @@ async function editarUsuario(codigo) {
         console.log('Editando usuário:', codigo); // Debug
 
         // Buscar dados do usuário usando api.get
-        const usuario = await api.get(`/cadastros/usuarios/${codigo}`); // Corrigido o endpoint
+        const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
 
         const modal = document.getElementById('userModal'); // ID correto
         const modalTitle = modal.querySelector('#modalTitle');
@@ -472,7 +472,7 @@ async function editarUsuarioSubmit(event) {
     }
 
     try {
-        const response = await api.put(`/cadastros/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado); // Corrigido o endpoint
+        const response = await api.put(`/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado); // Corrigido o endpoint
 
         if (response) {
             mostrarToast('Usuário atualizado com sucesso!', 'success');
@@ -510,7 +510,7 @@ async function excluirUsuario(codigo) {
         const codigoStr = codigo.toString().padStart(5, '0');
         console.log('Tentando excluir usuário com código:', codigoStr); // Debug
 
-        const response = await api.delete(`/cadastros/usuarios/${codigoStr}`); // Corrigido o endpoint
+        const response = await api.delete(`/usuarios/${codigoStr}`); // Corrigido o endpoint
         console.log('Resposta da exclusão:', response); // Debug
 
         if (response && response.message) {
