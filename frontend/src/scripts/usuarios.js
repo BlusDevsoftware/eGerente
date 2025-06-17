@@ -71,8 +71,13 @@ function closeViewModal() {
 
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
-    if (modal) modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
 }
 
 // Funções de manipulação de usuários
@@ -100,7 +105,7 @@ function setupEventListeners() {
             e.preventDefault();
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
-
+            
             // Decide se é criação ou edição baseado no campo 'codigo'
             if (form.codigo.value) { // Se o campo código não estiver vazio, é edição
                 editarUsuarioSubmit(e); // Nova função para lidar com o submit de edição
@@ -178,59 +183,59 @@ async function carregarUsuarios() {
                     continue;
                 } else {
                     console.error('Tabela de usuários não encontrada após múltiplas tentativas.');
-                    mostrarToast('Tabela de usuários não encontrada', 'error');
-                    return;
-                }
+            mostrarToast('Tabela de usuários não encontrada', 'error');
+            return;
+        }
             }
 
             const response = await api.get('/usuarios'); // Corrigido o endpoint
             console.log('Resposta da API:', response); // Debug
 
-            tbody.innerHTML = '';
-
+        tbody.innerHTML = '';
+        
             if (!response || response.length === 0) {
                 console.log('Nenhum usuário encontrado na resposta'); // Debug
-                const tr = document.createElement('tr');
-                tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
-                tbody.appendChild(tr);
-                return;
-            }
-
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
+            tbody.appendChild(tr);
+            return;
+        }
+        
             console.log('Processando usuários encontrados:', response.length); // Debug
 
             response.forEach(usuario => {
                 console.log('Processando usuário:', usuario); // Debug
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${usuario.codigo.toString().padStart(5, '0')}</td>
-                    <td>${usuario.nome}</td>
-                    <td>${usuario.email}</td>
-                    <td>${usuario.tipo}</td>
-                    <td>
-                        <span class="status ${usuario.status}">
-                            ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                        </span>
-                    </td>
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${usuario.codigo.toString().padStart(5, '0')}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.email}</td>
+                <td>${usuario.tipo}</td>
+                <td>
+                    <span class="status ${usuario.status}">
+                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                    </span>
+                </td>
                     <td class="actions">
                         <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
+                        <i class="fas fa-eye"></i>
+                    </button>
                         <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                        <i class="fas fa-edit"></i>
+                    </button>
                         <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
             usuarios = response;
-            console.log('Tabela atualizada com sucesso'); // Debug
+        console.log('Tabela atualizada com sucesso'); // Debug
             return; // Sai do loop se o carregamento for bem-sucedido
-        } catch (error) {
-            console.error('Erro ao carregar usuários:', error);
+    } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
             if (i < MAX_RETRIES - 1) {
                 mostrarToast('Erro ao carregar usuários, re-tentando...', 'error');
                 await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
@@ -320,11 +325,11 @@ async function criarUsuario(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    // Validar senhas
+        // Validar senhas
     if (formData.get('senha') !== formData.get('confirmar_senha')) {
-        mostrarToast('As senhas não coincidem', 'error');
-        return;
-    }
+            mostrarToast('As senhas não coincidem', 'error');
+            return;
+        }
 
     // Gerar código do usuário com 5 dígitos
     const codigo = gerarCodigoUsuario(); // Reutiliza a função existente
@@ -360,10 +365,10 @@ async function criarUsuario(event) {
 async function visualizarUsuario(codigo) {
     try {
         console.log('Visualizando usuário:', codigo); // Debug
-
+        
         // Buscar dados do usuário usando api.get
         const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
-
+        
         console.log('Dados do usuário:', usuario); // Debug
 
         const modal = document.getElementById('userModal'); // ID correto
@@ -425,7 +430,7 @@ async function editarUsuario(codigo) {
         let form = document.getElementById('usuarioForm'); // ID correto
 
         modalTitle.textContent = 'Editar Usuário';
-
+        
         // Preencher o formulário com os dados do usuário
         form.codigo.value = usuario.codigo;
         form.nome.value = usuario.nome;
@@ -469,35 +474,35 @@ async function editarUsuario(codigo) {
 
 // Nova função para lidar com o submit do formulário de edição
 async function editarUsuarioSubmit(event) {
-    event.preventDefault();
+            event.preventDefault();
     const form = event.target;
-    const formData = new FormData(form);
-
+            const formData = new FormData(form);
+            
     const usuarioAtualizado = {
-        codigo: form.codigo.value,
-        nome: formData.get('nome'),
-        email: formData.get('email'),
-        tipo: formData.get('tipo'),
-        status: formData.get('status')
-    };
+                codigo: form.codigo.value,
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                tipo: formData.get('tipo'),
+                status: formData.get('status')
+            };
 
-    const senha = formData.get('senha');
+            const senha = formData.get('senha');
     const confirmarSenha = formData.get('confirmar_senha');
-
-    if (senha || confirmarSenha) {
-        if (senha !== confirmarSenha) {
+            
+            if (senha || confirmarSenha) {
+                if (senha !== confirmarSenha) {
             mostrarToast('As senhas não coincidem', 'error');
             return;
-        }
+                }
         usuarioAtualizado.senha = senha;
-    }
+            }
 
-    try {
+            try {
         const response = await api.put(`/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado); // Corrigido o endpoint
 
         if (response) {
-            mostrarToast('Usuário atualizado com sucesso!', 'success');
-            carregarUsuarios();
+                mostrarToast('Usuário atualizado com sucesso!', 'success');
+                carregarUsuarios();
             form.reset();
             closeModal();
         } else {
@@ -517,39 +522,62 @@ async function editarUsuarioSubmit(event) {
 
 // Função para confirmar exclusão
 function confirmarExclusao(codigo) {
-    const modal = document.getElementById('deleteModal');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    
-    // Remover event listener anterior se existir
-    const newConfirmBtn = confirmBtn.cloneNode(true);
-    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-    
-    // Adicionar novo event listener
-    newConfirmBtn.addEventListener('click', () => excluirUsuario(codigo));
-    
-    modal.style.display = 'flex';
+    try {
+        console.log('Confirmando exclusão do usuário:', codigo); // Debug
+        
+        const modal = document.getElementById('deleteModal');
+        if (!modal) {
+            throw new Error('Modal de confirmação não encontrado');
+        }
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        if (!confirmBtn) {
+            throw new Error('Botão de confirmação não encontrado');
+        }
+
+        // Remover event listener anterior se existir
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        // Adicionar novo event listener
+        newConfirmBtn.addEventListener('click', () => {
+            console.log('Botão de confirmação clicado para usuário:', codigo); // Debug
+            excluirUsuario(codigo);
+        });
+        
+        // Mostrar o modal
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+    } catch (error) {
+        console.error('Erro ao preparar exclusão:', error);
+        mostrarToast('Erro ao preparar exclusão: ' + error.message, 'error');
+    }
 }
 
 // Função para excluir usuário
 async function excluirUsuario(codigo) {
     try {
+        console.log('Iniciando exclusão do usuário:', codigo); // Debug
+
         // Garantir que o código seja uma string com 5 dígitos
         const codigoStr = codigo.toString().padStart(5, '0');
-        console.log('Tentando excluir usuário com código:', codigoStr);
+        console.log('Código formatado:', codigoStr); // Debug
         
         const response = await api.delete(`/usuarios/${codigoStr}`);
-        console.log('Resposta da exclusão:', response);
+        console.log('Resposta da exclusão:', response); // Debug
         
         if (response && response.message) {
             mostrarToast('Usuário excluído com sucesso!', 'success');
             closeDeleteModal();
-            carregarUsuarios();
+            await carregarUsuarios();
         } else {
             throw new Error('Resposta inválida do servidor');
         }
     } catch (error) {
         console.error('Erro ao excluir usuário:', error);
-        mostrarToast('Erro ao excluir usuário', 'error');
+        mostrarToast('Erro ao excluir usuário: ' + error.message, 'error');
     }
 }
 
@@ -562,7 +590,7 @@ function mostrarToast(mensagem, tipo) {
         <span>${mensagem}</span>
         <button onclick="this.parentElement.remove()">×</button>
     `;
-
+    
     document.querySelector('.toast-container').appendChild(toast);
     setTimeout(() => toast.classList.add('show'), 100);
     setTimeout(() => {
@@ -590,8 +618,8 @@ function fecharModal() {
     if (modal) {
         // Adicionar animação de saída
         const modalContent = modal.querySelector('.modal-content');
-        modalContent.style.transform = 'translateY(-20px)';
-        modalContent.style.opacity = '0';
+            modalContent.style.transform = 'translateY(-20px)';
+            modalContent.style.opacity = '0';
 
         // Remover o modal após a animação
         setTimeout(() => {
