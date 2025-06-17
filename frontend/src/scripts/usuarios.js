@@ -527,23 +527,54 @@ function confirmarExclusao(codigo) {
 // Excluir usuário
 async function excluirUsuario(codigo) {
     try {
-        // Garantir que o código seja uma string com 5 dígitos
-        const codigoStr = codigo.toString().padStart(5, '0');
-        console.log('Tentando excluir usuário com código:', codigoStr); // Debug
+        console.log('Deletando usuário:', codigo); // Debug
 
-        const response = await api.delete(`/usuarios/${codigoStr}`); // Corrigido o endpoint
-        console.log('Resposta da exclusão:', response); // Debug
+        // Mostrar modal de confirmação
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmButton = document.getElementById('confirmButton');
+        const cancelButton = document.getElementById('cancelButton');
 
-        if (response && response.message) {
-            mostrarToast('Usuário excluído com sucesso!', 'success');
-            closeDeleteModal();
-            carregarUsuarios();
-        } else {
-            throw new Error('Resposta inválida do servidor');
-        }
+        confirmMessage.textContent = 'Tem certeza que deseja excluir este usuário?';
+        confirmModal.style.display = 'flex';
+        setTimeout(() => confirmModal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+        // Configurar eventos dos botões
+        confirmButton.onclick = async () => {
+            try {
+                // Fechar o modal de confirmação
+                confirmModal.classList.remove('show');
+                setTimeout(() => {
+                    confirmModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 300);
+
+                // Fazer a requisição DELETE usando api.delete
+                await api.delete(`/usuarios/${codigo}`); // Corrigido o endpoint
+
+                // Mostrar mensagem de sucesso
+                mostrarToast('Usuário excluído com sucesso!', 'success');
+
+                // Recarregar a lista de usuários
+                await carregarUsuarios();
+            } catch (error) {
+                console.error('Erro ao excluir usuário:', error);
+                mostrarToast('Erro ao excluir usuário: ' + error.message, 'error');
+            }
+        };
+
+        cancelButton.onclick = () => {
+            confirmModal.classList.remove('show');
+            setTimeout(() => {
+                confirmModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        };
+
     } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
-        mostrarToast('Erro ao excluir usuário', 'error');
+        console.error('Erro ao preparar exclusão:', error);
+        mostrarToast('Erro ao preparar exclusão: ' + error.message, 'error');
     }
 }
 
