@@ -86,7 +86,6 @@ let usuarioAtual = null;
 
 // Carregar usuários ao iniciar a página e configurar listeners
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM carregado, iniciando setup...'); // Debug
     carregarUsuarios();
     setupEventListeners();
 });
@@ -169,78 +168,64 @@ function gerarCodigoUsuario() {
 
 // Carregar usuários
 async function carregarUsuarios() {
-    const MAX_RETRIES = 5;
-    const RETRY_DELAY_MS = 200; // 200ms
-    for (let i = 0; i < MAX_RETRIES; i++) {
-        try {
-            console.log(`Carregando usuários (Tentativa ${i + 1}/${MAX_RETRIES})...`); // Debug
+    let tentativas = 0;
+    const maxTentativas = 5;
+    const delay = 200;
 
-            const tbody = document.getElementById('userTableBody');
+    while (tentativas < maxTentativas) {
+        tentativas++;
+        try {
+            const tbody = document.querySelector('#userTableBody');
             if (!tbody) {
-                if (i < MAX_RETRIES - 1) {
-                    console.warn('Tabela de usuários não encontrada, re-tentando...');
-                    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-                    continue;
-                } else {
-                    console.error('Tabela de usuários não encontrada após múltiplas tentativas.');
-            mostrarToast('Tabela de usuários não encontrada', 'error');
-            return;
-        }
+                throw new Error('Elemento tbody não encontrado');
             }
 
-            const response = await api.get('/usuarios'); // Corrigido o endpoint
-            console.log('Resposta da API:', response); // Debug
+            const response = await api.get('/usuarios');
+            const usuarios = response.data;
 
-        tbody.innerHTML = '';
-        
-            if (!response || response.length === 0) {
-                console.log('Nenhum usuário encontrado na resposta'); // Debug
-            const tr = document.createElement('tr');
-            tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
-            tbody.appendChild(tr);
-            return;
-        }
-        
-            console.log('Processando usuários encontrados:', response.length); // Debug
-
-            response.forEach(usuario => {
-                console.log('Processando usuário:', usuario); // Debug
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${usuario.codigo.toString().padStart(5, '0')}</td>
-                <td>${usuario.nome}</td>
-                <td>${usuario.email}</td>
-                <td>${usuario.tipo}</td>
-                <td>
-                    <span class="status ${usuario.status}">
-                        ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                    </span>
-                </td>
-                    <td class="actions">
-                        <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                        <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                        <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-        
-            usuarios = response;
-        console.log('Tabela atualizada com sucesso'); // Debug
-            return; // Sai do loop se o carregamento for bem-sucedido
-    } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-            if (i < MAX_RETRIES - 1) {
-                mostrarToast('Erro ao carregar usuários, re-tentando...', 'error');
-                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+            if (Array.isArray(usuarios) && usuarios.length > 0) {
+                tbody.innerHTML = '';
+                usuarios.forEach(usuario => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${usuario.codigo}</td>
+                        <td>${usuario.nome}</td>
+                        <td>${usuario.email}</td>
+                        <td>${usuario.tipo}</td>
+                        <td>
+                            <span class="badge ${usuario.ativo ? 'bg-success' : 'bg-danger'}">
+                                ${usuario.ativo ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-info btn-sm" onclick="visualizarUsuario('${usuario.codigo}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="editarUsuario('${usuario.codigo}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmarExclusao('${usuario.codigo}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             } else {
-                mostrarToast('Erro ao carregar usuários: ' + error.message, 'error');
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum usuário encontrado</td></tr>';
+            }
+            break;
+        } catch (error) {
+            if (tentativas === maxTentativas) {
+                console.error('Erro ao carregar usuários:', error);
+                const tbody = document.querySelector('#userTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erro ao carregar usuários</td></tr>';
+                }
+            } else {
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
     }
@@ -522,38 +507,13 @@ async function editarUsuarioSubmit(event) {
 
 // Função para confirmar exclusão
 function confirmarExclusao(codigo) {
-    try {
-        console.log('Confirmando exclusão do usuário:', codigo); // Debug
-        
-        const modal = document.getElementById('deleteModal');
-        if (!modal) {
-            throw new Error('Modal de confirmação não encontrado');
-        }
-
-        const confirmBtn = document.getElementById('confirmDeleteBtn');
-        if (!confirmBtn) {
-            throw new Error('Botão de confirmação não encontrado');
-        }
-
-        // Remover event listener anterior se existir
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-        
-        // Adicionar novo event listener
-        newConfirmBtn.addEventListener('click', () => {
-            console.log('Botão de confirmação clicado para usuário:', codigo); // Debug
-            excluirUsuario(codigo);
-        });
-        
-        // Mostrar o modal
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        document.body.style.overflow = 'hidden';
-
-    } catch (error) {
-        console.error('Erro ao preparar exclusão:', error);
-        mostrarToast('Erro ao preparar exclusão: ' + error.message, 'error');
-    }
+    const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    document.getElementById('deleteUserForm').onsubmit = (e) => {
+        e.preventDefault();
+        excluirUsuario(codigo);
+        modal.hide();
+    };
+    modal.show();
 }
 
 // Função para excluir usuário
@@ -568,7 +528,7 @@ async function excluirUsuario(codigo) {
         const response = await api.delete(`/usuarios/${codigoStr}`);
         console.log('Resposta da exclusão:', response); // Debug
         
-        if (response && response.message) {
+        if (response && response.data.message) {
             mostrarToast('Usuário excluído com sucesso!', 'success');
             closeDeleteModal();
             await carregarUsuarios();
