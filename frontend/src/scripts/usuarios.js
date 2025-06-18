@@ -168,64 +168,68 @@ function gerarCodigoUsuario() {
 
 // Carregar usuários
 async function carregarUsuarios() {
-    let tentativas = 0;
-    const maxTentativas = 5;
-    const delay = 200;
-
-    while (tentativas < maxTentativas) {
-        tentativas++;
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY_MS = 200; // 200ms
+    for (let i = 0; i < MAX_RETRIES; i++) {
         try {
-            const tbody = document.querySelector('#userTableBody');
+            const tbody = document.getElementById('userTableBody');
             if (!tbody) {
-                throw new Error('Elemento tbody não encontrado');
-            }
-
-            const response = await api.get('/usuarios');
-            const usuarios = response.data;
-
-            if (Array.isArray(usuarios) && usuarios.length > 0) {
-                tbody.innerHTML = '';
-                usuarios.forEach(usuario => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${usuario.codigo}</td>
-                        <td>${usuario.nome}</td>
-                        <td>${usuario.email}</td>
-                        <td>${usuario.tipo}</td>
-                        <td>
-                            <span class="badge ${usuario.ativo ? 'bg-success' : 'bg-danger'}">
-                                ${usuario.ativo ? 'Ativo' : 'Inativo'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-info btn-sm" onclick="visualizarUsuario('${usuario.codigo}')">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="editarUsuario('${usuario.codigo}')">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmarExclusao('${usuario.codigo}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } else {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum usuário encontrado</td></tr>';
-            }
-            break;
-        } catch (error) {
-            if (tentativas === maxTentativas) {
-                console.error('Erro ao carregar usuários:', error);
-                const tbody = document.querySelector('#userTableBody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erro ao carregar usuários</td></tr>';
+                if (i < MAX_RETRIES - 1) {
+                    await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+                    continue;
+                } else {
+                    console.error('Tabela de usuários não encontrada após múltiplas tentativas.');
+                    mostrarToast('Tabela de usuários não encontrada', 'error');
+                    return;
                 }
+            }
+
+            const response = await api.get('/usuarios'); // Corrigido o endpoint
+            tbody.innerHTML = '';
+        
+            if (!response || response.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" class="text-center">Nenhum usuário encontrado</td>';
+                tbody.appendChild(tr);
+                return;
+            }
+        
+            response.forEach(usuario => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${usuario.codigo.toString().padStart(5, '0')}</td>
+                    <td>${usuario.nome}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.tipo}</td>
+                    <td>
+                        <span class="status ${usuario.status}">
+                            ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" onclick="visualizarUsuario('${usuario.codigo}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editarUsuario('${usuario.codigo}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" onclick="confirmarExclusao('${usuario.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        
+            usuarios = response;
+            return; // Sai do loop se o carregamento for bem-sucedido
+        } catch (error) {
+            console.error('Erro ao carregar usuários:', error);
+            if (i < MAX_RETRIES - 1) {
+                mostrarToast('Erro ao carregar usuários, re-tentando...', 'error');
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
             } else {
-                await new Promise(resolve => setTimeout(resolve, delay));
+                mostrarToast('Erro ao carregar usuários: ' + error.message, 'error');
             }
         }
     }
@@ -349,12 +353,7 @@ async function criarUsuario(event) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        console.log('Visualizando usuário:', codigo); // Debug
-        
-        // Buscar dados do usuário usando api.get
         const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
-        
-        console.log('Dados do usuário:', usuario); // Debug
 
         const modal = document.getElementById('userModal'); // ID correto
         const modalTitle = modal.querySelector('#modalTitle');
@@ -405,9 +404,6 @@ async function visualizarUsuario(codigo) {
 // Editar usuário (função que abre o modal de edição)
 async function editarUsuario(codigo) {
     try {
-        console.log('Editando usuário:', codigo); // Debug
-
-        // Buscar dados do usuário usando api.get
         const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
 
         const modal = document.getElementById('userModal'); // ID correto
@@ -507,28 +503,46 @@ async function editarUsuarioSubmit(event) {
 
 // Função para confirmar exclusão
 function confirmarExclusao(codigo) {
-    const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
-    document.getElementById('deleteUserForm').onsubmit = (e) => {
-        e.preventDefault();
-        excluirUsuario(codigo);
-        modal.hide();
-    };
-    modal.show();
+    try {
+        const modal = document.getElementById('deleteModal');
+        if (!modal) {
+            throw new Error('Modal de confirmação não encontrado');
+        }
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        if (!confirmBtn) {
+            throw new Error('Botão de confirmação não encontrado');
+        }
+
+        // Remover event listener anterior se existir
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        // Adicionar novo event listener
+        newConfirmBtn.addEventListener('click', () => {
+            excluirUsuario(codigo);
+        });
+        
+        // Mostrar o modal
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+
+    } catch (error) {
+        console.error('Erro ao preparar exclusão:', error);
+        mostrarToast('Erro ao preparar exclusão: ' + error.message, 'error');
+    }
 }
 
 // Função para excluir usuário
 async function excluirUsuario(codigo) {
     try {
-        console.log('Iniciando exclusão do usuário:', codigo); // Debug
-
         // Garantir que o código seja uma string com 5 dígitos
         const codigoStr = codigo.toString().padStart(5, '0');
-        console.log('Código formatado:', codigoStr); // Debug
         
         const response = await api.delete(`/usuarios/${codigoStr}`);
-        console.log('Resposta da exclusão:', response); // Debug
         
-        if (response && response.data.message) {
+        if (response && response.message) {
             mostrarToast('Usuário excluído com sucesso!', 'success');
             closeDeleteModal();
             await carregarUsuarios();
