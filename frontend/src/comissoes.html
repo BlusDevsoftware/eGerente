@@ -242,33 +242,6 @@
         </div>
     </div>
 
-    <script>
-        function abrirModalComissao() {
-            document.getElementById('modalComissao').style.display = 'flex';
-        }
-
-        function fecharModalComissao() {
-            document.getElementById('modalComissao').style.display = 'none';
-        }
-
-        // Fechar modal ao clicar fora dele
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalComissao');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Calcular comissão automaticamente
-        document.getElementById('valorVenda').addEventListener('input', calcularComissao);
-        document.getElementById('percentual').addEventListener('input', calcularComissao);
-
-        function calcularComissao() {
-            const valorVenda = parseFloat(document.getElementById('valorVenda').value) || 0;
-            const percentual = parseFloat(document.getElementById('percentual').value) || 0;
-            const valorComissao = valorVenda * (percentual / 100);
-            // Aqui você pode adicionar a lógica para exibir o valor calculado
-        }
-    </script>
+    <script src="scripts/navigation.js"></script>
 </body>
 </html> 
