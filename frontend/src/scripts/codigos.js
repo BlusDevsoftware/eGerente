@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     submenuTriggers.forEach(trigger => {
         trigger.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             const parent = this.parentElement;
             parent.classList.toggle('active');
         });
@@ -61,6 +62,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 parentSubmenu.classList.add('active');
             }
         }
+    });
+
+    // Previne que cliques nos itens do submenu fechem o menu
+    document.querySelectorAll('.submenu a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Remove active de todos os outros links
+            document.querySelectorAll('.submenu a').forEach(otherLink => {
+                otherLink.classList.remove('active');
+            });
+            
+            // Adiciona active ao link clicado
+            this.classList.add('active');
+            
+            // Mantém o submenu pai aberto
+            const parentMenu = this.closest('.has-submenu');
+            if (parentMenu) {
+                parentMenu.classList.add('active');
+            }
+        });
     });
 });
 
