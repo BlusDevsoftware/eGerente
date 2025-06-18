@@ -64,15 +64,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Adiciona evento de clique para os links do menu
         document.querySelectorAll('.nav-menu a:not(.submenu-trigger)').forEach(link => {
             link.addEventListener('click', function(e) {
-                // Remove active de todos os links
+                // Não previne o comportamento padrão do link
+                // Apenas atualiza as classes de estilo
                 document.querySelectorAll('.nav-menu a').forEach(otherLink => {
                     otherLink.classList.remove('active');
                 });
-                
-                // Adiciona active ao link clicado
                 this.classList.add('active');
                 
-                // Se estiver em um submenu, mantém o menu pai aberto
                 const parentSubmenu = this.closest('.has-submenu');
                 if (parentSubmenu) {
                     parentSubmenu.classList.add('active');
