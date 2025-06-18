@@ -43,7 +43,7 @@ function initializeMenu() {
     
     document.querySelectorAll('.nav-menu a').forEach(item => {
         const href = item.getAttribute('href');
-        if (href === currentPage || href === './' + currentPage) {
+        if (href === currentPage || href === './' + currentPage || href === '/' + currentPage) {
             item.classList.add('active');
             const parentSubmenu = item.closest('.has-submenu');
             if (parentSubmenu) {
@@ -60,6 +60,15 @@ function initializeMenu() {
             });
         }
     });
+
+    // Abre o submenu do item ativo por padrão
+    const activeItem = document.querySelector('.nav-menu a.active');
+    if (activeItem) {
+        const parentSubmenu = activeItem.closest('.has-submenu');
+        if (parentSubmenu) {
+            parentSubmenu.classList.add('active');
+        }
+    }
 }
 
 // Inicializa o menu quando o DOM estiver carregado
