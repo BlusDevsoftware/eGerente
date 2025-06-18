@@ -42,12 +42,22 @@ function initializeMenu() {
     const currentPage = currentPath.split('/').pop() || 'index.html';
     
     document.querySelectorAll('.nav-menu a').forEach(item => {
-        if (item.getAttribute('href') === currentPage) {
+        const href = item.getAttribute('href');
+        if (href === currentPage || href === './' + currentPage) {
             item.classList.add('active');
             const parentSubmenu = item.closest('.has-submenu');
             if (parentSubmenu) {
                 parentSubmenu.classList.add('active');
             }
+        }
+    });
+
+    // Adiciona evento de clique no documento para fechar submenus quando clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.has-submenu')) {
+            document.querySelectorAll('.has-submenu').forEach(menu => {
+                menu.classList.remove('active');
+            });
         }
     });
 }
