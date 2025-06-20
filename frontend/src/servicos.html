@@ -9,6 +9,283 @@
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="api-config.js"></script>
+    <style>
+        /* Copiado e adaptado de produtos.html para padronização */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-header h2 i {
+            color: #2196F3;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group label i {
+            margin-right: 5px;
+            color: #2196F3;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .form-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .btn-primary,
+        .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #1976D2;
+        }
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        .actions {
+            white-space: nowrap !important;
+            min-width: 110px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            margin: 0 1px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .view-btn {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #198754;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+        .action-btn i {
+            font-size: 14px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .bg-success {
+            background: #e6f9ec;
+            color: #1ca14b;
+            border: 1px solid #b6e7c7;
+        }
+        .bg-danger {
+            background: #ffeaea;
+            color: #e53935;
+            border: 1px solid #ffcdd2;
+        }
+        /* Modal de exclusão customizado */
+        .modal-content.delete-confirmation {
+            max-width: 400px;
+            width: 90%;
+            margin: auto;
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .modal-header.delete-header {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 24px 24px 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header.delete-header h2 {
+            color: #dc3545;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .modal-header.delete-header i {
+            color: #dc3545;
+            font-size: 1.3em;
+        }
+        .delete-icon {
+            text-align: center;
+            font-size: 48px;
+            color: #dc3545;
+            margin: 24px 0 10px 0;
+        }
+        .delete-message {
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .delete-warning {
+            text-align: center;
+            font-size: 15px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+        .form-actions.delete-actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 0 24px 0;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-danger:hover {
+            background-color: #b71c1c;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -112,62 +389,91 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="servicosTableBody">
                     <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal de Cadastro/Edição/Visualização de Serviço -->
     <div class="modal" id="servicoModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Novo Serviço</h2>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <h2 id="servicoModalTitle"><i class="fas fa-cogs"></i> Novo Serviço</h2>
+                <button class="close-modal" onclick="closeServicoModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="servicoForm" onsubmit="salvarServico(event)">
-                    <input type="hidden" id="servicoId">
+                <form id="servicoForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Código</label>
+                            <label><i class="fas fa-hashtag"></i> Código</label>
                             <input type="text" id="codigo" name="codigo" readonly disabled>
                             <small class="form-text text-muted">Gerado automaticamente</small>
                         </div>
                         <div class="form-group">
-                            <label>Nome</label>
+                            <label><i class="fas fa-box"></i> Nome</label>
                             <input type="text" id="nome" name="nome" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Valor</label>
+                            <label><i class="fas fa-dollar-sign"></i> Valor</label>
                             <input type="number" id="valor" name="valor" step="0.01" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label>Status</label>
+                            <label><i class="fas fa-toggle-on"></i> Status</label>
                             <select id="status" name="status" required>
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
+                                <option value="Ativo">Ativo</option>
+                                <option value="Inativo">Inativo</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Duração</label>
+                            <label><i class="fas fa-clock"></i> Duração</label>
                             <input type="text" id="duracao" name="duracao" placeholder="Ex: 2h" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Descrição</label>
+                        <label><i class="fas fa-align-left"></i> Descrição</label>
                         <textarea id="descricao" name="descricao" rows="3" required></textarea>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="btn-secondary" onclick="closeServicoModal()">Cancelar</button>
                         <button type="submit" class="btn-primary">Salvar</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Exclusão de Serviço -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content delete-confirmation">
+            <div class="modal-header delete-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+                <button class="close-modal" onclick="closeDeleteModal()" style="font-size: 1.5em;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 0 24px; background: #fff;">
+                <div class="delete-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="delete-message">
+                    Tem certeza que deseja excluir este serviço?
+                </div>
+                <div class="delete-warning">
+                    Esta ação não pode ser desfeita.
+                </div>
+            </div>
+            <div class="form-actions delete-actions">
+                <button class="btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </button>
             </div>
         </div>
     </div>
@@ -175,35 +481,74 @@
     <script src="../Paginas_JS/codigos.js"></script>
     <script type="module">
         import api from '../js/config/api.js';
-
-        // Função para carregar serviços
+        // Funções globais para modais
+        window.openServicoModal = function(titulo = 'Novo Serviço', servico = null, modo = 'novo') {
+            const modal = document.getElementById('servicoModal');
+            const modalTitle = document.getElementById('servicoModalTitle');
+            const form = document.getElementById('servicoForm');
+            modalTitle.innerHTML = `<i class='fas fa-cogs'></i> ${titulo}`;
+            form.reset();
+            form.dataset.codigo = '';
+            // Preencher dados se for edição ou visualização
+            if (servico) {
+                form.codigo.value = servico.codigo;
+                form.nome.value = servico.nome;
+                form.valor.value = servico.valor;
+                form.status.value = servico.status;
+                form.duracao.value = servico.duracao;
+                form.descricao.value = servico.descricao;
+                form.dataset.codigo = servico.codigo;
+            }
+            // Modo visualização: desabilitar campos
+            Array.from(form.elements).forEach(el => {
+                el.disabled = (modo === 'visualizar');
+            });
+            // Exibir modal
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+        window.closeServicoModal = function() {
+            const modal = document.getElementById('servicoModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+        window.openDeleteModal = function(codigo) {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+            // Salvar código para exclusão
+            modal.dataset.codigo = codigo;
+        }
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+        // Renderizar tabela de serviços
         async function carregarServicos() {
             try {
                 const servicos = await api.get('/servicos');
-                const tbody = document.querySelector('#servicosTable tbody');
+                const tbody = document.getElementById('servicosTableBody');
                 tbody.innerHTML = '';
-
                 servicos.forEach(servico => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${servico.codigo}</td>
                         <td>${servico.nome}</td>
-                        <td>${servico.categoria}</td>
-                        <td>R$ ${servico.preco.toFixed(2)}</td>
-                        <td>${servico.duracao} min</td>
-                        <td>${servico.responsavel}</td>
-                        <td>
-                            <span class="badge ${servico.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                                ${servico.status}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="editarServico(${servico.codigo})">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirServico(${servico.codigo})">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <td>R$ ${parseFloat(servico.valor).toFixed(2)}</td>
+                        <td><span class="badge ${servico.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">${servico.status}</span></td>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarServico('${servico.codigo}')"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar" onclick="editarServico('${servico.codigo}')"><i class="fas fa-pen"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir" onclick="openDeleteModal('${servico.codigo}')"><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -213,94 +558,57 @@
                 alert('Erro ao carregar serviços');
             }
         }
-
-        // Função para salvar serviço
-        async function salvarServico(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const servico = {
-                nome: formData.get('nome'),
-                categoria: formData.get('categoria'),
-                preco: parseFloat(formData.get('preco')),
-                duracao: parseInt(formData.get('duracao')),
-                responsavel: formData.get('responsavel'),
-                status: formData.get('status')
-            };
-
-            try {
-                if (form.dataset.codigo) {
-                    // Atualizar serviço existente
-                    await api.put(`/servicos/${form.dataset.codigo}`, servico);
-                } else {
-                    // Criar novo serviço
-                    await api.post('/servicos', servico);
-                }
-
-                // Fechar modal e recarregar lista
-                const modal = bootstrap.Modal.getInstance(document.getElementById('servicoModal'));
-                modal.hide();
-                carregarServicos();
-            } catch (error) {
-                console.error('Erro ao salvar serviço:', error);
-                alert('Erro ao salvar serviço');
-            }
-        }
-
-        // Função para editar serviço
-        async function editarServico(codigo) {
+        // CRUD
+        window.visualizarServico = async function(codigo) {
             try {
                 const servico = await api.get(`/servicos/${codigo}`);
-                const form = document.getElementById('servicoForm');
-                
-                // Preencher formulário
-                form.dataset.codigo = servico.codigo;
-                form.nome.value = servico.nome;
-                form.categoria.value = servico.categoria;
-                form.preco.value = servico.preco;
-                form.duracao.value = servico.duracao;
-                form.responsavel.value = servico.responsavel;
-                form.status.value = servico.status;
-
-                // Abrir modal
-                const modal = new bootstrap.Modal(document.getElementById('servicoModal'));
-                modal.show();
+                window.openServicoModal('Visualizar Serviço', servico, 'visualizar');
             } catch (error) {
-                console.error('Erro ao carregar serviço:', error);
                 alert('Erro ao carregar serviço');
             }
         }
-
-        // Função para excluir serviço
-        async function excluirServico(codigo) {
-            if (!confirm('Tem certeza que deseja excluir este serviço?')) {
-                return;
-            }
-
+        window.editarServico = async function(codigo) {
             try {
-                await api.delete(`/servicos/${codigo}`);
+                const servico = await api.get(`/servicos/${codigo}`);
+                window.openServicoModal('Editar Serviço', servico, 'editar');
+            } catch (error) {
+                alert('Erro ao carregar serviço');
+            }
+        }
+        document.getElementById('servicoForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const servico = {
+                nome: form.nome.value,
+                valor: parseFloat(form.valor.value),
+                status: form.status.value,
+                duracao: form.duracao.value,
+                descricao: form.descricao.value
+            };
+            try {
+                if (form.dataset.codigo) {
+                    await api.put(`/servicos/${form.dataset.codigo}`, servico);
+                } else {
+                    await api.post('/servicos', servico);
+                }
+                closeServicoModal();
                 carregarServicos();
             } catch (error) {
-                console.error('Erro ao excluir serviço:', error);
+                alert('Erro ao salvar serviço');
+            }
+        }
+        document.getElementById('confirmDeleteBtn').onclick = async function() {
+            const modal = document.getElementById('deleteModal');
+            const codigo = modal.dataset.codigo;
+            try {
+                await api.delete(`/servicos/${codigo}`);
+                closeDeleteModal();
+                carregarServicos();
+            } catch (error) {
                 alert('Erro ao excluir serviço');
             }
         }
-
-        // Função para abrir modal de novo serviço
-        function novoServico() {
-            const form = document.getElementById('servicoForm');
-            form.reset();
-            delete form.dataset.codigo;
-            
-            const modal = new bootstrap.Modal(document.getElementById('servicoModal'));
-            modal.show();
-        }
-
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarServicos();
-            document.getElementById('servicoForm').addEventListener('submit', salvarServico);
-        });
+        document.addEventListener('DOMContentLoaded', carregarServicos);
     </script>
     <script src="scripts/navigation.js"></script>
 </body>
