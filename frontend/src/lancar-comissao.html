@@ -75,8 +75,274 @@
 
         <!-- Conteúdo da página -->
         <div class="content">
-            <!-- Resto do conteúdo da página -->
+            <div class="tabs-comissao">
+                <button id="tabUnico" class="tab-btn active" onclick="mostrarTabComissao('unico')">Lançamento Único</button>
+                <button id="tabMultiplo" class="tab-btn" onclick="mostrarTabComissao('multiplo')">Múltiplos Lançamentos</button>
+            </div>
+            <div id="tabUnicoContent" class="tab-content active">
+                <form id="formUnico" class="form-comissao">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Colaborador</label>
+                            <select name="colaborador" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-cubes"></i> Tipo</label>
+                            <select name="tipo" required onchange="atualizarTipoUnico()">
+                                <option value="produto">Produto</option>
+                                <option value="servico">Serviço</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
+                            <select name="item" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
+                            <input type="number" name="valor_venda" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-percent"></i> Percentual Comissão (%)</label>
+                            <input type="number" name="percentual" step="0.01" min="0" max="100" required oninput="calcularComissaoUnico()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-coins"></i> Valor Comissão</label>
+                            <input type="number" name="valor_comissao" step="0.01" min="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Data</label>
+                            <input type="date" name="data" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar</button>
+                    </div>
+                </form>
+            </div>
+            <div id="tabMultiploContent" class="tab-content">
+                <form id="formMultiplo" class="form-comissao">
+                    <div class="table-multiplos">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Tipo</th>
+                                    <th>Produto/Serviço</th>
+                                    <th>Valor Venda</th>
+                                    <th>% Comissão</th>
+                                    <th>Valor Comissão</th>
+                                    <th>Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linhasMultiplo">
+                                <!-- Linhas dinâmicas -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()"><i class="fas fa-plus"></i> Adicionar Linha</button>
+                    </div>
+                    <div class="form-actions">
+                        <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar Todos</button>
+                    </div>
+                </form>
+            </div>
         </div>
+        <style>
+            .tabs-comissao {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 24px;
+            }
+            .tab-btn {
+                background: #f5f5f5;
+                color: #333;
+                border: 1px solid #ddd;
+                border-radius: 6px 6px 0 0;
+                padding: 10px 28px;
+                font-size: 1.1em;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background 0.2s, color 0.2s;
+            }
+            .tab-btn.active {
+                background: #2196F3;
+                color: #fff;
+                border-bottom: 2px solid #2196F3;
+            }
+            .tab-content {
+                display: none;
+                animation: fadeIn 0.3s;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            .form-comissao {
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+                padding: 32px 24px;
+                margin-bottom: 32px;
+            }
+            .form-row {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            .form-group {
+                flex: 1;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #555;
+                font-weight: 500;
+            }
+            .form-group label i {
+                margin-right: 5px;
+                color: #2196F3;
+            }
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+            .form-group input:focus,
+            .form-group select:focus {
+                border-color: #2196F3;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+            }
+            .form-group input[readonly] {
+                background-color: #f5f5f5;
+                cursor: not-allowed;
+            }
+            .form-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            }
+            .btn-primary,
+            .btn-secondary {
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s;
+            }
+            .btn-primary {
+                background-color: #2196F3;
+                color: white;
+                border: none;
+            }
+            .btn-primary:hover {
+                background-color: #1976D2;
+            }
+            .btn-secondary {
+                background-color: #f5f5f5;
+                color: #333;
+                border: 1px solid #ddd;
+            }
+            .btn-secondary:hover {
+                background-color: #e0e0e0;
+            }
+            .table-multiplos table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 16px;
+            }
+            .table-multiplos th, .table-multiplos td {
+                border: 1px solid #eee;
+                padding: 8px 6px;
+                text-align: center;
+            }
+            .table-multiplos th {
+                background: #f5f5f5;
+                color: #333;
+                font-weight: 600;
+            }
+            .table-multiplos td {
+                background: #fff;
+            }
+            .table-multiplos .btn-primary {
+                margin-top: 8px;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        </style>
+        <script>
+            function mostrarTabComissao(tab) {
+                document.getElementById('tabUnico').classList.remove('active');
+                document.getElementById('tabMultiplo').classList.remove('active');
+                document.getElementById('tabUnicoContent').classList.remove('active');
+                document.getElementById('tabMultiploContent').classList.remove('active');
+                if (tab === 'unico') {
+                    document.getElementById('tabUnico').classList.add('active');
+                    document.getElementById('tabUnicoContent').classList.add('active');
+                } else {
+                    document.getElementById('tabMultiplo').classList.add('active');
+                    document.getElementById('tabMultiploContent').classList.add('active');
+                }
+            }
+            function atualizarTipoUnico() {
+                const tipo = document.querySelector('#formUnico select[name="tipo"]').value;
+                const label = document.getElementById('labelItemUnico');
+                label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produto' : '<i class="fas fa-cogs"></i> Serviço';
+            }
+            function calcularComissaoUnico() {
+                const form = document.getElementById('formUnico');
+                const valorVenda = parseFloat(form.valor_venda.value) || 0;
+                const percentual = parseFloat(form.percentual.value) || 0;
+                form.valor_comissao.value = (valorVenda * percentual / 100).toFixed(2);
+            }
+            // Múltiplos lançamentos
+            function adicionarLinhaMultiplo() {
+                const tbody = document.getElementById('linhasMultiplo');
+                const idx = tbody.children.length;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><select name="colaborador[]" required></select></td>
+                    <td><select name="tipo[]" required onchange="atualizarTipoMultiplo(this, ${idx})"><option value="produto">Produto</option><option value="servico">Serviço</option></select></td>
+                    <td><select name="item[]" required></select></td>
+                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required></td>
+                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly></td>
+                    <td><input type="date" name="data[]" required></td>
+                    <td><button type="button" class="btn-secondary" onclick="removerLinhaMultiplo(this)"><i class="fas fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            }
+            function removerLinhaMultiplo(btn) {
+                btn.closest('tr').remove();
+            }
+            function atualizarTipoMultiplo(select, idx) {
+                const td = select.parentElement.nextElementSibling;
+                const label = select.value === 'produto' ? 'Produto' : 'Serviço';
+                td.querySelector('select').innerHTML = '';
+            }
+            function calcularComissaoMultiplo(input, idx) {
+                const tr = input.closest('tr');
+                const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
+                const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
+                tr.querySelector('input[name="valor_comissao[]"]').value = (valorVenda * percentual / 100).toFixed(2);
+            }
+        </script>
     </div>
 
     <script src="scripts/navigation.js"></script>
