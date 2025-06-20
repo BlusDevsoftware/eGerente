@@ -304,6 +304,28 @@
             }
             .colaborador-bloco .form-group {
                 min-width: 160px;
+                flex: 1;
+            }
+            .colaborador-bloco .form-group .btn-secondary {
+                background-color: #dc3545;
+                color: #fff;
+                border: none;
+                padding: 6px 10px;
+                border-radius: 4px;
+                font-size: 14px;
+                min-width: unset;
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s;
+            }
+            .colaborador-bloco .form-group .btn-secondary:hover {
+                background-color: #b71c1c;
+            }
+            .colaborador-bloco .form-group .btn-secondary i {
+                font-size: 14px;
             }
         </style>
         <script>
@@ -371,6 +393,10 @@
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Colaborador</label>
                         <select name="colaborador[]" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-align-left"></i> Descrição</label>
+                        <input type="text" name="descricao_colaborador[]" maxlength="100" placeholder="Observação ou função...">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
