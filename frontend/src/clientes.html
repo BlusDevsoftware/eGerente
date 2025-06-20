@@ -120,7 +120,7 @@
     <div class="modal" id="clienteModal" style="display: none; align-items: center; justify-content: center;">
         <div class="modal-content" style="width: 80%; max-width: 600px; margin: auto;">
             <div class="modal-header">
-                <h2>Novo Cliente</h2>
+                <h2 id="modalTitle">Novo Cliente</h2>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -218,7 +218,56 @@
             }
         }
 
-        // Função para salvar cliente
+        // Função para abrir modal de novo cliente (customizado)
+        function novoCliente() {
+            const form = document.getElementById('clienteForm');
+            form.reset();
+            delete form.dataset.codigo;
+            form.codigo.value = '';
+            toggleTipoCliente('pf');
+            const modal = document.getElementById('clienteModal');
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.textContent = 'Novo Cliente';
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            const modal = document.getElementById('clienteModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Função para editar cliente (abre modal customizado)
+        async function editarCliente(codigo) {
+            try {
+                const cliente = await api.get(`/clientes/${codigo}`);
+                const form = document.getElementById('clienteForm');
+                form.dataset.codigo = cliente.codigo;
+                form.codigo.value = formatarCodigo(cliente.codigo);
+                form.codigo_crm.value = cliente.codigo_crm || '';
+                form.nome.value = cliente.nome;
+                form.tipo.value = cliente.tipo;
+                form.documento.value = cliente.documento || '';
+                toggleTipoCliente(cliente.tipo);
+                const modal = document.getElementById('clienteModal');
+                const modalTitle = document.getElementById('modalTitle');
+                modalTitle.textContent = 'Editar Cliente';
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Erro ao carregar cliente:', error);
+                alert('Erro ao carregar cliente');
+            }
+        }
+
+        // Função para salvar cliente (fecha modal customizado)
         async function salvarCliente(event) {
             event.preventDefault();
             const form = event.target;
@@ -232,42 +281,15 @@
 
             try {
                 if (form.dataset.codigo) {
-                    // Atualizar cliente existente
                     await api.put(`/clientes/${form.dataset.codigo}`, cliente);
                 } else {
-                    // Criar novo cliente
                     await api.post('/clientes', cliente);
                 }
-
-                // Fechar modal e recarregar lista
-                const modal = bootstrap.Modal.getInstance(document.getElementById('clienteModal'));
-                modal.hide();
+                closeModal();
                 carregarClientes();
             } catch (error) {
                 console.error('Erro ao salvar cliente:', error);
                 alert('Erro ao salvar cliente');
-            }
-        }
-
-        // Função para editar cliente
-        async function editarCliente(codigo) {
-            try {
-                const cliente = await api.get(`/clientes/${codigo}`);
-                const form = document.getElementById('clienteForm');
-                // Preencher formulário
-                form.dataset.codigo = cliente.codigo;
-                form.codigo.value = formatarCodigo(cliente.codigo);
-                form.codigo_crm.value = cliente.codigo_crm || '';
-                form.nome.value = cliente.nome;
-                form.tipo.value = cliente.tipo;
-                form.documento.value = cliente.documento || '';
-                toggleTipoCliente(cliente.tipo);
-                // Abrir modal
-                const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
-                modal.show();
-            } catch (error) {
-                console.error('Erro ao carregar cliente:', error);
-                alert('Erro ao carregar cliente');
             }
         }
 
@@ -286,17 +308,6 @@
             }
         }
 
-        // Função para abrir modal de novo cliente
-        function novoCliente() {
-            const form = document.getElementById('clienteForm');
-            form.reset();
-            delete form.dataset.codigo;
-            form.codigo.value = '';
-            toggleTipoCliente('pf');
-            const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
-            modal.show();
-        }
-
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             carregarClientes();
@@ -308,6 +319,7 @@
         window.editarCliente = editarCliente;
         window.excluirCliente = excluirCliente;
         window.toggleTipoCliente = toggleTipoCliente;
+        window.closeModal = closeModal;
     </script>
 
     <script src="scripts/navigation.js"></script>
