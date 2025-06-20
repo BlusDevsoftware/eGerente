@@ -294,7 +294,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="tipo"><i class="fas fa-users"></i> Tipo de Cliente</label>
-                            <select id="tipo" name="tipo" required onchange="toggleTipoCliente(this.value)" autocomplete="off">
+                            <select id="tipo" name="tipo" required onchange="toggleTipoCliente(this.value, true)" autocomplete="off">
                                 <option value="">Selecione...</option>
                                 <option value="pf">Pessoa Física</option>
                                 <option value="pj">Pessoa Jurídica</option>
@@ -321,7 +321,7 @@
         }
 
         // Função para alternar label e máscara do documento
-        function toggleTipoCliente(tipo) {
+        function toggleTipoCliente(tipo, limpar = false) {
             const label = document.getElementById('documentoLabel');
             const input = document.getElementById('documento');
             if (tipo === 'pj') {
@@ -333,7 +333,7 @@
                 input.placeholder = '000.000.000-00';
                 input.maxLength = 14;
             }
-            input.value = '';
+            if (limpar) input.value = '';
         }
 
         // Função para carregar clientes
@@ -376,7 +376,7 @@
             form.reset();
             delete form.dataset.codigo;
             form.codigo.value = '';
-            toggleTipoCliente('pf');
+            toggleTipoCliente('pf', true);
             const modal = document.getElementById('clienteModal');
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '<i class="fas fa-user-tie"></i> Novo Cliente';
@@ -414,7 +414,7 @@
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
                 form.documento.value = cliente.documento || '';
-                toggleTipoCliente(cliente.tipo);
+                toggleTipoCliente(cliente.tipo, false);
                 const modal = document.getElementById('clienteModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-user-tie"></i> Editar Cliente';
@@ -480,7 +480,7 @@
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
                 form.documento.value = cliente.documento || '';
-                toggleTipoCliente(cliente.tipo);
+                toggleTipoCliente(cliente.tipo, false);
                 // Desabilitar todos os campos
                 Array.from(form.elements).forEach(element => {
                     element.disabled = true;
