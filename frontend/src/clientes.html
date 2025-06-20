@@ -376,7 +376,7 @@
             toggleTipoCliente('pf');
             const modal = document.getElementById('clienteModal');
             const modalTitle = document.getElementById('modalTitle');
-            modalTitle.textContent = 'Novo Cliente';
+            modalTitle.innerHTML = '<i class="fas fa-user-tie"></i> Novo Cliente';
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
             document.body.style.overflow = 'hidden';
@@ -406,7 +406,7 @@
                 toggleTipoCliente(cliente.tipo);
                 const modal = document.getElementById('clienteModal');
                 const modalTitle = document.getElementById('modalTitle');
-                modalTitle.textContent = 'Editar Cliente';
+                modalTitle.innerHTML = '<i class="fas fa-user-tie"></i> Editar Cliente';
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
