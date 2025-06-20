@@ -90,11 +90,6 @@
                         <option value="pf">Pessoa Física</option>
                         <option value="pj">Pessoa Jurídica</option>
                     </select>
-                    <select>
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
                 </div>
                 <button class="btn-primary" onclick="openModal()">
                     <i class="fas fa-plus"></i>
@@ -111,9 +106,6 @@
                             <th>Código CRM</th>
                             <th>Nome/Razão Social</th>
                             <th>CNPJ/CPF</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -164,23 +156,6 @@
                                 <option value="pj">Pessoa Jurídica</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select id="status" name="status" required autocomplete="off">
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" autocomplete="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="telefone">Telefone</label>
-                            <input type="tel" id="telefone" name="telefone" autocomplete="tel">
-                        </div>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -227,13 +202,6 @@
                         <td>${cliente.codigo_crm || '-'}</td>
                         <td>${cliente.nome}</td>
                         <td>${cliente.documento || '-'}</td>
-                        <td>${cliente.email || '-'}</td>
-                        <td>${cliente.telefone || '-'}</td>
-                        <td>
-                            <span class="badge ${cliente.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                                ${cliente.status}
-                            </span>
-                        </td>
                         <td>
                             <button class="btn btn-sm btn-primary" onclick="editarCliente(${cliente.codigo})">
                                 <i class="bi bi-pencil"></i>
@@ -260,10 +228,7 @@
                 codigo_crm: formData.get('codigo_crm'),
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo'),
-                documento: formData.get('documento'),
-                email: formData.get('email'),
-                telefone: formData.get('telefone'),
-                status: formData.get('status')
+                documento: formData.get('documento')
             };
 
             try {
@@ -297,9 +262,6 @@
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
                 form.documento.value = cliente.documento || '';
-                form.email.value = cliente.email || '';
-                form.telefone.value = cliente.telefone || '';
-                form.status.value = cliente.status;
                 toggleTipoCliente(cliente.tipo);
                 // Abrir modal
                 const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
