@@ -83,10 +83,6 @@
                 <form id="formUnico" class="form-comissao">
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fas fa-user"></i> Colaborador</label>
-                            <select name="colaborador" required></select>
-                        </div>
-                        <div class="form-group">
                             <label><i class="fas fa-cubes"></i> Tipo</label>
                             <select name="tipo" required onchange="atualizarTipoUnico()">
                                 <option value="produto">Produto</option>
@@ -97,24 +93,24 @@
                             <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
                             <select name="item" required></select>
                         </div>
-                    </div>
-                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Data de Emissão</label>
+                            <input type="date" name="data_emissao" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
+                            <input type="date" name="data_vencimento" required>
+                        </div>
                         <div class="form-group">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
                             <input type="number" name="valor_venda" step="0.01" min="0" required>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-percent"></i> Percentual Comissão (%)</label>
-                            <input type="number" name="percentual" step="0.01" min="0" max="100" required oninput="calcularComissaoUnico()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-coins"></i> Valor Comissão</label>
-                            <input type="number" name="valor_comissao" step="0.01" min="0" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-alt"></i> Data</label>
-                            <input type="date" name="data" required>
-                        </div>
+                    </div>
+                    <div class="form-row" id="colaboradoresVinculados">
+                        <!-- Colaboradores dinâmicos aqui -->
+                    </div>
+                    <div style="margin-bottom: 18px;">
+                        <button type="button" class="btn-primary" onclick="adicionarColaboradorUnico()"><i class="fas fa-user-plus"></i> Adicionar Colaborador</button>
                     </div>
                     <div class="form-actions">
                         <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
@@ -285,6 +281,13 @@
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
+            #colaboradoresVinculados .form-row {
+                margin-bottom: 0;
+                align-items: flex-end;
+            }
+            #colaboradoresVinculados .form-group {
+                min-width: 180px;
+            }
         </style>
         <script>
             function mostrarTabComissao(tab) {
@@ -341,6 +344,26 @@
                 const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
                 const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
                 tr.querySelector('input[name="valor_comissao[]"]').value = (valorVenda * percentual / 100).toFixed(2);
+            }
+            function adicionarColaboradorUnico() {
+                const container = document.getElementById('colaboradoresVinculados');
+                const idx = container.children.length;
+                const div = document.createElement('div');
+                div.className = 'form-row';
+                div.innerHTML = `
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Colaborador</label>
+                        <select name="colaborador[]" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-percent"></i> % Comissão</label>
+                        <input type="number" name="percentual[]" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="form-group" style="align-self: flex-end;">
+                        <button type="button" class="btn-secondary" onclick="this.closest('.form-row').remove()"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
             }
         </script>
     </div>
