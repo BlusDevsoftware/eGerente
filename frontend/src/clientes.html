@@ -350,12 +350,15 @@
                         <td>${cliente.codigo_crm || '-'}</td>
                         <td>${cliente.nome}</td>
                         <td>${cliente.documento || '-'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="editarCliente(${cliente.codigo})">
-                                <i class="bi bi-pencil"></i>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarCliente('${cliente.codigo}')">
+                                <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirCliente(${cliente.codigo})">
-                                <i class="bi bi-trash"></i>
+                            <button class="action-btn edit-btn" title="Editar" onclick="editarCliente('${cliente.codigo}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" title="Excluir" onclick="excluirCliente('${cliente.codigo}')">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     `;
@@ -385,6 +388,14 @@
         // Função para fechar o modal
         function closeModal() {
             const modal = document.getElementById('clienteModal');
+            const form = document.getElementById('clienteForm');
+            // Reabilitar campos
+            Array.from(form.elements).forEach(element => {
+                element.disabled = false;
+            });
+            // Mostrar botões de ação
+            const formActions = form.querySelector('.form-actions');
+            if (formActions) formActions.style.display = '';
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
@@ -432,6 +443,7 @@
                 if (form.dataset.codigo) {
                     await api.put(`/clientes/${form.dataset.codigo}`, cliente);
                 } else {
+                    // Não enviar o campo codigo no POST
                     await api.post('/clientes', cliente);
                 }
                 closeModal();
@@ -457,6 +469,44 @@
             }
         }
 
+        // Função para visualizar cliente
+        async function visualizarCliente(codigo) {
+            try {
+                const cliente = await api.get(`/clientes/${codigo}`);
+                const form = document.getElementById('clienteForm');
+                // Preencher formulário
+                form.codigo.value = formatarCodigo(cliente.codigo);
+                form.codigo_crm.value = cliente.codigo_crm || '';
+                form.nome.value = cliente.nome;
+                form.tipo.value = cliente.tipo;
+                form.documento.value = cliente.documento || '';
+                toggleTipoCliente(cliente.tipo);
+                // Desabilitar todos os campos
+                Array.from(form.elements).forEach(element => {
+                    element.disabled = true;
+                });
+                // Ajustar título
+                const modal = document.getElementById('clienteModal');
+                const modalTitle = document.getElementById('modalTitle');
+                modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Cliente';
+                // Esconder botões de ação
+                const formActions = form.querySelector('.form-actions');
+                if (formActions) formActions.style.display = 'none';
+                // Abrir modal
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+                // Ao fechar, reabilitar campos e mostrar botões
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    closeModal();
+                };
+            } catch (error) {
+                console.error('Erro ao visualizar cliente:', error);
+                alert('Erro ao visualizar cliente');
+            }
+        }
+
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             carregarClientes();
@@ -469,6 +519,7 @@
         window.excluirCliente = excluirCliente;
         window.toggleTipoCliente = toggleTipoCliente;
         window.closeModal = closeModal;
+        window.visualizarCliente = visualizarCliente;
     </script>
 
     <script src="scripts/navigation.js"></script>
