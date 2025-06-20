@@ -15,7 +15,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="../Imagens/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
+            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;">
             <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
         </div>
         <ul class="nav-menu">
@@ -104,12 +104,13 @@
 
             <!-- Table -->
             <div class="table-container">
-                <table>
+                <table id="clientesTable">
                     <thead>
                         <tr>
                             <th>Código</th>
+                            <th>Código CRM</th>
                             <th>Nome/Razão Social</th>
-                            <th>Tipo</th>
+                            <th>CNPJ/CPF</th>
                             <th>Email</th>
                             <th>Telefone</th>
                             <th>Status</th>
@@ -146,6 +147,16 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label id="nomeLabel" for="nome">Nome/Razão Social</label>
+                            <input type="text" id="nome" name="nome" required autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label id="documentoLabel" for="documento">CPF</label>
+                            <input type="text" id="documento" name="documento" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
                             <label for="tipo">Tipo de Cliente</label>
                             <select id="tipo" name="tipo" required onchange="toggleTipoCliente(this.value)" autocomplete="off">
                                 <option value="">Selecione...</option>
@@ -159,16 +170,6 @@
                                 <option value="ativo">Ativo</option>
                                 <option value="inativo">Inativo</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label id="nomeLabel" for="nome">Nome Completo</label>
-                            <input type="text" id="nome" name="nome" required autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label id="documentoLabel" for="documento">CPF</label>
-                            <input type="text" id="documento" name="documento" required autocomplete="off">
                         </div>
                     </div>
                     <div class="form-row">
@@ -191,6 +192,27 @@
     </div>
 
     <script type="module">
+        // Função para formatar código com 5 dígitos
+        function formatarCodigo(codigo) {
+            return String(codigo).padStart(5, '0');
+        }
+
+        // Função para alternar label e máscara do documento
+        function toggleTipoCliente(tipo) {
+            const label = document.getElementById('documentoLabel');
+            const input = document.getElementById('documento');
+            if (tipo === 'pj') {
+                label.textContent = 'CNPJ';
+                input.placeholder = '00.000.000/0000-00';
+                input.maxLength = 18;
+            } else {
+                label.textContent = 'CPF';
+                input.placeholder = '000.000.000-00';
+                input.maxLength = 14;
+            }
+            input.value = '';
+        }
+
         // Função para carregar clientes
         async function carregarClientes() {
             try {
@@ -201,9 +223,10 @@
                 clientes.forEach(cliente => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${cliente.codigo}</td>
+                        <td>${formatarCodigo(cliente.codigo)}</td>
+                        <td>${cliente.codigo_crm || '-'}</td>
                         <td>${cliente.nome}</td>
-                        <td>${cliente.tipo}</td>
+                        <td>${cliente.documento || '-'}</td>
                         <td>${cliente.email || '-'}</td>
                         <td>${cliente.telefone || '-'}</td>
                         <td>
@@ -234,8 +257,10 @@
             const form = event.target;
             const formData = new FormData(form);
             const cliente = {
+                codigo_crm: formData.get('codigo_crm'),
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo'),
+                documento: formData.get('documento'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
                 status: formData.get('status')
@@ -265,15 +290,17 @@
             try {
                 const cliente = await api.get(`/clientes/${codigo}`);
                 const form = document.getElementById('clienteForm');
-                
                 // Preencher formulário
                 form.dataset.codigo = cliente.codigo;
+                form.codigo.value = formatarCodigo(cliente.codigo);
+                form.codigo_crm.value = cliente.codigo_crm || '';
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
+                form.documento.value = cliente.documento || '';
                 form.email.value = cliente.email || '';
                 form.telefone.value = cliente.telefone || '';
                 form.status.value = cliente.status;
-
+                toggleTipoCliente(cliente.tipo);
                 // Abrir modal
                 const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
                 modal.show();
@@ -303,7 +330,8 @@
             const form = document.getElementById('clienteForm');
             form.reset();
             delete form.dataset.codigo;
-            
+            form.codigo.value = '';
+            toggleTipoCliente('pf');
             const modal = new bootstrap.Modal(document.getElementById('clienteModal'));
             modal.show();
         }
@@ -312,6 +340,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             carregarClientes();
             document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
+            document.getElementById('tipo').addEventListener('change', (e) => toggleTipoCliente(e.target.value));
         });
     </script>
 
