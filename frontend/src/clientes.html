@@ -90,7 +90,7 @@
                         <option value="pj">Pessoa Jurídica</option>
                     </select>
                 </div>
-                <button class="btn-primary" onclick="openModal()">
+                <button class="btn-primary" onclick="novoCliente()">
                     <i class="fas fa-plus"></i>
                     Novo Cliente
                 </button>
@@ -186,6 +186,35 @@
             }
             input.value = '';
         }
+
+        // Função para abrir modal de novo cliente (padrão usuário)
+        function openModal() {
+            const form = document.getElementById('clienteForm');
+            form.reset();
+            delete form.dataset.codigo;
+            form.codigo.value = '';
+            toggleTipoCliente('pf');
+            const modal = document.getElementById('clienteModal');
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Função para fechar modal de cliente
+        function closeModal() {
+            const modal = document.getElementById('clienteModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 200);
+            }
+        }
+
+        // Tornar funções globais para uso no HTML
+        window.openModal = openModal;
+        window.closeModal = closeModal;
 
         // Função para carregar clientes
         async function carregarClientes() {
