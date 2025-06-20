@@ -490,10 +490,14 @@
                 form.descricao.value = servico.descricao;
                 form.dataset.codigo = servico.codigo;
             }
-            // Modo visualização: desabilitar campos
+            // Modo visualização: desabilitar campos e esconder botões
             Array.from(form.elements).forEach(el => {
                 el.disabled = (modo === 'visualizar');
             });
+            const formActions = form.querySelector('.form-actions');
+            if (formActions) {
+                formActions.style.display = (modo === 'visualizar') ? 'none' : '';
+            }
             // Exibir modal
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
