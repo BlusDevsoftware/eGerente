@@ -622,8 +622,10 @@
                 if (qtd < 1) qtd = 1;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorReceber / qtd;
+                const hoje = new Date();
+                const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
+                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
@@ -671,6 +673,22 @@
                     calcularValorReceberUnico(input);
                 });
             };
+            document.addEventListener('DOMContentLoaded', async function() {
+                // Preencher select de clientes
+                try {
+                    const clientes = await api.get('/clientes');
+                    const selectCliente = document.querySelector('select[name="cliente"]');
+                    selectCliente.innerHTML = '<option value="">Selecione um cliente...</option>';
+                    clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.codigo;
+                        option.textContent = cliente.nome;
+                        selectCliente.appendChild(option);
+                    });
+                } catch (e) {
+                    console.error('Erro ao carregar clientes:', e);
+                }
+            });
         </script>
     </div>
 
