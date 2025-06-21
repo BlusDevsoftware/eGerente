@@ -283,11 +283,31 @@
                 gap: 16px;
             }
             .colaborador-bloco {
-                background: #f9f9f9;
-                border-radius: 6px;
-                padding: 16px 12px 8px 12px;
-                margin-bottom: 0;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                position: relative;
+                padding-top: 8px;
+            }
+            .btn-excluir-bloco {
+                position: absolute;
+                top: 4px;
+                right: 4px;
+                background: #fff;
+                border: 2px solid #e53935;
+                color: #e53935;
+                border-radius: 50%;
+                width: 28px;
+                height: 28px;
+                font-size: 1.1em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: background 0.2s, border 0.2s;
+                z-index: 2;
+            }
+            .btn-excluir-bloco:hover {
+                background: #ffebee;
+                border-color: #b71c1c;
+                color: #b71c1c;
             }
             .colaborador-bloco .form-row {
                 margin-bottom: 0;
@@ -475,6 +495,7 @@
                 const div = document.createElement('div');
                 div.className = 'colaborador-bloco';
                 div.innerHTML = `
+                    <button type="button" class="btn-excluir-bloco" title="Remover colaborador" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-times"></i></button>
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> Colaborador</label>
@@ -504,11 +525,14 @@
                             <label><i class="fas fa-money-bill-wave"></i> Valor da Parcela</label>
                             <input type="text" name="valor_parcela[]" readonly>
                         </div>
-                        <div class="form-group" style="align-self: flex-end;">
-                            <button type="button" class="btn-secondary" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-trash"></i></button>
-                        </div>
                     </div>
-                    <div class="simulacao-titulos" style="display:none;"></div>
+                    <div class="simulacao-titulos" style="display:none;">
+                        <div class="simulacao-datas">
+                            <label style="margin-right:8px;">Data de Emissão <input type="date" class="simulacao-emissao"></label>
+                            <label>Data de Vencimento <input type="date" class="simulacao-vencimento"></label>
+                        </div>
+                        <div class="simulacao-tabela"></div>
+                    </div>
                 `;
                 container.appendChild(div);
             }
@@ -553,21 +577,24 @@
                 const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
+                const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
+                const dataEmissao = simulacaoDiv.querySelector('.simulacao-emissao').value;
+                const dataVencimento = simulacaoDiv.querySelector('.simulacao-vencimento').value;
                 const qtd = parseInt(qtdInput ? qtdInput.value : '');
                 const valorReceber = parseFloat(valorReceberInput.value.replace(',','.'));
                 if (!qtdInput || !qtd || qtd < 2 || !valorReceber || valorReceber <= 0) {
                     simulacaoDiv.style.display = 'block';
-                    simulacaoDiv.innerHTML = '<span style="color:#b71c1c;">Informe a quantidade de parcelas válida e o valor a receber.</span>';
+                    simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Informe a quantidade de parcelas válida e o valor a receber.</span>';
                     return;
                 }
-                let html = '<table><tr><th>Parcela</th><th>Valor</th></tr>';
+                let html = '<table><tr><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>';
                 const valorParcela = valorReceber / qtd;
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td></tr>`;
+                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td>${dataEmissao || '-'}</td><td>${dataVencimento || '-'}</td></tr>`;
                 }
                 html += '</table>';
                 simulacaoDiv.style.display = 'block';
-                simulacaoDiv.innerHTML = html;
+                simulacaoTabela.innerHTML = html;
             }
             document.getElementById('formUnico').valor_venda.oninput = function() {
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
