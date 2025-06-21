@@ -720,7 +720,7 @@
                             const option = document.createElement('option');
                             option.value = item.codigo;
                             option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                            option.dataset.valor = item.valor;
+                            option.dataset.valor = item.preco;
                             selectItem.appendChild(option);
                         });
                         if (window.Choices) {
@@ -747,7 +747,7 @@
                         let soma = 0;
                         selecionados.forEach(cod => {
                             const item = lista.find(i => i.codigo == cod);
-                            if (item && item.valor !== undefined && item.valor !== null) soma += Number(item.valor) || 0;
+                            if (item && item.preco !== undefined && item.preco !== null) soma += Number(item.preco) || 0;
                         });
                         const campoValor = document.querySelector('#formUnico input[name="valor_venda"]');
                         campoValor.value = soma.toFixed(2);
