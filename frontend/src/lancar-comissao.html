@@ -714,31 +714,36 @@
                             choicesItem.destroy();
                             choicesItem = null;
                         }
-                        selectItem.innerHTML = '';
+                        selectItem.innerHTML = '<option>Carregando...</option>';
+                        selectItem.disabled = true;
                         let lista = tipo === 'produto' ? produtos : servicos;
-                        lista.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.codigo;
-                            option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                            option.dataset.valor = item.preco;
-                            selectItem.appendChild(option);
-                        });
-                        if (window.Choices) {
-                            choicesItem = new Choices(selectItem, {
-                                searchEnabled: true,
-                                itemSelectText: '',
-                                shouldSort: false,
-                                placeholder: true,
-                                placeholderValue: 'Selecione um ou mais...',
-                                removeItemButton: true,
-                                maxItemCount: -1,
-                                duplicateItemsAllowed: false,
-                                noResultsText: 'Nenhum resultado encontrado',
-                                noChoicesText: 'Sem opções disponíveis'
+                        setTimeout(() => {
+                            selectItem.innerHTML = '';
+                            lista.forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.codigo;
+                                option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
+                                option.dataset.valor = item.preco;
+                                selectItem.appendChild(option);
                             });
-                            selectItem.removeEventListener('change', atualizarValorVendaPorItens);
-                            selectItem.addEventListener('change', atualizarValorVendaPorItens);
-                        }
+                            selectItem.disabled = false;
+                            if (window.Choices) {
+                                choicesItem = new Choices(selectItem, {
+                                    searchEnabled: true,
+                                    itemSelectText: '',
+                                    shouldSort: false,
+                                    placeholder: true,
+                                    placeholderValue: 'Selecione um ou mais...',
+                                    removeItemButton: true,
+                                    maxItemCount: -1,
+                                    duplicateItemsAllowed: false,
+                                    noResultsText: 'Nenhum resultado encontrado',
+                                    noChoicesText: 'Sem opções disponíveis'
+                                });
+                                selectItem.removeEventListener('change', atualizarValorVendaPorItens);
+                                selectItem.addEventListener('change', atualizarValorVendaPorItens);
+                            }
+                        }, 0);
                     }
                     function atualizarValorVendaPorItens() {
                         const tipo = selectTipo.value;
