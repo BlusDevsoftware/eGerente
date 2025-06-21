@@ -447,11 +447,14 @@
                 border: 1.5px solid #90caf9;
                 border-radius: 8px;
                 background: #f7fbff;
-                padding: 5px 10px;
+                padding: 5px 32px 5px 10px;
                 font-size: 1em;
                 color: #1565c0;
                 transition: box-shadow 0.18s, border 0.18s;
                 box-shadow: 0 1px 4px rgba(33,150,243,0.07);
+                min-width: 145px;
+                width: 100%;
+                box-sizing: border-box;
             }
             .simulacao-titulos input[type='date']:focus {
                 border-color: #1976d2;
@@ -515,12 +518,15 @@
                 const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
                 tr.querySelector('input[name="valor_comissao[]"]').value = (valorVenda * percentual / 100).toFixed(2);
             }
+            let numeroTituloPai = 1;
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
                 blocoCount++;
                 const div = document.createElement('div');
                 div.className = 'colaborador-bloco';
+                div.setAttribute('data-numero-pai', numeroTituloPai.toString().padStart(5, '0'));
+                numeroTituloPai++;
                 div.innerHTML = `
                     <button type="button" class="btn-excluir-bloco" title="Remover colaborador" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-times"></i></button>
                     <div class="form-row">
@@ -597,6 +603,8 @@
             }
             function simularTitulos(btn) {
                 const row = btn.closest('.form-row');
+                const bloco = btn.closest('.colaborador-bloco');
+                const numeroPai = bloco.getAttribute('data-numero-pai') || '00001';
                 const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
@@ -608,10 +616,10 @@
                     simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Informe a quantidade de parcelas válida e o valor a receber.</span>';
                     return;
                 }
-                let html = '<table><tr><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>';
+                let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorReceber / qtd;
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
+                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
                 }
                 html += '</table>';
                 html += `<div id='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select id='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
