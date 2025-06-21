@@ -335,6 +335,26 @@
                 box-shadow: 0 2px 8px rgba(33,150,243,0.07);
                 font-size: 1.15em;
             }
+            .btn-parcelado {
+                background: #fffbe6;
+                border: 1.5px solid #fbc02d;
+                color: #b8860b;
+                font-weight: 600;
+                border-radius: 4px;
+                padding: 6px 12px;
+                margin-top: 24px;
+                margin-left: 4px;
+                cursor: pointer;
+                transition: background 0.2s, border 0.2s;
+            }
+            .btn-parcelado.active {
+                background: #ffe082;
+                border-color: #fbc02d;
+            }
+            .group-parcelas, .group-valor-parcela {
+                min-width: 120px;
+                margin-left: 4px;
+            }
         </style>
         <script>
             function mostrarTabComissao(tab) {
@@ -415,6 +435,17 @@
                             <label><i class="fas fa-coins"></i> Valor a Receber</label>
                             <input type="number" name="valor_receber[]" step="0.01" min="0" readonly>
                         </div>
+                        <div class="form-group">
+                            <button type="button" class="btn-parcelado" onclick="toggleParcelado(this)">Parcelado</button>
+                        </div>
+                        <div class="form-group group-parcelas" style="display:none;">
+                            <label><i class="fas fa-list-ol"></i> Qtd. Parcelas</label>
+                            <input type="number" name="qtd_parcelas[]" min="2" step="1" oninput="atualizaValorParcela(this)">
+                        </div>
+                        <div class="form-group group-valor-parcela" style="display:none;">
+                            <label><i class="fas fa-money-bill-wave"></i> Valor da Parcela</label>
+                            <input type="text" name="valor_parcela[]" readonly>
+                        </div>
                         <div class="form-group" style="align-self: flex-end;">
                             <button type="button" class="btn-secondary" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-trash"></i></button>
                         </div>
@@ -429,6 +460,34 @@
                 const valorVenda = parseFloat(form.valor_venda.value) || 0;
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
                 valorReceber.value = (valorVenda * percentual / 100).toFixed(2);
+            }
+            function toggleParcelado(btn) {
+                const row = btn.closest('.form-row');
+                const groupParcelas = row.querySelector('.group-parcelas');
+                const groupValorParcela = row.querySelector('.group-valor-parcela');
+                if (groupParcelas.style.display === 'none') {
+                    groupParcelas.style.display = '';
+                    groupValorParcela.style.display = '';
+                    btn.classList.add('active');
+                } else {
+                    groupParcelas.style.display = 'none';
+                    groupValorParcela.style.display = 'none';
+                    btn.classList.remove('active');
+                    row.querySelector('input[name="qtd_parcelas[]"]').value = '';
+                    row.querySelector('input[name="valor_parcela[]"]').value = '';
+                }
+            }
+            function atualizaValorParcela(input) {
+                const row = input.closest('.form-row');
+                const qtd = parseInt(input.value);
+                const valorReceber = parseFloat(row.querySelector('input[name="valor_receber[]"]').value.replace(',','.'));
+                const valorParcelaInput = row.querySelector('input[name="valor_parcela[]"]');
+                if (qtd > 1 && valorReceber > 0) {
+                    const valorParcela = valorReceber / qtd;
+                    valorParcelaInput.value = valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                } else {
+                    valorParcelaInput.value = '';
+                }
             }
             document.getElementById('formUnico').valor_venda.oninput = function() {
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
