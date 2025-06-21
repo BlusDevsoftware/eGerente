@@ -107,7 +107,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
-                            <input type="number" name="valor_venda" step="0.01" min="0" required>
+                            <input type="number" name="valor_venda" step="0.01" min="0" required class="valor-venda-destaque">
                         </div>
                     </div>
                     <div id="colaboradoresVinculados">
@@ -326,6 +326,14 @@
             }
             .colaborador-bloco .form-group .btn-secondary i {
                 font-size: 14px;
+            }
+            .form-group.valor-venda-destaque input {
+                background: #e3f2fd;
+                border: 2px solid #2196F3;
+                font-weight: 600;
+                color: #1565c0;
+                box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+                font-size: 1.15em;
             }
         </style>
         <script>
