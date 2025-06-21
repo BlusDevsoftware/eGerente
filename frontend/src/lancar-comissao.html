@@ -452,8 +452,8 @@
                 color: #1565c0;
                 transition: box-shadow 0.18s, border 0.18s;
                 box-shadow: 0 1px 4px rgba(33,150,243,0.07);
-                min-width: 145px;
-                width: 100%;
+                min-width: 160px;
+                width: 160px;
                 box-sizing: border-box;
             }
             .simulacao-titulos input[type='date']:focus {
@@ -622,17 +622,19 @@
                     html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
                 }
                 html += '</table>';
-                html += `<div id='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select id='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
 
                 // Adiciona evento para mostrar o select de intervalo ao preencher a primeira data de vencimento
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
+                const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
+                const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
                 if (vencInputs.length > 1) {
                     vencInputs[0].addEventListener('change', function() {
-                        document.getElementById('intervalo-vencimento-container').style.display = 'inline-block';
+                        intervaloContainer.style.display = 'inline-block';
                     });
-                    document.getElementById('intervalo-vencimento-select').addEventListener('change', function() {
+                    intervaloSelect.addEventListener('change', function() {
                         if (!this.value) return;
                         const intervalo = parseInt(this.value);
                         const primeiraData = vencInputs[0].value;
