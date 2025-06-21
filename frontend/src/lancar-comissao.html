@@ -98,7 +98,7 @@
                         </div>
                         <div class="form-group">
                             <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
-                            <select name="item" required></select>
+                            <select name="item" multiple required></select>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -678,6 +678,8 @@
             };
             document.addEventListener('DOMContentLoaded', async function() {
                 let clientes = [];
+                let produtos = [];
+                let servicos = [];
                 try {
                     clientes = await api.get('/clientes');
                     const selectCliente = document.querySelector('select[name="cliente"]');
@@ -688,7 +690,6 @@
                         option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
                     });
-                    // Inicializa Choices.js
                     if (window.Choices) {
                         new Choices(selectCliente, {
                             searchEnabled: true,
@@ -698,8 +699,43 @@
                             placeholderValue: 'Selecione um cliente...'
                         });
                     }
+
+                    // Produtos e Serviços
+                    produtos = await api.get('/produtos');
+                    servicos = await api.get('/servicos');
+                    const selectTipo = document.querySelector('#formUnico select[name="tipo"]');
+                    const selectItem = document.querySelector('#formUnico select[name="item"]');
+                    function preencherItens(tipo) {
+                        selectItem.innerHTML = '';
+                        let lista = tipo === 'produto' ? produtos : servicos;
+                        lista.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.codigo;
+                            option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
+                            selectItem.appendChild(option);
+                        });
+                    }
+                    preencherItens(selectTipo.value);
+                    selectTipo.addEventListener('change', function() {
+                        preencherItens(this.value);
+                    });
+                    // Inicializa Choices.js múltiplo
+                    if (window.Choices) {
+                        new Choices(selectItem, {
+                            searchEnabled: true,
+                            itemSelectText: '',
+                            shouldSort: false,
+                            placeholder: true,
+                            placeholderValue: 'Selecione um ou mais...'
+                            ,removeItemButton: true,
+                            maxItemCount: -1,
+                            duplicateItemsAllowed: false,
+                            noResultsText: 'Nenhum resultado encontrado',
+                            noChoicesText: 'Sem opções disponíveis'
+                        });
+                    }
                 } catch (e) {
-                    console.error('Erro ao carregar clientes:', e);
+                    console.error('Erro ao carregar clientes/produtos/serviços:', e);
                 }
             });
         </script>
