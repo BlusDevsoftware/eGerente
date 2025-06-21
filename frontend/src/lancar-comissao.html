@@ -703,11 +703,11 @@
                         lista.appendChild(li);
                     });
                 }
+                buscaInput.addEventListener('focus', function() {
+                    renderLista('');
+                });
                 buscaInput.addEventListener('input', function() {
                     inputHidden.value = '';
-                    renderLista(this.value);
-                });
-                buscaInput.addEventListener('focus', function() {
                     renderLista(this.value);
                 });
                 document.addEventListener('click', function(e) {
