@@ -87,10 +87,6 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-user-tie"></i> Cliente</label>
-                            <div style="position:relative; margin-bottom:8px;">
-                                <input type="text" id="buscaCliente" placeholder="Buscar cliente..." style="width:100%;padding:8px 32px 8px 12px;border:1.5px solid #90caf9;border-radius:6px;font-size:1em;">
-                                <i class="fas fa-search" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#90caf9;"></i>
-                            </div>
                             <select name="cliente" required></select>
                         </div>
                         <div class="form-group">
@@ -705,22 +701,6 @@
                 } catch (e) {
                     console.error('Erro ao carregar clientes:', e);
                 }
-                // Filtro de busca
-                const buscaInput = document.getElementById('buscaCliente');
-                buscaInput.addEventListener('input', function() {
-                    const termo = this.value.toLowerCase();
-                    const selectCliente = document.querySelector('select[name="cliente"]');
-                    selectCliente.innerHTML = '<option value="">Selecione um cliente...</option>';
-                    clientes.forEach(cliente => {
-                        const texto = ((cliente.codigo_crm || '') + ' - ' + cliente.nome).toLowerCase();
-                        if (texto.includes(termo)) {
-                            const option = document.createElement('option');
-                            option.value = cliente.codigo;
-                            option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
-                            selectCliente.appendChild(option);
-                        }
-                    });
-                });
             });
         </script>
     </div>
