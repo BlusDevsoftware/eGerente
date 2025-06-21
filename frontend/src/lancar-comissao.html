@@ -470,14 +470,21 @@
                 color: #333;
                 border: 1.5px solid #ddd;
                 border-radius: 6px;
-                padding: 8px 18px;
-                font-size: 1em;
+                padding: 6px 10px;
+                font-size: 0.95em;
                 font-weight: 500;
                 cursor: pointer;
                 transition: background 0.2s, color 0.2s, border 0.2s;
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                min-width: 110px;
+            }
+            #tipo-toggle {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                width: 120px;
             }
             .btn-tipo.active {
                 background: #2196F3;
@@ -486,6 +493,8 @@
             }
         </style>
         <script>
+            let produtos = [];
+            let servicos = [];
             function mostrarTabComissao(tab) {
                 document.getElementById('tabUnico').classList.remove('active');
                 document.getElementById('tabMultiplo').classList.remove('active');
@@ -698,8 +707,6 @@
             };
             document.addEventListener('DOMContentLoaded', async function() {
                 let clientes = [];
-                let produtos = [];
-                let servicos = [];
                 try {
                     clientes = await api.get('/clientes');
                     const selectCliente = document.querySelector('select[name="cliente"]');
