@@ -332,16 +332,65 @@
                 border: 1.5px solid #fbc02d;
                 color: #b8860b;
                 font-weight: 600;
-                border-radius: 4px;
-                padding: 6px 12px;
+                border-radius: 16px;
+                padding: 4px 10px;
                 margin-top: 24px;
                 margin-left: 4px;
                 cursor: pointer;
-                transition: background 0.2s, border 0.2s;
+                font-size: 0.95em;
+                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
+                box-shadow: 0 1px 4px rgba(251,192,45,0.08);
             }
             .btn-parcelado.active {
                 background: #ffe082;
                 border-color: #fbc02d;
+                box-shadow: 0 2px 8px rgba(251,192,45,0.18);
+            }
+            .btn-parcelado:hover {
+                background: #fff8e1;
+                border-color: #ffd54f;
+            }
+            .btn-simular {
+                background: #e3f2fd;
+                border: 1.5px solid #2196F3;
+                color: #1565c0;
+                font-weight: 600;
+                border-radius: 16px;
+                padding: 4px 12px;
+                margin-top: 24px;
+                margin-left: 4px;
+                cursor: pointer;
+                font-size: 0.95em;
+                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
+                box-shadow: 0 1px 4px rgba(33,150,243,0.08);
+            }
+            .btn-simular:hover {
+                background: #bbdefb;
+                border-color: #1976d2;
+            }
+            .simulacao-titulos {
+                margin-top: 10px;
+                background: #f5f5f5;
+                border-radius: 8px;
+                padding: 10px 16px;
+                border: 1px solid #e0e0e0;
+                font-size: 0.98em;
+            }
+            .simulacao-titulos table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .simulacao-titulos th, .simulacao-titulos td {
+                padding: 4px 8px;
+                text-align: left;
+            }
+            .simulacao-titulos th {
+                background: #e3f2fd;
+                color: #1565c0;
+                font-weight: 700;
+            }
+            .simulacao-titulos tr:nth-child(even) {
+                background: #fafafa;
             }
             .group-parcelas, .group-valor-parcela {
                 min-width: 120px;
@@ -445,6 +494,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button" class="btn-parcelado" onclick="toggleParcelado(this)">Parcelado</button>
+                            <button type="button" class="btn-simular" onclick="simularTitulos(this)">Simular</button>
                         </div>
                         <div class="form-group group-parcelas" style="display:none;">
                             <label><i class="fas fa-list-ol"></i> Qtd. Parcelas</label>
@@ -458,6 +508,7 @@
                             <button type="button" class="btn-secondary" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
+                    <div class="simulacao-titulos" style="display:none;"></div>
                 `;
                 container.appendChild(div);
             }
@@ -496,6 +547,27 @@
                 } else {
                     valorParcelaInput.value = '';
                 }
+            }
+            function simularTitulos(btn) {
+                const row = btn.closest('.form-row');
+                const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
+                const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
+                const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
+                const qtd = parseInt(qtdInput ? qtdInput.value : '');
+                const valorReceber = parseFloat(valorReceberInput.value.replace(',','.'));
+                if (!qtdInput || !qtd || qtd < 2 || !valorReceber || valorReceber <= 0) {
+                    simulacaoDiv.style.display = 'block';
+                    simulacaoDiv.innerHTML = '<span style="color:#b71c1c;">Informe a quantidade de parcelas válida e o valor a receber.</span>';
+                    return;
+                }
+                let html = '<table><tr><th>Parcela</th><th>Valor</th></tr>';
+                const valorParcela = valorReceber / qtd;
+                for (let i = 1; i <= qtd; i++) {
+                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td></tr>`;
+                }
+                html += '</table>';
+                simulacaoDiv.style.display = 'block';
+                simulacaoDiv.innerHTML = html;
             }
             document.getElementById('formUnico').valor_venda.oninput = function() {
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
