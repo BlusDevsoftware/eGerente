@@ -609,20 +609,26 @@
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
                 const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
-                const qtd = parseInt(qtdInput ? qtdInput.value : '');
+                let qtd = 1;
+                if (qtdInput && qtdInput.closest('.group-parcelas') && qtdInput.closest('.group-parcelas').style.display !== 'none' && qtdInput.value && parseInt(qtdInput.value) > 1) {
+                    qtd = parseInt(qtdInput.value);
+                }
                 const valorReceber = parseFloat(valorReceberInput.value.replace(',','.'));
-                if (!qtdInput || !qtd || qtd < 2 || !valorReceber || valorReceber <= 0) {
+                if (!valorReceber || valorReceber <= 0) {
                     simulacaoDiv.style.display = 'block';
-                    simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Informe a quantidade de parcelas válida e o valor a receber.</span>';
+                    simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Informe o valor a receber.</span>';
                     return;
                 }
+                if (qtd < 1) qtd = 1;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorReceber / qtd;
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
+                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 html += '</table>';
-                html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                if (qtd > 1) {
+                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                }
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
 
