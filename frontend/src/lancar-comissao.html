@@ -288,8 +288,8 @@
             }
             .btn-excluir-bloco {
                 position: absolute;
-                top: 4px;
-                right: 4px;
+                top: 8px;
+                right: 10px;
                 background: #fff;
                 border: 2px solid #e53935;
                 color: #e53935;
@@ -347,19 +347,11 @@
                 box-shadow: 0 2px 8px rgba(33,150,243,0.07);
                 font-size: 1.15em;
             }
-            .btn-parcelado {
-                background: #fffbe6;
-                border: 1.5px solid #fbc02d;
-                color: #b8860b;
-                font-weight: 600;
-                border-radius: 16px;
-                padding: 4px 10px;
-                margin-top: 24px;
-                margin-left: 4px;
-                cursor: pointer;
-                font-size: 0.95em;
-                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
-                box-shadow: 0 1px 4px rgba(251,192,45,0.08);
+            .btn-parcelado, .btn-simular {
+                padding: 2px 8px;
+                font-size: 0.88em;
+                margin-top: 18px;
+                margin-left: 2px;
             }
             .btn-parcelado.active {
                 background: #ffe082;
@@ -369,20 +361,6 @@
             .btn-parcelado:hover {
                 background: #fff8e1;
                 border-color: #ffd54f;
-            }
-            .btn-simular {
-                background: #e3f2fd;
-                border: 1.5px solid #2196F3;
-                color: #1565c0;
-                font-weight: 600;
-                border-radius: 16px;
-                padding: 4px 12px;
-                margin-top: 24px;
-                margin-left: 4px;
-                cursor: pointer;
-                font-size: 0.95em;
-                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
-                box-shadow: 0 1px 4px rgba(33,150,243,0.08);
             }
             .btn-simular:hover {
                 background: #bbdefb;
@@ -578,8 +556,6 @@
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
                 const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
-                const dataEmissao = simulacaoDiv.querySelector('.simulacao-emissao').value;
-                const dataVencimento = simulacaoDiv.querySelector('.simulacao-vencimento').value;
                 const qtd = parseInt(qtdInput ? qtdInput.value : '');
                 const valorReceber = parseFloat(valorReceberInput.value.replace(',','.'));
                 if (!qtdInput || !qtd || qtd < 2 || !valorReceber || valorReceber <= 0) {
@@ -590,7 +566,7 @@
                 let html = '<table><tr><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>';
                 const valorParcela = valorReceber / qtd;
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td>${dataEmissao || '-'}</td><td>${dataVencimento || '-'}</td></tr>`;
+                    html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
                 }
                 html += '</table>';
                 simulacaoDiv.style.display = 'block';
