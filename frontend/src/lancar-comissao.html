@@ -614,7 +614,7 @@
                     html += `<tr><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:130px;'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:130px;'></td></tr>`;
                 }
                 html += '</table>';
-                html += `<div id='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select id='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30' selected>30 dias</option></select></div>`;
+                html += `<div id='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select id='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
 
@@ -625,6 +625,7 @@
                         document.getElementById('intervalo-vencimento-container').style.display = 'inline-block';
                     });
                     document.getElementById('intervalo-vencimento-select').addEventListener('change', function() {
+                        if (!this.value) return;
                         const intervalo = parseInt(this.value);
                         const primeiraData = vencInputs[0].value;
                         if (primeiraData) {
