@@ -97,9 +97,9 @@
                             </div>
                             <input type="hidden" name="tipo" value="produto">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group produto-servico">
                             <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
-                            <select name="item" multiple required></select>
+                            <select name="item" multiple required class="select-produto-servico"></select>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -491,10 +491,58 @@
                 color: #fff;
                 border-color: #2196F3;
             }
+            .form-group.produto-servico {
+                margin-bottom: 18px;
+            }
+            #labelItemUnico {
+                font-size: 1.08em;
+                font-weight: 600;
+                color: #1976D2;
+                margin-bottom: 6px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .select-produto-servico {
+                background: #f7fbff;
+                border: 2px solid #90caf9;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+                padding: 7px 12px;
+                font-size: 1em;
+                min-height: 44px;
+                margin-top: 2px;
+                margin-bottom: 2px;
+                transition: border 0.2s, box-shadow 0.2s;
+            }
+            .select-produto-servico:focus {
+                border-color: #2196F3;
+                box-shadow: 0 4px 16px rgba(33,150,243,0.13);
+            }
+            .choices__inner {
+                min-height: 44px !important;
+                border-radius: 8px !important;
+                background: #f7fbff !important;
+                border: 2px solid #90caf9 !important;
+                box-shadow: 0 2px 8px rgba(33,150,243,0.07) !important;
+                font-size: 1em !important;
+                padding: 7px 12px !important;
+            }
+            .choices__list--multiple .choices__item {
+                background: #e3f2fd !important;
+                color: #1976D2 !important;
+                border-radius: 6px !important;
+                border: 1px solid #90caf9 !important;
+                margin: 2px 4px 2px 0 !important;
+                padding: 3px 10px !important;
+            }
         </style>
         <script>
             let produtos = [];
             let servicos = [];
+            let choicesItem = null;
+            const selectItem = document.querySelector('#formUnico select[name="item"]');
+            const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
             function mostrarTabComissao(tab) {
                 document.getElementById('tabUnico').classList.remove('active');
                 document.getElementById('tabMultiplo').classList.remove('active');
@@ -509,7 +557,7 @@
                 }
             }
             function atualizarTipoUnico() {
-                const tipo = document.querySelector('#formUnico select[name="tipo"]').value;
+                const tipo = tipoInput.value;
                 const label = document.getElementById('labelItemUnico');
                 label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produto' : '<i class="fas fa-cogs"></i> Serviço';
             }
@@ -748,7 +796,10 @@
                 }
             });
             function preencherItens(tipo) {
-                const selectItem = document.querySelector('#formUnico select[name="item"]');
+                if (choicesItem) {
+                    choicesItem.destroy();
+                    choicesItem = null;
+                }
                 selectItem.style.visibility = 'hidden';
                 selectItem.innerHTML = '';
                 let lista = tipo === 'produto' ? produtos : servicos;
@@ -761,7 +812,7 @@
                 });
                 selectItem.disabled = false;
                 if (window.Choices) {
-                    const choicesItem = new Choices(selectItem, {
+                    choicesItem = new Choices(selectItem, {
                         searchEnabled: true,
                         itemSelectText: '',
                         shouldSort: false,
