@@ -705,35 +705,60 @@
                     servicos = await api.get('/servicos');
                     const selectTipo = document.querySelector('#formUnico select[name="tipo"]');
                     const selectItem = document.querySelector('#formUnico select[name="item"]');
+                    let choicesItem = null;
+                    let ultimoValorAuto = null;
                     function preencherItens(tipo) {
+                        if (choicesItem) {
+                            choicesItem.destroy();
+                            choicesItem = null;
+                        }
                         selectItem.innerHTML = '';
                         let lista = tipo === 'produto' ? produtos : servicos;
                         lista.forEach(item => {
                             const option = document.createElement('option');
                             option.value = item.codigo;
                             option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
+                            option.dataset.valor = item.valor;
                             selectItem.appendChild(option);
                         });
+                        if (window.Choices) {
+                            choicesItem = new Choices(selectItem, {
+                                searchEnabled: true,
+                                itemSelectText: '',
+                                shouldSort: false,
+                                placeholder: true,
+                                placeholderValue: 'Selecione um ou mais...',
+                                removeItemButton: true,
+                                maxItemCount: -1,
+                                duplicateItemsAllowed: false,
+                                noResultsText: 'Nenhum resultado encontrado',
+                                noChoicesText: 'Sem opções disponíveis'
+                            });
+                            selectItem.removeEventListener('change', atualizarValorVendaPorItens);
+                            selectItem.addEventListener('change', atualizarValorVendaPorItens);
+                        }
                     }
+                    function atualizarValorVendaPorItens() {
+                        const tipo = selectTipo.value;
+                        const lista = tipo === 'produto' ? produtos : servicos;
+                        const selecionados = Array.from(selectItem.selectedOptions).map(opt => opt.value);
+                        let soma = 0;
+                        selecionados.forEach(cod => {
+                            const item = lista.find(i => i.codigo == cod);
+                            if (item && item.valor) soma += Number(item.valor);
+                        });
+                        const campoValor = document.querySelector('#formUnico input[name="valor_venda"]');
+                        campoValor.value = soma.toFixed(2);
+                        ultimoValorAuto = soma.toFixed(2);
+                    }
+                    const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
+                    campoValorVenda.addEventListener('input', function() {
+                        ultimoValorAuto = null;
+                    });
                     preencherItens(selectTipo.value);
                     selectTipo.addEventListener('change', function() {
                         preencherItens(this.value);
                     });
-                    // Inicializa Choices.js múltiplo
-                    if (window.Choices) {
-                        new Choices(selectItem, {
-                            searchEnabled: true,
-                            itemSelectText: '',
-                            shouldSort: false,
-                            placeholder: true,
-                            placeholderValue: 'Selecione um ou mais...'
-                            ,removeItemButton: true,
-                            maxItemCount: -1,
-                            duplicateItemsAllowed: false,
-                            noResultsText: 'Nenhum resultado encontrado',
-                            noChoicesText: 'Sem opções disponíveis'
-                        });
-                    }
                 } catch (e) {
                     console.error('Erro ao carregar clientes/produtos/serviços:', e);
                 }
