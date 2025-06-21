@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="scripts/config/api.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -690,6 +692,16 @@
                         option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
                     });
+                    // Inicializa Choices.js
+                    if (window.Choices) {
+                        new Choices(selectCliente, {
+                            searchEnabled: true,
+                            itemSelectText: '',
+                            shouldSort: false,
+                            placeholder: true,
+                            placeholderValue: 'Selecione um cliente...'
+                        });
+                    }
                 } catch (e) {
                     console.error('Erro ao carregar clientes:', e);
                 }
