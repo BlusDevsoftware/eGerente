@@ -656,11 +656,16 @@
                 `;
                 container.appendChild(div);
             }
+            function extrairNumeroBR(valor) {
+                if (!valor) return 0;
+                return Number(valor.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            }
             function calcularValorReceberUnico(input) {
                 const bloco = input.closest('.colaborador-bloco');
                 const percentual = parseFloat(input.value) || 0;
                 const form = document.getElementById('formUnico');
-                const valorVenda = parseFloat(form.valor_venda.value) || 0;
+                const campoValorVenda = form.querySelector('input[name="valor_venda"]');
+                const valorVenda = extrairNumeroBR(campoValorVenda.value);
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
                 valorReceber.value = (valorVenda * percentual / 100).toFixed(2);
             }
@@ -855,16 +860,25 @@
                 const campoValor = document.querySelector('#formUnico input[name="valor_venda"]');
                 campoValor.value = formatarMoedaBR(soma);
             }
-            // Formatar ao digitar manualmente
+            // Permitir edição manual suave do campo Valor da Venda
+            let timeoutFormatMoeda = null;
             const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
             campoValorVenda.addEventListener('input', function(e) {
+                clearTimeout(timeoutFormatMoeda);
                 let valor = this.value.replace(/[^\d,]/g, '').replace(',', '.');
                 if (valor) {
                     valor = parseFloat(valor);
                     if (!isNaN(valor)) {
-                        this.value = formatarMoedaBR(valor);
+                        // Formatar após pequeno delay para não atrapalhar digitação
+                        timeoutFormatMoeda = setTimeout(() => {
+                            this.value = formatarMoedaBR(valor);
+                        }, 400);
                     }
                 }
+                // Atualizar todos os valores a receber ao editar manualmente
+                document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
+                    calcularValorReceberUnico(input);
+                });
             });
             // Converter para número puro ao submeter
             const formUnico = document.getElementById('formUnico');
