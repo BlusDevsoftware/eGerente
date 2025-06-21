@@ -703,6 +703,8 @@
                     // Produtos e Serviços
                     produtos = await api.get('/produtos');
                     servicos = await api.get('/servicos');
+                    console.log('Produtos:', produtos);
+                    console.log('Serviços:', servicos);
                     const selectTipo = document.querySelector('#formUnico select[name="tipo"]');
                     const selectItem = document.querySelector('#formUnico select[name="item"]');
                     let choicesItem = null;
@@ -745,7 +747,7 @@
                         let soma = 0;
                         selecionados.forEach(cod => {
                             const item = lista.find(i => i.codigo == cod);
-                            if (item && item.valor) soma += Number(item.valor);
+                            if (item && item.valor !== undefined && item.valor !== null) soma += Number(item.valor) || 0;
                         });
                         const campoValor = document.querySelector('#formUnico input[name="valor_venda"]');
                         campoValor.value = soma.toFixed(2);
