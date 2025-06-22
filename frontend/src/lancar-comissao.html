@@ -101,7 +101,9 @@
                         </div>
                         <div class="form-group produto-servico">
                             <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
-                            <select name="item" multiple required></select>
+                            <div class="choices-container-wrapper">
+                                <select name="item" multiple required></select>
+                            </div>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -479,10 +481,10 @@
                 outline: none;
             }
             .btn-tipo {
-                padding: 7px 14px;
-                font-size: 0.92em;
+                padding: 6px 10px;
+                font-size: 0.88em;
                 font-weight: 500;
-                gap: 6px;
+                gap: 5px;
                 border-radius: 6px;
                 border: 1.5px solid #e0e0e0;
                 background: #f9f9f9;
@@ -518,13 +520,18 @@
                 font-size: 1em !important;
                 padding: 7px 12px !important;
             }
+            #tipo-toggle {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
         </style>
         <script>
             let produtos = [];
             let servicos = [];
             let choicesItem = null;
 
-            const selectItem = document.querySelector('select[name="item"]');
+            const selectItem = document.querySelector('div.choices-container-wrapper > select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
             function mostrarTabComissao(tab) {
