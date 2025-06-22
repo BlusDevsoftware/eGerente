@@ -116,6 +116,10 @@
                     <div style="margin-bottom: 18px;">
                         <button type="button" class="btn-primary" onclick="adicionarColaboradorUnico()"><i class="fas fa-user-plus"></i> Adicionar Colaborador</button>
                     </div>
+                    <div class="form-actions">
+                        <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar Comissão</button>
+                    </div>
                 </form>
             </div>
             <div id="tabMultiploContent" class="tab-content">
@@ -619,6 +623,10 @@
                     <td><button type="button" class="btn-secondary" onclick="removerLinhaMultiplo(this)"><i class="fas fa-trash"></i></button></td>
                 `;
                 tbody.appendChild(tr);
+                
+                // Carregar colaboradores no select recém-criado
+                const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
+                carregarColaboradoresNoSelect(selectColaborador);
             }
 
             function removerLinhaMultiplo(btn) {
@@ -639,6 +647,32 @@
             }
 
             let numeroTituloPai = 1;
+            
+            // Função para carregar colaboradores no select
+            async function carregarColaboradoresNoSelect(selectElement) {
+                try {
+                    const colaboradores = await api.get('/colaboradores');
+                    selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
+                    colaboradores.forEach(colaborador => {
+                        const option = document.createElement('option');
+                        option.value = colaborador.codigo;
+                        option.textContent = `${colaborador.codigo} - ${colaborador.nome}`;
+                        selectElement.appendChild(option);
+                    });
+                    
+                    // Aplicar Choices.js no select
+                    new Choices(selectElement, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione um colaborador...'
+                    });
+                } catch (error) {
+                    console.error('Erro ao carregar colaboradores:', error);
+                    selectElement.innerHTML = '<option value="">Erro ao carregar colaboradores</option>';
+                }
+            }
+            
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
@@ -684,6 +718,10 @@
                     </div>
                 `;
                 container.appendChild(div);
+                
+                // Carregar colaboradores no select recém-criado
+                const selectColaborador = div.querySelector('select[name="colaborador[]"]');
+                carregarColaboradoresNoSelect(selectColaborador);
             }
 
             function extrairNumeroBR(valor) {
@@ -877,10 +915,150 @@
             });
 
             const formUnico = document.getElementById('formUnico');
-            formUnico.addEventListener('submit', function(e) {
-                const campo = formUnico.querySelector('input[name="valor_venda"]');
-                campo.value = campo.value.replace(/[^\d,]/g, '').replace(',', '.');
-            });
+            // Removido o evento anterior que apenas formatava o valor
+            // Agora o evento de submit está na função salvarComissaoUnica
+            
+            // Função para salvar comissão única
+            async function salvarComissaoUnica(event) {
+                event.preventDefault();
+                
+                const form = event.target;
+                const formData = new FormData(form);
+                
+                // Formatar valor da venda antes de salvar
+                const campoValorVenda = form.querySelector('input[name="valor_venda"]');
+                campoValorVenda.value = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
+                
+                // Validar se há pelo menos um colaborador
+                const colaboradores = document.querySelectorAll('.colaborador-bloco');
+                if (colaboradores.length === 0) {
+                    alert('Adicione pelo menos um colaborador antes de salvar.');
+                    return;
+                }
+                
+                // Coletar dados dos colaboradores
+                const dadosColaboradores = [];
+                colaboradores.forEach((bloco, index) => {
+                    const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
+                    const descricaoInput = bloco.querySelector('input[name="descricao_colaborador[]"]');
+                    const percentualInput = bloco.querySelector('input[name="percentual[]"]');
+                    const valorReceberInput = bloco.querySelector('input[name="valor_receber[]"]');
+                    
+                    if (colaboradorSelect.value && percentualInput.value) {
+                        dadosColaboradores.push({
+                            colaborador: colaboradorSelect.value,
+                            descricao: descricaoInput.value || '',
+                            percentual: parseFloat(percentualInput.value),
+                            valor_receber: parseFloat(valorReceberInput.value)
+                        });
+                    }
+                });
+                
+                if (dadosColaboradores.length === 0) {
+                    alert('Preencha os dados de pelo menos um colaborador.');
+                    return;
+                }
+                
+                // Preparar dados para envio
+                const dadosComissao = {
+                    cliente: formData.get('cliente'),
+                    tipo: formData.get('tipo'),
+                    itens: formData.getAll('item'),
+                    valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                    colaboradores: dadosColaboradores,
+                    data_lancamento: new Date().toISOString().split('T')[0]
+                };
+                
+                try {
+                    // Aqui você faria a chamada para a API para salvar a comissão
+                    console.log('Dados da comissão para salvar:', dadosComissao);
+                    
+                    // Simular salvamento (substitua pela chamada real da API)
+                    // await api.post('/comissoes', dadosComissao);
+                    
+                    alert('Comissão salva com sucesso!');
+                    form.reset();
+                    
+                    // Limpar colaboradores adicionados
+                    document.getElementById('colaboradoresVinculados').innerHTML = '';
+                    numeroTituloPai = 1;
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar comissão:', error);
+                    alert('Erro ao salvar comissão. Tente novamente.');
+                }
+            }
+            
+            // Adicionar evento de submit ao formulário único
+            document.getElementById('formUnico').addEventListener('submit', salvarComissaoUnica);
+            
+            // Função para salvar comissões múltiplas
+            async function salvarComissoesMultiplas(event) {
+                event.preventDefault();
+                
+                const form = event.target;
+                const formData = new FormData(form);
+                
+                // Coletar dados das linhas
+                const linhas = document.querySelectorAll('#linhasMultiplo tr');
+                if (linhas.length === 0) {
+                    alert('Adicione pelo menos uma linha antes de salvar.');
+                    return;
+                }
+                
+                const dadosComissoes = [];
+                let dadosValidos = true;
+                
+                linhas.forEach((linha, index) => {
+                    const colaboradorSelect = linha.querySelector('select[name="colaborador[]"]');
+                    const tipoSelect = linha.querySelector('select[name="tipo[]"]');
+                    const itemSelect = linha.querySelector('select[name="item[]"]');
+                    const valorVendaInput = linha.querySelector('input[name="valor_venda[]"]');
+                    const percentualInput = linha.querySelector('input[name="percentual[]"]');
+                    const valorComissaoInput = linha.querySelector('input[name="valor_comissao[]"]');
+                    const dataInput = linha.querySelector('input[name="data[]"]');
+                    
+                    if (!colaboradorSelect.value || !tipoSelect.value || !itemSelect.value || 
+                        !valorVendaInput.value || !percentualInput.value || !dataInput.value) {
+                        alert(`Preencha todos os campos da linha ${index + 1}.`);
+                        dadosValidos = false;
+                        return;
+                    }
+                    
+                    dadosComissoes.push({
+                        colaborador: colaboradorSelect.value,
+                        tipo: tipoSelect.value,
+                        item: itemSelect.value,
+                        valor_venda: parseFloat(valorVendaInput.value),
+                        percentual: parseFloat(percentualInput.value),
+                        valor_comissao: parseFloat(valorComissaoInput.value),
+                        data: dataInput.value
+                    });
+                });
+                
+                if (!dadosValidos) return;
+                
+                try {
+                    // Aqui você faria a chamada para a API para salvar as comissões
+                    console.log('Dados das comissões para salvar:', dadosComissoes);
+                    
+                    // Simular salvamento (substitua pela chamada real da API)
+                    // await api.post('/comissoes/multiplas', dadosComissoes);
+                    
+                    alert(`${dadosComissoes.length} comissões salvas com sucesso!`);
+                    form.reset();
+                    
+                    // Limpar tabela
+                    document.getElementById('linhasMultiplo').innerHTML = '';
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar comissões:', error);
+                    alert('Erro ao salvar comissões. Tente novamente.');
+                }
+            }
+            
+            // Adicionar evento de submit ao formulário múltiplo
+            document.getElementById('formMultiplo').addEventListener('submit', salvarComissoesMultiplas);
         </script>
     </div>
 
