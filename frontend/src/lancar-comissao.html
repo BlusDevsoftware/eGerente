@@ -99,10 +99,7 @@
                         </div>
                         <div class="form-group produto-servico">
                             <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
-                            <div class="choices-container-wrapper">
-                                <select name="item" multiple required></select>
-                                <div class="static-placeholder">Carregando...</div>
-                            </div>
+                            <select name="item" multiple required></select>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -517,64 +514,12 @@
                 align-items: center;
                 gap: 6px;
             }
-            .select-produto-servico {
-                opacity: 0;
-                height: 0;
-                position: absolute;
-                z-index: -1;
-            }
-            .choices__inner {
-                min-height: 44px !important;
-                border-radius: 8px !important;
-                background: #f7fbff !important;
-                border: 2px solid #90caf9 !important;
-                box-shadow: 0 2px 8px rgba(33,150,243,0.07) !important;
-                font-size: 1em !important;
-                padding: 7px 12px !important;
-            }
-            .choices__list--multiple .choices__item {
-                background: #e3f2fd !important;
-                color: #1976D2 !important;
-                border-radius: 6px !important;
-                border: 1px solid #90caf9 !important;
-                margin: 2px 4px 2px 0 !important;
-                padding: 3px 10px !important;
-            }
-            .choices-container-wrapper {
-                position: relative;
-                min-height: 44px;
-                border-radius: 8px;
-                background: #f7fbff;
-                border: 2px solid #90caf9;
-                box-shadow: 0 2px 8px rgba(33,150,243,0.07);
-                padding: 7px 12px;
-            }
-            .choices-container-wrapper .choices {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 2;
-            }
-            .choices-container-wrapper .static-placeholder {
-                position: absolute;
-                top: 50%;
-                left: 12px;
-                transform: translateY(-50%);
-                color: #555;
-                z-index: 1;
-            }
-            /* Esconde o placeholder estático quando o Choices.js for inicializado */
-            .choices-container-wrapper .choices.is-initialized + .static-placeholder {
-                display: none;
-            }
         </style>
         <script>
             let produtos = [];
             let servicos = [];
             let choicesItem = null;
-            const selectItem = document.querySelector('.choices-container-wrapper select[name="item"]');
+            const selectItem = document.querySelector('select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
             function mostrarTabComissao(tab) {
                 document.getElementById('tabUnico').classList.remove('active');
@@ -829,45 +774,47 @@
                             atualizarTipoUnico();
                         });
                     });
-                    // Inicializa Choices.js imediatamente
-                    if (!choicesItem && window.Choices) {
-                        choicesItem = new Choices(selectItem, {
-                            searchEnabled: true,
-                            itemSelectText: '',
-                            shouldSort: false,
-                            placeholder: true,
-                            placeholderValue: 'Selecione um ou mais...',
-                            removeItemButton: true,
-                            maxItemCount: -1,
-                            duplicateItemsAllowed: false,
-                            noResultsText: 'Nenhum resultado encontrado',
-                            noChoicesText: 'Sem opções disponíveis'
-                        });
-                        choicesItem.clearChoices();
-                        choicesItem.setChoices([{value: '', label: 'Carregando...', disabled: true}], 'value', 'label', true);
-                        selectItem.removeEventListener('change', atualizarValorVendaPorItens);
-                        selectItem.addEventListener('change', atualizarValorVendaPorItens);
-                    }
-                    // Após carregar produtos e serviços, já preencher com produtos e atualizar label
+
+                    // Preenche com produtos ao carregar a página
                     preencherItens('produto');
                     atualizarTipoUnico();
+
                 } catch (e) {
                     console.error('Erro ao carregar clientes/produtos/serviços:', e);
                 }
             });
             function preencherItens(tipo) {
-                // Apenas atualiza as opções do Choices.js, sem destruir/recriar
-                let lista = tipo === 'produto' ? produtos : servicos;
-                const choices = lista.map(item => ({
-                    value: item.codigo,
-                    label: (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome,
-                    customProperties: { preco: item.preco }
-                }));
                 if (choicesItem) {
-                    choicesItem.clearChoices();
-                    choicesItem.setChoices(choices, 'value', 'label', true);
-                    choicesItem.enable();
+                    choicesItem.destroy();
                 }
+                
+                selectItem.innerHTML = '';
+                
+                let lista = tipo === 'produto' ? produtos : servicos;
+                
+                lista.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.codigo;
+                    option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
+                    option.dataset.valor = item.preco; 
+                    selectItem.appendChild(option);
+                });
+
+                choicesItem = new Choices(selectItem, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    placeholder: true,
+                    placeholderValue: 'Selecione um ou mais...',
+                    removeItemButton: true,
+                    maxItemCount: -1,
+                    duplicateItemsAllowed: false,
+                    noResultsText: 'Nenhum resultado encontrado',
+                    noChoicesText: 'Sem opções disponíveis'
+                });
+                
+                // Adiciona o listener para atualizar o valor da venda
+                selectItem.addEventListener('change', atualizarValorVendaPorItens);
             }
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
