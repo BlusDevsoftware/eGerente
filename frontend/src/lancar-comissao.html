@@ -517,6 +517,15 @@
             select option[value=""] {
                 color: #757575;
             }
+            .choices__inner {
+                min-height: 44px !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+                border: 2px solid #2196F3 !important;
+                box-shadow: 0 2px 8px rgba(33,150,243,0.07) !important;
+                font-size: 1em !important;
+                padding: 7px 12px !important;
+            }
         </style>
         <script>
             let produtos = [];
@@ -802,6 +811,11 @@
                         option.value = cliente.codigo;
                         option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
+                    });
+
+                    new Choices(selectCliente, {
+                        searchEnabled: true,
+                        itemSelectText: ''
                     });
 
                     produtos = await api.get('/produtos');
