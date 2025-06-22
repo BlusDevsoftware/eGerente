@@ -807,6 +807,25 @@
                             atualizarTipoUnico();
                         });
                     });
+                    // Inicializa Choices.js imediatamente com placeholder 'Carregando...'
+                    if (!choicesItem && window.Choices) {
+                        choicesItem = new Choices(selectItem, {
+                            searchEnabled: true,
+                            itemSelectText: '',
+                            shouldSort: false,
+                            placeholder: true,
+                            placeholderValue: 'Selecione um ou mais...',
+                            removeItemButton: true,
+                            maxItemCount: -1,
+                            duplicateItemsAllowed: false,
+                            noResultsText: 'Nenhum resultado encontrado',
+                            noChoicesText: 'Sem opções disponíveis'
+                        });
+                        choicesItem.clearChoices();
+                        choicesItem.setChoices([{value: '', label: 'Carregando...', disabled: true}], 'value', 'label', true);
+                        selectItem.removeEventListener('change', atualizarValorVendaPorItens);
+                        selectItem.addEventListener('change', atualizarValorVendaPorItens);
+                    }
                     // Após carregar produtos e serviços, já preencher com produtos e atualizar label
                     preencherItens('produto');
                     atualizarTipoUnico();
@@ -815,51 +834,18 @@
                 }
             });
             function preencherItens(tipo) {
-                // Exibe o campo imediatamente com placeholder de carregando
-                selectItem.innerHTML = '<option>Carregando...</option>';
-                selectItem.disabled = true;
-                if (!choicesItem && window.Choices) {
-                    choicesItem = new Choices(selectItem, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        shouldSort: false,
-                        placeholder: true,
-                        placeholderValue: 'Selecione um ou mais...',
-                        removeItemButton: true,
-                        maxItemCount: -1,
-                        duplicateItemsAllowed: false,
-                        noResultsText: 'Nenhum resultado encontrado',
-                        noChoicesText: 'Sem opções disponíveis'
-                    });
-                    selectItem.removeEventListener('change', atualizarValorVendaPorItens);
-                    selectItem.addEventListener('change', atualizarValorVendaPorItens);
-                } else if (choicesItem) {
+                // Apenas atualiza as opções do Choices.js, sem destruir/recriar
+                let lista = tipo === 'produto' ? produtos : servicos;
+                const choices = lista.map(item => ({
+                    value: item.codigo,
+                    label: (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome,
+                    customProperties: { preco: item.preco }
+                }));
+                if (choicesItem) {
                     choicesItem.clearChoices();
-                    choicesItem.setChoices([{value: '', label: 'Carregando...', disabled: true}], 'value', 'label', true);
+                    choicesItem.setChoices(choices, 'value', 'label', true);
+                    choicesItem.enable();
                 }
-                // Aguarda os dados e atualiza as opções
-                setTimeout(() => {
-                    let lista = tipo === 'produto' ? produtos : servicos;
-                    const choices = lista.map(item => ({
-                        value: item.codigo,
-                        label: (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome,
-                        customProperties: { preco: item.preco }
-                    }));
-                    if (choicesItem) {
-                        choicesItem.clearChoices();
-                        choicesItem.setChoices(choices, 'value', 'label', true);
-                    } else {
-                        selectItem.innerHTML = '';
-                        lista.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.codigo;
-                            option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                            option.dataset.valor = item.preco;
-                            selectItem.appendChild(option);
-                        });
-                    }
-                    selectItem.disabled = false;
-                }, 0);
             }
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
