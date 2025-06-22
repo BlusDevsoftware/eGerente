@@ -540,11 +540,38 @@
                 }
             }
 
+            function preencherItens(tipo) {
+                choicesItem.enable();
+                let lista = tipo === 'produto' ? produtos : servicos;
+                const choices = lista.map(item => ({
+                    value: item.codigo,
+                    label: `${item.codigo.padStart(5, '0')} - ${item.nome}`,
+                    customProperties: { preco: item.preco || 0 }
+                }));
+                choicesItem.setChoices(choices, 'value', 'label', true);
+            }
+            
             function atualizarTipoUnico() {
                 const tipo = tipoInput.value;
                 const label = document.getElementById('labelItemUnico');
                 label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produtos' : '<i class="fas fa-cogs"></i> Serviços';
-                selectItem.disabled = false;
+            }
+
+            function atualizarValorVendaPorItens() {
+                let soma = 0;
+                const valoresSelecionados = choicesItem.getValue(true);
+                const todosItens = [...produtos, ...servicos];
+                
+                valoresSelecionados.forEach(val => {
+                    const item = todosItens.find(i => i.codigo === val);
+                    if (item) {
+                        soma += Number(item.preco) || 0;
+                    }
+                });
+
+                const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
+                campoValorVenda.value = formatarMoedaBR(soma);
+                campoValorVenda.dispatchEvent(new Event('input'));
             }
 
             function calcularComissaoUnico() {
@@ -754,6 +781,17 @@
             };
 
             document.addEventListener('DOMContentLoaded', async function() {
+                choicesItem = new Choices(selectItem, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: 'Selecione um tipo primeiro',
+                    searchEnabled: true,
+                    itemSelectText: '',
+                });
+                choicesItem.disable();
+
+                selectItem.addEventListener('change', atualizarValorVendaPorItens);
+
                 let clientes = [];
                 try {
                     clientes = await api.get('/clientes');
@@ -780,54 +818,14 @@
                         });
                     });
                     
-                    selectItem.innerHTML = '<option value="">Selecione um tipo primeiro</option>';
-                    selectItem.disabled = true;
-
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
-                    selectItem.innerHTML = '<option value="">Erro ao carregar</option>';
+                    choicesItem.setChoices([{ value: '', label: 'Erro ao carregar', disabled: true }]);
                 }
             });
 
-            function preencherItens(tipo) {
-                if (choicesItem) {
-                    choicesItem.destroy();
-                }
-
-                selectItem.innerHTML = '';
-                let lista = tipo === 'produto' ? produtos : servicos;
-                lista.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.codigo;
-                    option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                    option.dataset.preco = item.preco || 0;
-                    selectItem.appendChild(option);
-                });
-
-                choicesItem = new Choices(selectItem, {
-                    removeItemButton: true,
-                    placeholder: true,
-                    placeholderValue: 'Selecione um ou mais...',
-                    searchEnabled: true,
-                    itemSelectText: '',
-                });
-
-                selectItem.addEventListener('change', atualizarValorVendaPorItens);
-            }
-
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            }
-
-            function atualizarValorVendaPorItens() {
-                let soma = 0;
-                const selecionados = Array.from(selectItem.selectedOptions);
-                selecionados.forEach(option => {
-                    soma += Number(option.dataset.preco) || 0;
-                });
-                const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                campoValorVenda.value = formatarMoedaBR(soma);
-                campoValorVenda.dispatchEvent(new Event('input'));
             }
 
             let timeoutFormatMoeda = null;
