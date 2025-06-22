@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="scripts/config/api.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -99,7 +97,7 @@
                         </div>
                         <div class="form-group produto-servico">
                             <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
-                            <select name="item" multiple required></select>
+                            <select name="item" required></select>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -518,7 +516,6 @@
         <script>
             let produtos = [];
             let servicos = [];
-            let choicesItem = null;
             const selectItem = document.querySelector('select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
             function mostrarTabComissao(tab) {
@@ -538,6 +535,7 @@
                 const tipo = tipoInput.value;
                 const label = document.getElementById('labelItemUnico');
                 label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produto' : '<i class="fas fa-cogs"></i> Serviço';
+                selectItem.disabled = false;
             }
             function calcularComissaoUnico() {
                 const form = document.getElementById('formUnico');
@@ -748,23 +746,11 @@
                         option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
                     });
-                    if (window.Choices) {
-                        new Choices(selectCliente, {
-                            searchEnabled: true,
-                            itemSelectText: '',
-                            shouldSort: false,
-                            placeholder: true,
-                            placeholderValue: 'Selecione um cliente...'
-                        });
-                    }
 
-                    // Produtos e Serviços
                     produtos = await api.get('/produtos');
                     servicos = await api.get('/servicos');
-                    console.log('Produtos:', produtos);
-                    console.log('Serviços:', servicos);
+                    
                     const tipoToggle = document.getElementById('tipo-toggle');
-                    const tipoInput = document.querySelector('input[name="tipo"]');
                     tipoToggle.querySelectorAll('.btn-tipo').forEach(btn => {
                         btn.addEventListener('click', function() {
                             tipoToggle.querySelectorAll('.btn-tipo').forEach(b => b.classList.remove('active'));
@@ -774,63 +760,38 @@
                             atualizarTipoUnico();
                         });
                     });
-
-                    // Preenche com produtos ao carregar a página
-                    preencherItens('produto');
-                    atualizarTipoUnico();
+                    
+                    // Inicia com o campo vazio, esperando a seleção do tipo
+                    selectItem.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                    selectItem.disabled = true;
 
                 } catch (e) {
-                    console.error('Erro ao carregar clientes/produtos/serviços:', e);
+                    console.error('Erro ao carregar dados:', e);
+                    selectItem.innerHTML = '<option value="">Erro ao carregar</option>';
                 }
             });
             function preencherItens(tipo) {
-                if (choicesItem) {
-                    choicesItem.destroy();
-                }
-                
-                selectItem.innerHTML = '';
-                
+                selectItem.innerHTML = '<option value="">Carregando...</option>';
                 let lista = tipo === 'produto' ? produtos : servicos;
-                
+                selectItem.innerHTML = '<option value="">Selecione...</option>';
                 lista.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.codigo;
                     option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                    option.dataset.valor = item.preco; 
+                    option.dataset.preco = item.preco || 0;
                     selectItem.appendChild(option);
                 });
-
-                choicesItem = new Choices(selectItem, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    shouldSort: false,
-                    placeholder: true,
-                    placeholderValue: 'Selecione um ou mais...',
-                    removeItemButton: true,
-                    maxItemCount: -1,
-                    duplicateItemsAllowed: false,
-                    noResultsText: 'Nenhum resultado encontrado',
-                    noChoicesText: 'Sem opções disponíveis'
-                });
-                
-                // Adiciona o listener para atualizar o valor da venda
-                selectItem.addEventListener('change', atualizarValorVendaPorItens);
             }
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
-            function atualizarValorVendaPorItens() {
-                const tipo = tipoInput.value;
-                const lista = tipo === 'produto' ? produtos : servicos;
-                const selecionados = Array.from(selectItem.selectedOptions).map(opt => opt.value);
-                let soma = 0;
-                selecionados.forEach(cod => {
-                    const item = lista.find(i => i.codigo == cod);
-                    if (item && item.preco !== undefined && item.preco !== null) soma += Number(item.preco) || 0;
-                });
-                const campoValor = document.querySelector('#formUnico input[name="valor_venda"]');
-                campoValor.value = formatarMoedaBR(soma);
-            }
+            selectItem.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const preco = selectedOption.dataset.preco || 0;
+                const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
+                campoValorVenda.value = formatarMoedaBR(preco);
+                campoValorVenda.dispatchEvent(new Event('input')); // Recalcula comissões
+            });
             // Permitir edição manual suave do campo Valor da Venda
             let timeoutFormatMoeda = null;
             const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
