@@ -807,6 +807,9 @@
                             atualizarTipoUnico();
                         });
                     });
+                    // Após carregar produtos e serviços, já preencher com produtos e atualizar label
+                    preencherItens('produto');
+                    atualizarTipoUnico();
                 } catch (e) {
                     console.error('Erro ao carregar clientes/produtos/serviços:', e);
                 }
