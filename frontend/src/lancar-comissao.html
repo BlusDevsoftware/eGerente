@@ -87,11 +87,13 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-user-tie"></i> Cliente</label>
-                            <select name="cliente" required></select>
+                            <div class="choices-container-wrapper">
+                                <select name="cliente" required></select>
+                            </div>
                         </div>
                         <div class="form-group tipo-toggle-group">
                             <label><i class="fas fa-cubes"></i> Tipo</label>
-                            <div id="tipo-toggle" style="display: flex; gap: 8px; flex-direction: column; width: 100%;">
+                            <div id="tipo-toggle" style="display: flex; gap: 6px; flex-direction: column; width: 100%;">
                                 <button type="button" class="btn-tipo" data-tipo="produto"><i class="fas fa-box"></i> Produto</button>
                                 <button type="button" class="btn-tipo" data-tipo="servico"><i class="fas fa-cogs"></i> Serviço</button>
                             </div>
@@ -477,19 +479,10 @@
                 outline: none;
             }
             .btn-tipo {
-                background: #f5f5f5;
-                color: #333;
-                border: 1.5px solid #ddd;
-                border-radius: 6px;
-                padding: 6px 10px;
-                font-size: 0.95em;
-                font-weight: 500;
-                cursor: pointer;
-                transition: background 0.2s, color 0.2s, border 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                min-width: 110px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+                gap: 5px;
+                min-width: 100px;
             }
             #tipo-toggle {
                 display: flex;
@@ -804,7 +797,7 @@
                 let clientes = [];
                 try {
                     clientes = await api.get('/clientes');
-                    const selectCliente = document.querySelector('select[name="cliente"]');
+                    const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
                     selectCliente.innerHTML = '<option value="">Selecione um cliente...</option>';
                     clientes.forEach(cliente => {
                         const option = document.createElement('option');
@@ -815,7 +808,9 @@
 
                     new Choices(selectCliente, {
                         searchEnabled: true,
-                        itemSelectText: ''
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione um cliente...'
                     });
 
                     produtos = await api.get('/produtos');
