@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="scripts/config/api.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -90,14 +92,14 @@
                         <div class="form-group tipo-toggle-group">
                             <label><i class="fas fa-cubes"></i> Tipo</label>
                             <div id="tipo-toggle" style="display: flex; gap: 8px; flex-direction: column; width: 100%;">
-                                <button type="button" class="btn-tipo active" data-tipo="produto"><i class="fas fa-box"></i> Produto</button>
+                                <button type="button" class="btn-tipo" data-tipo="produto"><i class="fas fa-box"></i> Produto</button>
                                 <button type="button" class="btn-tipo" data-tipo="servico"><i class="fas fa-cogs"></i> Serviço</button>
                             </div>
-                            <input type="hidden" name="tipo" value="produto">
+                            <input type="hidden" name="tipo" value="">
                         </div>
                         <div class="form-group produto-servico">
-                            <label id="labelItemUnico"><i class="fas fa-box"></i> Produto</label>
-                            <select name="item" required></select>
+                            <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
+                            <select name="item" multiple required></select>
                         </div>
                         <div class="form-group valor-venda-destaque">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
@@ -512,12 +514,18 @@
                 align-items: center;
                 gap: 6px;
             }
+            select option[value=""] {
+                color: #757575;
+            }
         </style>
         <script>
             let produtos = [];
             let servicos = [];
+            let choicesItem = null;
+
             const selectItem = document.querySelector('select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
+
             function mostrarTabComissao(tab) {
                 document.getElementById('tabUnico').classList.remove('active');
                 document.getElementById('tabMultiplo').classList.remove('active');
@@ -531,19 +539,21 @@
                     document.getElementById('tabMultiploContent').classList.add('active');
                 }
             }
+
             function atualizarTipoUnico() {
                 const tipo = tipoInput.value;
                 const label = document.getElementById('labelItemUnico');
-                label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produto' : '<i class="fas fa-cogs"></i> Serviço';
+                label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produtos' : '<i class="fas fa-cogs"></i> Serviços';
                 selectItem.disabled = false;
             }
+
             function calcularComissaoUnico() {
                 const form = document.getElementById('formUnico');
                 const valorVenda = parseFloat(form.valor_venda.value) || 0;
                 const percentual = parseFloat(form.percentual.value) || 0;
                 form.valor_comissao.value = (valorVenda * percentual / 100).toFixed(2);
             }
-            // Múltiplos lançamentos
+
             function adicionarLinhaMultiplo() {
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
@@ -560,20 +570,24 @@
                 `;
                 tbody.appendChild(tr);
             }
+
             function removerLinhaMultiplo(btn) {
                 btn.closest('tr').remove();
             }
+
             function atualizarTipoMultiplo(select, idx) {
                 const td = select.parentElement.nextElementSibling;
                 const label = select.value === 'produto' ? 'Produto' : 'Serviço';
                 td.querySelector('select').innerHTML = '';
             }
+
             function calcularComissaoMultiplo(input, idx) {
                 const tr = input.closest('tr');
                 const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
                 const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
                 tr.querySelector('input[name="valor_comissao[]"]').value = (valorVenda * percentual / 100).toFixed(2);
             }
+
             let numeroTituloPai = 1;
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
@@ -621,10 +635,12 @@
                 `;
                 container.appendChild(div);
             }
+
             function extrairNumeroBR(valor) {
                 if (!valor) return 0;
                 return Number(valor.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
             }
+
             function calcularValorReceberUnico(input) {
                 const bloco = input.closest('.colaborador-bloco');
                 const percentual = parseFloat(input.value) || 0;
@@ -634,6 +650,7 @@
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
                 valorReceber.value = (valorVenda * percentual / 100).toFixed(2);
             }
+
             function toggleParcelado(btn) {
                 const row = btn.closest('.form-row');
                 const groupParcelas = row.querySelector('.group-parcelas');
@@ -650,6 +667,7 @@
                     row.querySelector('input[name="valor_parcela[]"]').value = '';
                 }
             }
+
             function atualizaValorParcela(input) {
                 const row = input.closest('.form-row');
                 const qtd = parseInt(input.value);
@@ -662,6 +680,7 @@
                     valorParcelaInput.value = '';
                 }
             }
+
             function simularTitulos(btn) {
                 const row = btn.closest('.form-row');
                 const bloco = btn.closest('.colaborador-bloco');
@@ -695,7 +714,6 @@
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
 
-                // Adiciona evento para mostrar o select de intervalo ao preencher a primeira data de vencimento
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
                 const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
@@ -717,7 +735,6 @@
                     });
                 }
 
-                // Adiciona evento para preencher todas as datas de emissão ao preencher a primeira
                 const emissaoInputs = simulacaoTabela.querySelectorAll('.simulacao-emissao-parcela');
                 if (emissaoInputs.length > 1) {
                     emissaoInputs[0].addEventListener('change', function() {
@@ -729,11 +746,13 @@
                     });
                 }
             }
+
             document.getElementById('formUnico').valor_venda.oninput = function() {
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
                     calcularValorReceberUnico(input);
                 });
             };
+
             document.addEventListener('DOMContentLoaded', async function() {
                 let clientes = [];
                 try {
@@ -756,13 +775,12 @@
                             tipoToggle.querySelectorAll('.btn-tipo').forEach(b => b.classList.remove('active'));
                             this.classList.add('active');
                             tipoInput.value = this.dataset.tipo;
-                            preencherItens(this.dataset.tipo);
                             atualizarTipoUnico();
+                            preencherItens(this.dataset.tipo);
                         });
                     });
                     
-                    // Inicia com o campo vazio, esperando a seleção do tipo
-                    selectItem.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                    selectItem.innerHTML = '<option value="">Selecione um tipo primeiro</option>';
                     selectItem.disabled = true;
 
                 } catch (e) {
@@ -770,10 +788,14 @@
                     selectItem.innerHTML = '<option value="">Erro ao carregar</option>';
                 }
             });
+
             function preencherItens(tipo) {
-                selectItem.innerHTML = '<option value="">Carregando...</option>';
+                if (choicesItem) {
+                    choicesItem.destroy();
+                }
+
+                selectItem.innerHTML = '';
                 let lista = tipo === 'produto' ? produtos : servicos;
-                selectItem.innerHTML = '<option value="">Selecione...</option>';
                 lista.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.codigo;
@@ -781,18 +803,33 @@
                     option.dataset.preco = item.preco || 0;
                     selectItem.appendChild(option);
                 });
+
+                choicesItem = new Choices(selectItem, {
+                    removeItemButton: true,
+                    placeholder: true,
+                    placeholderValue: 'Selecione um ou mais...',
+                    searchEnabled: true,
+                    itemSelectText: '',
+                });
+
+                selectItem.addEventListener('change', atualizarValorVendaPorItens);
             }
+
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
-            selectItem.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const preco = selectedOption.dataset.preco || 0;
+
+            function atualizarValorVendaPorItens() {
+                let soma = 0;
+                const selecionados = Array.from(selectItem.selectedOptions);
+                selecionados.forEach(option => {
+                    soma += Number(option.dataset.preco) || 0;
+                });
                 const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                campoValorVenda.value = formatarMoedaBR(preco);
-                campoValorVenda.dispatchEvent(new Event('input')); // Recalcula comissões
-            });
-            // Permitir edição manual suave do campo Valor da Venda
+                campoValorVenda.value = formatarMoedaBR(soma);
+                campoValorVenda.dispatchEvent(new Event('input'));
+            }
+
             let timeoutFormatMoeda = null;
             const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
             campoValorVenda.addEventListener('input', function(e) {
@@ -801,18 +838,16 @@
                 if (valor) {
                     valor = parseFloat(valor);
                     if (!isNaN(valor)) {
-                        // Formatar após pequeno delay para não atrapalhar digitação
                         timeoutFormatMoeda = setTimeout(() => {
                             this.value = formatarMoedaBR(valor);
                         }, 400);
                     }
                 }
-                // Atualizar todos os valores a receber ao editar manualmente
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
                     calcularValorReceberUnico(input);
                 });
             });
-            // Converter para número puro ao submeter
+
             const formUnico = document.getElementById('formUnico');
             formUnico.addEventListener('submit', function(e) {
                 const campo = formUnico.querySelector('input[name="valor_venda"]');
