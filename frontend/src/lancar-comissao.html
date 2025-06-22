@@ -143,6 +143,21 @@
                             </tbody>
                         </table>
                         <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()"><i class="fas fa-plus"></i> Adicionar Linha</button>
+                        <button type="button" class="btn-secondary" onclick="limparTodasLinhas()" style="margin-left: 10px;"><i class="fas fa-trash-alt"></i> Limpar Todas</button>
+                    </div>
+                    <div class="resumo-multiplo" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                        <h4 style="margin: 0 0 10px 0; color: #495057;"><i class="fas fa-chart-bar"></i> Resumo</h4>
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div>
+                                <strong>Total de Linhas:</strong> <span id="totalLinhas">0</span>
+                            </div>
+                            <div>
+                                <strong>Valor Total das Vendas:</strong> <span id="valorTotalVendas">R$ 0,00</span>
+                            </div>
+                            <div>
+                                <strong>Valor Total das Comissões:</strong> <span id="valorTotalComissoes">R$ 0,00</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-actions">
                         <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
@@ -554,16 +569,22 @@
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
             function mostrarTabComissao(tab) {
-                document.getElementById('tabUnico').classList.remove('active');
-                document.getElementById('tabMultiplo').classList.remove('active');
-                document.getElementById('tabUnicoContent').classList.remove('active');
-                document.getElementById('tabMultiploContent').classList.remove('active');
+                // Remover classe active de todas as abas
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
                 if (tab === 'unico') {
                     document.getElementById('tabUnico').classList.add('active');
                     document.getElementById('tabUnicoContent').classList.add('active');
-                } else {
+                } else if (tab === 'multiplo') {
                     document.getElementById('tabMultiplo').classList.add('active');
                     document.getElementById('tabMultiploContent').classList.add('active');
+                    
+                    // Adicionar uma linha inicial se não houver nenhuma
+                    const tbody = document.getElementById('linhasMultiplo');
+                    if (tbody.children.length === 0) {
+                        adicionarLinhaMultiplo();
+                    }
                 }
             }
 
@@ -611,39 +632,156 @@
             function adicionarLinhaMultiplo() {
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
+                const dataAtual = new Date().toISOString().split('T')[0];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><select name="colaborador[]" required></select></td>
-                    <td><select name="tipo[]" required onchange="atualizarTipoMultiplo(this, ${idx})"><option value="produto">Produto</option><option value="servico">Serviço</option></select></td>
-                    <td><select name="item[]" required></select></td>
-                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required></td>
-                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly></td>
-                    <td><input type="date" name="data[]" required></td>
-                    <td><button type="button" class="btn-secondary" onclick="removerLinhaMultiplo(this)"><i class="fas fa-trash"></i></button></td>
+                    <td><select name="tipo[]" required onchange="atualizarTipoMultiplo(this, ${idx})"><option value="">Selecione...</option><option value="produto">Produto</option><option value="servico">Serviço</option></select></td>
+                    <td><select name="item[]" required disabled><option value="">Selecione o tipo primeiro</option></select></td>
+                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularComissaoMultiplo(this, ${idx})" placeholder="0.00"></td>
+                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00"></td>
+                    <td><input type="date" name="data[]" required value="${dataAtual}"></td>
+                    <td>
+                        <button type="button" class="btn-secondary" onclick="duplicarLinhaMultiplo(this)" title="Duplicar linha"><i class="fas fa-copy"></i></button>
+                        <button type="button" class="btn-secondary" onclick="removerLinhaMultiplo(this)" title="Remover linha"><i class="fas fa-trash"></i></button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
                 
                 // Carregar colaboradores no select recém-criado
                 const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
                 carregarColaboradoresNoSelect(selectColaborador);
+                
+                // Atualizar resumo
+                atualizarResumoMultiplo();
             }
 
             function removerLinhaMultiplo(btn) {
                 btn.closest('tr').remove();
+                atualizarResumoMultiplo();
+            }
+
+            function duplicarLinhaMultiplo(btn) {
+                const linhaOriginal = btn.closest('tr');
+                const tbody = document.getElementById('linhasMultiplo');
+                const idx = tbody.children.length;
+                const dataAtual = new Date().toISOString().split('T')[0];
+                
+                // Criar nova linha
+                const novaLinha = linhaOriginal.cloneNode(true);
+                
+                // Limpar valores dos campos, exceto colaborador e tipo
+                novaLinha.querySelector('select[name="item[]"]').value = '';
+                novaLinha.querySelector('input[name="valor_venda[]"]').value = '';
+                novaLinha.querySelector('input[name="percentual[]"]').value = '';
+                novaLinha.querySelector('input[name="valor_comissao[]"]').value = '';
+                novaLinha.querySelector('input[name="data[]"]').value = dataAtual;
+                
+                // Atualizar eventos
+                novaLinha.querySelector('select[name="tipo[]"]').onchange = function() { atualizarTipoMultiplo(this, idx); };
+                novaLinha.querySelector('input[name="valor_venda[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
+                novaLinha.querySelector('input[name="percentual[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
+                novaLinha.querySelector('button[onclick*="duplicarLinhaMultiplo"]').onclick = function() { duplicarLinhaMultiplo(this); };
+                novaLinha.querySelector('button[onclick*="removerLinhaMultiplo"]').onclick = function() { removerLinhaMultiplo(this); };
+                
+                // Adicionar a nova linha
+                tbody.appendChild(novaLinha);
+                
+                // Recarregar colaboradores no select da nova linha
+                const selectColaborador = novaLinha.querySelector('select[name="colaborador[]"]');
+                carregarColaboradoresNoSelect(selectColaborador);
+                
+                // Atualizar resumo
+                atualizarResumoMultiplo();
             }
 
             function atualizarTipoMultiplo(select, idx) {
                 const td = select.parentElement.nextElementSibling;
-                const label = select.value === 'produto' ? 'Produto' : 'Serviço';
-                td.querySelector('select').innerHTML = '';
+                const itemSelect = td.querySelector('select[name="item[]"]');
+                const tipo = select.value;
+                
+                // Limpar e desabilitar o select de itens
+                itemSelect.innerHTML = '<option value="">Carregando...</option>';
+                itemSelect.disabled = true;
+                
+                if (!tipo) {
+                    itemSelect.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                    return;
+                }
+                
+                // Carregar produtos ou serviços baseado no tipo selecionado
+                let lista = tipo === 'produto' ? produtos : servicos;
+                
+                if (lista && lista.length > 0) {
+                    itemSelect.innerHTML = '<option value="">Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...</option>';
+                    lista.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.codigo;
+                        option.textContent = `${item.codigo.padStart(5, '0')} - ${item.nome}`;
+                        option.setAttribute('data-preco', item.preco || 0);
+                        itemSelect.appendChild(option);
+                    });
+                    
+                    // Habilitar o select de itens
+                    itemSelect.disabled = false;
+                    
+                    // Aplicar Choices.js no select de itens
+                    new Choices(itemSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...'
+                    });
+                    
+                    // Adicionar evento para atualizar valor da venda quando item for selecionado
+                    itemSelect.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        if (selectedOption && selectedOption.value) {
+                            const preco = parseFloat(selectedOption.getAttribute('data-preco')) || 0;
+                            const valorVendaInput = select.closest('tr').querySelector('input[name="valor_venda[]"]');
+                            valorVendaInput.value = preco.toFixed(2);
+                            // Recalcular comissão se houver percentual
+                            const percentualInput = select.closest('tr').querySelector('input[name="percentual[]"]');
+                            if (percentualInput.value) {
+                                calcularComissaoMultiplo(percentualInput, idx);
+                            }
+                        }
+                    });
+                } else {
+                    itemSelect.innerHTML = '<option value="">Nenhum ' + (tipo === 'produto' ? 'produto' : 'serviço') + ' encontrado</option>';
+                }
             }
 
             function calcularComissaoMultiplo(input, idx) {
                 const tr = input.closest('tr');
                 const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
                 const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
-                tr.querySelector('input[name="valor_comissao[]"]').value = (valorVenda * percentual / 100).toFixed(2);
+                const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
+                
+                const valorComissao = (valorVenda * percentual / 100);
+                valorComissaoInput.value = valorComissao.toFixed(2);
+                
+                // Atualizar resumo
+                atualizarResumoMultiplo();
+            }
+            
+            function atualizarResumoMultiplo() {
+                const linhas = document.querySelectorAll('#linhasMultiplo tr');
+                let totalVendas = 0;
+                let totalComissoes = 0;
+                
+                linhas.forEach(linha => {
+                    const valorVenda = parseFloat(linha.querySelector('input[name="valor_venda[]"]').value) || 0;
+                    const valorComissao = parseFloat(linha.querySelector('input[name="valor_comissao[]"]').value) || 0;
+                    
+                    totalVendas += valorVenda;
+                    totalComissoes += valorComissao;
+                });
+                
+                document.getElementById('totalLinhas').textContent = linhas.length;
+                document.getElementById('valorTotalVendas').textContent = formatarMoedaBR(totalVendas);
+                document.getElementById('valorTotalComissoes').textContent = formatarMoedaBR(totalComissoes);
             }
 
             let numeroTituloPai = 1;
