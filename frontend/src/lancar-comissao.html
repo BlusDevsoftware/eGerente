@@ -815,22 +815,10 @@
                 }
             });
             function preencherItens(tipo) {
-                if (choicesItem) {
-                    choicesItem.destroy();
-                    choicesItem = null;
-                }
-                selectItem.style.visibility = 'hidden';
-                selectItem.innerHTML = '';
-                let lista = tipo === 'produto' ? produtos : servicos;
-                lista.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.codigo;
-                    option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
-                    option.dataset.valor = item.preco;
-                    selectItem.appendChild(option);
-                });
-                selectItem.disabled = false;
-                if (window.Choices) {
+                // Exibe o campo imediatamente com placeholder de carregando
+                selectItem.innerHTML = '<option>Carregando...</option>';
+                selectItem.disabled = true;
+                if (!choicesItem && window.Choices) {
                     choicesItem = new Choices(selectItem, {
                         searchEnabled: true,
                         itemSelectText: '',
@@ -845,8 +833,33 @@
                     });
                     selectItem.removeEventListener('change', atualizarValorVendaPorItens);
                     selectItem.addEventListener('change', atualizarValorVendaPorItens);
+                } else if (choicesItem) {
+                    choicesItem.clearChoices();
+                    choicesItem.setChoices([{value: '', label: 'Carregando...', disabled: true}], 'value', 'label', true);
                 }
-                selectItem.style.visibility = 'visible';
+                // Aguarda os dados e atualiza as opções
+                setTimeout(() => {
+                    let lista = tipo === 'produto' ? produtos : servicos;
+                    const choices = lista.map(item => ({
+                        value: item.codigo,
+                        label: (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome,
+                        customProperties: { preco: item.preco }
+                    }));
+                    if (choicesItem) {
+                        choicesItem.clearChoices();
+                        choicesItem.setChoices(choices, 'value', 'label', true);
+                    } else {
+                        selectItem.innerHTML = '';
+                        lista.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.codigo;
+                            option.textContent = (item.codigo ? item.codigo.toString().padStart(5, '0') + ' - ' : '') + item.nome;
+                            option.dataset.valor = item.preco;
+                            selectItem.appendChild(option);
+                        });
+                    }
+                    selectItem.disabled = false;
+                }, 0);
             }
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
