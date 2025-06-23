@@ -559,6 +559,25 @@
                 box-shadow: none;
                 pointer-events: none;
             }
+            /* Botão duplicar azul */
+            .btn-duplicar {
+                background-color: #2196F3;
+                color: #fff;
+                border: none;
+                margin-right: 4px;
+            }
+            .btn-duplicar:hover {
+                background-color: #1976D2;
+            }
+            /* Botão deletar vermelho */
+            .btn-deletar {
+                background-color: #e53935;
+                color: #fff;
+                border: none;
+            }
+            .btn-deletar:hover {
+                background-color: #b71c1c;
+            }
         </style>
         <script>
             let produtos = [];
@@ -629,6 +648,65 @@
                 form.valor_comissao.value = (valorVenda * percentual / 100).toFixed(2);
             }
 
+            // Variável global para armazenar colaboradores
+            let colaboradoresCache = null;
+            let colaboradoresCarregando = false;
+            let colaboradoresCallbacks = [];
+
+            // Função para buscar colaboradores uma única vez
+            async function buscarColaboradores() {
+                if (colaboradoresCache) return colaboradoresCache;
+                if (colaboradoresCarregando) {
+                    // Se já está carregando, retorna uma Promise que resolve quando terminar
+                    return new Promise(resolve => colaboradoresCallbacks.push(resolve));
+                }
+                colaboradoresCarregando = true;
+                try {
+                    colaboradoresCache = await api.get('/colaboradores');
+                    colaboradoresCallbacks.forEach(cb => cb(colaboradoresCache));
+                    colaboradoresCallbacks = [];
+                    return colaboradoresCache;
+                } catch (error) {
+                    colaboradoresCache = [];
+                    colaboradoresCallbacks.forEach(cb => cb(colaboradoresCache));
+                    colaboradoresCallbacks = [];
+                    return [];
+                } finally {
+                    colaboradoresCarregando = false;
+                }
+            }
+
+            // Função para preencher o select de colaborador (layout fixo, carrega opções depois)
+            function preencherSelectColaborador(selectElement) {
+                // Layout fixo imediato
+                selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
+                // Aplica Choices.js imediatamente
+                new Choices(selectElement, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'Selecione um colaborador...'
+                });
+                // Carrega opções em background
+                buscarColaboradores().then(colaboradores => {
+                    // Remove todas as opções exceto o placeholder
+                    selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
+                    colaboradores.forEach(colaborador => {
+                        const option = document.createElement('option');
+                        option.value = colaborador.codigo;
+                        option.textContent = `${colaborador.codigo} - ${colaborador.nome}`;
+                        selectElement.appendChild(option);
+                    });
+                    // Reaplica Choices.js para atualizar as opções
+                    new Choices(selectElement, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione um colaborador...'
+                    });
+                });
+            }
+
             function adicionarLinhaMultiplo() {
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
@@ -643,22 +721,14 @@
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00"></td>
                     <td><input type="date" name="data[]" required value="${dataAtual}"></td>
                     <td>
-                        <button type="button" class="btn-secondary" onclick="duplicarLinhaMultiplo(this)" title="Duplicar linha"><i class="fas fa-copy"></i></button>
-                        <button type="button" class="btn-secondary" onclick="removerLinhaMultiplo(this)" title="Remover linha"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn-duplicar" onclick="duplicarLinhaMultiplo(this)" title="Duplicar linha"><i class="fas fa-copy"></i></button>
+                        <button type="button" class="btn-deletar" onclick="removerLinhaMultiplo(this)" title="Remover linha"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
-                
-                // Carregar colaboradores no select recém-criado
+                // Preencher colaborador (layout fixo, carrega opções depois)
                 const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
-                carregarColaboradoresNoSelect(selectColaborador);
-                
-                // Atualizar resumo
-                atualizarResumoMultiplo();
-            }
-
-            function removerLinhaMultiplo(btn) {
-                btn.closest('tr').remove();
+                preencherSelectColaborador(selectColaborador);
                 atualizarResumoMultiplo();
             }
 
@@ -667,32 +737,23 @@
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
                 const dataAtual = new Date().toISOString().split('T')[0];
-                
-                // Criar nova linha
                 const novaLinha = linhaOriginal.cloneNode(true);
-                
-                // Limpar valores dos campos, exceto colaborador e tipo
                 novaLinha.querySelector('select[name="item[]"]').value = '';
                 novaLinha.querySelector('input[name="valor_venda[]"]').value = '';
                 novaLinha.querySelector('input[name="percentual[]"]').value = '';
                 novaLinha.querySelector('input[name="valor_comissao[]"]').value = '';
                 novaLinha.querySelector('input[name="data[]"]').value = dataAtual;
-                
-                // Atualizar eventos
                 novaLinha.querySelector('select[name="tipo[]"]').onchange = function() { atualizarTipoMultiplo(this, idx); };
                 novaLinha.querySelector('input[name="valor_venda[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
                 novaLinha.querySelector('input[name="percentual[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
-                novaLinha.querySelector('button[onclick*="duplicarLinhaMultiplo"]').onclick = function() { duplicarLinhaMultiplo(this); };
-                novaLinha.querySelector('button[onclick*="removerLinhaMultiplo"]').onclick = function() { removerLinhaMultiplo(this); };
-                
-                // Adicionar a nova linha
+                novaLinha.querySelector('button[title="Duplicar linha"]').className = 'btn-duplicar';
+                novaLinha.querySelector('button[title="Duplicar linha"]').onclick = function() { duplicarLinhaMultiplo(this); };
+                novaLinha.querySelector('button[title="Remover linha"]').className = 'btn-deletar';
+                novaLinha.querySelector('button[title="Remover linha"]').onclick = function() { removerLinhaMultiplo(this); };
                 tbody.appendChild(novaLinha);
-                
-                // Recarregar colaboradores no select da nova linha
+                // Preencher colaborador (layout fixo, carrega opções depois)
                 const selectColaborador = novaLinha.querySelector('select[name="colaborador[]"]');
-                carregarColaboradoresNoSelect(selectColaborador);
-                
-                // Atualizar resumo
+                preencherSelectColaborador(selectColaborador);
                 atualizarResumoMultiplo();
             }
 
@@ -786,31 +847,6 @@
 
             let numeroTituloPai = 1;
             
-            // Função para carregar colaboradores no select
-            async function carregarColaboradoresNoSelect(selectElement) {
-                try {
-                    const colaboradores = await api.get('/colaboradores');
-                    selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
-                    colaboradores.forEach(colaborador => {
-                        const option = document.createElement('option');
-                        option.value = colaborador.codigo;
-                        option.textContent = `${colaborador.codigo} - ${colaborador.nome}`;
-                        selectElement.appendChild(option);
-                    });
-                    
-                    // Aplicar Choices.js no select
-                    new Choices(selectElement, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Selecione um colaborador...'
-                    });
-                } catch (error) {
-                    console.error('Erro ao carregar colaboradores:', error);
-                    selectElement.innerHTML = '<option value="">Erro ao carregar colaboradores</option>';
-                }
-            }
-            
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
@@ -859,7 +895,7 @@
                 
                 // Carregar colaboradores no select recém-criado
                 const selectColaborador = div.querySelector('select[name="colaborador[]"]');
-                carregarColaboradoresNoSelect(selectColaborador);
+                preencherSelectColaborador(selectColaborador);
             }
 
             function extrairNumeroBR(valor) {
