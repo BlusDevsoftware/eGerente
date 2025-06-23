@@ -678,10 +678,15 @@
 
             // Função para preencher o select de colaborador (layout fixo, carrega opções depois)
             function preencherSelectColaborador(selectElement) {
+                // Destroi Choices anterior se existir
+                if (selectElement.choicesInstance) {
+                    selectElement.choicesInstance.destroy();
+                    selectElement.choicesInstance = null;
+                }
                 // Layout fixo imediato
                 selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
-                // Aplica Choices.js imediatamente
-                new Choices(selectElement, {
+                // Aplica Choices.js imediatamente e guarda a instância
+                selectElement.choicesInstance = new Choices(selectElement, {
                     searchEnabled: true,
                     itemSelectText: '',
                     placeholder: true,
@@ -689,6 +694,11 @@
                 });
                 // Carrega opções em background
                 buscarColaboradores().then(colaboradores => {
+                    // Destroi Choices anterior antes de atualizar opções
+                    if (selectElement.choicesInstance) {
+                        selectElement.choicesInstance.destroy();
+                        selectElement.choicesInstance = null;
+                    }
                     // Remove todas as opções exceto o placeholder
                     selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
                     colaboradores.forEach(colaborador => {
@@ -697,8 +707,8 @@
                         option.textContent = `${colaborador.codigo} - ${colaborador.nome}`;
                         selectElement.appendChild(option);
                     });
-                    // Reaplica Choices.js para atualizar as opções
-                    new Choices(selectElement, {
+                    // Reaplica Choices.js para atualizar as opções e guarda a instância
+                    selectElement.choicesInstance = new Choices(selectElement, {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
