@@ -724,7 +724,13 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><select name="colaborador[]" required></select></td>
-                    <td><select name="tipo[]" required onchange="atualizarTipoMultiplo(this, ${idx})"><option value="">Selecione...</option><option value="produto">Produto</option><option value="servico">Serviço</option></select></td>
+                    <td>
+                        <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
+                            <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
+                            <button type="button" class="btn-tipo" data-tipo="servico" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-cogs"></i> Serviço</button>
+                            <input type="hidden" name="tipo[]" value="">
+                        </div>
+                    </td>
                     <td><select name="item[]" required disabled><option value="">Selecione o tipo primeiro</option></select></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularComissaoMultiplo(this, ${idx})" placeholder="0.00"></td>
@@ -742,29 +748,17 @@
                 atualizarResumoMultiplo();
             }
 
-            function duplicarLinhaMultiplo(btn) {
-                const linhaOriginal = btn.closest('tr');
-                const tbody = document.getElementById('linhasMultiplo');
-                const idx = tbody.children.length;
-                const dataAtual = new Date().toISOString().split('T')[0];
-                const novaLinha = linhaOriginal.cloneNode(true);
-                novaLinha.querySelector('select[name="item[]"]').value = '';
-                novaLinha.querySelector('input[name="valor_venda[]"]').value = '';
-                novaLinha.querySelector('input[name="percentual[]"]').value = '';
-                novaLinha.querySelector('input[name="valor_comissao[]"]').value = '';
-                novaLinha.querySelector('input[name="data[]"]').value = dataAtual;
-                novaLinha.querySelector('select[name="tipo[]"]').onchange = function() { atualizarTipoMultiplo(this, idx); };
-                novaLinha.querySelector('input[name="valor_venda[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
-                novaLinha.querySelector('input[name="percentual[]"]').oninput = function() { calcularComissaoMultiplo(this, idx); };
-                novaLinha.querySelector('button[title="Duplicar linha"]').className = 'btn-duplicar';
-                novaLinha.querySelector('button[title="Duplicar linha"]').onclick = function() { duplicarLinhaMultiplo(this); };
-                novaLinha.querySelector('button[title="Remover linha"]').className = 'btn-deletar';
-                novaLinha.querySelector('button[title="Remover linha"]').onclick = function() { removerLinhaMultiplo(this); };
-                tbody.appendChild(novaLinha);
-                // Preencher colaborador (layout fixo, carrega opções depois)
-                const selectColaborador = novaLinha.querySelector('select[name="colaborador[]"]');
-                preencherSelectColaborador(selectColaborador);
-                atualizarResumoMultiplo();
+            // Função toggle dos botões de tipo na tabela múltiplos
+            function toggleTipoMultiplo(btn, idx) {
+                const container = btn.parentElement;
+                const buttons = container.querySelectorAll('.btn-tipo');
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tipo = btn.getAttribute('data-tipo');
+                container.querySelector('input[name="tipo[]"]').value = tipo;
+                // Atualizar select de itens
+                const tr = btn.closest('tr');
+                atualizarTipoMultiplo({ value: tipo, parentElement: () => btn.closest('td'), closest: tr.closest.bind(tr) }, idx);
             }
 
             function atualizarTipoMultiplo(select, idx) {
