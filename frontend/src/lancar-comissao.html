@@ -762,22 +762,39 @@
             }
 
             function atualizarTipoMultiplo(select, idx) {
-                const td = select.parentElement.nextElementSibling;
-                const itemSelect = td.querySelector('select[name="item[]"]');
-                const tipo = select.value;
-                
+                // Suporte para chamada via botão (objeto customizado)
+                let td, itemSelect, tipo;
+                if (select instanceof HTMLElement || (select && select.tagName)) {
+                    td = select.parentElement.nextElementSibling;
+                    itemSelect = td.querySelector('select[name="item[]"]');
+                    tipo = select.value;
+                } else {
+                    // chamada via toggleTipoMultiplo
+                    td = select.parentElement().nextElementSibling;
+                    itemSelect = td.querySelector('select[name="item[]"]');
+                    tipo = select.value;
+                }
                 // Limpar e desabilitar o select de itens
                 itemSelect.innerHTML = '<option value="">Carregando...</option>';
                 itemSelect.disabled = true;
-                
+                // Destroi Choices anterior se existir
+                if (itemSelect.choicesInstance) {
+                    itemSelect.choicesInstance.destroy();
+                    itemSelect.choicesInstance = null;
+                }
                 if (!tipo) {
                     itemSelect.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                    // Aplica Choices.js para manter padrão visual
+                    itemSelect.choicesInstance = new Choices(itemSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione o tipo primeiro'
+                    });
                     return;
                 }
-                
                 // Carregar produtos ou serviços baseado no tipo selecionado
                 let lista = tipo === 'produto' ? produtos : servicos;
-                
                 if (lista && lista.length > 0) {
                     itemSelect.innerHTML = '<option value="">Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...</option>';
                     lista.forEach(item => {
@@ -787,27 +804,24 @@
                         option.setAttribute('data-preco', item.preco || 0);
                         itemSelect.appendChild(option);
                     });
-                    
                     // Habilitar o select de itens
                     itemSelect.disabled = false;
-                    
                     // Aplicar Choices.js no select de itens
-                    new Choices(itemSelect, {
+                    itemSelect.choicesInstance = new Choices(itemSelect, {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
                         placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...'
                     });
-                    
                     // Adicionar evento para atualizar valor da venda quando item for selecionado
                     itemSelect.addEventListener('change', function() {
                         const selectedOption = this.options[this.selectedIndex];
                         if (selectedOption && selectedOption.value) {
                             const preco = parseFloat(selectedOption.getAttribute('data-preco')) || 0;
-                            const valorVendaInput = select.closest('tr').querySelector('input[name="valor_venda[]"]');
+                            const valorVendaInput = td.parentElement.querySelector('input[name="valor_venda[]"]');
                             valorVendaInput.value = preco.toFixed(2);
                             // Recalcular comissão se houver percentual
-                            const percentualInput = select.closest('tr').querySelector('input[name="percentual[]"]');
+                            const percentualInput = td.parentElement.querySelector('input[name="percentual[]"]');
                             if (percentualInput.value) {
                                 calcularComissaoMultiplo(percentualInput, idx);
                             }
@@ -815,6 +829,13 @@
                     });
                 } else {
                     itemSelect.innerHTML = '<option value="">Nenhum ' + (tipo === 'produto' ? 'produto' : 'serviço') + ' encontrado</option>';
+                    // Aplica Choices.js para manter padrão visual
+                    itemSelect.choicesInstance = new Choices(itemSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Nenhum ' + (tipo === 'produto' ? 'produto' : 'serviço') + ' encontrado'
+                    });
                 }
             }
 
