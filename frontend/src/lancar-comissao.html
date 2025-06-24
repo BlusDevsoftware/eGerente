@@ -107,7 +107,7 @@
                         </div>
                         <div class="form-group valor-venda-destaque" style="flex: 1.5;">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
-                            <input type="text" name="valor_venda" required class="valor-venda-destaque-input" readonly placeholder="R$ 0,00">
+                            <input type="text" name="valor_venda" required class="valor-venda-destaque-input" placeholder="R$ 0,00">
                         </div>
                     </div>
                     <div id="colaboradoresVinculados">
@@ -628,17 +628,19 @@
                 let soma = 0;
                 const valoresSelecionados = choicesItem.getValue(true);
                 const todosItens = [...produtos, ...servicos];
-                
                 valoresSelecionados.forEach(val => {
                     const item = todosItens.find(i => i.codigo === val);
                     if (item) {
                         soma += Number(item.preco) || 0;
                     }
                 });
-
                 const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                campoValorVenda.value = formatarMoedaBR(soma);
-                campoValorVenda.dispatchEvent(new Event('input'));
+                // Só sugere o valor se o campo estiver vazio ou igual ao valor anterior sugerido
+                const valorAtual = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
+                if (!valorAtual || parseFloat(valorAtual) === 0) {
+                    campoValorVenda.value = formatarMoedaBR(soma);
+                    campoValorVenda.dispatchEvent(new Event('input'));
+                }
             }
 
             function calcularComissaoUnico() {
