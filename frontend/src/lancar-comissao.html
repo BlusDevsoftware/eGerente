@@ -131,6 +131,7 @@
                                     <th>Colaborador</th>
                                     <th>Tipo</th>
                                     <th>Produto/Serviço</th>
+                                    <th>Descrição</th>
                                     <th>Valor Venda</th>
                                     <th>% Comissão</th>
                                     <th>Valor Comissão</th>
@@ -561,6 +562,23 @@
                 outline: none;
                 box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
             }
+            /* Ajuste visual do campo descrição na tabela múltiplos lançamentos */
+            .table-multiplos input.input-descricao {
+                border: 1.5px solid #90caf9;
+                border-radius: 8px;
+                background: #f4faff;
+                color: #1565c0;
+                font-size: 14px;
+                padding: 10px;
+                box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+                text-align: center;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .table-multiplos input.input-descricao:focus {
+                border-color: #2196F3 !important;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
+            }
         </style>
         <script>
             let produtos = [];
@@ -717,10 +735,11 @@
                         </div>
                     </td>
                     <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
+                    <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição do lançamento" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td style="min-width:120px;display:flex;flex-direction:column;gap:2px;align-items:center;">
+                    <td style="min-width:120px;display:flex;flex-direction:column;gap:1px;align-items:center;">
                         <button type="button" class="btn-parcelado" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
                         <button type="button" class="btn-simular" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                     </td>
