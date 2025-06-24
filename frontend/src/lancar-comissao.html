@@ -134,7 +134,6 @@
                                     <th>Valor Venda</th>
                                     <th>% Comissão</th>
                                     <th>Valor Comissão</th>
-                                    <th>Data</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -537,6 +536,31 @@
                 background: #bbdefb;
                 border-color: #1976d2;
             }
+            /* Ajuste visual dos campos da tabela múltiplos lançamentos para igualar ao campo colaborador */
+            .table-multiplos select.input-colaborador,
+            .table-multiplos select.input-item,
+            .table-multiplos input.input-valor,
+            .table-multiplos input.input-percentual,
+            .table-multiplos input.input-comissao {
+                border: 1.5px solid #90caf9;
+                border-radius: 8px;
+                background: #f4faff;
+                color: #1565c0;
+                font-size: 14px;
+                padding: 10px;
+                box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+                text-align: center;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .table-multiplos select.input-colaborador:focus,
+            .table-multiplos select.input-item:focus,
+            .table-multiplos input.input-valor:focus,
+            .table-multiplos input.input-percentual:focus,
+            .table-multiplos input.input-comissao:focus {
+                border-color: #2196F3 !important;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
+            }
         </style>
         <script>
             let produtos = [];
@@ -684,7 +708,7 @@
                 const dataAtual = new Date().toISOString().split('T')[0];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><select name="colaborador[]" required></select></td>
+                    <td><select name="colaborador[]" required class="input-colaborador"></select></td>
                     <td>
                         <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
                             <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
@@ -692,14 +716,13 @@
                             <input type="hidden" name="tipo[]" value="">
                         </div>
                     </td>
-                    <td><select name="item[]" required disabled><option value="">Selecione o tipo primeiro</option></select></td>
-                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularComissaoMultiplo(this, ${idx})" placeholder="0.00"></td>
-                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00"></td>
-                    <td><input type="date" name="data[]" required value="${dataAtual}"></td>
-                    <td>
-                        <button type="button" class="btn-duplicar" onclick="duplicarLinhaMultiplo(this)" title="Duplicar linha"><i class="fas fa-copy"></i></button>
-                        <button type="button" class="btn-deletar" onclick="removerLinhaMultiplo(this)" title="Remover linha"><i class="fas fa-trash"></i></button>
+                    <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
+                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
+                    <td style="min-width:120px;display:flex;flex-direction:column;gap:2px;align-items:center;">
+                        <button type="button" class="btn-parcelado" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
+                        <button type="button" class="btn-simular" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
