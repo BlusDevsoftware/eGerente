@@ -579,10 +579,11 @@
                 outline: none;
                 box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
             }
-            .table-multiplos .btn-parcelado,
-            .table-multiplos .btn-simular {
-                margin-top: 2px !important;
-                margin-bottom: 0 !important;
+            .table-multiplos .btn-multiplos-acao {
+                width: 110px;
+                min-width: 110px;
+                max-width: 110px;
+                box-sizing: border-box;
             }
         </style>
         <script>
@@ -744,9 +745,9 @@
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td style="min-width:120px;display:flex;flex-direction:column;gap:0px;align-items:center;">
-                        <button type="button" class="btn-parcelado" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
-                        <button type="button" class="btn-simular" onclick="simularTitulosMultiploLinha(this)">Simular</button>
+                    <td style="min-width:120px;display:flex;flex-direction:column;gap:4px;align-items:center;">
+                        <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
+                        <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
