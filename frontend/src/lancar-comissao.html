@@ -107,7 +107,7 @@
                         </div>
                         <div class="form-group valor-venda-destaque" style="flex: 1.5;">
                             <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
-                            <input type="text" name="valor_venda" required class="valor-venda-destaque-input" placeholder="R$ 0,00">
+                            <input type="text" name="valor_venda" required class="valor-venda-destaque-input" placeholder="R$ 0,00" style="flex:1;">
                         </div>
                     </div>
                     <div id="colaboradoresVinculados">
@@ -635,8 +635,8 @@
                     }
                 });
                 const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                // Só sugere o valor se o campo estiver vazio ou igual ao valor anterior sugerido
-                const valorAtual = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
+                // Só atualiza automaticamente se o campo estiver vazio ou zero
+                let valorAtual = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
                 if (!valorAtual || parseFloat(valorAtual) === 0) {
                     campoValorVenda.value = formatarMoedaBR(soma);
                     campoValorVenda.dispatchEvent(new Event('input'));
@@ -1090,6 +1090,17 @@
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
                     choicesItem.setChoices([{ value: '', label: 'Erro ao carregar', disabled: true }]);
+                }
+
+                const btnSugere = document.getElementById('btnSugereValorVenda');
+                if (btnSugere) {
+                    btnSugere.addEventListener('click', function() {
+                        const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
+                        if (window.valorVendaSugerido !== undefined) {
+                            campoValorVenda.value = formatarMoedaBR(window.valorVendaSugerido);
+                            campoValorVenda.dispatchEvent(new Event('input'));
+                        }
+                    });
                 }
             });
 
