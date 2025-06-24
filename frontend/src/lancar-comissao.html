@@ -1280,6 +1280,129 @@
             
             // Adicionar evento de submit ao formulário múltiplo
             document.getElementById('formMultiplo').addEventListener('submit', salvarComissoesMultiplas);
+
+            // Função para alternar exibição do campo de parcelas e valor da parcela na linha de múltiplos lançamentos
+            function toggleParceladoMultiploLinha(btn) {
+                const td = btn.closest('td');
+                let groupParcelas = td.querySelector('.group-parcelas');
+                let groupValorParcela = td.querySelector('.group-valor-parcela');
+                // Se não existir, criar os campos dinamicamente
+                if (!groupParcelas) {
+                    groupParcelas = document.createElement('div');
+                    groupParcelas.className = 'group-parcelas';
+                    groupParcelas.style.marginTop = '6px';
+                    groupParcelas.innerHTML = `<label style="font-size:0.95em;"><i class='fas fa-list-ol'></i> Qtd. Parcelas</label><input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:90px;margin-left:6px;' oninput='atualizaValorParcelaMultiplo(this)'>`;
+                    td.appendChild(groupParcelas);
+                }
+                if (!groupValorParcela) {
+                    groupValorParcela = document.createElement('div');
+                    groupValorParcela.className = 'group-valor-parcela';
+                    groupValorParcela.style.marginTop = '4px';
+                    groupValorParcela.innerHTML = `<label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i> Valor da Parcela</label><input type='text' class='input-valor-parcela' style='width:110px;margin-left:6px;' readonly>`;
+                    td.appendChild(groupValorParcela);
+                }
+                if (groupParcelas.style.display === 'none' || groupParcelas.style.display === '') {
+                    groupParcelas.style.display = 'block';
+                    groupValorParcela.style.display = 'block';
+                    btn.classList.add('active');
+                } else {
+                    groupParcelas.style.display = 'none';
+                    groupValorParcela.style.display = 'none';
+                    btn.classList.remove('active');
+                    groupParcelas.querySelector('input').value = '';
+                    groupValorParcela.querySelector('input').value = '';
+                }
+            }
+
+            // Função para atualizar valor da parcela na linha de múltiplos lançamentos
+            function atualizaValorParcelaMultiplo(input) {
+                const td = input.closest('td');
+                const tr = td.closest('tr');
+                const qtd = parseInt(input.value);
+                const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
+                const valorComissao = parseFloat(valorComissaoInput.value.replace(',','.'));
+                const valorParcelaInput = td.querySelector('.input-valor-parcela');
+                if (qtd > 1 && valorComissao > 0) {
+                    const valorParcela = valorComissao / qtd;
+                    valorParcelaInput.value = valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                } else {
+                    valorParcelaInput.value = '';
+                }
+            }
+
+            // Função para simular títulos na linha de múltiplos lançamentos
+            function simularTitulosMultiploLinha(btn) {
+                const td = btn.closest('td');
+                const tr = td.closest('tr');
+                let groupParcelas = td.querySelector('.group-parcelas');
+                let qtd = 1;
+                if (groupParcelas && groupParcelas.style.display !== 'none') {
+                    const qtdInput = groupParcelas.querySelector('input');
+                    if (qtdInput && parseInt(qtdInput.value) > 1) {
+                        qtd = parseInt(qtdInput.value);
+                    }
+                }
+                const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
+                const valorComissao = parseFloat(valorComissaoInput.value.replace(',','.'));
+                let simulacaoDiv = td.querySelector('.simulacao-titulos-multiplo');
+                if (!simulacaoDiv) {
+                    simulacaoDiv = document.createElement('div');
+                    simulacaoDiv.className = 'simulacao-titulos-multiplo';
+                    simulacaoDiv.style.marginTop = '8px';
+                    td.appendChild(simulacaoDiv);
+                }
+                if (!valorComissao || valorComissao <= 0) {
+                    simulacaoDiv.innerHTML = '<span style="color:#b71c1c;">Informe o valor da comissão.</span>';
+                    simulacaoDiv.style.display = 'block';
+                    return;
+                }
+                if (qtd < 1) qtd = 1;
+                let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
+                const valorParcela = valorComissao / qtd;
+                const hoje = new Date();
+                const dataHoje = hoje.toISOString().slice(0,10);
+                for (let i = 1; i <= qtd; i++) {
+                    html += `<tr><td>${i}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
+                }
+                html += '</table>';
+                if (qtd > 1) {
+                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                }
+                simulacaoDiv.innerHTML = html;
+                simulacaoDiv.style.display = 'block';
+
+                const vencInputs = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
+                const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
+                const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
+                if (vencInputs.length > 1) {
+                    vencInputs[0].addEventListener('change', function() {
+                        intervaloContainer.style.display = 'inline-block';
+                    });
+                    intervaloSelect.addEventListener('change', function() {
+                        if (!this.value) return;
+                        const intervalo = parseInt(this.value);
+                        const primeiraData = vencInputs[0].value;
+                        if (primeiraData) {
+                            let data = new Date(primeiraData);
+                            for (let i = 1; i < vencInputs.length; i++) {
+                                data.setDate(data.getDate() + intervalo);
+                                vencInputs[i].value = data.toISOString().slice(0,10);
+                            }
+                        }
+                    });
+                }
+
+                const emissaoInputs = simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela');
+                if (emissaoInputs.length > 1) {
+                    emissaoInputs[0].addEventListener('change', function() {
+                        if (this.value) {
+                            for (let i = 1; i < emissaoInputs.length; i++) {
+                                if (!emissaoInputs[i].value) emissaoInputs[i].value = this.value;
+                            }
+                        }
+                    });
+                }
+            }
         </script>
     </div>
 
