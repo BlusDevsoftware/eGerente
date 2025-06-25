@@ -1545,7 +1545,17 @@
                 }
                 html += '</table>';
                 if (qtd > 1) {
-                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                    html += `<tr class='linha-intervalo-vencimento'><td colspan='5' style='text-align:left;'>
+                        <div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'>
+                            <label style='font-weight:500;'>Intervalo entre títulos: </label>
+                            <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'>
+                                <option value='' selected disabled>Selecione...</option>
+                                <option value='10'>10 dias</option>
+                                <option value='20'>20 dias</option>
+                                <option value='30'>30 dias</option>
+                            </select>
+                        </div>
+                    </td></tr>`;
                 }
                 simulacaoDiv.innerHTML = html;
                 trSimulacao.style.display = '';
