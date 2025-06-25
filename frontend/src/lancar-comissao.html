@@ -1315,29 +1315,14 @@
             // Adicionar evento de submit ao formulário múltiplo
             document.getElementById('formMultiplo').addEventListener('submit', salvarComissoesMultiplas);
 
-            // Função para alternar exibição do campo de parcelas e valor da parcela na linha de múltiplos lançamentos
+            // Função para alternar exibição dos campos de parcelas e valor da parcela na linha de múltiplos lançamentos
             function toggleParceladoMultiploLinha(btn) {
                 const td = btn.closest('td');
-                let groupParcelas = td.querySelector('.group-parcelas');
-                let groupValorParcela = td.querySelector('.group-valor-parcela');
-                // Se não existir, criar os campos dinamicamente
-                if (!groupParcelas) {
-                    groupParcelas = document.createElement('div');
-                    groupParcelas.className = 'group-parcelas';
-                    groupParcelas.style.marginTop = '6px';
-                    groupParcelas.innerHTML = `<label style="font-size:0.95em;"><i class='fas fa-list-ol'></i> Qtd. Parcelas</label><input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:90px;margin-left:6px;' oninput='atualizaValorParcelaMultiplo(this)'>`;
-                    td.appendChild(groupParcelas);
-                }
-                if (!groupValorParcela) {
-                    groupValorParcela = document.createElement('div');
-                    groupValorParcela.className = 'group-valor-parcela';
-                    groupValorParcela.style.marginTop = '4px';
-                    groupValorParcela.innerHTML = `<label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i> Valor da Parcela</label><input type='text' class='input-valor-parcela' style='width:110px;margin-left:6px;' readonly>`;
-                    td.appendChild(groupValorParcela);
-                }
+                const groupParcelas = td.querySelector('.group-parcelas');
+                const groupValorParcela = td.querySelector('.group-valor-parcela');
                 if (groupParcelas.style.display === 'none' || groupParcelas.style.display === '') {
-                    groupParcelas.style.display = 'block';
-                    groupValorParcela.style.display = 'block';
+                    groupParcelas.style.display = 'flex';
+                    groupValorParcela.style.display = 'flex';
                     btn.classList.add('active');
                 } else {
                     groupParcelas.style.display = 'none';
@@ -1368,7 +1353,8 @@
             function simularTitulosMultiploLinha(btn) {
                 const td = btn.closest('td');
                 const tr = td.closest('tr');
-                let groupParcelas = td.querySelector('.group-parcelas');
+                const trSimulacao = tr.nextElementSibling;
+                const groupParcelas = td.querySelector('.group-parcelas');
                 let qtd = 1;
                 if (groupParcelas && groupParcelas.style.display !== 'none') {
                     const qtdInput = groupParcelas.querySelector('input');
@@ -1378,16 +1364,10 @@
                 }
                 const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
                 const valorComissao = parseFloat(valorComissaoInput.value.replace(',','.'));
-                let simulacaoDiv = td.querySelector('.simulacao-titulos-multiplo');
-                if (!simulacaoDiv) {
-                    simulacaoDiv = document.createElement('div');
-                    simulacaoDiv.className = 'simulacao-titulos-multiplo';
-                    simulacaoDiv.style.marginTop = '8px';
-                    td.appendChild(simulacaoDiv);
-                }
+                const simulacaoDiv = trSimulacao.querySelector('.simulacao-titulos-multiplo');
                 if (!valorComissao || valorComissao <= 0) {
                     simulacaoDiv.innerHTML = '<span style="color:#b71c1c;">Informe o valor da comissão.</span>';
-                    simulacaoDiv.style.display = 'block';
+                    trSimulacao.style.display = '';
                     return;
                 }
                 if (qtd < 1) qtd = 1;
@@ -1403,8 +1383,8 @@
                     html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
                 }
                 simulacaoDiv.innerHTML = html;
-                simulacaoDiv.style.display = 'block';
-
+                trSimulacao.style.display = '';
+                // Eventos para intervalos e datas
                 const vencInputs = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
                 const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
@@ -1425,7 +1405,6 @@
                         }
                     });
                 }
-
                 const emissaoInputs = simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela');
                 if (emissaoInputs.length > 1) {
                     emissaoInputs[0].addEventListener('change', function() {
