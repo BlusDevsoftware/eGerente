@@ -943,6 +943,7 @@
                 numeroTituloPaiMultiplo++;
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
+                tr.style.position = 'relative';
                 tr.innerHTML = `
                     <td><select name="colaborador[]" required class="input-colaborador"></select></td>
                     <td>
@@ -960,8 +961,6 @@
                     <td class="acao-multiplos">
                         <div class="acoes-multiplos-wrapper">
                             <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center;">
-                                <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
-                                <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
                                 <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
                                 <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                             </div>
@@ -979,6 +978,22 @@
                     </td>
                 `;
                 tbody.appendChild(tr);
+                // Botões duplicar/excluir fora da grid
+                const btnsFloat = document.createElement('div');
+                btnsFloat.className = 'botoes-flutuantes-multiplos';
+                btnsFloat.innerHTML = `
+                    <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
+                    <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
+                `;
+                btnsFloat.style.position = 'absolute';
+                btnsFloat.style.right = '-60px';
+                btnsFloat.style.top = '50%';
+                btnsFloat.style.transform = 'translateY(-50%)';
+                btnsFloat.style.display = 'flex';
+                btnsFloat.style.flexDirection = 'column';
+                btnsFloat.style.gap = '6px';
+                btnsFloat.style.zIndex = '2';
+                tr.appendChild(btnsFloat);
                 // Adiciona linha para simulação (abaixo)
                 const trSimulacao = document.createElement('tr');
                 trSimulacao.className = 'linha-simulacao-multiplo';
