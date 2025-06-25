@@ -777,6 +777,22 @@
             .simulacao-titulos-multiplo .intervalo-vencimento-select {
                 color: #222 !important;
             }
+            /* CSS para botões flutuantes ao lado da linha múltiplos lançamentos */
+            .botoes-flutuantes-multiplos {
+                position: absolute;
+                right: -60px;
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                z-index: 2;
+            }
+            @media (max-width: 1200px) {
+                .botoes-flutuantes-multiplos {
+                    right: -40px;
+                }
+            }
         </style>
         <script>
             let produtos = [];
@@ -926,6 +942,7 @@
                 numeroTituloPaiMultiplo++;
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
+                tr.style.position = 'relative';
                 tr.innerHTML = `
                     <td><select name="colaborador[]" required class="input-colaborador"></select></td>
                     <td>
@@ -943,8 +960,6 @@
                     <td class="acao-multiplos">
                         <div class="acoes-multiplos-wrapper">
                             <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-                                <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
-                                <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
                                 <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
                                 <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                             </div>
@@ -962,6 +977,14 @@
                     </td>
                 `;
                 tbody.appendChild(tr);
+                // Botões duplicar/excluir fora da grid
+                const btnsFloat = document.createElement('div');
+                btnsFloat.className = 'botoes-flutuantes-multiplos';
+                btnsFloat.innerHTML = `
+                    <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
+                    <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
+                `;
+                tr.appendChild(btnsFloat);
                 // Adiciona linha para simulação (abaixo)
                 const trSimulacao = document.createElement('tr');
                 trSimulacao.className = 'linha-simulacao-multiplo';
