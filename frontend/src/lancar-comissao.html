@@ -733,14 +733,18 @@
 
             /* Ajuste da coluna de ações para alinhamento perfeito */
             .table-multiplos td.acao-multiplos {
-                min-width: 240px;
                 vertical-align: middle;
                 padding: 0 4px;
+                /* Remover display:flex, min-width, height do td */
+            }
+            .table-multiplos .acoes-multiplos-wrapper {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
                 justify-content: center;
                 gap: 12px;
+                width: 100%;
+                height: 100%;
             }
             .table-multiplos .acoes-multiplos-botoes {
                 display: flex;
@@ -921,19 +925,21 @@
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td class="acao-multiplos" style="min-width:240px;padding:0 4px;">
-                        <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-                            <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
-                            <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
-                        </div>
-                        <div class="acoes-multiplos-parcelas" style="display:none;">
-                            <div class="group-parcelas">
-                                <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
-                                <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
+                    <td class="acao-multiplos">
+                        <div class="acoes-multiplos-wrapper">
+                            <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+                                <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
+                                <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                             </div>
-                            <div class="group-valor-parcela">
-                                <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
-                                <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                            <div class="acoes-multiplos-parcelas" style="display:none;">
+                                <div class="group-parcelas">
+                                    <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
+                                    <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
+                                </div>
+                                <div class="group-valor-parcela">
+                                    <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
+                                    <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                                </div>
                             </div>
                         </div>
                     </td>
