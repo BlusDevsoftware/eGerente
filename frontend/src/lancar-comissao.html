@@ -732,10 +732,14 @@
             /* Ajuste da coluna de ações para alinhamento perfeito */
             .table-multiplos td.acao-multiplos {
                 min-width: 240px;
-                /* Remover display:flex do td */
                 height: 56px;
                 vertical-align: middle;
                 padding: 0 4px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
             }
             .table-multiplos .acoes-multiplos-botoes,
             .table-multiplos .acoes-multiplos-parcelas {
@@ -744,7 +748,7 @@
                 gap: 4px;
                 align-items: center;
                 justify-content: center;
-                height: 100%;
+                height: auto;
             }
             .table-multiplos .acoes-multiplos-parcelas {
                 align-items: flex-start;
