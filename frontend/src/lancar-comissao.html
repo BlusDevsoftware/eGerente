@@ -765,7 +765,6 @@
             function adicionarLinhaMultiplo() {
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
-                const dataAtual = new Date().toISOString().split('T')[0];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><select name="colaborador[]" required class="input-colaborador"></select></td>
@@ -781,12 +780,26 @@
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td style="min-width:120px;display:flex;flex-direction:column;gap:4px;align-items:center;">
+                    <td style="min-width:320px;display:flex;flex-direction:row;gap:8px;align-items:center;justify-content:center;">
                         <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
+                        <div class="group-parcelas" style="display:none;">
+                            <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
+                            <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
+                        </div>
+                        <div class="group-valor-parcela" style="display:none;">
+                            <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
+                            <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                        </div>
                         <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
+                // Adiciona linha para simulação (abaixo)
+                const trSimulacao = document.createElement('tr');
+                trSimulacao.className = 'linha-simulacao-multiplo';
+                trSimulacao.style.display = 'none';
+                trSimulacao.innerHTML = `<td colspan="8"><div class="simulacao-titulos-multiplo"></div></td>`;
+                tbody.appendChild(trSimulacao);
                 // Preencher colaborador (layout fixo, carrega opções depois)
                 const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
                 preencherSelectColaborador(selectColaborador);
