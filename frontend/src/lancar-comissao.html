@@ -622,6 +622,19 @@
                 align-items: center;
                 justify-content: center;
             }
+            /* CSS para alinhar botões em coluna e campos ao lado */
+            .table-multiplos .acoes-multiplos-botoes {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                align-items: center;
+            }
+            .table-multiplos .acoes-multiplos-parcelas {
+                display: none;
+                flex-direction: column;
+                gap: 4px;
+                align-items: flex-start;
+            }
         </style>
         <script>
             let produtos = [];
@@ -780,17 +793,21 @@
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td style="min-width:320px;display:flex;flex-direction:row;gap:8px;align-items:center;justify-content:center;">
-                        <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
-                        <div class="group-parcelas" style="display:none;">
-                            <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
-                            <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
+                    <td style="min-width:220px;display:flex;flex-direction:row;gap:12px;align-items:center;justify-content:center;">
+                        <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+                            <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
+                            <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                         </div>
-                        <div class="group-valor-parcela" style="display:none;">
-                            <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
-                            <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                        <div class="acoes-multiplos-parcelas" style="display:none;flex-direction:column;gap:4px;align-items:flex-start;">
+                            <div class="group-parcelas">
+                                <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
+                                <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
+                            </div>
+                            <div class="group-valor-parcela">
+                                <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
+                                <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                            </div>
                         </div>
-                        <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1331,18 +1348,15 @@
             // Função para alternar exibição dos campos de parcelas e valor da parcela na linha de múltiplos lançamentos
             function toggleParceladoMultiploLinha(btn) {
                 const td = btn.closest('td');
-                const groupParcelas = td.querySelector('.group-parcelas');
-                const groupValorParcela = td.querySelector('.group-valor-parcela');
-                if (groupParcelas.style.display === 'none' || groupParcelas.style.display === '') {
-                    groupParcelas.style.display = 'flex';
-                    groupValorParcela.style.display = 'flex';
+                const divParcelas = td.querySelector('.acoes-multiplos-parcelas');
+                if (divParcelas.style.display === 'none' || divParcelas.style.display === '') {
+                    divParcelas.style.display = 'flex';
                     btn.classList.add('active');
                 } else {
-                    groupParcelas.style.display = 'none';
-                    groupValorParcela.style.display = 'none';
+                    divParcelas.style.display = 'none';
                     btn.classList.remove('active');
-                    groupParcelas.querySelector('input').value = '';
-                    groupValorParcela.querySelector('input').value = '';
+                    divParcelas.querySelector('.input-qtd-parcelas').value = '';
+                    divParcelas.querySelector('.input-valor-parcela').value = '';
                 }
             }
 
@@ -1367,7 +1381,7 @@
                 const td = btn.closest('td');
                 const tr = td.closest('tr');
                 const trSimulacao = tr.nextElementSibling;
-                const groupParcelas = td.querySelector('.group-parcelas');
+                const groupParcelas = td.querySelector('.acoes-multiplos-parcelas');
                 let qtd = 1;
                 if (groupParcelas && groupParcelas.style.display !== 'none') {
                     const qtdInput = groupParcelas.querySelector('input');
