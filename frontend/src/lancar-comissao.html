@@ -919,7 +919,7 @@
 
             let numeroTituloPaiMultiplo = 1;
 
-            function adicionarLinhaMultiplo() {
+            function adicionarLinhaMultiplo(valores = null) {
                 const tbody = document.getElementById('linhasMultiplo');
                 const idx = tbody.children.length;
                 const numeroPai = numeroTituloPaiMultiplo.toString().padStart(6, '0');
@@ -943,6 +943,8 @@
                     <td class="acao-multiplos">
                         <div class="acoes-multiplos-wrapper">
                             <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+                                <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
+                                <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
                                 <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
                                 <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
                             </div>
@@ -969,6 +971,51 @@
                 // Preencher colaborador (layout fixo, carrega opções depois)
                 const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
                 preencherSelectColaborador(selectColaborador);
+                // Se valores foram passados (duplicação), preencher os campos
+                if (valores) {
+                    tr.querySelector('input[name="descricao[]"]').value = valores.descricao || '';
+                    tr.querySelector('input[name="valor_venda[]"]').value = valores.valor_venda || '';
+                    tr.querySelector('input[name="percentual[]"]').value = valores.percentual || '';
+                    tr.querySelector('input[name="valor_comissao[]"]').value = valores.valor_comissao || '';
+                    // Preencher selects após carregamento
+                    setTimeout(() => {
+                        if (valores.colaborador) selectColaborador.value = valores.colaborador;
+                        if (valores.tipo) {
+                            const tipoBtn = tr.querySelector(`.btn-tipo[data-tipo='${valores.tipo}']`);
+                            if (tipoBtn) tipoBtn.click();
+                        }
+                        setTimeout(() => {
+                            if (valores.item) {
+                                const selectItem = tr.querySelector('select[name="item[]"]');
+                                selectItem.value = valores.item;
+                            }
+                        }, 200);
+                    }, 200);
+                }
+                atualizarResumoMultiplo();
+            }
+
+            function duplicarLinhaMultiplo(btn) {
+                const tr = btn.closest('tr');
+                const valores = {
+                    colaborador: tr.querySelector('select[name="colaborador[]"]').value,
+                    tipo: tr.querySelector('input[name="tipo[]"]').value,
+                    item: tr.querySelector('select[name="item[]"]').value,
+                    descricao: tr.querySelector('input[name="descricao[]"]').value,
+                    valor_venda: tr.querySelector('input[name="valor_venda[]"]').value,
+                    percentual: tr.querySelector('input[name="percentual[]"]').value,
+                    valor_comissao: tr.querySelector('input[name="valor_comissao[]"]').value
+                };
+                adicionarLinhaMultiplo(valores);
+            }
+
+            function excluirLinhaMultiplo(btn) {
+                const tr = btn.closest('tr');
+                const trSimulacao = tr.nextElementSibling;
+                tr.remove();
+                if (trSimulacao && trSimulacao.classList.contains('linha-simulacao-multiplo')) {
+                    trSimulacao.remove();
+                }
                 atualizarResumoMultiplo();
             }
 
