@@ -328,6 +328,14 @@
             }
             .table-multiplos td {
                 background: #fff;
+                vertical-align: middle;
+                min-height: 56px;
+                height: 56px;
+            }
+            .table-multiplos td:last-child {
+                min-height: 56px;
+                height: 56px;
+                vertical-align: middle;
             }
             .table-multiplos .btn-primary {
                 margin-top: 8px;
@@ -634,6 +642,26 @@
                 flex-direction: column;
                 gap: 4px;
                 align-items: flex-start;
+            }
+            /* Melhorar design dos campos de quantidade de parcelas e valor da parcela na aba múltiplos lançamentos */
+            .table-multiplos .acoes-multiplos-parcelas .group-parcelas input,
+            .table-multiplos .acoes-multiplos-parcelas .group-valor-parcela input {
+                border: 1.5px solid #90caf9;
+                border-radius: 8px;
+                background: #f4faff;
+                color: #1565c0;
+                font-size: 14px;
+                padding: 10px;
+                box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+                text-align: center;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                width: 90px;
+            }
+            .table-multiplos .acoes-multiplos-parcelas .group-parcelas input:focus,
+            .table-multiplos .acoes-multiplos-parcelas .group-valor-parcela input:focus {
+                border-color: #2196F3 !important;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
             }
         </style>
         <script>
