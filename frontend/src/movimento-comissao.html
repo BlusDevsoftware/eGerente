@@ -8,6 +8,256 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Tabela padrão do sistema */
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            overflow: hidden;
+        }
+        .table-container th, .table-container td {
+            border: 1px solid #eee;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 1em;
+        }
+        .table-container th {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+        .table-container td {
+            background: #fff;
+            color: #333;
+        }
+        .table-container tr:last-child td {
+            border-bottom: none;
+        }
+        /* Filtros e busca */
+        .filters-container {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            margin: 24px 0 18px 0;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f4faff;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            padding: 6px 14px;
+            color: #1565c0;
+            font-size: 1em;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+        }
+        .search-box input[type='text'] {
+            border: none;
+            background: transparent;
+            color: #1565c0;
+            font-size: 1em;
+            outline: none;
+            margin-left: 8px;
+            width: 180px;
+        }
+        .filter-options select,
+        .filter-options input[type='date'] {
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            background: #f4faff;
+            color: #1565c0;
+            font-size: 1em;
+            padding: 7px 12px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            margin-right: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-options select:focus,
+        .filter-options input[type='date']:focus {
+            border-color: #2196F3 !important;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
+        }
+        /* Botões de ação na tabela */
+        .action-btn {
+            border-radius: 6px;
+            border: 1.5px solid #90caf9;
+            background: #e3f2fd;
+            color: #1565c0;
+            font-size: 1.1em;
+            padding: 6px 10px;
+            margin: 0 2px;
+            cursor: pointer;
+            transition: background 0.18s, border 0.18s, color 0.18s;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+        }
+        .action-btn:hover {
+            background: #bbdefb;
+            border-color: #2196F3;
+            color: #1976d2;
+        }
+        .action-btn.pay-btn {
+            background: #fffbe6;
+            border: 1.5px solid #fbc02d;
+            color: #b8860b;
+        }
+        .action-btn.pay-btn:hover {
+            background: #ffe082;
+            border-color: #fbc02d;
+            color: #b8860b;
+        }
+        .action-btn.edit-btn {
+            background: #ffebee;
+            border: 1.5px solid #e53935;
+            color: #b71c1c;
+        }
+        .action-btn.edit-btn:hover {
+            background: #ffcdd2;
+            border-color: #e53935;
+            color: #b71c1c;
+        }
+        /* Status */
+        .status.paid {
+            background: #e3f9e5;
+            color: #388e3c;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        .status.pending {
+            background: #fffbe6;
+            color: #b8860b;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        /* Modal de pagamento */
+        .modal-content {
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(33,150,243,0.13);
+            padding: 32px 28px;
+            max-width: 480px;
+            width: 100%;
+        }
+        .modal-header h2 {
+            color: #1976D2;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+        .modal-header .close-modal {
+            background: #ffebee;
+            border: 1.5px solid #e53935;
+            color: #e53935;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.18s, border 0.18s, color 0.18s;
+        }
+        .modal-header .close-modal:hover {
+            background: #ffcdd2;
+            border-color: #b71c1c;
+            color: #b71c1c;
+        }
+        .modal-body .form-row {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .modal-body .form-group label {
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .modal-body input[type='number'],
+        .modal-body input[type='date'],
+        .modal-body select,
+        .modal-body textarea {
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            background: #f4faff;
+            color: #1565c0;
+            font-size: 14px;
+            padding: 10px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .modal-body input[type='number']:focus,
+        .modal-body input[type='date']:focus,
+        .modal-body select:focus,
+        .modal-body textarea:focus {
+            border-color: #2196F3 !important;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
+        }
+        .modal-body .input-group {
+            display: flex;
+            align-items: center;
+            background: #f4faff;
+            border-radius: 8px;
+            border: 1.5px solid #90caf9;
+            padding: 0 8px;
+            margin-bottom: 0;
+        }
+        .modal-body .input-prefix {
+            color: #1976D2;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .modal-body textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .modal-body .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+        .modal-body .btn-primary,
+        .modal-body .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .modal-body .btn-primary {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        .modal-body .btn-primary:hover {
+            background-color: #1976D2;
+        }
+        .modal-body .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .modal-body .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
