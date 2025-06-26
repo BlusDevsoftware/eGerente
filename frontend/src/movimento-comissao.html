@@ -99,22 +99,26 @@
             background: #e3f2fd;
             color: #fff;
             padding: 0;
+            outline: none;
         }
         .action-btn i {
             color: #fff !important;
-            font-size: 1.15em;
+            font-size: 1.25em;
+            margin: 0;
         }
         .action-btn.view-btn {
             background: #1976d2;
         }
         .action-btn.view-btn:hover {
             background: #115293;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.18);
         }
         .action-btn.edit-btn {
             background: #388e3c;
         }
         .action-btn.edit-btn:hover {
             background: #256029;
+            box-shadow: 0 2px 8px rgba(56, 142, 60, 0.18);
         }
         .action-btn.pay-btn {
             background: #fbc02d;
@@ -122,12 +126,14 @@
         }
         .action-btn.pay-btn:hover {
             background: #b8860b;
+            box-shadow: 0 2px 8px rgba(251, 192, 45, 0.18);
         }
         .action-btn.delete-btn {
             background: #d32f2f;
         }
         .action-btn.delete-btn:hover {
             background: #a31515;
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.18);
         }
         /* Status */
         .status.paid {
@@ -530,9 +536,9 @@
                         <td>R$ 1.500,00</td>
                         <td><span class="status pending">Pendente</span></td>
                         <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(1, 1500.00)"><i class="fas fa-money-bill-wave"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                            <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(1, 1500.00)"><i class="fa-solid fa-money-bill-wave"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -546,9 +552,9 @@
                         <td>R$ 2.300,00</td>
                         <td><span class="status paid">Pago</span></td>
                         <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -562,9 +568,9 @@
                         <td>R$ 900,00</td>
                         <td><span class="status vencido">Vencido</span></td>
                         <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(2, 900.00)"><i class="fas fa-money-bill-wave"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                            <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(2, 900.00)"><i class="fa-solid fa-money-bill-wave"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -578,9 +584,9 @@
                         <td>R$ 1.200,00</td>
                         <td><span class="status nao-pago">Cliente não pagou</span></td>
                         <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 </tbody>
