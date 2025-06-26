@@ -295,8 +295,8 @@
             background: white;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 0;
-            max-width: 600px;
-            width: 90%;
+            max-width: 700px;
+            width: 96%;
         }
         #viewModal .modal-header {
             padding: 20px;
@@ -329,25 +329,44 @@
             color: #333;
         }
         #viewModal .modal-body {
-            padding: 20px;
+            padding: 24px 24px 10px 24px;
         }
-        .view-details .detail-row {
-            margin-bottom: 15px;
+        #viewModal .form-row {
             display: flex;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            gap: 20px;
+            margin-bottom: 18px;
         }
-        .view-details .detail-row strong {
-            width: 200px;
-            color: #666;
-        }
-        .view-details .detail-row span {
+        #viewModal .form-group {
             flex: 1;
-            color: #333;
+        }
+        #viewModal .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        #viewModal .form-group label i {
+            margin-right: 5px;
+            color: #2196F3;
+        }
+        #viewModal .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #f5f5f5;
+            color: #222;
+            font-weight: 400;
+            transition: border-color 0.3s;
+        }
+        #viewModal .form-group input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
         }
         @media (max-width: 700px) {
-            #viewModal .modal-content { max-width: 98vw; padding: 18px 6px; }
-            #viewModal .modal-body { grid-template-columns: 1fr; }
+            #viewModal .modal-content { max-width: 98vw; padding: 8px 2px; }
+            #viewModal .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
@@ -622,15 +641,60 @@
 
     <!-- Modal de Visualização -->
     <div id="viewModal" class="modal">
-        <div class="modal-content" style="max-width: 600px; width: 90%;">
+        <div class="modal-content" style="max-width: 700px; width: 96%;">
             <div class="modal-header">
-                <h2><i class="fas fa-eye"></i> Detalhes do Título</h2>
+                <h2><i class="fas fa-eye"></i> Visualizar Título</h2>
                 <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="viewContent" class="view-details">
-                    <!-- O conteúdo será preenchido dinamicamente -->
-                </div>
+                <form id="viewTituloForm" autocomplete="off" style="margin:0;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-hashtag"></i> Nº Título</label>
+                            <input type="text" id="view-numero" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Colaborador</label>
+                            <input type="text" id="view-colaborador" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-cubes"></i> Tipo</label>
+                            <input type="text" id="view-tipo" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-coins"></i> Valor</label>
+                            <input type="text" id="view-valor" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-align-left"></i> Descrição</label>
+                            <input type="text" id="view-descricao" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-flag"></i> Status</label>
+                            <input type="text" id="view-status" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
+                            <input type="text" id="view-geracao" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
+                            <input type="text" id="view-vencimento" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
+                            <input type="text" id="view-usuario" readonly>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -683,18 +747,15 @@
 
         function openViewModal(data) {
             const modal = document.getElementById('viewModal');
-            const content = document.getElementById('viewContent');
-            content.innerHTML = `
-                <div class="detail-row"><strong><i class="fas fa-hashtag"></i> Nº Título:</strong> <span>${data.numero}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-user"></i> Colaborador:</strong> <span>${data.colaborador}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-cubes"></i> Tipo:</strong> <span>${data.tipo}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-align-left"></i> Descrição:</strong> <span>${data.descricao}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-coins"></i> Valor:</strong> <span>${data.valor}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-flag"></i> Status:</strong> <span>${data.status}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-calendar-plus"></i> Data da Geração:</strong> <span>${data.geracao}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-calendar-check"></i> Data de Vencimento:</strong> <span>${data.vencimento}</span></div>
-                <div class="detail-row"><strong><i class="fas fa-user-shield"></i> Usuário do Lançamento:</strong> <span>${data.usuario || 'admin'}</span></div>
-            `;
+            document.getElementById('view-numero').value = data.numero || '';
+            document.getElementById('view-colaborador').value = data.colaborador || '';
+            document.getElementById('view-tipo').value = data.tipo || '';
+            document.getElementById('view-valor').value = data.valor || '';
+            document.getElementById('view-descricao').value = data.descricao || '';
+            document.getElementById('view-status').value = data.status || '';
+            document.getElementById('view-geracao').value = data.geracao || '';
+            document.getElementById('view-vencimento').value = data.vencimento || '';
+            document.getElementById('view-usuario').value = data.usuario || '';
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
