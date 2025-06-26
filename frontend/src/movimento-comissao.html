@@ -291,73 +291,59 @@
             color: #e65100;
         }
         #viewModal .modal-content {
-            max-width: 420px;
-            padding: 24px 18px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 0;
+            max-width: 600px;
+            width: 90%;
         }
         #viewModal .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
         }
         #viewModal .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #1976D2;
-            font-size: 1.25em;
-            font-weight: 700;
-            margin: 0;
         }
-        #viewModal .modal-header i {
+        #viewModal .modal-header h2 i {
             color: #2196F3;
-            font-size: 1.3em;
+        }
+        #viewModal .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        #viewModal .close-modal:hover {
+            color: #333;
         }
         #viewModal .modal-body {
+            padding: 20px;
+        }
+        .view-details .detail-row {
+            margin-bottom: 15px;
             display: flex;
-            flex-direction: column;
-            gap: 14px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
         }
-        #viewModal .form-group-view {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .view-details .detail-row strong {
+            width: 200px;
+            color: #666;
         }
-        #viewModal .form-group-view label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #444;
-            font-weight: 500;
-            font-size: 0.98em;
-        }
-        #viewModal .form-group-view i {
-            color: #888;
-            font-size: 1.1em;
-        }
-        #viewModal .form-group-view input,
-        #viewModal .form-group-view textarea {
-            background: #f4faff;
-            border: 1.5px solid #e3e3e3;
-            border-radius: 8px;
-            color: #222;
-            font-size: 1em;
-            padding: 8px 12px;
-            font-weight: 400;
-            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
-            outline: none;
-            resize: none;
-        }
-        #viewModal .form-group-view input[readonly],
-        #viewModal .form-group-view textarea[readonly] {
-            background: #f4faff;
-            color: #222;
-            border: 1.5px solid #e3e3e3;
-            cursor: default;
-        }
-        #viewModal .form-group-view textarea {
-            min-height: 38px;
-            max-height: 80px;
+        .view-details .detail-row span {
+            flex: 1;
+            color: #333;
         }
         @media (max-width: 700px) {
             #viewModal .modal-content { max-width: 98vw; padding: 18px 6px; }
@@ -642,7 +628,7 @@
                 <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div id="viewContent" class="view-content">
+                <div id="viewContent" class="view-details">
                     <!-- O conteúdo será preenchido dinamicamente -->
                 </div>
             </div>
