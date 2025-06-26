@@ -639,11 +639,11 @@
         </div>
     </div>
 
-    <!-- Modal de Visualização -->
+    <!-- Modal de Visualização/Edição -->
     <div id="viewModal" class="modal">
         <div class="modal-content" style="max-width: 700px; width: 96%;">
             <div class="modal-header">
-                <h2><i class="fas fa-eye"></i> Visualizar Título</h2>
+                <h2 id="viewModalTitle"><i class="fas fa-eye"></i> Visualizar Título</h2>
                 <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -693,6 +693,14 @@
                             <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
                             <input type="text" id="view-usuario" readonly>
                         </div>
+                    </div>
+                    <div class="form-actions" id="editActions" style="display:none; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
+                        <button type="button" class="btn-secondary" onclick="closeViewModal()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="button" class="btn-primary" onclick="saveEditModal()">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
                     </div>
                 </form>
             </div>
@@ -747,6 +755,9 @@
 
         function openViewModal(data) {
             const modal = document.getElementById('viewModal');
+            document.getElementById('viewModalTitle').innerHTML = '<i class="fas fa-eye"></i> Visualizar Título';
+            document.getElementById('editActions').style.display = 'none';
+            // Preencher campos
             document.getElementById('view-numero').value = data.numero || '';
             document.getElementById('view-colaborador').value = data.colaborador || '';
             document.getElementById('view-tipo').value = data.tipo || '';
@@ -756,6 +767,29 @@
             document.getElementById('view-geracao').value = data.geracao || '';
             document.getElementById('view-vencimento').value = data.vencimento || '';
             document.getElementById('view-usuario').value = data.usuario || '';
+            // Deixar todos os campos readonly
+            document.querySelectorAll('#viewTituloForm input').forEach(input => input.setAttribute('readonly', true));
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openEditModal(data) {
+            const modal = document.getElementById('viewModal');
+            document.getElementById('viewModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Título';
+            document.getElementById('editActions').style.display = 'flex';
+            // Preencher campos
+            document.getElementById('view-numero').value = data.numero || '';
+            document.getElementById('view-colaborador').value = data.colaborador || '';
+            document.getElementById('view-tipo').value = data.tipo || '';
+            document.getElementById('view-valor').value = data.valor || '';
+            document.getElementById('view-descricao').value = data.descricao || '';
+            document.getElementById('view-status').value = data.status || '';
+            document.getElementById('view-geracao').value = data.geracao || '';
+            document.getElementById('view-vencimento').value = data.vencimento || '';
+            document.getElementById('view-usuario').value = data.usuario || '';
+            // Tornar todos os campos editáveis, exceto o número
+            document.querySelectorAll('#viewTituloForm input').forEach(input => input.removeAttribute('readonly'));
+            document.getElementById('view-numero').setAttribute('readonly', true);
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
@@ -763,67 +797,23 @@
         function closeViewModal() {
             document.getElementById('viewModal').style.display = 'none';
             document.body.style.overflow = 'auto';
-        }
-
-        function openEditModal(data) {
-            const modal = document.getElementById('viewModal');
-            const body = document.getElementById('viewModalBody');
-            body.innerHTML = `
-                <div class="form-group-view">
-                    <label><i class="fas fa-hashtag"></i> Nº Título</label>
-                    <input type="text" id="edit-numero" value="${data.numero}" readonly>
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-user"></i> Colaborador</label>
-                    <input type="text" id="edit-colaborador" value="${data.colaborador}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-cubes"></i> Tipo</label>
-                    <input type="text" id="edit-tipo" value="${data.tipo}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-align-left"></i> Descrição</label>
-                    <textarea id="edit-descricao">${data.descricao}</textarea>
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-coins"></i> Valor</label>
-                    <input type="text" id="edit-valor" value="${data.valor}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-flag"></i> Status</label>
-                    <input type="text" id="edit-status" value="${data.status}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
-                    <input type="text" id="edit-geracao" value="${data.geracao}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
-                    <input type="text" id="edit-vencimento" value="${data.vencimento}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
-                    <input type="text" id="edit-usuario" value="${data.usuario || 'admin'}">
-                </div>
-            `;
-            // Atualiza o título do modal
-            modal.querySelector('.modal-header h2').innerHTML = '<i class="fas fa-edit"></i> Editar Título';
-            document.getElementById('viewModalActions').style.display = 'flex';
-            modal.style.display = 'flex';
+            // Sempre restaurar campos para readonly ao fechar
+            document.querySelectorAll('#viewTituloForm input').forEach(input => input.setAttribute('readonly', true));
+            document.getElementById('editActions').style.display = 'none';
         }
 
         function saveEditModal() {
-            // Aqui você pode coletar os dados dos campos editáveis e salvar
+            // Coletar dados dos campos editáveis
             const dataEditada = {
-                numero: document.getElementById('edit-numero').value,
-                colaborador: document.getElementById('edit-colaborador').value,
-                tipo: document.getElementById('edit-tipo').value,
-                descricao: document.getElementById('edit-descricao').value,
-                valor: document.getElementById('edit-valor').value,
-                status: document.getElementById('edit-status').value,
-                geracao: document.getElementById('edit-geracao').value,
-                vencimento: document.getElementById('edit-vencimento').value,
-                usuario: document.getElementById('edit-usuario').value
+                numero: document.getElementById('view-numero').value,
+                colaborador: document.getElementById('view-colaborador').value,
+                tipo: document.getElementById('view-tipo').value,
+                valor: document.getElementById('view-valor').value,
+                descricao: document.getElementById('view-descricao').value,
+                status: document.getElementById('view-status').value,
+                geracao: document.getElementById('view-geracao').value,
+                vencimento: document.getElementById('view-vencimento').value,
+                usuario: document.getElementById('view-usuario').value
             };
             // Aqui você pode enviar para o backend ou atualizar a tabela
             alert('Título editado com sucesso!');
