@@ -292,6 +292,46 @@
             border-color: #ff9800;
             color: #e65100;
         }
+        #viewModal .modal-content {
+            max-width: 420px;
+            padding: 28px 22px;
+        }
+        #viewModal .modal-header h2 {
+            color: #1976D2;
+            font-size: 1.15em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        #viewModal .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 1em;
+        }
+        #viewModal .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f4faff;
+            border-radius: 7px;
+            padding: 7px 12px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+        }
+        #viewModal .info-row i {
+            color: #2196F3;
+            font-size: 1.1em;
+            min-width: 20px;
+            text-align: center;
+        }
+        #viewModal .info-label {
+            font-weight: 500;
+            color: #1976D2;
+            min-width: 120px;
+        }
+        #viewModal .info-value {
+            color: #333;
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
@@ -622,14 +662,15 @@
             const modal = document.getElementById('viewModal');
             const body = document.getElementById('viewModalBody');
             body.innerHTML = `
-                <strong>Nº Título:</strong> ${data.numero}<br>
-                <strong>Colaborador:</strong> ${data.colaborador}<br>
-                <strong>Tipo:</strong> ${data.tipo}<br>
-                <strong>Descrição:</strong> ${data.descricao}<br>
-                <strong>Valor:</strong> ${data.valor}<br>
-                <strong>Status:</strong> ${data.status}<br>
-                <strong>Data da Geração:</strong> ${data.geracao}<br>
-                <strong>Data de Vencimento:</strong> ${data.vencimento}<br>
+                <div class="info-row"><i class="fas fa-hashtag"></i><span class="info-label">Nº Título:</span><span class="info-value">${data.numero}</span></div>
+                <div class="info-row"><i class="fas fa-user"></i><span class="info-label">Colaborador:</span><span class="info-value">${data.colaborador}</span></div>
+                <div class="info-row"><i class="fas fa-cubes"></i><span class="info-label">Tipo:</span><span class="info-value">${data.tipo}</span></div>
+                <div class="info-row"><i class="fas fa-align-left"></i><span class="info-label">Descrição:</span><span class="info-value">${data.descricao}</span></div>
+                <div class="info-row"><i class="fas fa-coins"></i><span class="info-label">Valor:</span><span class="info-value">${data.valor}</span></div>
+                <div class="info-row"><i class="fas fa-flag"></i><span class="info-label">Status:</span><span class="info-value">${data.status}</span></div>
+                <div class="info-row"><i class="fas fa-calendar-plus"></i><span class="info-label">Data da Geração:</span><span class="info-value">${data.geracao}</span></div>
+                <div class="info-row"><i class="fas fa-calendar-check"></i><span class="info-label">Data de Vencimento:</span><span class="info-value">${data.vencimento}</span></div>
+                <div class="info-row"><i class="fas fa-user-shield"></i><span class="info-label">Usuário do Lançamento:</span><span class="info-value">${data.usuario || 'admin'}</span></div>
             `;
             modal.style.display = 'flex';
         }
