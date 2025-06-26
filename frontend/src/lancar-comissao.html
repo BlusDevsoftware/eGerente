@@ -718,6 +718,33 @@
             .duplicar-excluir-multiplos .btn-duplicar:hover { background: #bbdefb; }
             .duplicar-excluir-multiplos .btn-deletar { background: #ffebee; color: #c62828; }
             .duplicar-excluir-multiplos .btn-deletar:hover { background: #ffcdd2; }
+            #tabSimplesContent input[type='number'],
+            #tabSimplesContent input[type='date'] {
+                border: 1.5px solid #90caf9;
+                border-radius: 8px;
+                background: #f4faff;
+                color: #1565c0;
+                font-size: 14px;
+                padding: 10px;
+                box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+                text-align: center;
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            #tabSimplesContent input[type='number']:focus,
+            #tabSimplesContent input[type='date']:focus {
+                border-color: #2196F3 !important;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13);
+            }
+            #tabSimplesContent .form-group label {
+                color: #555;
+                font-weight: 500;
+                margin-bottom: 6px;
+            }
+            #tabSimplesContent .form-row {
+                gap: 18px;
+                align-items: flex-end;
+            }
         </style>
         <script>
             let produtos = [];
@@ -1643,4 +1670,4 @@
 
     <script src="scripts/navigation.js"></script>
 </body>
-</html> 
+</html>  
