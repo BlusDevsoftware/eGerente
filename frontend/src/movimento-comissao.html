@@ -384,7 +384,7 @@
 
         <!-- Commissions Table -->
         <div class="table-container">
-            <table>
+            <table id="movimentoComissoesTable">
                 <thead>
                     <tr>
                         <th>Nº Título</th>
@@ -538,6 +538,39 @@
             // Aqui você pode adicionar a lógica para salvar a baixa
             alert('Baixa registrada com sucesso!');
             closePaymentModal();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('movimentoComissoesTable');
+            const thead = table.querySelector('thead tr');
+            let draggingColIndex = null;
+
+            thead.querySelectorAll('th').forEach((th, idx) => {
+                th.style.cursor = 'move';
+                th.draggable = true;
+                th.addEventListener('dragstart', function(e) {
+                    draggingColIndex = idx;
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                th.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+                th.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    const targetColIndex = idx;
+                    if (draggingColIndex === null || draggingColIndex === targetColIndex) return;
+
+                    // Move a coluna no thead
+                    const ths = Array.from(thead.children);
+                    thead.insertBefore(ths[draggingColIndex], ths[targetColIndex + (draggingColIndex < targetColIndex ? 1 : 0)]);
+
+                    // Move as células correspondentes em cada linha do tbody
+                    table.querySelectorAll('tbody tr').forEach(tr => {
+                        const tds = Array.from(tr.children);
+                        tr.insertBefore(tds[draggingColIndex], tds[targetColIndex + (draggingColIndex < targetColIndex ? 1 : 0)]);
+                    });
+                });
+            });
         });
     </script>
 
