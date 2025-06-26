@@ -559,6 +559,19 @@
         </div>
     </div>
 
+    <!-- Modal de Visualização -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Título</h2>
+                <button class="close-modal" onclick="closeViewModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="viewModalBody">
+                <!-- Conteúdo preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -574,13 +587,6 @@
                 
                 // Toggle do submenu atual
                 this.parentElement.classList.toggle('active');
-            });
-        });
-
-        // Select all checkbox
-        document.getElementById('selectAll').addEventListener('change', function() {
-            document.querySelectorAll('.commission-select').forEach(checkbox => {
-                checkbox.checked = this.checked;
             });
         });
 
@@ -610,6 +616,46 @@
             // Aqui você pode adicionar a lógica para salvar a baixa
             alert('Baixa registrada com sucesso!');
             closePaymentModal();
+        });
+
+        function openViewModal(data) {
+            const modal = document.getElementById('viewModal');
+            const body = document.getElementById('viewModalBody');
+            body.innerHTML = `
+                <strong>Nº Título:</strong> ${data.numero}<br>
+                <strong>Colaborador:</strong> ${data.colaborador}<br>
+                <strong>Tipo:</strong> ${data.tipo}<br>
+                <strong>Descrição:</strong> ${data.descricao}<br>
+                <strong>Valor:</strong> ${data.valor}<br>
+                <strong>Status:</strong> ${data.status}<br>
+                <strong>Data da Geração:</strong> ${data.geracao}<br>
+                <strong>Data de Vencimento:</strong> ${data.vencimento}<br>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').style.display = 'none';
+        }
+
+        // Adiciona evento aos botões de visualizar
+        window.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.view-btn').forEach(function(btn, idx) {
+                btn.addEventListener('click', function() {
+                    // Dados fictícios para demonstração
+                    const row = btn.closest('tr');
+                    openViewModal({
+                        numero: row.children[1].textContent,
+                        geracao: row.children[2].textContent,
+                        vencimento: row.children[3].textContent,
+                        colaborador: row.children[4].textContent,
+                        tipo: row.children[5].textContent,
+                        descricao: row.children[6].textContent,
+                        valor: row.children[7].textContent,
+                        status: row.children[8].textContent
+                    });
+                });
+            });
         });
     </script>
 
