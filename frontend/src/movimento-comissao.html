@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         /* Tabela padrão do sistema */
         .table-container table {
@@ -256,6 +257,11 @@
         }
         .modal-body .btn-secondary:hover {
             background-color: #e0e0e0;
+        }
+        /* Visual feedback para coluna arrastada */
+        .sortable-ghost {
+            opacity: 0.5;
+            background: #bbdefb !important;
         }
     </style>
 </head>
@@ -542,34 +548,33 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const table = document.getElementById('movimentoComissoesTable');
-            const thead = table.querySelector('thead tr');
-            let draggingColIndex = null;
+            const theadRow = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
 
-            thead.querySelectorAll('th').forEach((th, idx) => {
-                th.style.cursor = 'move';
-                th.draggable = true;
-                th.addEventListener('dragstart', function(e) {
-                    draggingColIndex = idx;
-                    e.dataTransfer.effectAllowed = 'move';
-                });
-                th.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                });
-                th.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    const targetColIndex = idx;
-                    if (draggingColIndex === null || draggingColIndex === targetColIndex) return;
+            // Cria um array de índices para mapear a ordem das colunas
+            let colOrder = Array.from(theadRow.children).map((_, i) => i);
 
-                    // Move a coluna no thead
-                    const ths = Array.from(thead.children);
-                    thead.insertBefore(ths[draggingColIndex], ths[targetColIndex + (draggingColIndex < targetColIndex ? 1 : 0)]);
+            // Torna cada th um handle de drag
+            Array.from(theadRow.children).forEach(th => {
+                th.style.cursor = 'grab';
+            });
 
-                    // Move as células correspondentes em cada linha do tbody
-                    table.querySelectorAll('tbody tr').forEach(tr => {
-                        const tds = Array.from(tr.children);
-                        tr.insertBefore(tds[draggingColIndex], tds[targetColIndex + (draggingColIndex < targetColIndex ? 1 : 0)]);
+            // Usa Sortable.js para o thead
+            Sortable.create(theadRow, {
+                animation: 150,
+                sort: true,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    // Atualiza a ordem das colunas no tbody
+                    colOrder = Array.from(theadRow.children).map(th => th.cellIndex);
+                    Array.from(tbody.children).forEach(tr => {
+                        const cells = Array.from(tr.children);
+                        const newRow = colOrder.map(i => cells[i]);
+                        newRow.forEach((td, idx) => {
+                            tr.appendChild(td);
+                        });
                     });
-                });
+                }
             });
         });
     </script>
