@@ -293,44 +293,78 @@
             color: #e65100;
         }
         #viewModal .modal-content {
-            max-width: 420px;
-            padding: 28px 22px;
+            max-width: 600px;
+            padding: 32px 28px;
+        }
+        #viewModal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
         }
         #viewModal .modal-header h2 {
-            color: #1976D2;
-            font-size: 1.15em;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        #viewModal .modal-body {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            font-size: 1em;
-        }
-        #viewModal .info-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: #f4faff;
-            border-radius: 7px;
-            padding: 7px 12px;
-            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            color: #1976D2;
+            font-size: 1.25em;
+            font-weight: 700;
+            margin: 0;
         }
-        #viewModal .info-row i {
+        #viewModal .modal-header i {
+            color: #2196F3;
+            font-size: 1.3em;
+        }
+        #viewModal .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 24px;
+            font-size: 1em;
+        }
+        #viewModal .form-group-view {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        #viewModal .form-group-view label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1976D2;
+            font-weight: 500;
+            font-size: 0.98em;
+        }
+        #viewModal .form-group-view i {
             color: #2196F3;
             font-size: 1.1em;
-            min-width: 20px;
-            text-align: center;
         }
-        #viewModal .info-label {
-            font-weight: 500;
-            color: #1976D2;
-            min-width: 120px;
-        }
-        #viewModal .info-value {
+        #viewModal .form-group-view input,
+        #viewModal .form-group-view textarea {
+            background: #f4faff;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
             color: #333;
+            font-size: 1em;
+            padding: 8px 12px;
             font-weight: 400;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            outline: none;
+            resize: none;
+        }
+        #viewModal .form-group-view input[readonly],
+        #viewModal .form-group-view textarea[readonly] {
+            background: #f4faff;
+            color: #333;
+            border: 1.5px solid #e3f2fd;
+            cursor: default;
+        }
+        #viewModal .form-group-view textarea {
+            min-height: 38px;
+            max-height: 80px;
+        }
+        @media (max-width: 700px) {
+            #viewModal .modal-content { max-width: 98vw; padding: 18px 6px; }
+            #viewModal .modal-body { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -662,16 +696,45 @@
             const modal = document.getElementById('viewModal');
             const body = document.getElementById('viewModalBody');
             body.innerHTML = `
-                <div class="info-row"><i class="fas fa-hashtag"></i><span class="info-label">Nº Título:</span><span class="info-value">${data.numero}</span></div>
-                <div class="info-row"><i class="fas fa-user"></i><span class="info-label">Colaborador:</span><span class="info-value">${data.colaborador}</span></div>
-                <div class="info-row"><i class="fas fa-cubes"></i><span class="info-label">Tipo:</span><span class="info-value">${data.tipo}</span></div>
-                <div class="info-row"><i class="fas fa-align-left"></i><span class="info-label">Descrição:</span><span class="info-value">${data.descricao}</span></div>
-                <div class="info-row"><i class="fas fa-coins"></i><span class="info-label">Valor:</span><span class="info-value">${data.valor}</span></div>
-                <div class="info-row"><i class="fas fa-flag"></i><span class="info-label">Status:</span><span class="info-value">${data.status}</span></div>
-                <div class="info-row"><i class="fas fa-calendar-plus"></i><span class="info-label">Data da Geração:</span><span class="info-value">${data.geracao}</span></div>
-                <div class="info-row"><i class="fas fa-calendar-check"></i><span class="info-label">Data de Vencimento:</span><span class="info-value">${data.vencimento}</span></div>
-                <div class="info-row"><i class="fas fa-user-shield"></i><span class="info-label">Usuário do Lançamento:</span><span class="info-value">${data.usuario || 'admin'}</span></div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-hashtag"></i> Nº Título</label>
+                    <input type="text" readonly value="${data.numero}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-user"></i> Colaborador</label>
+                    <input type="text" readonly value="${data.colaborador}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-cubes"></i> Tipo</label>
+                    <input type="text" readonly value="${data.tipo}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-align-left"></i> Descrição</label>
+                    <textarea readonly>${data.descricao}</textarea>
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-coins"></i> Valor</label>
+                    <input type="text" readonly value="${data.valor}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-flag"></i> Status</label>
+                    <input type="text" readonly value="${data.status}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
+                    <input type="text" readonly value="${data.geracao}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
+                    <input type="text" readonly value="${data.vencimento}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
+                    <input type="text" readonly value="${data.usuario || 'admin'}">
+                </div>
             `;
+            // Atualiza o título do modal
+            modal.querySelector('.modal-header h2').innerHTML = '<i class="fas fa-eye"></i> Visualizar Título';
             modal.style.display = 'flex';
         }
 
