@@ -84,41 +84,50 @@
         }
         /* Botões de ação na tabela */
         .action-btn {
-            border-radius: 6px;
-            border: 1.5px solid #90caf9;
-            background: #e3f2fd;
-            color: #1565c0;
-            font-size: 1.1em;
-            padding: 6px 10px;
-            margin: 0 2px;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35em;
+            margin: 0 4px;
             cursor: pointer;
-            transition: background 0.18s, border 0.18s, color 0.18s;
-            box-shadow: 0 1px 4px rgba(33,150,243,0.04);
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: none;
+            background: #e3f2fd;
+            color: #fff;
+            padding: 0;
         }
-        .action-btn:hover {
-            background: #bbdefb;
-            border-color: #2196F3;
-            color: #1976d2;
+        .action-btn i {
+            color: #fff !important;
+            font-size: 1.15em;
         }
-        .action-btn.pay-btn {
-            background: #fffbe6;
-            border: 1.5px solid #fbc02d;
-            color: #b8860b;
+        .action-btn.view-btn {
+            background: #1976d2;
         }
-        .action-btn.pay-btn:hover {
-            background: #ffe082;
-            border-color: #fbc02d;
-            color: #b8860b;
+        .action-btn.view-btn:hover {
+            background: #115293;
         }
         .action-btn.edit-btn {
-            background: #ffebee;
-            border: 1.5px solid #e53935;
-            color: #b71c1c;
+            background: #388e3c;
         }
         .action-btn.edit-btn:hover {
-            background: #ffcdd2;
-            border-color: #e53935;
-            color: #b71c1c;
+            background: #256029;
+        }
+        .action-btn.pay-btn {
+            background: #fbc02d;
+            color: #fff;
+        }
+        .action-btn.pay-btn:hover {
+            background: #b8860b;
+        }
+        .action-btn.delete-btn {
+            background: #d32f2f;
+        }
+        .action-btn.delete-btn:hover {
+            background: #a31515;
         }
         /* Status */
         .status.paid {
@@ -293,8 +302,8 @@
             color: #e65100;
         }
         #viewModal .modal-content {
-            max-width: 600px;
-            padding: 32px 28px;
+            max-width: 420px;
+            padding: 24px 18px;
         }
         #viewModal .modal-header {
             display: flex;
@@ -316,10 +325,9 @@
             font-size: 1.3em;
         }
         #viewModal .modal-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px 24px;
-            font-size: 1em;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
         }
         #viewModal .form-group-view {
             display: flex;
@@ -330,20 +338,20 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            color: #1976D2;
+            color: #444;
             font-weight: 500;
             font-size: 0.98em;
         }
         #viewModal .form-group-view i {
-            color: #2196F3;
+            color: #888;
             font-size: 1.1em;
         }
         #viewModal .form-group-view input,
         #viewModal .form-group-view textarea {
             background: #f4faff;
-            border: 1.5px solid #90caf9;
+            border: 1.5px solid #e3e3e3;
             border-radius: 8px;
-            color: #333;
+            color: #222;
             font-size: 1em;
             padding: 8px 12px;
             font-weight: 400;
@@ -354,8 +362,8 @@
         #viewModal .form-group-view input[readonly],
         #viewModal .form-group-view textarea[readonly] {
             background: #f4faff;
-            color: #333;
-            border: 1.5px solid #e3f2fd;
+            color: #222;
+            border: 1.5px solid #e3e3e3;
             cursor: default;
         }
         #viewModal .form-group-view textarea {
@@ -524,6 +532,7 @@
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(1, 1500.00)"><i class="fas fa-money-bill-wave"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -539,6 +548,7 @@
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn edit-btn" title="Editar Baixa"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -554,6 +564,7 @@
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(2, 900.00)"><i class="fas fa-money-bill-wave"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -569,6 +580,7 @@
                         <td>
                             <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn edit-btn" title="Editar Baixa"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 </tbody>
@@ -637,11 +649,19 @@
     <div class="modal" id="viewModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Detalhes do Título</h2>
+                <h2><i class="fas fa-eye"></i> Visualizar Título</h2>
                 <button class="close-modal" onclick="closeViewModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" id="viewModalBody">
                 <!-- Conteúdo preenchido via JS -->
+            </div>
+            <div class="modal-actions" id="viewModalActions" style="display:none; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
+                <button type="button" class="btn-secondary" onclick="closeViewModal()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn-primary" onclick="saveEditModal()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
             </div>
         </div>
     </div>
@@ -735,11 +755,77 @@
             `;
             // Atualiza o título do modal
             modal.querySelector('.modal-header h2').innerHTML = '<i class="fas fa-eye"></i> Visualizar Título';
+            document.getElementById('viewModalActions').style.display = 'none';
             modal.style.display = 'flex';
         }
 
         function closeViewModal() {
             document.getElementById('viewModal').style.display = 'none';
+        }
+
+        function openEditModal(data) {
+            const modal = document.getElementById('viewModal');
+            const body = document.getElementById('viewModalBody');
+            body.innerHTML = `
+                <div class="form-group-view">
+                    <label><i class="fas fa-hashtag"></i> Nº Título</label>
+                    <input type="text" id="edit-numero" value="${data.numero}" readonly>
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-user"></i> Colaborador</label>
+                    <input type="text" id="edit-colaborador" value="${data.colaborador}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-cubes"></i> Tipo</label>
+                    <input type="text" id="edit-tipo" value="${data.tipo}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-align-left"></i> Descrição</label>
+                    <textarea id="edit-descricao">${data.descricao}</textarea>
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-coins"></i> Valor</label>
+                    <input type="text" id="edit-valor" value="${data.valor}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-flag"></i> Status</label>
+                    <input type="text" id="edit-status" value="${data.status}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
+                    <input type="text" id="edit-geracao" value="${data.geracao}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
+                    <input type="text" id="edit-vencimento" value="${data.vencimento}">
+                </div>
+                <div class="form-group-view">
+                    <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
+                    <input type="text" id="edit-usuario" value="${data.usuario || 'admin'}">
+                </div>
+            `;
+            // Atualiza o título do modal
+            modal.querySelector('.modal-header h2').innerHTML = '<i class="fas fa-edit"></i> Editar Título';
+            document.getElementById('viewModalActions').style.display = 'flex';
+            modal.style.display = 'flex';
+        }
+
+        function saveEditModal() {
+            // Aqui você pode coletar os dados dos campos editáveis e salvar
+            const dataEditada = {
+                numero: document.getElementById('edit-numero').value,
+                colaborador: document.getElementById('edit-colaborador').value,
+                tipo: document.getElementById('edit-tipo').value,
+                descricao: document.getElementById('edit-descricao').value,
+                valor: document.getElementById('edit-valor').value,
+                status: document.getElementById('edit-status').value,
+                geracao: document.getElementById('edit-geracao').value,
+                vencimento: document.getElementById('edit-vencimento').value,
+                usuario: document.getElementById('edit-usuario').value
+            };
+            // Aqui você pode enviar para o backend ou atualizar a tabela
+            alert('Título editado com sucesso!');
+            closeViewModal();
         }
 
         // Adiciona evento aos botões de visualizar
@@ -758,6 +844,31 @@
                         valor: row.children[7].textContent,
                         status: row.children[8].textContent
                     });
+                });
+            });
+            document.querySelectorAll('.edit-btn').forEach(function(btn, idx) {
+                btn.addEventListener('click', function() {
+                    const row = btn.closest('tr');
+                    openEditModal({
+                        numero: row.children[1].textContent,
+                        geracao: row.children[2].textContent,
+                        vencimento: row.children[3].textContent,
+                        colaborador: row.children[4].textContent,
+                        tipo: row.children[5].textContent,
+                        descricao: row.children[6].textContent,
+                        valor: row.children[7].textContent,
+                        status: row.children[8].textContent
+                    });
+                });
+            });
+            document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const row = btn.closest('tr');
+                    const numero = row.children[1].textContent;
+                    if (confirm('Tem certeza que deseja excluir o título ' + numero + '?')) {
+                        row.remove();
+                        // Aqui você pode adicionar lógica para excluir do backend
+                    }
                 });
             });
         });
