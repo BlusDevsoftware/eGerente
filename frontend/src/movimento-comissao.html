@@ -84,56 +84,39 @@
         }
         /* Botões de ação na tabela */
         .action-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 8px;
+            background: none;
             border: none;
+            cursor: pointer;
+            padding: 6px;
+            margin: 0 2px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.35em;
-            margin: 0 4px;
-            cursor: pointer;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: none;
-            background: #e3f2fd;
-            color: #fff;
-            padding: 0;
-            outline: none;
+        }
+        .view-btn {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #198754;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
         }
         .action-btn i {
-            color: #fff !important;
-            font-size: 1.25em;
-            margin: 0;
+            font-size: 14px;
         }
-        .action-btn.view-btn {
-            background: #1976d2;
-        }
-        .action-btn.view-btn:hover {
-            background: #115293;
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.18);
-        }
-        .action-btn.edit-btn {
-            background: #388e3c;
-        }
-        .action-btn.edit-btn:hover {
-            background: #256029;
-            box-shadow: 0 2px 8px rgba(56, 142, 60, 0.18);
-        }
-        .action-btn.pay-btn {
-            background: #fbc02d;
-            color: #fff;
-        }
-        .action-btn.pay-btn:hover {
-            background: #b8860b;
-            box-shadow: 0 2px 8px rgba(251, 192, 45, 0.18);
-        }
-        .action-btn.delete-btn {
-            background: #d32f2f;
-        }
-        .action-btn.delete-btn:hover {
-            background: #a31515;
-            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.18);
+        .actions {
+            white-space: nowrap;
         }
         /* Status */
         .status.paid {
@@ -535,10 +518,10 @@
                         <td>Venda de notebook</td>
                         <td>R$ 1.500,00</td>
                         <td><span class="status pending">Pendente</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(1, 1500.00)"><i class="fa-solid fa-money-bill-wave"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -551,10 +534,10 @@
                         <td>Consultoria financeira</td>
                         <td>R$ 2.300,00</td>
                         <td><span class="status paid">Pago</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -567,10 +550,10 @@
                         <td>Venda de impressora</td>
                         <td>R$ 900,00</td>
                         <td><span class="status vencido">Vencido</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
                             <button class="action-btn pay-btn" title="Dar Baixa" onclick="openPaymentModal(2, 900.00)"><i class="fa-solid fa-money-bill-wave"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     <tr>
@@ -583,10 +566,10 @@
                         <td>Treinamento</td>
                         <td>R$ 1.200,00</td>
                         <td><span class="status nao-pago">Cliente não pagou</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fa-solid fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar Baixa"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="action-btn delete-btn" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        <td class="actions">
+                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 </tbody>
@@ -652,22 +635,16 @@
     </div>
 
     <!-- Modal de Visualização -->
-    <div class="modal" id="viewModal">
-        <div class="modal-content">
+    <div id="viewModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; width: 90%;">
             <div class="modal-header">
-                <h2><i class="fas fa-eye"></i> Visualizar Título</h2>
-                <button class="close-modal" onclick="closeViewModal()"><i class="fas fa-times"></i></button>
+                <h2><i class="fas fa-eye"></i> Detalhes do Título</h2>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
-            <div class="modal-body" id="viewModalBody">
-                <!-- Conteúdo preenchido via JS -->
-            </div>
-            <div class="modal-actions" id="viewModalActions" style="display:none; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
-                <button type="button" class="btn-secondary" onclick="closeViewModal()">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="button" class="btn-primary" onclick="saveEditModal()">
-                    <i class="fas fa-save"></i> Salvar
-                </button>
+            <div class="modal-body">
+                <div id="viewContent" class="view-content">
+                    <!-- O conteúdo será preenchido dinamicamente -->
+                </div>
             </div>
         </div>
     </div>
@@ -720,53 +697,25 @@
 
         function openViewModal(data) {
             const modal = document.getElementById('viewModal');
-            const body = document.getElementById('viewModalBody');
-            body.innerHTML = `
-                <div class="form-group-view">
-                    <label><i class="fas fa-hashtag"></i> Nº Título</label>
-                    <input type="text" readonly value="${data.numero}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-user"></i> Colaborador</label>
-                    <input type="text" readonly value="${data.colaborador}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-cubes"></i> Tipo</label>
-                    <input type="text" readonly value="${data.tipo}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-align-left"></i> Descrição</label>
-                    <textarea readonly>${data.descricao}</textarea>
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-coins"></i> Valor</label>
-                    <input type="text" readonly value="${data.valor}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-flag"></i> Status</label>
-                    <input type="text" readonly value="${data.status}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
-                    <input type="text" readonly value="${data.geracao}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
-                    <input type="text" readonly value="${data.vencimento}">
-                </div>
-                <div class="form-group-view">
-                    <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
-                    <input type="text" readonly value="${data.usuario || 'admin'}">
-                </div>
+            const content = document.getElementById('viewContent');
+            content.innerHTML = `
+                <div class="detail-row"><strong><i class="fas fa-hashtag"></i> Nº Título:</strong> <span>${data.numero}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-user"></i> Colaborador:</strong> <span>${data.colaborador}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-cubes"></i> Tipo:</strong> <span>${data.tipo}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-align-left"></i> Descrição:</strong> <span>${data.descricao}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-coins"></i> Valor:</strong> <span>${data.valor}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-flag"></i> Status:</strong> <span>${data.status}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-calendar-plus"></i> Data da Geração:</strong> <span>${data.geracao}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-calendar-check"></i> Data de Vencimento:</strong> <span>${data.vencimento}</span></div>
+                <div class="detail-row"><strong><i class="fas fa-user-shield"></i> Usuário do Lançamento:</strong> <span>${data.usuario || 'admin'}</span></div>
             `;
-            // Atualiza o título do modal
-            modal.querySelector('.modal-header h2').innerHTML = '<i class="fas fa-eye"></i> Visualizar Título';
-            document.getElementById('viewModalActions').style.display = 'none';
             modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
 
         function closeViewModal() {
             document.getElementById('viewModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         function openEditModal(data) {
