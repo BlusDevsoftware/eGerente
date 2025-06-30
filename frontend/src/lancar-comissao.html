@@ -1422,7 +1422,8 @@
                             valor: parseFloat(valorReceberInput.value),
                             data_geracao: new Date().toISOString().split('T')[0],
                             data_vencimento: new Date().toISOString().split('T')[0],
-                            numero_titulo: numeroTitulo
+                            numero_titulo: numeroTitulo,
+                            status: 'PENDENTE'
                         };
                         try {
                             await window.api.post('/movimento_comissoes', dadosComissao);
