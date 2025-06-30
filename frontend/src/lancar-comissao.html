@@ -1254,7 +1254,6 @@
 
             async function simularTitulos(btn) {
                 const row = btn.closest('.form-row');
-                const bloco = btn.closest('.colaborador-bloco');
                 const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
@@ -1270,26 +1269,14 @@
                     return;
                 }
                 if (qtd < 1) qtd = 1;
-                // Buscar o último número de título do backend
-                let ultimoNumero = 0;
-                try {
-                    const ultimos = await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1');
-                    if (ultimos && ultimos.length > 0) {
-                        const match = (ultimos[0].numero_titulo || '').match(/^(\d{5})/);
-                        if (match) {
-                            ultimoNumero = parseInt(match[1], 10);
-                        }
-                    }
-                } catch (e) {
-                    ultimoNumero = 0;
-                }
+                let numeroSimulacao = ultimoNumeroTitulo;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorReceber / qtd;
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    ultimoNumero++;
-                    html += `<tr><td>${ultimoNumero.toString().padStart(5, '0')}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
+                    numeroSimulacao++;
+                    html += `<tr><td>${numeroSimulacao.toString().padStart(5, '0')}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
@@ -1365,6 +1352,19 @@
                             campoValorVenda.dispatchEvent(new Event('input'));
                         }
                     });
+                }
+
+                let ultimoNumeroTitulo = 0;
+                try {
+                    const ultimos = await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1');
+                    if (ultimos && ultimos.length > 0) {
+                        const match = (ultimos[0].numero_titulo || '').match(/^(\d{5})/);
+                        if (match) {
+                            ultimoNumeroTitulo = parseInt(match[1], 10);
+                        }
+                    }
+                } catch (e) {
+                    ultimoNumeroTitulo = 0;
                 }
             });
 
@@ -1445,7 +1445,7 @@
                     if (colaboradorSelect.value && percentualInput.value) {
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
                             ultimoNumero++; // Incrementa para cada título/parcela
-                            const numeroTitulo = (ultimoNumero).toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
+                            const numeroTitulo = ultimoNumero.toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
                             // Determinar usuário de lançamento
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
@@ -1613,26 +1613,14 @@
                     return;
                 }
                 if (qtd < 1) qtd = 1;
-                // Buscar o último número de título do backend
-                let ultimoNumero = 0;
-                try {
-                    const ultimos = await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1');
-                    if (ultimos && ultimos.length > 0) {
-                        const match = (ultimos[0].numero_titulo || '').match(/^(\d{5})/);
-                        if (match) {
-                            ultimoNumero = parseInt(match[1], 10);
-                        }
-                    }
-                } catch (e) {
-                    ultimoNumero = 0;
-                }
+                let numeroSimulacao = ultimoNumeroTitulo;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorComissao / qtd;
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    ultimoNumero++;
-                    html += `<tr><td>${ultimoNumero.toString().padStart(5, '0')}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
+                    numeroSimulacao++;
+                    html += `<tr><td>${numeroSimulacao.toString().padStart(5, '0')}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
