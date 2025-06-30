@@ -1422,7 +1422,7 @@
                 
                 try {
                     // Integração real com o backend de cadastros
-                    const resposta = await window.api.post('/cadastros/movimento_comissoes', dadosComissao);
+                    const resposta = await window.api.post('/movimento_comissoes', dadosComissao);
                     alert('Comissão salva com sucesso!');
                     form.reset();
                     document.getElementById('colaboradoresVinculados').innerHTML = '';
