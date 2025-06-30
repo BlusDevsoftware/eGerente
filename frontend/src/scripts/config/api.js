@@ -1,5 +1,5 @@
 // Configuração da API
-const API_URL = 'https://e-gerente-backend-gateway.vercel.app/api';
+const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
 
 // Função para fazer requisições GET
 async function get(endpoint) {
