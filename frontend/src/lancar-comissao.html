@@ -1412,6 +1412,13 @@
                     const valorReceberInput = bloco.querySelector('input[name="valor_receber[]"]');
                     if (colaboradorSelect.value && percentualInput.value) {
                         const numeroTitulo = (ultimoNumero + i + 1).toString().padStart(5, '0') + '-1/1';
+                        // Determinar usuário de lançamento
+                        let usuarioLancamento = 'admin';
+                        if (window.usuarioLogado) {
+                            usuarioLancamento = window.usuarioLogado;
+                        } else if (localStorage.getItem('usuarioLogado')) {
+                            usuarioLancamento = localStorage.getItem('usuarioLogado');
+                        }
                         const dadosComissao = {
                             cliente_id: parseInt(formData.get('cliente')),
                             colaborador_id: colaboradorSelect.value,
@@ -1423,7 +1430,8 @@
                             data_geracao: new Date().toISOString().split('T')[0],
                             data_vencimento: new Date().toISOString().split('T')[0],
                             numero_titulo: numeroTitulo,
-                            status: 'PENDENTE'
+                            status: 'PENDENTE',
+                            usuario_lancamento: usuarioLancamento
                         };
                         try {
                             await window.api.post('/movimento_comissoes', dadosComissao);
