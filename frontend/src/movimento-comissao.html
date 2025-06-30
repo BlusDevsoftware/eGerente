@@ -42,7 +42,13 @@
             display: flex;
             gap: 18px;
             align-items: center;
-            margin: 24px 0 18px 0;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.08);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            width: 100%;
+            box-sizing: border-box;
         }
         .search-box {
             display: flex;
@@ -673,6 +679,23 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <!-- Paginação e seleção de quantidade por página -->
+        <div class="pagination-bar" style="display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(33,150,243,0.08); padding: 14px 24px; margin: 18px 0 24px 0;">
+            <div class="pagination-controls" style="display: flex; gap: 8px; align-items: center;">
+                <button class="pagination-btn" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; cursor: pointer;">&laquo; Anterior</button>
+                <span class="pagination-pages" style="font-weight: 600; color: #1976D2;">1 de 10</span>
+                <button class="pagination-btn" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; cursor: pointer;">Próxima &raquo;</button>
+            </div>
+            <div class="pagination-rows" style="display: flex; align-items: center; gap: 8px;">
+                <span style="color: #1976D2; font-weight: 600;">Exibir</span>
+                <select id="rowsPerPage" style="border: 1.5px solid #90caf9; border-radius: 6px; background: #f4faff; color: #1565c0; font-size: 1em; padding: 7px 12px; font-weight: 600;">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+                <span style="color: #1976D2; font-weight: 600;">por página</span>
+            </div>
         </div>
     </div>
 
