@@ -1410,36 +1410,46 @@
                     const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
                     const percentualInput = bloco.querySelector('input[name="percentual[]"]');
                     const valorReceberInput = bloco.querySelector('input[name="valor_receber[]"]');
+                    const descricaoInput = bloco.querySelector('input[name="descricao_colaborador[]"]');
+                    const qtdParcelasInput = bloco.querySelector('input[name="qtd_parcelas[]"]');
+                    let qtdParcelas = 1;
+                    if (qtdParcelasInput && qtdParcelasInput.value && parseInt(qtdParcelasInput.value) > 1) {
+                        qtdParcelas = parseInt(qtdParcelasInput.value);
+                    }
                     if (colaboradorSelect.value && percentualInput.value) {
-                        const numeroTitulo = (ultimoNumero + i + 1).toString().padStart(5, '0') + '-1/1';
-                        // Determinar usuário de lançamento
-                        let usuarioLancamento = 'admin';
-                        if (window.usuarioLogado) {
-                            usuarioLancamento = window.usuarioLogado;
-                        } else if (localStorage.getItem('usuarioLogado')) {
-                            usuarioLancamento = localStorage.getItem('usuarioLogado');
+                        for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
+                            const numeroTitulo = (ultimoNumero + 1).toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
+                            // Determinar usuário de lançamento
+                            let usuarioLancamento = 'admin';
+                            if (window.usuarioLogado) {
+                                usuarioLancamento = window.usuarioLogado;
+                            } else if (localStorage.getItem('usuarioLogado')) {
+                                usuarioLancamento = localStorage.getItem('usuarioLogado');
+                            }
+                            const dadosComissao = {
+                                cliente_id: parseInt(formData.get('cliente')),
+                                colaborador_id: colaboradorSelect.value,
+                                item_id: parseInt(formData.getAll('item')[0]),
+                                tipo: formData.get('tipo'),
+                                valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                                percentual_comissao: parseFloat(percentualInput.value),
+                                valor: parseFloat(valorReceberInput.value) / qtdParcelas,
+                                data_geracao: new Date().toISOString().split('T')[0],
+                                data_vencimento: new Date().toISOString().split('T')[0],
+                                numero_titulo: numeroTitulo,
+                                status: 'PENDENTE',
+                                usuario_lancamento: usuarioLancamento,
+                                descricao: descricaoInput ? descricaoInput.value : ''
+                            };
+                            try {
+                                await window.api.post('/movimento_comissoes', dadosComissao);
+                                sucesso++;
+                            } catch (error) {
+                                erro++;
+                                console.error('Erro ao salvar comissão:', error);
+                            }
                         }
-                        const dadosComissao = {
-                            cliente_id: parseInt(formData.get('cliente')),
-                            colaborador_id: colaboradorSelect.value,
-                            item_id: parseInt(formData.getAll('item')[0]),
-                            tipo: formData.get('tipo'),
-                            valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
-                            percentual_comissao: parseFloat(percentualInput.value),
-                            valor: parseFloat(valorReceberInput.value),
-                            data_geracao: new Date().toISOString().split('T')[0],
-                            data_vencimento: new Date().toISOString().split('T')[0],
-                            numero_titulo: numeroTitulo,
-                            status: 'PENDENTE',
-                            usuario_lancamento: usuarioLancamento
-                        };
-                        try {
-                            await window.api.post('/movimento_comissoes', dadosComissao);
-                            sucesso++;
-                        } catch (error) {
-                            erro++;
-                            console.error('Erro ao salvar comissão:', error);
-                        }
+                        ultimoNumero++;
                     }
                 }
                 if (sucesso > 0) {
