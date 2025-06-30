@@ -1397,7 +1397,7 @@
                     
                     if (colaboradorSelect.value && percentualInput.value) {
                         dadosColaboradores.push({
-                            colaborador: colaboradorSelect.value,
+                            colaborador_id: colaboradorSelect.value, // campo esperado no backend
                             descricao: descricaoInput.value || '',
                             percentual: parseFloat(percentualInput.value),
                             valor_receber: parseFloat(valorReceberInput.value)
@@ -1421,22 +1421,17 @@
                 };
                 
                 try {
-                    // Aqui você faria a chamada para a API para salvar a comissão
-                    console.log('Dados da comissão para salvar:', dadosComissao);
-                    
-                    // Simular salvamento (substitua pela chamada real da API)
-                    // await api.post('/comissoes', dadosComissao);
-                    
+                    // Integração real com o backend
+                    const resposta = await window.api.post('/movimento_comissoes', dadosComissao);
                     alert('Comissão salva com sucesso!');
                     form.reset();
-                    
-                    // Limpar colaboradores adicionados
                     document.getElementById('colaboradoresVinculados').innerHTML = '';
                     numeroTituloPai = 1;
-                    
                 } catch (error) {
                     console.error('Erro ao salvar comissão:', error);
-                    alert('Erro ao salvar comissão. Tente novamente.');
+                    let msg = 'Erro ao salvar comissão. Tente novamente.';
+                    if (error && error.data && error.data.message) msg = error.data.message;
+                    alert(msg);
                 }
             }
             
