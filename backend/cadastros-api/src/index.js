@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const corsMiddleware = require('./middleware/cors');
 const cadastroRoutes = require('./routes/cadastroRoutes');
+const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 
 // Rotas
 app.use('/api/cadastros', cadastroRoutes);
+app.use('/api/cadastros', movimentoComissaoRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
