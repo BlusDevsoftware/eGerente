@@ -1412,7 +1412,7 @@
                 
                 // Preparar dados para envio
                 const dadosComissao = {
-                    cliente: formData.get('cliente'),
+                    cliente_id: formData.get('cliente'),
                     tipo: formData.get('tipo'),
                     itens: formData.getAll('item'),
                     valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
