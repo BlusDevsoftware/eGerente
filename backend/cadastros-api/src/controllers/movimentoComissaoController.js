@@ -47,7 +47,7 @@ const criarMovimento = async (req, res) => {
         res.status(201).json(data);
     } catch (error) {
         console.error('Erro ao criar movimento:', error);
-        res.status(500).json({ error: 'Erro ao criar movimento' });
+        res.status(500).json({ error: 'Erro ao criar movimento', details: error.message || error });
     }
 };
 
