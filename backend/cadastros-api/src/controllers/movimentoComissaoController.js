@@ -36,6 +36,7 @@ const buscarMovimento = async (req, res) => {
 // Criar novo movimento
 const criarMovimento = async (req, res) => {
     try {
+        console.log('Payload recebido para movimento_comissoes:', req.body);
         const novoMovimento = req.body;
         const { data, error } = await supabase
             .from('movimento_comissoes')
