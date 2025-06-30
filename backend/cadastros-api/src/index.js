@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
 });
 
 // Rotas
-app.use('/api/cadastros', cadastroRoutes);
 app.use('/api/cadastros', movimentoComissaoRoutes);
+app.use('/api/cadastros', cadastroRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
