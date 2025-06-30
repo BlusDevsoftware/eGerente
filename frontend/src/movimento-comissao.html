@@ -937,7 +937,6 @@
             // Deixar todos os campos readonly
             document.querySelectorAll('#viewTituloForm input').forEach(input => input.setAttribute('readonly', true));
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
         }
 
         function openEditModal(data) {
@@ -958,12 +957,10 @@
             document.querySelectorAll('#viewTituloForm input').forEach(input => input.removeAttribute('readonly'));
             document.getElementById('view-numero').setAttribute('readonly', true);
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
         }
 
         function closeViewModal() {
             document.getElementById('viewModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
             // Sempre restaurar campos para readonly ao fechar
             document.querySelectorAll('#viewTituloForm input').forEach(input => input.setAttribute('readonly', true));
             document.getElementById('editActions').style.display = 'none';
@@ -1041,11 +1038,9 @@
             document.getElementById('baixa-diferenciada-data').value = '';
             document.getElementById('baixa-diferenciada-obs').value = '';
             document.getElementById('baixaModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
         }
         function closeBaixaModal() {
             document.getElementById('baixaModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
         function showBaixaTab(tab) {
             document.querySelectorAll('#baixaModal .baixa-tab-btn').forEach(btn => btn.classList.remove('active'));
