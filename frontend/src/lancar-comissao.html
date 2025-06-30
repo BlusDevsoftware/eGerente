@@ -1462,7 +1462,8 @@
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            const numeroTitulo = (ultimoNumero + 1).toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
+                            ultimoNumero++; // Incrementa para cada título/parcela
+                            const numeroTitulo = (ultimoNumero).toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
                             // Determinar usuário de lançamento
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
@@ -1493,7 +1494,6 @@
                                 console.error('Erro ao salvar comissão:', error);
                             }
                         }
-                        ultimoNumero++;
                     }
                 }
                 if (sucesso > 0) {
