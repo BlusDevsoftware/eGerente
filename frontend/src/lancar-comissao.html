@@ -1421,16 +1421,8 @@
                 };
                 
                 try {
-                    // Chamada direta para o endpoint de comissão
-                    const resposta = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/movimento_comissoes', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dadosComissao)
-                    });
-                    if (!resposta.ok) {
-                        const erro = await resposta.json();
-                        throw { status: resposta.status, data: erro };
-                    }
+                    // Integração real com o backend de cadastros
+                    const resposta = await window.api.post('/cadastros/movimento_comissoes', dadosComissao);
                     alert('Comissão salva com sucesso!');
                     form.reset();
                     document.getElementById('colaboradoresVinculados').innerHTML = '';
