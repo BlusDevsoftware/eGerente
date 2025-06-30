@@ -1387,51 +1387,40 @@
                     return;
                 }
                 
-                // Coletar dados dos colaboradores
-                const dadosColaboradores = [];
-                colaboradores.forEach((bloco, index) => {
+                // Coletar dados dos colaboradores e enviar um POST para cada
+                let sucesso = 0;
+                let erro = 0;
+                for (const bloco of colaboradores) {
                     const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
-                    const descricaoInput = bloco.querySelector('input[name="descricao_colaborador[]"]');
                     const percentualInput = bloco.querySelector('input[name="percentual[]"]');
                     const valorReceberInput = bloco.querySelector('input[name="valor_receber[]"]');
-                    
                     if (colaboradorSelect.value && percentualInput.value) {
-                        dadosColaboradores.push({
-                            colaborador_id: colaboradorSelect.value, // campo esperado no backend
-                            descricao: descricaoInput.value || '',
-                            percentual: parseFloat(percentualInput.value),
-                            valor_receber: parseFloat(valorReceberInput.value)
-                        });
+                        const dadosComissao = {
+                            cliente_id: parseInt(formData.get('cliente')),
+                            colaborador_id: colaboradorSelect.value,
+                            item_id: parseInt(formData.getAll('item')[0]),
+                            tipo: formData.get('tipo'),
+                            valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                            percentual_comissao: parseFloat(percentualInput.value),
+                            valor: parseFloat(valorReceberInput.value),
+                            data_geracao: new Date().toISOString().split('T')[0]
+                        };
+                        try {
+                            await window.api.post('/movimento_comissoes', dadosComissao);
+                            sucesso++;
+                        } catch (error) {
+                            erro++;
+                            console.error('Erro ao salvar comissão:', error);
+                        }
                     }
-                });
-                
-                if (dadosColaboradores.length === 0) {
-                    alert('Preencha os dados de pelo menos um colaborador.');
-                    return;
                 }
-                
-                // Preparar dados para envio
-                const dadosComissao = {
-                    cliente_id: formData.get('cliente'),
-                    tipo: formData.get('tipo'),
-                    itens: formData.getAll('item'),
-                    valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
-                    colaboradores: dadosColaboradores,
-                    data_lancamento: new Date().toISOString().split('T')[0]
-                };
-                
-                try {
-                    // Integração real com o backend de cadastros
-                    const resposta = await window.api.post('/movimento_comissoes', dadosComissao);
-                    alert('Comissão salva com sucesso!');
+                if (sucesso > 0) {
+                    alert(`Comissão lançada com sucesso para ${sucesso} colaborador(es)!`);
                     form.reset();
                     document.getElementById('colaboradoresVinculados').innerHTML = '';
                     numeroTituloPai = 1;
-                } catch (error) {
-                    console.error('Erro ao salvar comissão:', error);
-                    let msg = 'Erro ao salvar comissão. Tente novamente.';
-                    if (error && error.data && error.data.message) msg = error.data.message;
-                    alert(msg);
+                } else {
+                    alert('Erro ao salvar comissão. Tente novamente.');
                 }
             }
             
