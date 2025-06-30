@@ -1429,7 +1429,7 @@
                             const dadosComissao = {
                                 cliente_id: formData.get('cliente'),
                                 colaborador_id: colaboradorSelect.value,
-                                item_id: parseInt(formData.getAll('item')[0]),
+                                item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
                                 tipo: formData.get('tipo'),
                                 valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
                                 percentual_comissao: parseFloat(percentualInput.value),
