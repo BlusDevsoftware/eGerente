@@ -1156,6 +1156,22 @@
 
             let numeroTituloPai = 1;
             
+            async function buscarNumeroBaseColaborador(div, colaboradorId) {
+                let numeroBase = 1;
+                try {
+                    const titulosColab = await window.api.get(`/movimento_comissoes?colaborador_id=eq.${colaboradorId}&order=numero_titulo.desc&limit=1`);
+                    if (titulosColab && titulosColab.length > 0) {
+                        const match = (titulosColab[0].numero_titulo || '').match(/^(\d{5})/);
+                        if (match) {
+                            numeroBase = parseInt(match[1], 10) + 1;
+                        }
+                    }
+                } catch (e) {
+                    numeroBase = 1;
+                }
+                div.setAttribute('data-numero-base', numeroBase.toString().padStart(5, '0'));
+            }
+
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
@@ -1205,22 +1221,11 @@
                 // Carregar colaboradores no select recém-criado
                 const selectColaborador = div.querySelector('select[name="colaborador[]"]');
                 preencherSelectColaborador(selectColaborador);
-                // Buscar o último número base ao selecionar colaborador
-                selectColaborador.addEventListener('change', async function() {
-                    let numeroBase = 1;
-                    try {
-                        const titulosColab = await window.api.get(`/movimento_comissoes?colaborador_id=eq.${this.value}&order=numero_titulo.desc&limit=1`);
-                        if (titulosColab && titulosColab.length > 0) {
-                            const match = (titulosColab[0].numero_titulo || '').match(/^(\d{5})/);
-                            if (match) {
-                                numeroBase = parseInt(match[1], 10) + 1;
-                            }
-                        }
-                    } catch (e) {
-                        numeroBase = 1;
-                    }
-                    div.setAttribute('data-numero-base', numeroBase.toString().padStart(5, '0'));
+                selectColaborador.addEventListener('change', function() {
+                    if (this.value) buscarNumeroBaseColaborador(div, this.value);
                 });
+                // Se já tem valor ao criar, buscar imediatamente
+                if (selectColaborador.value) buscarNumeroBaseColaborador(div, selectColaborador.value);
             }
 
             function extrairNumeroBR(valor) {
