@@ -36,9 +36,8 @@ const buscarMovimento = async (req, res) => {
 // Criar novo movimento
 const criarMovimento = async (req, res) => {
     try {
-        const novoMovimento = req.body;
-        const qtd_parcelas = novoMovimento.qtd_parcelas ? parseInt(novoMovimento.qtd_parcelas) : 1;
-        // Buscar o maior número sequencial global já utilizado
+        const movimentos = Array.isArray(req.body) ? req.body : [req.body];
+        // Buscar o maior número sequencial global já utilizado UMA ÚNICA VEZ
         let ultimoNumero = 0;
         try {
             const { data: todos, error: errorTodos } = await supabase
@@ -59,15 +58,24 @@ const criarMovimento = async (req, res) => {
         } catch (e) {
             ultimoNumero = 0;
         }
-        const proximoNumero = ultimoNumero + 1;
-        const numeroBaseStr = proximoNumero.toString().padStart(6, '0');
-        // Montar os registros das parcelas
+        // Montar os registros para todos os colaboradores, incrementando o número para cada colaborador
         const registros = [];
-        for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
-            registros.push({
-                ...novoMovimento,
-                numero_titulo: `${numeroBaseStr}-${parcela}/${qtd_parcelas}`
-            });
+        for (let i = 0; i < movimentos.length; i++) {
+            const mov = movimentos[i];
+            const qtd_parcelas = mov.qtd_parcelas ? parseInt(mov.qtd_parcelas) : 1;
+            const proximoNumero = ultimoNumero + 1; // incrementa a partir do maior encontrado
+            const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
+            for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
+                let numeroTitulo = numeroBaseStr;
+                if (qtd_parcelas > 1) {
+                    numeroTitulo += `-${parcela}/${qtd_parcelas}`;
+                }
+                registros.push({
+                    ...mov,
+                    numero_titulo: numeroTitulo
+                });
+            }
+            ultimoNumero++; // incrementa para o próximo colaborador
         }
         // Inserir todos os registros de uma vez
         const { data, error } = await supabase
