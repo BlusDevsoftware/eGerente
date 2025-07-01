@@ -99,15 +99,22 @@ const simularProximoNumeroBase = async (req, res) => {
             .select('numero_titulo')
             .eq('colaborador_id', colaborador_id);
         if (error) throw error;
-        let maioresBases = (data || [])
+        let usados = (data || [])
             .map(t => {
                 const match = (t.numero_titulo || '').match(/^(\d{5})/);
-                return match ? parseInt(match[1], 10) : 0;
+                return match ? parseInt(match[1], 10) : null;
             })
-            .filter(n => n > 0);
+            .filter(n => n !== null && n > 0);
         let proximoNumeroBase = 1;
-        if (maioresBases.length > 0) {
-            proximoNumeroBase = Math.max(...maioresBases) + 1;
+        if (usados.length > 0) {
+            usados.sort((a, b) => a - b);
+            // Procurar o menor número não usado
+            for (let i = 1; i <= usados[usados.length - 1] + 1; i++) {
+                if (!usados.includes(i)) {
+                    proximoNumeroBase = i;
+                    break;
+                }
+            }
         }
         return res.json({ proximo_numero_base: proximoNumeroBase.toString().padStart(5, '0') });
     } catch (error) {
