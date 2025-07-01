@@ -1337,6 +1337,33 @@
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
                 const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
+                if (vencInputs.length > 1 && intervaloContainer && intervaloSelect) {
+                    vencInputs[0].addEventListener('change', function() {
+                        intervaloContainer.style.display = 'block';
+                    });
+                    intervaloSelect.addEventListener('change', function() {
+                        if (!this.value) return;
+                        const intervalo = parseInt(this.value);
+                        const primeiraData = vencInputs[0].value;
+                        if (primeiraData) {
+                            let data = new Date(primeiraData);
+                            for (let i = 1; i < vencInputs.length; i++) {
+                                data.setDate(data.getDate() + intervalo);
+                                vencInputs[i].value = data.toISOString().slice(0,10);
+                            }
+                        }
+                    });
+                }
+                const emissaoInputs = simulacaoTabela.querySelectorAll('.simulacao-emissao-parcela');
+                if (emissaoInputs.length > 1) {
+                    emissaoInputs[0].addEventListener('change', function() {
+                        if (this.value) {
+                            for (let i = 1; i < emissaoInputs.length; i++) {
+                                if (!emissaoInputs[i].value) emissaoInputs[i].value = this.value;
+                            }
+                        }
+                    });
+                }
             }
 
             document.getElementById('formUnico').valor_venda.oninput = function() {
@@ -1668,9 +1695,36 @@
                 simulacaoDiv.innerHTML = html;
                 trSimulacao.style.display = '';
                 // Eventos para intervalos e datas
-                const vencInputs = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
-                const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
-                const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
+                const vencInputs2 = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
+                const intervaloContainer2 = simulacaoDiv.querySelector('.intervalo-vencimento-container');
+                const intervaloSelect2 = simulacaoDiv.querySelector('.intervalo-vencimento-select');
+                if (vencInputs2.length > 1 && intervaloContainer2 && intervaloSelect2) {
+                    vencInputs2[0].addEventListener('change', function() {
+                        intervaloContainer2.style.display = 'block';
+                    });
+                    intervaloSelect2.addEventListener('change', function() {
+                        if (!this.value) return;
+                        const intervalo = parseInt(this.value);
+                        const primeiraData = vencInputs2[0].value;
+                        if (primeiraData) {
+                            let data = new Date(primeiraData);
+                            for (let i = 1; i < vencInputs2.length; i++) {
+                                data.setDate(data.getDate() + intervalo);
+                                vencInputs2[i].value = data.toISOString().slice(0,10);
+                            }
+                        }
+                    });
+                }
+                const emissaoInputs2 = simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela');
+                if (emissaoInputs2.length > 1) {
+                    emissaoInputs2[0].addEventListener('change', function() {
+                        if (this.value) {
+                            for (let i = 1; i < emissaoInputs2.length; i++) {
+                                if (!emissaoInputs2[i].value) emissaoInputs2[i].value = this.value;
+                            }
+                        }
+                    });
+                }
             }
 
             // Preencher select de colaborador na aba simples
