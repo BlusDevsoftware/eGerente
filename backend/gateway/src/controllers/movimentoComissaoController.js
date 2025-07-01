@@ -41,16 +41,19 @@ const criarMovimento = async (req, res) => {
         // Buscar o maior número sequencial global já utilizado
         let ultimoNumero = 0;
         try {
-            const { data: ultimos, error: errorUltimo } = await supabase
+            const { data: todos, error: errorTodos } = await supabase
                 .from('movimento_comissoes')
-                .select('numero_titulo')
-                .order('id', { ascending: false })
-                .limit(1);
-            if (errorUltimo) throw errorUltimo;
-            if (ultimos && ultimos.length > 0) {
-                const match = (ultimos[0].numero_titulo || '').match(/^(\d{5,})/);
-                if (match) {
-                    ultimoNumero = parseInt(match[1], 10);
+                .select('numero_titulo');
+            if (errorTodos) throw errorTodos;
+            if (todos && todos.length > 0) {
+                const bases = todos
+                    .map(t => {
+                        const match = (t.numero_titulo || '').match(/^(\d{5,})/);
+                        return match ? parseInt(match[1], 10) : null;
+                    })
+                    .filter(n => n !== null && n > 0);
+                if (bases.length > 0) {
+                    ultimoNumero = Math.max(...bases);
                 }
             }
         } catch (e) {
