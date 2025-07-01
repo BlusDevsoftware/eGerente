@@ -1169,11 +1169,23 @@
                 } catch (e) {
                     numeroBase = 1;
                 }
+                // Verificar se já existe outro bloco para o mesmo colaborador na tela
+                const container = document.getElementById('colaboradoresVinculados');
+                const outrosBlocos = Array.from(container.querySelectorAll('.colaborador-bloco'))
+                    .filter(b => b !== div && b.querySelector('select[name="colaborador[]"]').value === colaboradorId);
+                if (outrosBlocos.length > 0) {
+                    // Incrementa o número base para evitar duplicidade na tela
+                    numeroBase += outrosBlocos.length;
+                }
                 div.setAttribute('data-numero-base', numeroBase.toString().padStart(5, '0'));
             }
 
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
+                // Bloquear se já existe bloco para o mesmo colaborador
+                const selects = container.querySelectorAll('select[name="colaborador[]"]');
+                const colaboradoresExistentes = Array.from(selects).map(s => s.value).filter(Boolean);
+                // Cria o bloco normalmente
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
                 blocoCount++;
                 const div = document.createElement('div');
@@ -1222,6 +1234,12 @@
                 const selectColaborador = div.querySelector('select[name="colaborador[]"]');
                 preencherSelectColaborador(selectColaborador);
                 selectColaborador.addEventListener('change', function() {
+                    // Bloquear se já existe bloco para o mesmo colaborador
+                    if (this.value && colaboradoresExistentes.includes(this.value)) {
+                        alert('Já existe um bloco para este colaborador!');
+                        div.remove();
+                        return;
+                    }
                     if (this.value) buscarNumeroBaseColaborador(div, this.value);
                 });
                 // Se já tem valor ao criar, buscar imediatamente
