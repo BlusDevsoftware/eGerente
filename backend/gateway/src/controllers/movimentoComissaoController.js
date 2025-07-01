@@ -37,34 +37,27 @@ const buscarMovimento = async (req, res) => {
 const criarMovimento = async (req, res) => {
     try {
         const novoMovimento = req.body;
-        const colaborador_id = novoMovimento.colaborador_id;
         const qtd_parcelas = novoMovimento.qtd_parcelas ? parseInt(novoMovimento.qtd_parcelas) : 1;
-        if (!colaborador_id) {
-            return res.status(400).json({ error: 'colaborador_id é obrigatório' });
-        }
-        // Busca todos os títulos do colaborador
-        const { data: titulosExistentes, error: errorBusca } = await supabase
-            .from('movimento_comissoes')
-            .select('numero_titulo')
-            .eq('colaborador_id', colaborador_id);
-        if (errorBusca) throw errorBusca;
-        let usados = (titulosExistentes || [])
-            .map(t => {
-                const match = (t.numero_titulo || '').match(/^(\d{5})/);
-                return match ? parseInt(match[1], 10) : null;
-            })
-            .filter(n => n !== null && n > 0);
-        let numeroBase = 1;
-        if (usados.length > 0) {
-            usados.sort((a, b) => a - b);
-            for (let i = 1; i <= usados[usados.length - 1] + 1; i++) {
-                if (!usados.includes(i)) {
-                    numeroBase = i;
-                    break;
+        // Buscar o maior número sequencial global já utilizado
+        let ultimoNumero = 0;
+        try {
+            const { data: ultimos, error: errorUltimo } = await supabase
+                .from('movimento_comissoes')
+                .select('numero_titulo')
+                .order('id', { ascending: false })
+                .limit(1);
+            if (errorUltimo) throw errorUltimo;
+            if (ultimos && ultimos.length > 0) {
+                const match = (ultimos[0].numero_titulo || '').match(/^(\d{5,})/);
+                if (match) {
+                    ultimoNumero = parseInt(match[1], 10);
                 }
             }
+        } catch (e) {
+            ultimoNumero = 0;
         }
-        const numeroBaseStr = numeroBase.toString().padStart(5, '0');
+        const proximoNumero = ultimoNumero + 1;
+        const numeroBaseStr = proximoNumero.toString().padStart(6, '0');
         // Montar os registros das parcelas
         const registros = [];
         for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
