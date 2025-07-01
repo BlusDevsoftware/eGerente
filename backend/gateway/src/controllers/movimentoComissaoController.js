@@ -86,10 +86,41 @@ const excluirMovimento = async (req, res) => {
     }
 };
 
+// Simular próximo número base para um colaborador
+const simularProximoNumeroBase = async (req, res) => {
+    try {
+        const { colaborador_id } = req.query;
+        if (!colaborador_id) {
+            return res.status(400).json({ error: 'colaborador_id é obrigatório' });
+        }
+        // Busca todos os títulos do colaborador
+        const { data, error } = await supabase
+            .from('movimento_comissoes')
+            .select('numero_titulo')
+            .eq('colaborador_id', colaborador_id);
+        if (error) throw error;
+        let maioresBases = (data || [])
+            .map(t => {
+                const match = (t.numero_titulo || '').match(/^(\d{5})/);
+                return match ? parseInt(match[1], 10) : 0;
+            })
+            .filter(n => n > 0);
+        let proximoNumeroBase = 1;
+        if (maioresBases.length > 0) {
+            proximoNumeroBase = Math.max(...maioresBases) + 1;
+        }
+        return res.json({ proximo_numero_base: proximoNumeroBase.toString().padStart(5, '0') });
+    } catch (error) {
+        console.error('Erro ao simular próximo número base:', error);
+        res.status(500).json({ error: 'Erro ao simular próximo número base' });
+    }
+};
+
 module.exports = {
     listarMovimentos,
     buscarMovimento,
     criarMovimento,
     atualizarMovimento,
-    excluirMovimento
+    excluirMovimento,
+    simularProximoNumeroBase
 }; 

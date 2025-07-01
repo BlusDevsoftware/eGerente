@@ -1294,10 +1294,11 @@
                 }
             }
 
-            function simularTitulos(btn) {
+            async function simularTitulos(btn) {
                 const row = btn.closest('.form-row');
                 const bloco = btn.closest('.colaborador-bloco');
-                const numeroPai = bloco.getAttribute('data-numero-pai') || '00001';
+                const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
+                const colaboradorId = colaboradorSelect ? colaboradorSelect.value : null;
                 const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
@@ -1306,11 +1307,28 @@
                 if (qtdInput && qtdInput.closest('.group-parcelas') && qtdInput.closest('.group-parcelas').style.display !== 'none' && qtdInput.value && parseInt(qtdInput.value) > 1) {
                     qtd = parseInt(qtdInput.value);
                 }
-                const valorReceber = parseFloat(valorReceberInput.value.replace(',','.'));
+                const valorReceber = parseFloat(valorReceberInput.value.replace(',', '.'));
                 if (!valorReceber || valorReceber <= 0) {
                     simulacaoDiv.style.display = 'block';
                     simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Informe o valor a receber.</span>';
                     return;
+                }
+                if (!colaboradorId) {
+                    simulacaoDiv.style.display = 'block';
+                    simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Selecione o colaborador.</span>';
+                    return;
+                }
+                // Buscar o próximo número base do backend
+                let numeroBase = '00001';
+                try {
+                    const response = await fetch(`/movimento_comissoes/proximo_numero_base?colaborador_id=${encodeURIComponent(colaboradorId)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        numeroBase = data.proximo_numero_base || '00001';
+                    }
+                } catch (e) {
+                    // fallback para 00001
+                    numeroBase = '00001';
                 }
                 if (qtd < 1) qtd = 1;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
@@ -1318,7 +1336,7 @@
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
+                    html += `<tr><td>${numeroBase}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
@@ -1326,38 +1344,6 @@
                 }
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
-
-                const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
-                const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
-                const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
-                if (vencInputs.length > 1) {
-                    vencInputs[0].addEventListener('change', function() {
-                        intervaloContainer.style.display = 'block';
-                    });
-                    intervaloSelect.addEventListener('change', function() {
-                        if (!this.value) return;
-                        const intervalo = parseInt(this.value);
-                        const primeiraData = vencInputs[0].value;
-                        if (primeiraData) {
-                            let data = new Date(primeiraData);
-                            for (let i = 1; i < vencInputs.length; i++) {
-                                data.setDate(data.getDate() + intervalo);
-                                vencInputs[i].value = data.toISOString().slice(0,10);
-                            }
-                        }
-                    });
-                }
-
-                const emissaoInputs = simulacaoTabela.querySelectorAll('.simulacao-emissao-parcela');
-                if (emissaoInputs.length > 1) {
-                    emissaoInputs[0].addEventListener('change', function() {
-                        if (this.value) {
-                            for (let i = 1; i < emissaoInputs.length; i++) {
-                                if (!emissaoInputs[i].value) emissaoInputs[i].value = this.value;
-                            }
-                        }
-                    });
-                }
             }
 
             document.getElementById('formUnico').valor_venda.oninput = function() {

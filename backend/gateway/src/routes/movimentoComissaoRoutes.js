@@ -17,4 +17,7 @@ router.put('/movimento_comissoes/:id', movimentoComissaoController.atualizarMovi
 // Excluir movimento
 router.delete('/movimento_comissoes/:id', movimentoComissaoController.excluirMovimento);
 
+// Simular próximo número base para um colaborador
+router.get('/movimento_comissoes/proximo_numero_base', movimentoComissaoController.simularProximoNumeroBase);
+
 module.exports = router; 
