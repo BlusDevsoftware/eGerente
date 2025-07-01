@@ -1318,39 +1318,14 @@
                     simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Selecione o colaborador.</span>';
                     return;
                 }
-                // Buscar os títulos do colaborador usando a API já existente
-                let numeroBase = '00001';
-                try {
-                    const response = await fetch(`/movimento_comissoes?colaborador_id=eq.${encodeURIComponent(colaboradorId)}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        let usados = (data || [])
-                            .map(t => {
-                                const match = (t.numero_titulo || '').match(/^(\d{5})/);
-                                return match ? parseInt(match[1], 10) : null;
-                            })
-                            .filter(n => n !== null && n > 0);
-                        if (usados.length > 0) {
-                            usados.sort((a, b) => a - b);
-                            for (let i = 1; i <= usados[usados.length - 1] + 1; i++) {
-                                if (!usados.includes(i)) {
-                                    numeroBase = i;
-                                    break;
-                                }
-                            }
-                        }
-                        numeroBase = numeroBase.toString().padStart(5, '0');
-                    }
-                } catch (e) {
-                    numeroBase = '00001';
-                }
+                // Exibir número simulado
                 if (qtd < 1) qtd = 1;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
                 const valorParcela = valorReceber / qtd;
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${numeroBase}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
+                    html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
@@ -1362,33 +1337,6 @@
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
                 const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
-                if (vencInputs.length > 1 && intervaloContainer && intervaloSelect) {
-                    vencInputs[0].addEventListener('change', function() {
-                        intervaloContainer.style.display = 'block';
-                    });
-                    intervaloSelect.addEventListener('change', function() {
-                        if (!this.value) return;
-                        const intervalo = parseInt(this.value);
-                        const primeiraData = vencInputs[0].value;
-                        if (primeiraData) {
-                            let data = new Date(primeiraData);
-                            for (let i = 1; i < vencInputs.length; i++) {
-                                data.setDate(data.getDate() + intervalo);
-                                vencInputs[i].value = data.toISOString().slice(0,10);
-                            }
-                        }
-                    });
-                }
-                const emissaoInputs = simulacaoTabela.querySelectorAll('.simulacao-emissao-parcela');
-                if (emissaoInputs.length > 1) {
-                    emissaoInputs[0].addEventListener('change', function() {
-                        if (this.value) {
-                            for (let i = 1; i < emissaoInputs.length; i++) {
-                                if (!emissaoInputs[i].value) emissaoInputs[i].value = this.value;
-                            }
-                        }
-                    });
-                }
             }
 
             document.getElementById('formUnico').valor_venda.oninput = function() {
@@ -1688,7 +1636,6 @@
             function simularTitulosMultiploLinha(btn) {
                 const td = btn.closest('td');
                 const tr = td.closest('tr');
-                const numeroPai = tr.getAttribute('data-numero-pai') || '000001';
                 const trSimulacao = tr.nextElementSibling;
                 const groupParcelas = td.querySelector('.acoes-multiplos-parcelas');
                 let qtd = 1;
@@ -1712,21 +1659,11 @@
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>${numeroPai}-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
+                    html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
-                    html += `<tr class='linha-intervalo-vencimento'><td colspan='5' style='text-align:left;'>
-                        <div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'>
-                            <label style='font-weight:500;'>Intervalo entre títulos: </label>
-                            <select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'>
-                                <option value='' selected disabled>Selecione...</option>
-                                <option value='10'>10 dias</option>
-                                <option value='20'>20 dias</option>
-                                <option value='30'>30 dias</option>
-                            </select>
-                        </div>
-                    </td></tr>`;
+                    html += `<tr class='linha-intervalo-vencimento'><td colspan='5' style='text-align:left;'><div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label><select class='intervalo-vencimento-select' style='margin-left:6px; padding:2px 8px; border-radius:6px; border:1px solid #bbb;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div></td></tr>`;
                 }
                 simulacaoDiv.innerHTML = html;
                 trSimulacao.style.display = '';
@@ -1734,33 +1671,6 @@
                 const vencInputs = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
                 const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
-                if (vencInputs.length > 1) {
-                    vencInputs[0].addEventListener('change', function() {
-                        intervaloContainer.style.display = 'block';
-                    });
-                    intervaloSelect.addEventListener('change', function() {
-                        if (!this.value) return;
-                        const intervalo = parseInt(this.value);
-                        const primeiraData = vencInputs[0].value;
-                        if (primeiraData) {
-                            let data = new Date(primeiraData);
-                            for (let i = 1; i < vencInputs.length; i++) {
-                                data.setDate(data.getDate() + intervalo);
-                                vencInputs[i].value = data.toISOString().slice(0,10);
-                            }
-                        }
-                    });
-                }
-                const emissaoInputs = simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela');
-                if (emissaoInputs.length > 1) {
-                    emissaoInputs[0].addEventListener('change', function() {
-                        if (this.value) {
-                            for (let i = 1; i < emissaoInputs.length; i++) {
-                                if (!emissaoInputs[i].value) emissaoInputs[i].value = this.value;
-                            }
-                        }
-                    });
-                }
             }
 
             // Preencher select de colaborador na aba simples
