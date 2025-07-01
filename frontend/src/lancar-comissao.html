@@ -1159,22 +1159,25 @@
             async function buscarNumeroBaseColaborador(div, colaboradorId) {
                 let numeroBase = 1;
                 try {
-                    const titulosColab = await window.api.get(`/movimento_comissoes?colaborador_id=eq.${colaboradorId}&order=numero_titulo.desc&limit=1`);
-                    if (titulosColab && titulosColab.length > 0) {
-                        const match = (titulosColab[0].numero_titulo || '').match(/^(\d{5})/);
-                        if (match) {
-                            numeroBase = parseInt(match[1], 10) + 1;
-                        }
+                    // Busca todos os títulos do colaborador
+                    const titulosColab = await window.api.get(`/movimento_comissoes?colaborador_id=eq.${colaboradorId}`);
+                    let maioresBases = titulosColab
+                        .map(t => {
+                            const match = (t.numero_titulo || '').match(/^(\d{5})/);
+                            return match ? parseInt(match[1], 10) : 0;
+                        })
+                        .filter(n => n > 0);
+                    if (maioresBases.length > 0) {
+                        numeroBase = Math.max(...maioresBases) + 1;
                     }
                 } catch (e) {
                     numeroBase = 1;
                 }
-                // Verificar se já existe outro bloco para o mesmo colaborador na tela
+                // Verifica se já existe outro bloco para o mesmo colaborador na tela
                 const container = document.getElementById('colaboradoresVinculados');
                 const outrosBlocos = Array.from(container.querySelectorAll('.colaborador-bloco'))
                     .filter(b => b !== div && b.querySelector('select[name="colaborador[]"]').value === colaboradorId);
                 if (outrosBlocos.length > 0) {
-                    // Incrementa o número base para evitar duplicidade na tela
                     numeroBase += outrosBlocos.length;
                 }
                 div.setAttribute('data-numero-base', numeroBase.toString().padStart(5, '0'));
