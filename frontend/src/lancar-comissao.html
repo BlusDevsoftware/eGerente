@@ -1318,16 +1318,30 @@
                     simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Selecione o colaborador.</span>';
                     return;
                 }
-                // Buscar o próximo número base do backend
+                // Buscar os títulos do colaborador usando a API já existente
                 let numeroBase = '00001';
                 try {
-                    const response = await fetch(`/movimento_comissoes/proximo_numero_base?colaborador_id=${encodeURIComponent(colaboradorId)}`);
+                    const response = await fetch(`/movimento_comissoes?colaborador_id=eq.${encodeURIComponent(colaboradorId)}`);
                     if (response.ok) {
                         const data = await response.json();
-                        numeroBase = data.proximo_numero_base || '00001';
+                        let usados = (data || [])
+                            .map(t => {
+                                const match = (t.numero_titulo || '').match(/^(\d{5})/);
+                                return match ? parseInt(match[1], 10) : null;
+                            })
+                            .filter(n => n !== null && n > 0);
+                        if (usados.length > 0) {
+                            usados.sort((a, b) => a - b);
+                            for (let i = 1; i <= usados[usados.length - 1] + 1; i++) {
+                                if (!usados.includes(i)) {
+                                    numeroBase = i;
+                                    break;
+                                }
+                            }
+                        }
+                        numeroBase = numeroBase.toString().padStart(5, '0');
                     }
                 } catch (e) {
-                    // fallback para 00001
                     numeroBase = '00001';
                 }
                 if (qtd < 1) qtd = 1;
