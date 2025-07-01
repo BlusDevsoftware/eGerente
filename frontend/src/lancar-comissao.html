@@ -1461,9 +1461,23 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
+                        // Buscar o maior número base já usado por esse colaborador
+                        let numeroBase = 1;
+                        try {
+                            const titulosColab = await window.api.get(`/movimento_comissoes?colaborador_id=eq.${colaboradorSelect.value}&order=numero_titulo.desc&limit=1`);
+                            if (titulosColab && titulosColab.length > 0) {
+                                const match = (titulosColab[0].numero_titulo || '').match(/^(\d{5})/);
+                                if (match) {
+                                    numeroBase = parseInt(match[1], 10) + 1;
+                                }
+                            }
+                        } catch (e) {
+                            numeroBase = 1;
+                        }
+                        const numeroBaseStr = numeroBase.toString().padStart(5, '0');
+                        // Gerar todas as parcelas com o mesmo numeroBaseStr
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            ultimoNumero++; // Incrementa para cada título/parcela
-                            const numeroTitulo = (ultimoNumero).toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
+                            const numeroTitulo = numeroBaseStr + `-${parcela}/${qtdParcelas}`;
                             // Determinar usuário de lançamento
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
