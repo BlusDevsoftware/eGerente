@@ -71,8 +71,10 @@ const criarMovimento = async (req, res) => {
                 if (qtd_parcelas > 1) {
                     numeroTitulo += `-${parcela}/${qtd_parcelas}`;
                 }
+                // Remover qtd_parcelas do objeto antes de inserir
+                const { qtd_parcelas, ...movSemQtdParcelas } = mov;
                 registros.push({
-                    ...mov,
+                    ...movSemQtdParcelas,
                     numero_titulo: numeroTitulo
                 });
             }
