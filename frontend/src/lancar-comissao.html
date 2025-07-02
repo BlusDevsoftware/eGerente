@@ -1500,6 +1500,7 @@
                 }
                 let sucesso = 0;
                 let erro = 0;
+                const listaComissoes = [];
                 for (let i = 0; i < colaboradores.length; i++) {
                     const bloco = colaboradores[i];
                     const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
@@ -1531,15 +1532,18 @@
                             status: 'PENDENTE',
                             usuario_lancamento: usuarioLancamento,
                             descricao: descricaoInput ? descricaoInput.value : '',
-                            qtd_parcelas: qtdParcelas // <-- Envia apenas uma vez por colaborador
+                            qtd_parcelas: qtdParcelas
                         };
-                        try {
-                            await window.api.post('/movimento_comissoes', dadosComissao);
-                            sucesso++;
-                        } catch (error) {
-                            erro++;
-                            console.error('Erro ao salvar comissão:', error);
-                        }
+                        listaComissoes.push(dadosComissao);
+                    }
+                }
+                if (listaComissoes.length > 0) {
+                    try {
+                        await window.api.post('/movimento_comissoes', listaComissoes);
+                        sucesso = listaComissoes.length;
+                    } catch (error) {
+                        erro = listaComissoes.length;
+                        console.error('Erro ao salvar comissão:', error);
                     }
                 }
                 if (sucesso > 0) {
