@@ -1510,9 +1510,10 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
+                        numeroBase++; // Incrementa uma vez por colaborador
+                        const numeroTituloBase = numeroBase.toString().padStart(5, '0');
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            numeroBase++;
-                            const numeroTitulo = numeroBase.toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
+                            const numeroTitulo = numeroTituloBase + `-${parcela}/${qtdParcelas}`;
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
                                 usuarioLancamento = window.usuarioLogado;
