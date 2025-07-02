@@ -1512,36 +1512,33 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
-                        for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            let usuarioLancamento = 'admin';
-                            if (window.usuarioLogado) {
-                                usuarioLancamento = window.usuarioLogado;
-                            } else if (localStorage.getItem('usuarioLogado')) {
-                                usuarioLancamento = localStorage.getItem('usuarioLogado');
-                            }
-                            const dadosComissao = {
-                                cliente_id: formData.get('cliente'),
-                                colaborador_id: colaboradorSelect.value,
-                                item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
-                                tipo: formData.get('tipo'),
-                                valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
-                                percentual_comissao: parseFloat(percentualInput.value),
-                                valor: parseFloat(valorReceberInput.value) / qtdParcelas,
-                                data_geracao: new Date().toISOString().split('T')[0],
-                                data_vencimento: new Date().toISOString().split('T')[0],
-                                // numero_titulo: numeroTitulo, // REMOVIDO: agora o backend gera
-                                status: 'PENDENTE',
-                                usuario_lancamento: usuarioLancamento,
-                                descricao: descricaoInput ? descricaoInput.value : '',
-                                qtd_parcelas: qtdParcelas // <-- Adicionado para backend gerar sufixo corretamente
-                            };
-                            try {
-                                await window.api.post('/movimento_comissoes', dadosComissao);
-                                sucesso++;
-                            } catch (error) {
-                                erro++;
-                                console.error('Erro ao salvar comissão:', error);
-                            }
+                        let usuarioLancamento = 'admin';
+                        if (window.usuarioLogado) {
+                            usuarioLancamento = window.usuarioLogado;
+                        } else if (localStorage.getItem('usuarioLogado')) {
+                            usuarioLancamento = localStorage.getItem('usuarioLogado');
+                        }
+                        const dadosComissao = {
+                            cliente_id: formData.get('cliente'),
+                            colaborador_id: colaboradorSelect.value,
+                            item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
+                            tipo: formData.get('tipo'),
+                            valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                            percentual_comissao: parseFloat(percentualInput.value),
+                            valor: parseFloat(valorReceberInput.value) / qtdParcelas,
+                            data_geracao: new Date().toISOString().split('T')[0],
+                            data_vencimento: new Date().toISOString().split('T')[0],
+                            status: 'PENDENTE',
+                            usuario_lancamento: usuarioLancamento,
+                            descricao: descricaoInput ? descricaoInput.value : '',
+                            qtd_parcelas: qtdParcelas // <-- Envia apenas uma vez por colaborador
+                        };
+                        try {
+                            await window.api.post('/movimento_comissoes', dadosComissao);
+                            sucesso++;
+                        } catch (error) {
+                            erro++;
+                            console.error('Erro ao salvar comissão:', error);
                         }
                     }
                 }
