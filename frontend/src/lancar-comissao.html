@@ -1532,7 +1532,8 @@
                                 // numero_titulo: numeroTitulo, // REMOVIDO: agora o backend gera
                                 status: 'PENDENTE',
                                 usuario_lancamento: usuarioLancamento,
-                                descricao: descricaoInput ? descricaoInput.value : ''
+                                descricao: descricaoInput ? descricaoInput.value : '',
+                                qtd_parcelas: qtdParcelas // <-- Adicionado para backend gerar sufixo corretamente
                             };
                             try {
                                 await window.api.post('/movimento_comissoes', dadosComissao);
