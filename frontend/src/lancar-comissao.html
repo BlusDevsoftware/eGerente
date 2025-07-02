@@ -779,11 +779,20 @@
           </div>
         </div>
         <style>
+        .modal-feedback {
+          position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+          background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .modal-feedback .modal-content {
+          background: #fff; border-radius: 12px; padding: 38px 36px; min-width: 320px; box-shadow: 0 8px 32px rgba(33,150,243,0.13);
+          display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 220px;
+        }
         .doc-loader, .doc-success {
-          display: flex; align-items: center; justify-content: center; height: 70px; margin-bottom: 8px;
+          display: flex; align-items: center; justify-content: center; height: 120px; margin-bottom: 8px;
+          width: 100%;
         }
         .doc-svg {
-          width: 64px; height: 64px;
+          width: 80px; height: 80px; display: block; margin: 0 auto;
         }
         .doc-paper {
           stroke: #2196F3; stroke-width: 2.5; fill: #fff; stroke-dasharray: 200; stroke-dashoffset: 200;
