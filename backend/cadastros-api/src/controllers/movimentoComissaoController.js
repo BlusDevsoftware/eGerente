@@ -37,12 +37,52 @@ const buscarMovimento = async (req, res) => {
 const criarMovimento = async (req, res) => {
     try {
         console.log('Payload recebido para movimento_comissoes:', req.body);
-        const novoMovimento = req.body;
+        const movimentos = Array.isArray(req.body) ? req.body : [req.body];
+        // Buscar o maior número sequencial global já utilizado UMA ÚNICA VEZ
+        let ultimoNumero = 0;
+        try {
+            const { data: todos, error: errorTodos } = await supabase
+                .from('movimento_comissoes')
+                .select('numero_titulo');
+            if (errorTodos) throw errorTodos;
+            if (todos && todos.length > 0) {
+                const bases = todos
+                    .map(t => {
+                        const match = (t.numero_titulo || '').match(/^(\d{5,})/);
+                        return match ? parseInt(match[1], 10) : null;
+                    })
+                    .filter(n => n !== null && n > 0);
+                if (bases.length > 0) {
+                    ultimoNumero = Math.max(...bases);
+                }
+            }
+        } catch (e) {
+            ultimoNumero = 0;
+        }
+        // Montar os registros para todos os colaboradores, incrementando o número para cada colaborador
+        const registros = [];
+        for (let i = 0; i < movimentos.length; i++) {
+            const mov = movimentos[i];
+            const qtd_parcelas = mov.qtd_parcelas ? parseInt(mov.qtd_parcelas) : 1;
+            const proximoNumero = ultimoNumero + 1; // incrementa a partir do maior encontrado
+            const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
+            for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
+                let numeroTitulo = numeroBaseStr;
+                if (qtd_parcelas > 1) {
+                    numeroTitulo += `-${parcela}/${qtd_parcelas}`;
+                }
+                registros.push({
+                    ...mov,
+                    numero_titulo: numeroTitulo
+                });
+            }
+            ultimoNumero++; // incrementa para o próximo colaborador
+        }
+        // Inserir todos os registros de uma vez
         const { data, error } = await supabase
             .from('movimento_comissoes')
-            .insert([novoMovimento])
-            .select()
-            .single();
+            .insert(registros)
+            .select();
         if (error) throw error;
         res.status(201).json(data);
     } catch (error) {
