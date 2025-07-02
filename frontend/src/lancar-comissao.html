@@ -1596,22 +1596,30 @@
                         } else if (localStorage.getItem('usuarioLogado')) {
                             usuarioLancamento = localStorage.getItem('usuarioLogado');
                         }
-                        const dadosComissao = {
-                            cliente_id: formData.get('cliente'),
-                            colaborador_id: colaboradorSelect.value,
-                            item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
-                            tipo: formData.get('tipo'),
-                            valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
-                            percentual_comissao: parseFloat(percentualInput.value),
-                            valor: parseFloat(valorReceberInput.value) / qtdParcelas,
-                            data_geracao: new Date().toISOString().split('T')[0],
-                            data_vencimento: new Date().toISOString().split('T')[0],
-                            status: 'PENDENTE',
-                            usuario_lancamento: usuarioLancamento,
-                            descricao: descricaoInput ? descricaoInput.value : '',
-                            qtd_parcelas: qtdParcelas
-                        };
-                        listaComissoes.push(dadosComissao);
+                        // Capturar datas da simulação de títulos (se houver)
+                        const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
+                        const emissaoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela') : null;
+                        const vencimentoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela') : null;
+                        for (let parcela = 0; parcela < qtdParcelas; parcela++) {
+                            const dataGeracao = (emissaoInputs && emissaoInputs[parcela]) ? emissaoInputs[parcela].value : new Date().toISOString().split('T')[0];
+                            const dataVencimento = (vencimentoInputs && vencimentoInputs[parcela]) ? vencimentoInputs[parcela].value : new Date().toISOString().split('T')[0];
+                            const dadosComissao = {
+                                cliente_id: formData.get('cliente'),
+                                colaborador_id: colaboradorSelect.value,
+                                item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
+                                tipo: formData.get('tipo'),
+                                valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                                percentual_comissao: parseFloat(percentualInput.value),
+                                valor: parseFloat(valorReceberInput.value) / qtdParcelas,
+                                data_geracao: dataGeracao,
+                                data_vencimento: dataVencimento,
+                                status: 'PENDENTE',
+                                usuario_lancamento: usuarioLancamento,
+                                descricao: descricaoInput ? descricaoInput.value : '',
+                                qtd_parcelas: qtdParcelas
+                            };
+                            listaComissoes.push(dadosComissao);
+                        }
                     }
                 }
                 if (listaComissoes.length > 0) {
