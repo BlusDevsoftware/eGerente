@@ -63,6 +63,15 @@ const criarMovimento = async (req, res) => {
         const registros = [];
         for (let i = 0; i < movimentos.length; i++) {
             const mov = movimentos[i];
+            // Se já veio com numero_titulo no formato de parcela, apenas insere
+            if (mov.numero_titulo && /-\d+\/\d+$/.test(mov.numero_titulo)) {
+                const { qtd_parcelas: _qtd_parcelas, ...movSemQtdParcelas } = mov;
+                registros.push({
+                    ...movSemQtdParcelas
+                });
+                continue;
+            }
+            // Caso contrário, gera as parcelas normalmente
             const qtd_parcelas = mov.qtd_parcelas ? parseInt(mov.qtd_parcelas) : 1;
             const proximoNumero = ultimoNumero + 1;
             const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
@@ -71,7 +80,6 @@ const criarMovimento = async (req, res) => {
                 if (qtd_parcelas > 1) {
                     numeroTitulo += `-${parcela}/${qtd_parcelas}`;
                 }
-                // Remover qtd_parcelas do objeto antes de inserir (evitar conflito de escopo)
                 const { qtd_parcelas: _qtd_parcelas, ...movSemQtdParcelas } = mov;
                 registros.push({
                     ...movSemQtdParcelas,
