@@ -1493,11 +1493,13 @@
                     // Se der erro, começa do zero
                     ultimoNumero = 0;
                 }
-                
-                // Coletar dados dos colaboradores e enviar um POST para cada
+                // Reservar faixa de números para todos os colaboradores
+                const numeroBases = [];
+                for (let i = 0; i < colaboradores.length; i++) {
+                    numeroBases.push((ultimoNumero + 1 + i).toString().padStart(5, '0'));
+                }
                 let sucesso = 0;
                 let erro = 0;
-                let numeroBase = ultimoNumero;
                 for (let i = 0; i < colaboradores.length; i++) {
                     const bloco = colaboradores[i];
                     const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
@@ -1510,8 +1512,7 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
-                        numeroBase++; // Incrementa uma vez por colaborador
-                        const numeroTituloBase = numeroBase.toString().padStart(5, '0');
+                        const numeroTituloBase = numeroBases[i];
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
                             const numeroTitulo = numeroTituloBase + `-${parcela}/${qtdParcelas}`;
                             let usuarioLancamento = 'admin';
