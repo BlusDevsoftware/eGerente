@@ -64,7 +64,7 @@ const criarMovimento = async (req, res) => {
         for (let i = 0; i < movimentos.length; i++) {
             const mov = movimentos[i];
             const qtd_parcelas = mov.qtd_parcelas ? parseInt(mov.qtd_parcelas) : 1;
-            const proximoNumero = ultimoNumero + 1; // incrementa a partir do maior encontrado
+            const proximoNumero = ultimoNumero + 1;
             const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
             for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
                 let numeroTitulo = numeroBaseStr;
@@ -76,7 +76,7 @@ const criarMovimento = async (req, res) => {
                     numero_titulo: numeroTitulo
                 });
             }
-            ultimoNumero++; // incrementa para o próximo colaborador
+            ultimoNumero++;
         }
         // Inserir todos os registros de uma vez
         const { data, error } = await supabase
