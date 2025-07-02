@@ -1479,7 +1479,7 @@
                     return;
                 }
                 
-                // Buscar o último numero_titulo existente
+                // Buscar o último numero_titulo existente GLOBAL
                 let ultimoNumero = 0;
                 try {
                     const ultimos = await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1');
@@ -1497,6 +1497,7 @@
                 // Coletar dados dos colaboradores e enviar um POST para cada
                 let sucesso = 0;
                 let erro = 0;
+                let numeroBase = ultimoNumero;
                 for (let i = 0; i < colaboradores.length; i++) {
                     const bloco = colaboradores[i];
                     const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
@@ -1509,11 +1510,9 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
-                        // Usar o número base já carregado no atributo do bloco
-                        const numeroBaseStr = bloco.getAttribute('data-numero-base') || '00001';
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            const numeroTitulo = numeroBaseStr + `-${parcela}/${qtdParcelas}`;
-                            // Determinar usuário de lançamento
+                            numeroBase++;
+                            const numeroTitulo = numeroBase.toString().padStart(5, '0') + `-${parcela}/${qtdParcelas}`;
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
                                 usuarioLancamento = window.usuarioLogado;
