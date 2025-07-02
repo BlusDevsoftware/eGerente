@@ -1512,9 +1512,7 @@
                         qtdParcelas = parseInt(qtdParcelasInput.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
-                        const numeroTituloBase = numeroBases[i];
                         for (let parcela = 1; parcela <= qtdParcelas; parcela++) {
-                            const numeroTitulo = numeroTituloBase + `-${parcela}/${qtdParcelas}`;
                             let usuarioLancamento = 'admin';
                             if (window.usuarioLogado) {
                                 usuarioLancamento = window.usuarioLogado;
@@ -1531,7 +1529,7 @@
                                 valor: parseFloat(valorReceberInput.value) / qtdParcelas,
                                 data_geracao: new Date().toISOString().split('T')[0],
                                 data_vencimento: new Date().toISOString().split('T')[0],
-                                numero_titulo: numeroTitulo,
+                                // numero_titulo: numeroTitulo, // REMOVIDO: agora o backend gera
                                 status: 'PENDENTE',
                                 usuario_lancamento: usuarioLancamento,
                                 descricao: descricaoInput ? descricaoInput.value : ''
