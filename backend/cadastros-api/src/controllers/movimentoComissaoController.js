@@ -77,9 +77,8 @@ const criarMovimento = async (req, res) => {
             const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
             for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
                 let numeroTitulo = numeroBaseStr;
-                if (qtd_parcelas > 1) {
-                    numeroTitulo += `-${parcela}/${qtd_parcelas}`;
-                }
+                // Sempre gerar sufixo -parcela/total, mesmo para parcela única
+                numeroTitulo += `-${parcela}/${qtd_parcelas}`;
                 const { qtd_parcelas: _qtd_parcelas, ...movSemQtdParcelas } = mov;
                 registros.push({
                     ...movSemQtdParcelas,
