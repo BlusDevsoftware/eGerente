@@ -132,8 +132,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width: 180px;">Cliente</th>
-                                    <th style="width: 180px;">Colaborador</th>
+                                    <th style="width: 260px;">Cliente</th>
+                                    <th style="width: 260px;">Colaborador</th>
                                     <th>Tipo</th>
                                     <th>Produto/Serviço</th>
                                     <th>Descrição</th>
@@ -749,6 +749,11 @@
                 gap: 18px;
                 align-items: flex-end;
             }
+            .table-multiplos select.input-cliente,
+            .table-multiplos select.input-colaborador {
+                min-width: 220px;
+                max-width: 100%;
+            }
         </style>
         <!-- Modal de feedback -->
         <div id="modalFeedback" class="modal-feedback" style="display:none;">
@@ -1018,8 +1023,8 @@
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
                 tr.innerHTML = `
-                    <td style="width: 180px;"><select name="cliente[]" required class="input-cliente" style="width: 100%;"></select></td>
-                    <td style="width: 180px;"><select name="colaborador[]" required class="input-colaborador" style="width: 100%;"></select></td>
+                    <td style="width: 260px;"><select name="cliente[]" required class="input-cliente" style="width: 100%; min-width:220px;"></select></td>
+                    <td style="width: 260px;"><select name="colaborador[]" required class="input-colaborador" style="width: 100%; min-width:220px;"></select></td>
                     <td>
                         <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
                             <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
