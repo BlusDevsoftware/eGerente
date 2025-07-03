@@ -1682,8 +1682,9 @@
                     const valorVendaInput = linha.querySelector('input[name="valor_venda[]"]');
                     const percentualInput = linha.querySelector('input[name="percentual[]"]');
                     const valorComissaoInput = linha.querySelector('input[name="valor_comissao[]"]');
-                    const dataInput = linha.querySelector('input[name="data[]"]');
-                    
+                    const dataGeracaoInput = linha.querySelector('input[name="data_geracao[]"]');
+                    const dataVencimentoInput = linha.querySelector('input[name="data_vencimento[]"]');
+
                     // Só processa se todos os campos existem e estão preenchidos
                     if (
                         !colaboradorSelect || !colaboradorSelect.value ||
@@ -1692,12 +1693,12 @@
                         !valorVendaInput || !valorVendaInput.value ||
                         !percentualInput || !percentualInput.value ||
                         !valorComissaoInput || !valorComissaoInput.value ||
-                        !dataInput || !dataInput.value
+                        !dataGeracaoInput || !dataGeracaoInput.value ||
+                        !dataVencimentoInput || !dataVencimentoInput.value
                     ) {
-                        // Pode exibir um alerta ou apenas pular a linha
                         return;
                     }
-                    
+
                     // Montar item_id como 'codigo-nome' separados por vírgula
                     const selectedOptions = Array.from(itemSelect.selectedOptions).filter(opt => opt.value);
                     const lista = tipoSelect.value === 'produto' ? produtos : servicos;
@@ -1706,7 +1707,7 @@
                         return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
                     }).filter(Boolean);
                     const item_id = itensSelecionados.join(',');
-                    
+
                     dadosComissoes.push({
                         colaborador_id: colaboradorSelect.value,
                         tipo: tipoSelect.value,
@@ -1714,8 +1715,8 @@
                         valor_venda: parseFloat(valorVendaInput.value),
                         percentual_comissao: parseFloat(percentualInput.value),
                         valor: parseFloat(valorComissaoInput.value),
-                        data_geracao: dataInput.value,
-                        data_vencimento: dataInput.value,
+                        data_geracao: dataGeracaoInput.value,
+                        data_vencimento: dataVencimentoInput.value,
                         status: 'PENDENTE',
                         // ...outros campos se necessário
                     });
