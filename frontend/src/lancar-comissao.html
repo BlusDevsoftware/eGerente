@@ -1692,6 +1692,9 @@
                         if (emissaoInput && emissaoInput.value) dataGeracao = emissaoInput.value;
                         if (vencimentoInput && vencimentoInput.value) dataVencimento = vencimentoInput.value;
                     }
+                    // Preencher datas com data atual se estiverem vazias (igual ao lançamento comercial)
+                    if (!dataGeracao) dataGeracao = new Date().toISOString().split('T')[0];
+                    if (!dataVencimento) dataVencimento = new Date().toISOString().split('T')[0];
 
                     if (
                         !colaboradorSelect || !colaboradorSelect.value ||
