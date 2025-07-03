@@ -1222,8 +1222,10 @@
                 let totalComissoes = 0;
                 
                 linhas.forEach(linha => {
-                    const valorVenda = parseFloat(linha.querySelector('input[name="valor_venda[]"]').value) || 0;
-                    const valorComissao = parseFloat(linha.querySelector('input[name="valor_comissao[]"]').value) || 0;
+                    const inputValorVenda = linha.querySelector('input[name="valor_venda[]"]');
+                    const inputValorComissao = linha.querySelector('input[name="valor_comissao[]"]');
+                    const valorVenda = inputValorVenda ? parseFloat(inputValorVenda.value) || 0 : 0;
+                    const valorComissao = inputValorComissao ? parseFloat(inputValorComissao.value) || 0 : 0;
                     
                     totalVendas += valorVenda;
                     totalComissoes += valorComissao;
