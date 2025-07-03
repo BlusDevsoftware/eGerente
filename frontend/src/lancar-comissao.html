@@ -126,17 +126,13 @@
             <div id="tabMultiploContent" class="tab-content">
                 <form id="formMultiplo" class="form-comissao">
                     <div class="form-row">
-                        <div class="form-group" style="flex: 1.5;">
-                            <label><i class="fas fa-user-tie"></i> Cliente</label>
-                            <div class="choices-container-wrapper">
-                                <select name="cliente" required></select>
-                            </div>
-                        </div>
+                        <!-- Remover campo de cliente do topo -->
                     </div>
                     <div class="table-multiplos">
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Cliente</th>
                                     <th>Colaborador</th>
                                     <th>Tipo</th>
                                     <th>Produto/Serviço</th>
@@ -1019,6 +1015,7 @@
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
                 tr.innerHTML = `
+                    <td><select name="cliente[]" required class="input-cliente"></select></td>
                     <td><select name="colaborador[]" required class="input-colaborador"></select></td>
                     <td>
                         <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
@@ -1683,6 +1680,7 @@
                 let dadosValidos = true;
                 
                 linhas.forEach((linha, index) => {
+                    const clienteSelect = linha.querySelector('select[name="cliente[]"]');
                     const colaboradorSelect = linha.querySelector('select[name="colaborador[]"]');
                     const tipoSelect = linha.querySelector('select[name="tipo[]"]');
                     const itemSelect = linha.querySelector('select[name="item[]"]');
@@ -1705,6 +1703,7 @@
                     if (!dataVencimento) dataVencimento = new Date().toISOString().split('T')[0];
 
                     if (
+                        !clienteSelect || !clienteSelect.value ||
                         !colaboradorSelect || !colaboradorSelect.value ||
                         !tipoSelect || !tipoSelect.value ||
                         !itemSelect || !itemSelect.selectedOptions.length ||
@@ -1726,7 +1725,7 @@
                     const item_id = itensSelecionados.join(',');
 
                     dadosComissoes.push({
-                        cliente_id: formData.get('cliente'),
+                        cliente_id: clienteSelect.value,
                         colaborador_id: colaboradorSelect.value,
                         tipo: tipoSelect.value,
                         item_id: item_id,
