@@ -1596,13 +1596,21 @@
                         const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
                         const emissaoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela') : null;
                         const vencimentoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela') : null;
+                        // Montar item_id como codigo-nome para todos os itens selecionados
+                        const valoresSelecionados = choicesItem.getValue(true);
+                        const todosItens = [...produtos, ...servicos];
+                        const itensSelecionados = valoresSelecionados.map(val => {
+                            const item = todosItens.find(i => i.codigo === val);
+                            return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
+                        }).filter(Boolean);
+                        const item_id = itensSelecionados.join(',');
                         for (let parcela = 0; parcela < qtdParcelas; parcela++) {
                             const dataGeracao = (emissaoInputs && emissaoInputs[parcela]) ? emissaoInputs[parcela].value : new Date().toISOString().split('T')[0];
                             const dataVencimento = (vencimentoInputs && vencimentoInputs[parcela]) ? vencimentoInputs[parcela].value : new Date().toISOString().split('T')[0];
                             const dadosComissao = {
                                 cliente_id: formData.get('cliente'),
                                 colaborador_id: colaboradorSelect.value,
-                                item_id: String(formData.getAll('item')[0]).padStart(5, '0'),
+                                item_id: item_id,
                                 tipo: formData.get('tipo'),
                                 valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
                                 percentual_comissao: parseFloat(percentualInput.value),
@@ -1612,7 +1620,6 @@
                                 status: 'PENDENTE',
                                 usuario_lancamento: usuarioLancamento,
                                 descricao: descricaoInput ? descricaoInput.value : ''
-                                // Removido: qtd_parcelas
                             };
                             listaComissoes.push(dadosComissao);
                         }
