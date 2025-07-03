@@ -132,8 +132,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Cliente</th>
-                                    <th>Colaborador</th>
+                                    <th style="width: 180px;">Cliente</th>
+                                    <th style="width: 180px;">Colaborador</th>
                                     <th>Tipo</th>
                                     <th>Produto/Serviço</th>
                                     <th>Descrição</th>
@@ -1015,8 +1015,8 @@
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
                 tr.innerHTML = `
-                    <td><select name="cliente[]" required class="input-cliente"></select></td>
-                    <td><select name="colaborador[]" required class="input-colaborador"></select></td>
+                    <td style="width: 180px;"><select name="cliente[]" required class="input-cliente"></select></td>
+                    <td style="width: 180px;"><select name="colaborador[]" required class="input-colaborador"></select></td>
                     <td>
                         <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
                             <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
