@@ -1216,7 +1216,7 @@
             }
             
             function atualizarResumoMultiplo() {
-                const linhas = document.querySelectorAll('#linhasMultiplo tr');
+                const linhas = document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)');
                 let totalVendas = 0;
                 let totalComissoes = 0;
                 
@@ -1665,7 +1665,7 @@
                 const formData = new FormData(form);
                 
                 // Coletar dados das linhas
-                const linhas = document.querySelectorAll('#linhasMultiplo tr');
+                const linhas = document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)');
                 if (linhas.length === 0) {
                     alert('Adicione pelo menos uma linha antes de salvar.');
                     return;
