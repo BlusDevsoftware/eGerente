@@ -1731,18 +1731,11 @@
                 if (!dadosValidos) return;
                 
                 try {
-                    // Aqui você faria a chamada para a API para salvar as comissões
-                    console.log('Dados das comissões para salvar:', dadosComissoes);
-                    
-                    // Simular salvamento (substitua pela chamada real da API)
-                    // await api.post('/comissoes/multiplas', dadosComissoes);
-                    
+                    await window.api.post('/movimento_comissoes', dadosComissoes);
                     alert(`${dadosComissoes.length} comissões salvas com sucesso!`);
                     form.reset();
-                    
                     // Limpar tabela
                     document.getElementById('linhasMultiplo').innerHTML = '';
-                    
                 } catch (error) {
                     console.error('Erro ao salvar comissões:', error);
                     alert('Erro ao salvar comissões. Tente novamente.');
