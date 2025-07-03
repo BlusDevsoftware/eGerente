@@ -1172,9 +1172,8 @@
                         removeItemButton: true,
                         maxItemCount: -1,
                         shouldSort: false,
-                        duplicateItemsAllowed: false,
-                        // Permitir múltipla seleção
-                        multiple: true
+                        duplicateItemsAllowed: false
+                        // Removido: multiple: true
                     });
                     // Adicionar evento para atualizar valor da venda quando item for selecionado
                     itemSelect.addEventListener('change', function() {
@@ -1682,10 +1681,18 @@
                     const valorVendaInput = linha.querySelector('input[name="valor_venda[]"]');
                     const percentualInput = linha.querySelector('input[name="percentual[]"]');
                     const valorComissaoInput = linha.querySelector('input[name="valor_comissao[]"]');
-                    const dataGeracaoInput = linha.querySelector('input[name="data_geracao[]"]');
-                    const dataVencimentoInput = linha.querySelector('input[name="data_vencimento[]"]');
 
-                    // Só processa se todos os campos existem e estão preenchidos
+                    // Buscar datas da simulação (linha seguinte)
+                    let dataGeracao = '';
+                    let dataVencimento = '';
+                    const trSimulacao = linha.nextElementSibling;
+                    if (trSimulacao && trSimulacao.classList.contains('linha-simulacao-multiplo')) {
+                        const emissaoInput = trSimulacao.querySelector('input.simulacao-emissao-parcela');
+                        const vencimentoInput = trSimulacao.querySelector('input.simulacao-vencimento-parcela');
+                        if (emissaoInput && emissaoInput.value) dataGeracao = emissaoInput.value;
+                        if (vencimentoInput && vencimentoInput.value) dataVencimento = vencimentoInput.value;
+                    }
+
                     if (
                         !colaboradorSelect || !colaboradorSelect.value ||
                         !tipoSelect || !tipoSelect.value ||
@@ -1693,8 +1700,7 @@
                         !valorVendaInput || !valorVendaInput.value ||
                         !percentualInput || !percentualInput.value ||
                         !valorComissaoInput || !valorComissaoInput.value ||
-                        !dataGeracaoInput || !dataGeracaoInput.value ||
-                        !dataVencimentoInput || !dataVencimentoInput.value
+                        !dataGeracao || !dataVencimento
                     ) {
                         return;
                     }
@@ -1715,8 +1721,8 @@
                         valor_venda: parseFloat(valorVendaInput.value),
                         percentual_comissao: parseFloat(percentualInput.value),
                         valor: parseFloat(valorComissaoInput.value),
-                        data_geracao: dataGeracaoInput.value,
-                        data_vencimento: dataVencimentoInput.value,
+                        data_geracao: dataGeracao,
+                        data_vencimento: dataVencimento,
                         status: 'PENDENTE',
                         // ...outros campos se necessário
                     });
