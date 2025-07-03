@@ -1019,7 +1019,7 @@
                             <input type="hidden" name="tipo[]" value="">
                         </div>
                     </td>
-                    <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
+                    <td><select name="item[]" required disabled class="input-item" multiple><option value="">Selecione o tipo primeiro</option></select></td>
                     <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição do lançamento" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
@@ -1168,20 +1168,27 @@
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...'
+                        placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...',
+                        removeItemButton: true,
+                        maxItemCount: -1,
+                        shouldSort: false,
+                        duplicateItemsAllowed: false,
+                        // Permitir múltipla seleção
+                        multiple: true
                     });
                     // Adicionar evento para atualizar valor da venda quando item for selecionado
                     itemSelect.addEventListener('change', function() {
-                        const selectedOption = this.options[this.selectedIndex];
-                        if (selectedOption && selectedOption.value) {
-                            const preco = parseFloat(selectedOption.getAttribute('data-preco')) || 0;
-                            const valorVendaInput = td.parentElement.querySelector('input[name="valor_venda[]"]');
-                            valorVendaInput.value = preco.toFixed(2);
-                            // Recalcular comissão se houver percentual
-                            const percentualInput = td.parentElement.querySelector('input[name="percentual[]"]');
-                            if (percentualInput.value) {
-                                calcularComissaoMultiplo(percentualInput, idx);
-                            }
+                        const selectedOptions = Array.from(this.selectedOptions).filter(opt => opt.value);
+                        let soma = 0;
+                        selectedOptions.forEach(opt => {
+                            soma += parseFloat(opt.getAttribute('data-preco')) || 0;
+                        });
+                        const valorVendaInput = td.parentElement.querySelector('input[name="valor_venda[]"]');
+                        valorVendaInput.value = soma.toFixed(2);
+                        // Recalcular comissão se houver percentual
+                        const percentualInput = td.parentElement.querySelector('input[name="percentual[]"]');
+                        if (percentualInput.value) {
+                            calcularComissaoMultiplo(percentualInput, idx);
                         }
                     });
                 } else {
@@ -1682,14 +1689,26 @@
                         return;
                     }
                     
+                    // Montar item_id como 'codigo-nome' separados por vírgula
+                    const selectedOptions = Array.from(itemSelect.selectedOptions).filter(opt => opt.value);
+                    const lista = tipoSelect.value === 'produto' ? produtos : servicos;
+                    const itensSelecionados = selectedOptions.map(opt => {
+                        const item = lista.find(i => i.codigo === opt.value);
+                        return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
+                    }).filter(Boolean);
+                    const item_id = itensSelecionados.join(',');
+                    
                     dadosComissoes.push({
-                        colaborador: colaboradorSelect.value,
+                        colaborador_id: colaboradorSelect.value,
                         tipo: tipoSelect.value,
-                        item: itemSelect.value,
+                        item_id: item_id,
                         valor_venda: parseFloat(valorVendaInput.value),
-                        percentual: parseFloat(percentualInput.value),
-                        valor_comissao: parseFloat(valorComissaoInput.value),
-                        data: dataInput.value
+                        percentual_comissao: parseFloat(percentualInput.value),
+                        valor: parseFloat(valorComissaoInput.value),
+                        data_geracao: dataInput.value,
+                        data_vencimento: dataInput.value,
+                        status: 'PENDENTE',
+                        // ...outros campos se necessário
                     });
                 });
                 
