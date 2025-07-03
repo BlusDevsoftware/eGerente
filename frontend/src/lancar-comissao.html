@@ -875,6 +875,9 @@
             let servicos = [];
             let choicesItem = null;
 
+            // Torna clientes global
+            window.clientes = [];
+
             const selectItem = document.querySelector('div.choices-container-wrapper > select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
@@ -1015,8 +1018,8 @@
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-numero-pai', numeroPai);
                 tr.innerHTML = `
-                    <td style="width: 180px;"><select name="cliente[]" required class="input-cliente"></select></td>
-                    <td style="width: 180px;"><select name="colaborador[]" required class="input-colaborador"></select></td>
+                    <td style="width: 180px;"><select name="cliente[]" required class="input-cliente" style="width: 100%;"></select></td>
+                    <td style="width: 180px;"><select name="colaborador[]" required class="input-colaborador" style="width: 100%;"></select></td>
                     <td>
                         <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
                             <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
@@ -1084,6 +1087,35 @@
                     }, 200);
                 }
                 atualizarResumoMultiplo();
+                // Adicione esta função no <script> principal, junto das outras funções auxiliares:
+                function preencherSelectClienteMultiplo(selectElement) {
+                    // Destroi Choices anterior se existir
+                    if (selectElement.choicesInstance) {
+                        selectElement.choicesInstance.destroy();
+                        selectElement.choicesInstance = null;
+                    }
+                    selectElement.innerHTML = '<option value="">Selecione um cliente...</option>';
+                    if (window.clientes && window.clientes.length > 0) {
+                        window.clientes.forEach(cliente => {
+                            const option = document.createElement('option');
+                            option.value = cliente.id || cliente.codigo;
+                            option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
+                            selectElement.appendChild(option);
+                        });
+                    }
+                    selectElement.choicesInstance = new Choices(selectElement, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'Selecione um cliente...'
+                    });
+                }
+                // ... existing code ...
+                // Dentro da função adicionarLinhaMultiplo, logo após criar a linha (tr):
+                // ... existing code ...
+                const selectCliente = tr.querySelector('select[name="cliente[]"]');
+                preencherSelectClienteMultiplo(selectCliente);
+                // ... existing code ...
             }
 
             function duplicarLinhaMultiplo(btn) {
@@ -1470,18 +1502,17 @@
 
                 selectItem.addEventListener('change', atualizarValorVendaPorItens);
 
-                let clientes = [];
                 try {
-                    clientes = await api.get('/clientes');
+                    // Carrega clientes globalmente
+                    window.clientes = await api.get('/clientes');
                     const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
                     selectCliente.innerHTML = '<option value="">Selecione um cliente...</option>';
-                    clientes.forEach(cliente => {
+                    window.clientes.forEach(cliente => {
                         const option = document.createElement('option');
-                        option.value = cliente.codigo;
+                        option.value = cliente.id || cliente.codigo;
                         option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
                     });
-
                     new Choices(selectCliente, {
                         searchEnabled: true,
                         itemSelectText: '',
