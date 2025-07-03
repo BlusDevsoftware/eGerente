@@ -38,36 +38,43 @@ const criarMovimento = async (req, res) => {
     try {
         console.log('Payload recebido para movimento_comissoes:', req.body);
         const movimentos = Array.isArray(req.body) ? req.body : [req.body];
-        // Gerar número base sequencial global UMA ÚNICA VEZ
+        // Buscar o maior número base já utilizado
         let ultimoNumero = 0;
-        try {
-            const { data: todos, error: errorTodos } = await supabase
-                .from('movimento_comissoes')
-                .select('numero_titulo');
-            if (errorTodos) throw errorTodos;
-            if (todos && todos.length > 0) {
-                const bases = todos
-                    .map(t => {
-                        const match = (t.numero_titulo || '').match(/^\d{5,}/);
-                        return match ? parseInt(match[0], 10) : null;
-                    })
-                    .filter(n => n !== null && n > 0);
-                if (bases.length > 0) {
-                    ultimoNumero = Math.max(...bases);
-                }
+        const { data: todos, error: errorTodos } = await supabase
+            .from('movimento_comissoes')
+            .select('numero_titulo');
+        if (errorTodos) throw errorTodos;
+        if (todos && todos.length > 0) {
+            const bases = todos
+                .map(t => {
+                    const match = (t.numero_titulo || '').match(/^\d{5,}/);
+                    return match ? parseInt(match[0], 10) : null;
+                })
+                .filter(n => n !== null && n > 0);
+            if (bases.length > 0) {
+                ultimoNumero = Math.max(...bases);
             }
-        } catch (e) {
-            ultimoNumero = 0;
         }
-        // Gerar número base para este grupo de parcelas
-        const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
-        const qtdParcelas = movimentos.length;
-        // Montar cada parcela com o mesmo número base e sufixo correto
-        const registros = movimentos.map((mov, idx) => ({
-            ...mov,
-            numero_titulo: `${numeroBaseStr}-${idx + 1}/${qtdParcelas}`
-        }));
-        // Inserir todos os registros de uma vez
+        // Agrupar por colaborador_id
+        const grupos = {};
+        movimentos.forEach(mov => {
+            const key = mov.colaborador_id; // pode ser ajustado para outro critério de agrupamento
+            if (!grupos[key]) grupos[key] = [];
+            grupos[key].push(mov);
+        });
+        // Para cada grupo, gerar número base e numerar as parcelas
+        const registros = [];
+        Object.values(grupos).forEach(parcelas => {
+            const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
+            parcelas.forEach((mov, i) => {
+                registros.push({
+                    ...mov,
+                    numero_titulo: `${numeroBaseStr}-${i + 1}/${parcelas.length}`
+                });
+            });
+            ultimoNumero++;
+        });
+        // Inserir todos os registros
         const { data, error } = await supabase
             .from('movimento_comissoes')
             .insert(registros)
