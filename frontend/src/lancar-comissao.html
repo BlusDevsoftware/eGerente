@@ -1070,6 +1070,22 @@
                 // Preencher colaborador (layout fixo, carrega opções depois)
                 const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
                 preencherSelectColaborador(selectColaborador);
+                // Inicializar Choices.js no campo Produto/Serviço ao criar a linha
+                const selectItem = tr.querySelector('select[name="item[]"]');
+                if (selectItem.choicesInstance) {
+                    selectItem.choicesInstance.destroy();
+                    selectItem.choicesInstance = null;
+                }
+                selectItem.choicesInstance = new Choices(selectItem, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'Selecione o tipo primeiro',
+                    removeItemButton: true,
+                    maxItemCount: -1,
+                    shouldSort: false,
+                    duplicateItemsAllowed: false
+                });
                 // Se valores foram passados (duplicação), preencher os campos
                 if (valores) {
                     tr.querySelector('input[name="descricao[]"]').value = valores.descricao || '';
