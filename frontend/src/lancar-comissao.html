@@ -125,6 +125,14 @@
             </div>
             <div id="tabMultiploContent" class="tab-content">
                 <form id="formMultiplo" class="form-comissao">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1.5;">
+                            <label><i class="fas fa-user-tie"></i> Cliente</label>
+                            <div class="choices-container-wrapper">
+                                <select name="cliente" required></select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-multiplos">
                         <table>
                             <thead>
@@ -1718,6 +1726,7 @@
                     const item_id = itensSelecionados.join(',');
 
                     dadosComissoes.push({
+                        cliente_id: formData.get('cliente'),
                         colaborador_id: colaboradorSelect.value,
                         tipo: tipoSelect.value,
                         item_id: item_id,
