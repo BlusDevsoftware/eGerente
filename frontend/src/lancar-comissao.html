@@ -1682,10 +1682,17 @@
                     const valorComissaoInput = linha.querySelector('input[name="valor_comissao[]"]');
                     const dataInput = linha.querySelector('input[name="data[]"]');
                     
-                    if (!colaboradorSelect.value || !tipoSelect.value || !itemSelect.value || 
-                        !valorVendaInput.value || !percentualInput.value || !dataInput.value) {
-                        alert(`Preencha todos os campos da linha ${index + 1}.`);
-                        dadosValidos = false;
+                    // Só processa se todos os campos existem e estão preenchidos
+                    if (
+                        !colaboradorSelect || !colaboradorSelect.value ||
+                        !tipoSelect || !tipoSelect.value ||
+                        !itemSelect || !itemSelect.selectedOptions.length ||
+                        !valorVendaInput || !valorVendaInput.value ||
+                        !percentualInput || !percentualInput.value ||
+                        !valorComissaoInput || !valorComissaoInput.value ||
+                        !dataInput || !dataInput.value
+                    ) {
+                        // Pode exibir um alerta ou apenas pular a linha
                         return;
                     }
                     
