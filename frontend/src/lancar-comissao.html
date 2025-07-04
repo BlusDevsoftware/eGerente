@@ -1066,7 +1066,7 @@
                         </div>
                     </td>
                     <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
-                    <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição do lançamento" class="input-descricao"></td>
+                    <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
@@ -1819,7 +1819,8 @@
                         data_geracao: dataGeracao,
                         data_vencimento: dataVencimento,
                         status: 'PENDENTE',
-                        // ...outros campos se necessário
+                        usuario_lancamento: (window.usuarioLogado || localStorage.getItem('usuarioLogado') || 'admin'),
+                        descricao: linha.querySelector('input[name="descricao[]"]').value || ''
                     });
                 });
                 
