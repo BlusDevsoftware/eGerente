@@ -1827,7 +1827,8 @@
                 if (!dadosValidos) return;
                 
                 try {
-                    await window.api.post('/movimento_comissoes', dadosComissoes);
+                    const response = await window.api.post('/movimento_comissoes', dadosComissoes);
+                    console.log('Resposta do Supabase (múltiplos lançamentos):', response);
                     alert(`${dadosComissoes.length} comissões salvas com sucesso!`);
                     form.reset();
                     // Limpar tabela
