@@ -770,6 +770,20 @@
                 width: 100% !important;
                 box-sizing: border-box !important;
             }
+            .table-multiplos td > .choices,
+            .table-multiplos .choices__inner {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .table-multiplos .choices__placeholder {
+                text-overflow: ellipsis !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                width: 100% !important;
+                display: block !important;
+            }
         </style>
         <!-- Modal de feedback -->
         <div id="modalFeedback" class="modal-feedback" style="display:none;">
@@ -990,41 +1004,28 @@
 
             // Função para preencher o select de colaborador (layout fixo, carrega opções depois)
             function preencherSelectColaborador(selectElement) {
-                // Destroi Choices anterior se existir
                 if (selectElement.choicesInstance) {
                     selectElement.choicesInstance.destroy();
                     selectElement.choicesInstance = null;
                 }
-                // Layout fixo imediato
-                selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
-                // Aplica Choices.js imediatamente e guarda a instância
-                selectElement.choicesInstance = new Choices(selectElement, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: 'Selecione um colaborador...'
-                });
-                // Carrega opções em background
+                selectElement.innerHTML = '<option value="">Selecione...</option>';
                 buscarColaboradores().then(colaboradores => {
-                    // Destroi Choices anterior antes de atualizar opções
                     if (selectElement.choicesInstance) {
                         selectElement.choicesInstance.destroy();
                         selectElement.choicesInstance = null;
                     }
-                    // Remove todas as opções exceto o placeholder
-                    selectElement.innerHTML = '<option value="">Selecione um colaborador...</option>';
+                    selectElement.innerHTML = '<option value="">Selecione...</option>';
                     colaboradores.forEach(colaborador => {
                         const option = document.createElement('option');
                         option.value = colaborador.codigo;
                         option.textContent = `${colaborador.codigo} - ${colaborador.nome}`;
                         selectElement.appendChild(option);
                     });
-                    // Reaplica Choices.js para atualizar as opções e guarda a instância
                     selectElement.choicesInstance = new Choices(selectElement, {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione um colaborador...'
+                        placeholderValue: 'Selecione...'
                     });
                 });
             }
@@ -1126,12 +1127,11 @@
                 atualizarResumoMultiplo();
                 // Adicione esta função no <script> principal, junto das outras funções auxiliares:
                 function preencherSelectClienteMultiplo(selectElement) {
-                    // Destroi Choices anterior se existir
                     if (selectElement.choicesInstance) {
                         selectElement.choicesInstance.destroy();
                         selectElement.choicesInstance = null;
                     }
-                    selectElement.innerHTML = '<option value="">Selecione um cliente...</option>';
+                    selectElement.innerHTML = '<option value="">Selecione...</option>';
                     if (window.clientes && window.clientes.length > 0) {
                         window.clientes.forEach(cliente => {
                             const option = document.createElement('option');
@@ -1144,7 +1144,7 @@
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione um cliente...'
+                        placeholderValue: 'Selecione...'
                     });
                 }
                 // ... existing code ...
@@ -1394,7 +1394,7 @@
                 selectColaborador.addEventListener('change', function() {
                     // Bloquear se já existe bloco para o mesmo colaborador
                     if (this.value && colaboradoresExistentes.includes(this.value)) {
-                        alert('Já existe um bloco para este colaborador!');
+                        alert('O colaborador ja foi adicionado nesse lançamento');
                         div.remove();
                         return;
                     }
