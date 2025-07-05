@@ -1866,3 +1866,9 @@ tr:hover {
     max-height: 49.22px !important;
     box-sizing: border-box;
 }
+
+.form-group select.input-colaborador {
+    width: 3313.46px !important;
+    min-width: 3313.46px !important;
+    max-width: 3313.46px !important;
+}
