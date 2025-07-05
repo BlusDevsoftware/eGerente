@@ -1826,7 +1826,10 @@
                         continue;
                     }
                     // Coletar itens selecionados via Choices.js (mais seguro)
-                    const valoresSelecionados = itemSelect.choicesInstance.getValue(true);
+                    let valoresSelecionados = itemSelect.choicesInstance.getValue(true);
+                    if (!Array.isArray(valoresSelecionados)) {
+                        valoresSelecionados = valoresSelecionados ? [valoresSelecionados] : [];
+                    }
                     const lista = tipoInput.value === 'produto' ? produtos : servicos;
                     const itensSelecionados = valoresSelecionados.map(val => {
                         const item = lista.find(i => i.codigo === val);
