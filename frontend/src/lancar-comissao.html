@@ -1749,93 +1749,139 @@
             // Função para salvar comissões múltiplas
             async function salvarComissoesMultiplas(event) {
                 event.preventDefault();
-                
+                // Exibir feedback visual de carregamento (opcional)
+                if (typeof mostrarModalFeedbackCarregando === 'function') mostrarModalFeedbackCarregando();
+
                 const form = event.target;
-                const formData = new FormData(form);
-                
                 // Coletar dados das linhas
                 const linhas = document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)');
                 if (linhas.length === 0) {
                     alert('Adicione pelo menos uma linha antes de salvar.');
+                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
                     return;
                 }
-                
-                const dadosComissoes = [];
-                let dadosValidos = true;
-                
-                linhas.forEach((linha, index) => {
+
+                // Buscar o último numero_titulo existente GLOBAL
+                let ultimoNumero = 0;
+                try {
+                    const ultimos = await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1');
+                    if (ultimos && ultimos.length > 0) {
+                        const match = (ultimos[0].numero_titulo || '').match(/^(\d{5})/);
+                        if (match) {
+                            ultimoNumero = parseInt(match[1], 10);
+                        }
+                    }
+                } catch (e) {
+                    ultimoNumero = 0;
+                }
+                // Reservar faixa de números para todas as linhas
+                const numeroBases = [];
+                for (let i = 0; i < linhas.length; i++) {
+                    numeroBases.push((ultimoNumero + 1 + i).toString().padStart(5, '0'));
+                }
+                let sucesso = 0;
+                let erro = 0;
+                const listaComissoes = [];
+                for (let i = 0; i < linhas.length; i++) {
+                    const linha = linhas[i];
                     const clienteSelect = linha.querySelector('select[name="cliente[]"]');
                     const colaboradorSelect = linha.querySelector('select[name="colaborador[]"]');
-                    const tipoSelect = linha.querySelector('select[name="tipo[]"]');
+                    const tipoInput = linha.querySelector('input[name="tipo[]"]');
                     const itemSelect = linha.querySelector('select[name="item[]"]');
                     const valorVendaInput = linha.querySelector('input[name="valor_venda[]"]');
                     const percentualInput = linha.querySelector('input[name="percentual[]"]');
                     const valorComissaoInput = linha.querySelector('input[name="valor_comissao[]"]');
-
+                    const descricaoInput = linha.querySelector('input[name="descricao[]"]');
+                    // Parcelamento
+                    let qtdParcelas = 1;
+                    const tdAcoes = linha.querySelector('.acao-multiplos');
+                    if (tdAcoes) {
+                        const divParcelas = tdAcoes.querySelector('.acoes-multiplos-parcelas');
+                        if (divParcelas && divParcelas.style.display !== 'none') {
+                            const qtdInput = divParcelas.querySelector('.input-qtd-parcelas');
+                            if (qtdInput && parseInt(qtdInput.value) > 1) {
+                                qtdParcelas = parseInt(qtdInput.value);
+                            }
+                        }
+                    }
                     // Buscar datas da simulação (linha seguinte)
-                    let dataGeracao = '';
-                    let dataVencimento = '';
                     const trSimulacao = linha.nextElementSibling;
+                    let emissaoInputs = null;
+                    let vencimentoInputs = null;
                     if (trSimulacao && trSimulacao.classList.contains('linha-simulacao-multiplo')) {
-                        const emissaoInput = trSimulacao.querySelector('input.simulacao-emissao-parcela');
-                        const vencimentoInput = trSimulacao.querySelector('input.simulacao-vencimento-parcela');
-                        if (emissaoInput && emissaoInput.value) dataGeracao = emissaoInput.value;
-                        if (vencimentoInput && vencimentoInput.value) dataVencimento = vencimentoInput.value;
+                        emissaoInputs = trSimulacao.querySelectorAll('input.simulacao-emissao-parcela');
+                        vencimentoInputs = trSimulacao.querySelectorAll('input.simulacao-vencimento-parcela');
                     }
-                    // Preencher datas com data atual se estiverem vazias (igual ao lançamento comercial)
-                    if (!dataGeracao) dataGeracao = new Date().toISOString().split('T')[0];
-                    if (!dataVencimento) dataVencimento = new Date().toISOString().split('T')[0];
-
-                    if (
-                        !clienteSelect || !clienteSelect.value ||
-                        !colaboradorSelect || !colaboradorSelect.value ||
-                        !tipoSelect || !tipoSelect.value ||
-                        !itemSelect || !itemSelect.selectedOptions.length ||
-                        !valorVendaInput || !valorVendaInput.value ||
-                        !percentualInput || !percentualInput.value ||
-                        !valorComissaoInput || !valorComissaoInput.value ||
-                        !dataGeracao || !dataVencimento
-                    ) {
-                        return;
-                    }
-
                     // Montar item_id como 'codigo-nome' separados por vírgula
                     const selectedOptions = Array.from(itemSelect.selectedOptions).filter(opt => opt.value);
-                    const lista = tipoSelect.value === 'produto' ? produtos : servicos;
+                    const lista = tipoInput.value === 'produto' ? produtos : servicos;
                     const itensSelecionados = selectedOptions.map(opt => {
                         const item = lista.find(i => i.codigo === opt.value);
                         return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
                     }).filter(Boolean);
                     const item_id = itensSelecionados.join(',');
-
-                    dadosComissoes.push({
-                        cliente_id: clienteSelect.value,
-                        colaborador_id: colaboradorSelect.value,
-                        tipo: tipoSelect.value,
-                        item_id: item_id,
-                        valor_venda: parseFloat(valorVendaInput.value),
-                        percentual_comissao: parseFloat(percentualInput.value),
-                        valor: parseFloat(valorComissaoInput.value),
-                        data_geracao: dataGeracao,
-                        data_vencimento: dataVencimento,
-                        status: 'PENDENTE',
-                        usuario_lancamento: (window.usuarioLogado || localStorage.getItem('usuarioLogado') || 'admin'),
-                        descricao: linha.querySelector('input[name="descricao[]"]').value || ''
-                    });
-                });
-                
-                if (!dadosValidos) return;
-                
-                try {
-                    const response = await window.api.post('/movimento_comissoes', dadosComissoes);
-                    console.log('Resposta do Supabase (múltiplos lançamentos):', response);
-                    alert(`${dadosComissoes.length} comissões salvas com sucesso!`);
+                    // Validação básica
+                    if (
+                        !clienteSelect || !clienteSelect.value ||
+                        !colaboradorSelect || !colaboradorSelect.value ||
+                        !tipoInput || !tipoInput.value ||
+                        !itemSelect || !itemSelect.selectedOptions.length ||
+                        !valorVendaInput || !valorVendaInput.value ||
+                        !percentualInput || !percentualInput.value ||
+                        !valorComissaoInput || !valorComissaoInput.value
+                    ) {
+                        erro++;
+                        continue;
+                    }
+                    for (let parcela = 0; parcela < qtdParcelas; parcela++) {
+                        let dataGeracao = new Date().toISOString().split('T')[0];
+                        let dataVencimento = new Date().toISOString().split('T')[0];
+                        if (emissaoInputs && emissaoInputs[parcela] && emissaoInputs[parcela].value) {
+                            dataGeracao = emissaoInputs[parcela].value;
+                        }
+                        if (vencimentoInputs && vencimentoInputs[parcela] && vencimentoInputs[parcela].value) {
+                            dataVencimento = vencimentoInputs[parcela].value;
+                        }
+                        let usuarioLancamento = 'admin';
+                        if (window.usuarioLogado) {
+                            usuarioLancamento = window.usuarioLogado;
+                        } else if (localStorage.getItem('usuarioLogado')) {
+                            usuarioLancamento = localStorage.getItem('usuarioLogado');
+                        }
+                        listaComissoes.push({
+                            cliente_id: clienteSelect.value,
+                            colaborador_id: colaboradorSelect.value,
+                            tipo: tipoInput.value,
+                            item_id: item_id,
+                            valor_venda: parseFloat(valorVendaInput.value),
+                            percentual_comissao: parseFloat(percentualInput.value),
+                            valor: parseFloat(valorComissaoInput.value) / qtdParcelas,
+                            data_geracao: dataGeracao,
+                            data_vencimento: dataVencimento,
+                            status: 'PENDENTE',
+                            usuario_lancamento: usuarioLancamento,
+                            descricao: descricaoInput ? descricaoInput.value : '',
+                            numero_titulo: numeroBases[i] + (qtdParcelas > 1 ? `-${(parcela+1).toString().padStart(2,'0')}` : '')
+                        });
+                    }
+                }
+                if (listaComissoes.length > 0) {
+                    try {
+                        await window.api.post('/movimento_comissoes', listaComissoes);
+                        sucesso = listaComissoes.length;
+                    } catch (error) {
+                        erro = listaComissoes.length;
+                        console.error('Erro ao salvar comissão:', error);
+                    }
+                }
+                if (sucesso > 0) {
+                    if (typeof mostrarModalFeedbackSucesso === 'function') mostrarModalFeedbackSucesso(`Comissão lançada com sucesso para ${sucesso} lançamento(s)!`);
+                    setTimeout(() => { if (typeof fecharModalFeedback === 'function') fecharModalFeedback(); }, 2500);
                     form.reset();
-                    // Limpar tabela
                     document.getElementById('linhasMultiplo').innerHTML = '';
-                } catch (error) {
-                    console.error('Erro ao salvar comissões:', error);
-                    alert('Erro ao salvar comissões. Tente novamente.');
+                } else {
+                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                    alert('Erro ao salvar comissão. Tente novamente.');
                 }
             }
             
