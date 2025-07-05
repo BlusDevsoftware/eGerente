@@ -1978,7 +1978,7 @@
                 const hoje = new Date();
                 const dataHoje = hoje.toISOString().slice(0,10);
                 for (let i = 1; i <= qtd; i++) {
-                    html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:120px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:120px;'></td></tr>`;
+                    html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela form-group-input' placeholder='dd/mm/aa' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela form-group-input' placeholder='dd/mm/aa'></td></tr>`;
                 }
                 html += '</table>';
                 if (qtd > 1) {
