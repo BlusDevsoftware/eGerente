@@ -1886,7 +1886,8 @@ tr:hover {
 }
 
 .form-group select.input-item,
-.form-group .choices.input-item {
+.form-group .choices.input-item,
+.form-group .choices__inner.input-item {
     height: 65px !important;
     min-height: 65px !important;
     max-height: 65px !important;
@@ -1894,10 +1895,7 @@ tr:hover {
 }
 
 .form-group .choices__inner.input-item {
-    height: 65px !important;
-    min-height: 65px !important;
-    max-height: 65px !important;
-    box-sizing: border-box;
+    background: #fff !important;
 }
 
 .form-group .choices__placeholder {
