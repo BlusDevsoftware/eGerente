@@ -1830,3 +1830,22 @@ tr:hover {
 .table-multiplos td {
     padding: 8px 16px;
 }
+
+.table-multiplos input.input-descricao {
+    background: #fff !important;
+    color: #333;
+}
+
+.table-multiplos input.input-descricao:focus {
+    background: #fff !important;
+    color: #333;
+}
+
+.intervalo-vencimento-container {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    margin-top: 8px;
+    gap: 8px;
+    text-align: left !important;
+}
