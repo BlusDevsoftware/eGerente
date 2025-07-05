@@ -1858,7 +1858,9 @@ tr:hover {
 .form-group input.input-descricao,
 .form-group select.input-colaborador,
 .form-group input[name="valor_receber[]"],
-.form-group input[name="percentual[]"] {
+.form-group input[name="percentual[]"],
+.form-group input[name="qtd_parcelas[]"],
+.form-group input[name="valor_parcela[]"] {
     height: 49.22px !important;
     min-height: 49.22px !important;
     max-height: 49.22px !important;
