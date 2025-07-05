@@ -2111,6 +2111,23 @@
                 }
             }
             // ... existing code ...
+
+            // Função para atribuir verificação de colaborador duplicado a todos os selects
+            function atribuirVerificacaoColaboradorMultiplo() {
+                const selects = document.querySelectorAll('select[name="colaborador[]"]');
+                selects.forEach(select => {
+                    select.onchange = null;
+                    select.addEventListener('change', function() {
+                        verificarColaboradorDuplicadoMultiplo(this);
+                    });
+                });
+            }
+            // Substituir sobrescrita de adicionarLinhaMultiplo para chamar atribuirVerificacaoColaboradorMultiplo
+            const originalAdicionarLinhaMultiplo = adicionarLinhaMultiplo;
+            adicionarLinhaMultiplo = function(valores = null) {
+                originalAdicionarLinhaMultiplo(valores);
+                atribuirVerificacaoColaboradorMultiplo();
+            };
         </script>
     </div>
 
