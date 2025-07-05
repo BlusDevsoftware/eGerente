@@ -1872,3 +1872,11 @@ tr:hover {
     min-width: 3313.46px !important;
     max-width: 3313.46px !important;
 }
+
+.form-group .choices,
+.form-group .choices__inner {
+    width: 3313.46px !important;
+    min-width: 3313.46px !important;
+    max-width: 3313.46px !important;
+    box-sizing: border-box;
+}
