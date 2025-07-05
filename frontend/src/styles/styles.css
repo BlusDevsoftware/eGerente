@@ -1785,11 +1785,15 @@ tr:hover {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
-    transition: border-color 0.3s;
+    background: #fff;
+    color: #333;
+    transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
 }
 .table-multiplos input[type="date"]:focus {
     border-color: #2196F3;
     outline: none;
     box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+    background: #fff;
+    color: #333;
 }
