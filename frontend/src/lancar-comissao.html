@@ -1812,20 +1812,12 @@
                         emissaoInputs = trSimulacao.querySelectorAll('input.simulacao-emissao-parcela');
                         vencimentoInputs = trSimulacao.querySelectorAll('input.simulacao-vencimento-parcela');
                     }
-                    // Montar item_id como 'codigo-nome' separados por vírgula
-                    const selectedOptions = Array.from(itemSelect.selectedOptions).filter(opt => opt.value);
-                    const lista = tipoInput.value === 'produto' ? produtos : servicos;
-                    const itensSelecionados = selectedOptions.map(opt => {
-                        const item = lista.find(i => i.codigo === opt.value);
-                        return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
-                    }).filter(Boolean);
-                    const item_id = itensSelecionados.join(',');
-                    // Validação básica
+                    // Validação ANTES de acessar propriedades
                     if (
                         !clienteSelect || !clienteSelect.value ||
                         !colaboradorSelect || !colaboradorSelect.value ||
                         !tipoInput || !tipoInput.value ||
-                        !itemSelect || !itemSelect.selectedOptions || !itemSelect.selectedOptions.length ||
+                        !itemSelect || !itemSelect.choicesInstance ||
                         !valorVendaInput || !valorVendaInput.value ||
                         !percentualInput || !percentualInput.value ||
                         !valorComissaoInput || !valorComissaoInput.value
@@ -1833,6 +1825,14 @@
                         erro++;
                         continue;
                     }
+                    // Coletar itens selecionados via Choices.js (mais seguro)
+                    const valoresSelecionados = itemSelect.choicesInstance.getValue(true);
+                    const lista = tipoInput.value === 'produto' ? produtos : servicos;
+                    const itensSelecionados = valoresSelecionados.map(val => {
+                        const item = lista.find(i => i.codigo === val);
+                        return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
+                    }).filter(Boolean);
+                    const item_id = itensSelecionados.join(',');
                     for (let parcela = 0; parcela < qtdParcelas; parcela++) {
                         let dataGeracao = new Date().toISOString().split('T')[0];
                         let dataVencimento = new Date().toISOString().split('T')[0];
