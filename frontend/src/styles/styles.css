@@ -1831,14 +1831,19 @@ tr:hover {
     padding: 8px 16px;
 }
 
-.table-multiplos input.input-descricao {
+.table-multiplos input.input-descricao,
+.table-multiplos input.input-descricao:focus,
+.table-multiplos input.input-descricao:-webkit-autofill,
+.table-multiplos input.input-descricao:-webkit-autofill:focus,
+.form-group input.input-descricao,
+.form-group input.input-descricao:focus,
+.form-group input.input-descricao:-webkit-autofill,
+.form-group input.input-descricao:-webkit-autofill:focus {
     background: #fff !important;
-    color: #333;
-}
-
-.table-multiplos input.input-descricao:focus {
-    background: #fff !important;
-    color: #333;
+    color: #333 !important;
+    box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .intervalo-vencimento-container {
