@@ -1872,15 +1872,30 @@ tr:hover {
     width: 3313.46px !important;
     min-width: 3313.46px !important;
     max-width: 3313.46px !important;
-    height: 65.23px !important;
-    min-height: 65.23px !important;
-    max-height: 65.23px !important;
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
     box-sizing: border-box;
 }
 
 .form-group .choices__inner {
-    height: 65.23px !important;
-    min-height: 65.23px !important;
-    max-height: 65.23px !important;
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
+    box-sizing: border-box;
+}
+
+.form-group select.input-item,
+.form-group .choices.input-item {
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
+    box-sizing: border-box;
+}
+
+.form-group .choices__inner.input-item {
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
     box-sizing: border-box;
 }
