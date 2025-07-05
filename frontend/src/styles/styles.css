@@ -1887,15 +1887,23 @@ tr:hover {
 
 .form-group select.input-item,
 .form-group .choices.input-item {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
+    height: 65px !important;
+    min-height: 65px !important;
+    max-height: 65px !important;
     box-sizing: border-box;
 }
 
 .form-group .choices__inner.input-item {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
+    height: 65px !important;
+    min-height: 65px !important;
+    max-height: 65px !important;
     box-sizing: border-box;
+}
+
+.form-group .choices__placeholder {
+    background: #fff !important;
+    color: #888 !important;
+    border: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
 }
