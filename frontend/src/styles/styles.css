@@ -1867,16 +1867,19 @@ tr:hover {
     box-sizing: border-box;
 }
 
-.form-group select.input-colaborador {
+.form-group select.input-colaborador,
+.form-group .choices.input-colaborador {
     width: 3313.46px !important;
     min-width: 3313.46px !important;
     max-width: 3313.46px !important;
+    box-sizing: border-box;
 }
 
-.form-group .choices,
+/*
 .form-group .choices__inner {
     width: 3313.46px !important;
     min-width: 3313.46px !important;
     max-width: 3313.46px !important;
     box-sizing: border-box;
 }
+*/
