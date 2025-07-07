@@ -1869,34 +1869,13 @@ tr:hover {
 
 .form-group select.input-colaborador,
 .form-group .choices.input-colaborador {
-    width: 3313.46px !important;
-    min-width: 3313.46px !important;
-    max-width: 3313.46px !important;
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box;
-}
-
-/*
-.form-group .choices__inner {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box;
-}
-*/
-
-.form-group select.input-item,
-.form-group .choices.input-item,
-.form-group .choices__inner.input-item {
     height: 65px !important;
     min-height: 65px !important;
     max-height: 65px !important;
     box-sizing: border-box;
 }
 
-.form-group .choices__inner.input-item {
+.form-group .choices__inner.input-colaborador {
     background: #fff !important;
 }
 
