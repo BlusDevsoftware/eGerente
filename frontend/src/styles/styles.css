@@ -1887,12 +1887,33 @@ tr:hover {
     opacity: 1 !important;
 }
 
+#formUnico .valor-venda-destaque .choices-container-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
 #formUnico input.valor-venda-destaque-input {
     height: 65px !important;
     min-height: 65px !important;
     max-height: 65px !important;
     box-sizing: border-box;
     background: #fff !important;
+    border: 1.5px solid #2196F3 !important;
+    border-radius: 5px !important;
+    box-shadow: none !important;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #222;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+#formUnico input.valor-venda-destaque-input:focus {
+    border-color: #2196F3 !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 #formUnico input.valor-venda-destaque-input::placeholder {
@@ -1901,12 +1922,8 @@ tr:hover {
     background: #fff !important;
     line-height: 65px !important;
     height: 65px !important;
+    font-weight: 400;
+    font-size: 1em;
     display: flex;
     align-items: center;
-}
-
-#formUnico .valor-venda-destaque .choices-container-wrapper {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
 }
