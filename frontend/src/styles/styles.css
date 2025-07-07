@@ -1904,3 +1904,9 @@ tr:hover {
     display: flex;
     align-items: center;
 }
+
+#formUnico .valor-venda-destaque .choices-container-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
