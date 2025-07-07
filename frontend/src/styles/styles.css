@@ -1888,5 +1888,19 @@ tr:hover {
 }
 
 #formUnico input.valor-venda-destaque-input {
+    height: 65px !important;
+    min-height: 65px !important;
+    max-height: 65px !important;
+    box-sizing: border-box;
     background: #fff !important;
+}
+
+#formUnico input.valor-venda-destaque-input::placeholder {
+    color: #888 !important;
+    opacity: 1 !important;
+    background: #fff !important;
+    line-height: 65px !important;
+    height: 65px !important;
+    display: flex;
+    align-items: center;
 }
