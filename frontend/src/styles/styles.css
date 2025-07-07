@@ -1886,3 +1886,10 @@ tr:hover {
     box-shadow: none !important;
     opacity: 1 !important;
 }
+
+#formUnico input.valor-venda-destaque-input {
+    height: 65px !important;
+    min-height: 65px !important;
+    max-height: 65px !important;
+    box-sizing: border-box;
+}
