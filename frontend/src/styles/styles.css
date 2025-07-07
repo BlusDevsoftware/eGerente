@@ -1887,11 +1887,12 @@ tr:hover {
     opacity: 1 !important;
 }
 
+#formUnico .valor-venda-destaque,
 #formUnico .valor-venda-destaque .choices-container-wrapper {
     background: transparent !important;
+    background-color: transparent !important;
     box-shadow: none !important;
     border: none !important;
-    padding: 0 !important;
 }
 
 #formUnico input.valor-venda-destaque-input {
