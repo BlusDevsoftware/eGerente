@@ -1888,8 +1888,5 @@ tr:hover {
 }
 
 #formUnico input.valor-venda-destaque-input {
-    height: 65px !important;
-    min-height: 65px !important;
-    max-height: 65px !important;
-    box-sizing: border-box;
+    background: #fff !important;
 }
