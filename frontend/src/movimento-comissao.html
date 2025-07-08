@@ -1038,9 +1038,7 @@
         });
     });
     </script>
-    <script type="module">
-import api from './services/api.js';
-
+    <script>
 function formatarValor(valor) {
     return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '';
 }
@@ -1063,7 +1061,7 @@ async function carregarComissoes() {
     const tbody = document.getElementById('movimentoComissoesTableBody');
     tbody.innerHTML = '<tr><td colspan="10">Carregando...</td></tr>';
     try {
-        const { data } = await api.get('/movimento_comissoes');
+        const data = await window.api.get('/movimento_comissoes');
         if (!data || !Array.isArray(data) || data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
             return;
@@ -1093,7 +1091,6 @@ async function carregarComissoes() {
         tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
     }
 }
-
 window.addEventListener('DOMContentLoaded', carregarComissoes);
 </script>
 </body>
