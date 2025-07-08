@@ -629,22 +629,17 @@
                 </tbody>
             </table>
         </div>
-        <!-- Paginação e seleção de quantidade por página -->
-        <div class="pagination-bar" style="display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(33,150,243,0.08); padding: 14px 24px; margin: 18px 0 24px 0;">
-            <div class="pagination-controls" style="display: flex; gap: 8px; align-items: center;">
-                <button class="pagination-btn" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; cursor: pointer;">&laquo; Anterior</button>
-                <span class="pagination-pages" style="font-weight: 600; color: #1976D2;">1 de 10</span>
-                <button class="pagination-btn" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; cursor: pointer;">Próxima &raquo;</button>
-            </div>
-            <div class="pagination-rows" style="display: flex; align-items: center; gap: 8px;">
-                <span style="color: #1976D2; font-weight: 600;">Exibir</span>
-                <select id="rowsPerPage" style="border: 1.5px solid #90caf9; border-radius: 6px; background: #f4faff; color: #1565c0; font-size: 1em; padding: 7px 12px; font-weight: 600;">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-                <span style="color: #1976D2; font-weight: 600;">por página</span>
-            </div>
+        <!-- Exibir por página -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+            <span style="font-weight: 600; color: #1976D2;">Exibir</span>
+            <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span style="font-weight: 600; color: #1976D2;">Títulos</span>
+            <div id="paginacaoComissoes" style="margin-left: auto; display: flex; align-items: center; gap: 6px;"></div>
         </div>
     </div>
 
@@ -1051,6 +1046,8 @@
     </script>
     <script src="scripts/config/api.js"></script>
     <script>
+let todosTitulos = [];
+
 function formatarValor(valor) {
     return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '';
 }
@@ -1069,41 +1066,50 @@ function statusClass(status) {
     if (s.includes('não pagou') || s.includes('nao pagou')) return 'nao-pago';
     return '';
 }
+function renderTabelaLimitada() {
+    const tbody = document.getElementById('movimentoComissoesTableBody');
+    tbody.innerHTML = '';
+    const select = document.getElementById('selectPorPagina');
+    const limite = parseInt(select.value);
+    if (!todosTitulos.length) {
+        tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
+        return;
+    }
+    const titulosExibir = todosTitulos.slice(0, limite);
+    titulosExibir.forEach(titulo => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
+            <td>${titulo.numero_titulo || ''}</td>
+            <td>${formatarData(titulo.data_geracao)}</td>
+            <td>${formatarData(titulo.data_vencimento)}</td>
+            <td>${titulo.colaborador_nome || titulo.colaborador_id || ''}</td>
+            <td>${titulo.tipo || ''}</td>
+            <td>${titulo.descricao || ''}</td>
+            <td>${formatarValor(titulo.valor)}</td>
+            <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
+            <td class="actions">
+                <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 async function carregarComissoes() {
     const tbody = document.getElementById('movimentoComissoesTableBody');
     tbody.innerHTML = '<tr><td colspan="10">Carregando...</td></tr>';
     try {
         const data = await window.api.get('/movimento_comissoes');
-        if (!data || !Array.isArray(data) || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = '';
-        data.forEach(titulo => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
-                <td>${titulo.numero_titulo || ''}</td>
-                <td>${formatarData(titulo.data_geracao)}</td>
-                <td>${formatarData(titulo.data_vencimento)}</td>
-                <td>${titulo.colaborador_nome || titulo.colaborador_id || ''}</td>
-                <td>${titulo.tipo || ''}</td>
-                <td>${titulo.descricao || ''}</td>
-                <td>${formatarValor(titulo.valor)}</td>
-                <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
-                <td class="actions">
-                    <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        todosTitulos = Array.isArray(data) ? data : [];
+        renderTabelaLimitada();
     } catch (e) {
         console.error('Erro detalhado ao carregar títulos:', e);
         tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
     }
 }
+document.getElementById('selectPorPagina').addEventListener('change', renderTabelaLimitada);
 window.addEventListener('DOMContentLoaded', carregarComissoes);
 </script>
 </body>
