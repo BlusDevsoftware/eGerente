@@ -1877,16 +1877,27 @@ tr:hover {
     box-sizing: border-box;
 }
 
-.form-group .choices__inner.input-colaborador {
-    background: #fff !important;
+.form-group .choices.input-colaborador .choices__inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 65px !important;
 }
 
-.form-group .choices__placeholder {
-    background: #fff !important;
-    color: #888 !important;
-    border: none !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
+.form-group .choices.input-colaborador .choices__item--selectable {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 65px !important;
+    line-height: 65px !important;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #222;
+    padding-left: 0 !important;
+    width: 100%;
+    text-align: center;
 }
 
 #formUnico .valor-venda-destaque,
@@ -1937,27 +1948,4 @@ tr:hover {
 
 #formUnico .valor-venda-destaque .choices-container-wrapper {
     margin-top: 7px;
-}
-
-.form-group .choices__inner {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    line-height: 65px !important;
-}
-
-.form-group .choices__item--selectable {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 65px !important;
-    line-height: 65px !important;
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #222;
-    padding-left: 0 !important;
-    width: 100%;
-    text-align: center;
 }
