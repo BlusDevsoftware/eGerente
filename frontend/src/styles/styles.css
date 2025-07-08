@@ -1934,3 +1934,7 @@ tr:hover {
 #formUnico .valor-venda-destaque label {
     margin-top: 0 !important;
 }
+
+#formUnico .valor-venda-destaque .choices-container-wrapper {
+    margin-top: 8px;
+}
