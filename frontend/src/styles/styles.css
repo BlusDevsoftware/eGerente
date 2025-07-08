@@ -1962,9 +1962,9 @@ tr:hover {
 #formSimples input#valorComissaoSimples,
 #formSimples input#dataEmissaoSimples,
 #formSimples input#dataVencimentoSimples {
-    height: 65px !important;
-    min-height: 65px !important;
-    max-height: 65px !important;
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
     box-sizing: border-box;
     background: #fff !important;
     border: 1.5px solid #2196F3 !important;
