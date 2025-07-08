@@ -2053,3 +2053,41 @@ tr:hover {
     width: 100%;
     text-align: center;
 }
+
+#formSimples .form-group .choices.input-colaborador,
+#formSimples .form-group .choices__inner.input-colaborador,
+#formSimples .form-group .choices.input-colaborador .choices__inner {
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
+    box-sizing: border-box !important;
+}
+
+#tabSimplesContent .choices.input-colaborador,
+#tabSimplesContent .choices__inner {
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
+    box-sizing: border-box !important;
+}
+#tabSimplesContent .choices.input-colaborador .choices__inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 49.22px !important;
+}
+#tabSimplesContent .choices.input-colaborador .choices__item--selectable {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 49.22px !important;
+    line-height: 49.22px !important;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #222;
+    padding-left: 0 !important;
+    width: 100%;
+    text-align: center;
+}
