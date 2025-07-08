@@ -1997,7 +1997,28 @@ tr:hover {
     align-items: center;
 }
 
+#formSimples input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #2196F3 !important;
+    border-radius: 8px !important;
+    font-size: 15px;
+    background: #fff !important;
+    color: #2196F3 !important;
+    font-family: inherit;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+    margin: 0;
+    height: 38px !important;
+}
+#formSimples input[type="date"]:focus {
+    border-color: #2196F3 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13) !important;
+    background: #fff !important;
+    color: #1976D2 !important;
+}
 #formSimples input[type="date"]::placeholder {
-    color: #888 !important;
+    color: #2196F3 !important;
     opacity: 1 !important;
 }
