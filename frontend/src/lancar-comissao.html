@@ -2061,15 +2061,24 @@
                     mostrarModalAlerta('Preencha todos os campos obrigatórios!');
                     return;
                 }
-                // Monta o payload conforme esperado pela API
-                const payload = {
-                    colaborador,
-                    valor_comissao,
-                    data_emissao,
-                    data_vencimento
-                };
+                // Monta o payload igual ao das outras abas (array de objetos)
+                const usuarioLancamento = window.usuarioLogado || localStorage.getItem('usuarioLogado') || 'admin';
+                const payload = [{
+                    cliente_id: '', // ou preencha se houver campo
+                    colaborador_id: colaborador,
+                    tipo: 'simples', // ou outro valor padrão se necessário
+                    item_id: '',
+                    valor_venda: 0,
+                    percentual_comissao: 0,
+                    valor: parseFloat(valor_comissao.replace(',', '.')),
+                    data_geracao: data_emissao,
+                    data_vencimento: data_vencimento,
+                    status: 'PENDENTE',
+                    usuario_lancamento: usuarioLancamento,
+                    descricao: '', // ou preencha se houver campo
+                    numero_titulo: '' // ou gere conforme padrão se necessário
+                }];
                 try {
-                    // Usa a API global já utilizada nas demais abas
                     await window.api.post('/movimento_comissoes', payload);
                     mostrarModalAlerta('Comissão lançada com sucesso!');
                     form.reset();
