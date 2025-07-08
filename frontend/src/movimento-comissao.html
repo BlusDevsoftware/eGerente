@@ -1088,6 +1088,7 @@ async function carregarComissoes() {
             tbody.appendChild(tr);
         });
     } catch (e) {
+        console.error('Erro detalhado ao carregar títulos:', e);
         tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
     }
 }
