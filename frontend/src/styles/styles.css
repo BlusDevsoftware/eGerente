@@ -1957,3 +1957,11 @@ tr:hover {
     box-shadow: none !important;
     opacity: 1 !important;
 }
+
+.form-group .choices.is-disabled .choices__placeholder {
+    background: transparent !important;
+    color: #888 !important;
+    border: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
