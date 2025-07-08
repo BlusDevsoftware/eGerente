@@ -1996,3 +1996,8 @@ tr:hover {
     display: flex;
     align-items: center;
 }
+
+#formSimples input[type="date"]::placeholder {
+    color: #888 !important;
+    opacity: 1 !important;
+}
