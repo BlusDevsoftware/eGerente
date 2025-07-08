@@ -1949,3 +1949,11 @@ tr:hover {
 #formUnico .valor-venda-destaque .choices-container-wrapper {
     margin-top: 7px;
 }
+
+.form-group .choices__placeholder {
+    background: transparent !important;
+    color: #888 !important;
+    border: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
