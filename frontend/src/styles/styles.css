@@ -2022,3 +2022,34 @@ tr:hover {
     color: #2196F3 !important;
     opacity: 1 !important;
 }
+
+#formSimples .choices.input-colaborador,
+#formSimples .choices__inner.input-colaborador {
+    height: 49.22px !important;
+    min-height: 49.22px !important;
+    max-height: 49.22px !important;
+    box-sizing: border-box;
+}
+#formSimples .choices.input-colaborador .choices__inner,
+#formSimples .choices__inner.input-colaborador {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 49.22px !important;
+}
+#formSimples .choices.input-colaborador .choices__item--selectable,
+#formSimples .choices__inner.input-colaborador .choices__item--selectable {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 49.22px !important;
+    line-height: 49.22px !important;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #222;
+    padding-left: 0 !important;
+    width: 100%;
+    text-align: center;
+}
