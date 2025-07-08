@@ -2054,14 +2054,28 @@
                 event.preventDefault();
                 const form = event.target;
                 const colaborador = form.colaborador.value;
-                const valorComissao = form.valor_comissao.value;
-                if (!colaborador || !valorComissao) {
-                    alert('Preencha todos os campos.');
+                const valor_comissao = form.valor_comissao.value;
+                const data_emissao = form.data_emissao.value;
+                const data_vencimento = form.data_vencimento.value;
+                if (!colaborador || !valor_comissao || !data_emissao || !data_vencimento) {
+                    mostrarModalAlerta('Preencha todos os campos obrigatórios!');
                     return;
                 }
-                // Aqui você pode enviar para a API
-                alert('Comissão lançada com sucesso!');
-                form.reset();
+                // Monta o payload conforme esperado pela API
+                const payload = {
+                    colaborador,
+                    valor_comissao,
+                    data_emissao,
+                    data_vencimento
+                };
+                try {
+                    // Usa a API global já utilizada nas demais abas
+                    await window.api.post('/movimento_comissoes', payload);
+                    mostrarModalAlerta('Comissão lançada com sucesso!');
+                    form.reset();
+                } catch (e) {
+                    mostrarModalAlerta('Erro ao lançar comissão. Tente novamente.');
+                }
             }
 
             document.getElementById('formSimples').addEventListener('submit', salvarComissaoSimples);
