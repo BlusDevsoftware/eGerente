@@ -1220,6 +1220,7 @@
                     const titulo = titulosFiltrados[index];
                     abrirModalConfirmExclusao(titulo, async function() {
                         try {
+                            console.log('DEBUG EXCLUIR TITULO:', titulo);
                             await window.api.delete(`/movimento_comissoes/${titulo.id}`);
                             row.remove();
                             alert('Título excluído com sucesso!');
