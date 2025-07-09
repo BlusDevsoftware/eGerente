@@ -823,7 +823,7 @@
     <div id="modalTitulo" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 2000; align-items: center; justify-content: center;">
       <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 700px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
         <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
-          <h2 id="modalTituloTitulo" style="margin: 0; font-size: 1.5em; color: #222; display: flex; align-items: center; gap: 10px;"><i id="modalTituloIcon" class="fas fa-eye" style="color: #2196F3;"></i> Visualizar Título</h2>
+          <h2 id="modalTituloTitulo" style="margin: 0; font-size: 1.5em; color: #222; display: flex; align-items: center; gap: 10px;"><i id="modalTituloIcon" class="fas fa-eye" style="color: #2196F3;"></i> <span id="modalTituloTexto">Visualizar Título</span></h2>
           <button class="close-modal" onclick="fecharModalTitulo()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
         </div>
         <form id="formModalTitulo" autocomplete="off" style="padding: 0 32px 0 32px; margin:0;">
@@ -1103,15 +1103,16 @@
             // Título e ícone
             const tituloEl = document.getElementById('modalTituloTitulo');
             const iconEl = document.getElementById('modalTituloIcon');
+            const textoEl = document.getElementById('modalTituloTexto');
             if (modo === 'visualizar') {
-                tituloEl.innerHTML = '<i class="fas fa-eye" style="color: #2196F3;"></i> Visualizar Título';
                 iconEl.className = 'fas fa-eye';
+                textoEl.textContent = 'Visualizar Título';
                 // Todos readonly
                 form.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
                 document.getElementById('btnSalvarModalTitulo').style.display = 'none';
             } else {
-                tituloEl.innerHTML = '<i class="fas fa-edit" style="color: #2196F3;"></i> Editar Título';
                 iconEl.className = 'fas fa-edit';
+                textoEl.textContent = 'Editar Título';
                 // Todos editáveis, exceto número
                 form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
                 document.getElementById('modal-numero').setAttribute('readonly', true);
