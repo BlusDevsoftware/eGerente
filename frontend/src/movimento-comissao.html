@@ -1028,16 +1028,6 @@
                     });
                 });
             });
-            document.querySelectorAll('.delete-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const row = btn.closest('tr');
-                    const numero = row.children[1].textContent;
-                    if (confirm('Tem certeza que deseja excluir o título ' + numero + '?')) {
-                        row.remove();
-                        // Aqui você pode adicionar lógica para excluir do backend
-                    }
-                });
-            });
         });
 
         // Funções JS para o modal de baixa
@@ -1147,6 +1137,17 @@
                     const index = Array.from(row.parentNode.children).indexOf(row);
                     const titulo = titulosFiltrados[index];
                     abrirModalTitulo(titulo, 'editar');
+                };
+            });
+            document.querySelectorAll('.delete-btn').forEach(function(btn, idx) {
+                btn.onclick = function() {
+                    const row = btn.closest('tr');
+                    const index = Array.from(row.parentNode.children).indexOf(row);
+                    const titulo = titulosFiltrados[index];
+                    if (confirm('Tem certeza que deseja excluir o título ' + titulo.numero_titulo + '?')) {
+                        row.remove();
+                        // Aqui você pode adicionar lógica para excluir do backend
+                    }
                 };
             });
         }
