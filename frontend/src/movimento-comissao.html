@@ -590,16 +590,17 @@
                 </select>
                 <select>
                     <option value="">Status</option>
-                    <option value="pending">Pendente</option>
-                    <option value="paid">Pago</option>
-                    <option value="vencido">Vencido</option>
-                    <option value="nao-pago">Cliente não pagou</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="PAGO">Pago</option>
+                    <option value="VENCIDO">Vencido</option>
+                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
                 </select>
                 <input type="date" id="data-inicial" placeholder="Data inicial">
                 <span style="margin: 0 6px; color: #1976D2; font-weight: bold;">até</span>
                 <input type="date" id="data-final" placeholder="Data final">
                 <button id="btn-geracao" type="button" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; margin-left: 8px; cursor: pointer;">Data de Geração</button>
                 <button id="btn-vencimento" type="button" style="background: #e3f2fd; color: #1976D2; border: 1.5px solid #90caf9; border-radius: 6px; padding: 7px 14px; font-weight: 600; margin-left: 4px; cursor: pointer;">Data de Vencimento</button>
+                <button id="btn-limpar-filtros" type="button" style="background: #fff; color: #1976D2; border: 1.5px solid #2196F3; border-radius: 6px; padding: 7px 14px; font-weight: 600; margin-left: 10px; cursor: pointer; transition: background 0.2s, color 0.2s;">Limpar Filtros</button>
             </div>
         </div>
 
@@ -1089,7 +1090,7 @@ function aplicarFiltros() {
         // Filtro colaborador
         if (colaborador && titulo.colaborador_id != colaborador) ok = false;
         // Filtro status
-        if (status && (titulo.status||'').toLowerCase() !== status.toLowerCase()) ok = false;
+        if (status && (titulo.status||'').toUpperCase() !== status.toUpperCase()) ok = false;
         // Filtro data
         let dataCampo = '';
         if (filtroDataPor === 'geracao') dataCampo = titulo.data_geracao;
@@ -1189,6 +1190,19 @@ document.getElementById('btn-vencimento').addEventListener('click', function() {
     this.style.color = '#fff';
     document.getElementById('btn-geracao').style.background = '#e3f2fd';
     document.getElementById('btn-geracao').style.color = '#1976D2';
+    atualizarTabelaComFiltros();
+});
+document.getElementById('btn-limpar-filtros').addEventListener('click', function() {
+    document.querySelector('.search-box input[type="text"]').value = '';
+    document.querySelector('.filter-options select').selectedIndex = 0;
+    document.querySelectorAll('.filter-options select')[1].selectedIndex = 0;
+    document.getElementById('data-inicial').value = '';
+    document.getElementById('data-final').value = '';
+    filtroDataPor = 'geracao';
+    document.getElementById('btn-geracao').style.background = '#1976D2';
+    document.getElementById('btn-geracao').style.color = '#fff';
+    document.getElementById('btn-vencimento').style.background = '#e3f2fd';
+    document.getElementById('btn-vencimento').style.color = '#1976D2';
     atualizarTabelaComFiltros();
 });
 window.addEventListener('DOMContentLoaded', carregarComissoes);
