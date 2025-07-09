@@ -1043,6 +1043,8 @@
     <script>
 let todosTitulos = [];
 let mapaColaboradores = {};
+let titulosFiltrados = [];
+let filtroDataPor = 'geracao'; // 'geracao' ou 'vencimento'
 
 function formatarValor(valor) {
     return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '';
@@ -1062,16 +1064,51 @@ function statusClass(status) {
     if (s.includes('não pagou') || s.includes('nao pagou')) return 'nao-pago';
     return '';
 }
+function aplicarFiltros() {
+    // Pega valores dos filtros
+    const busca = document.querySelector('.search-box input[type="text"]').value.trim().toLowerCase();
+    const colaborador = document.querySelector('.filter-options select').value;
+    const status = document.querySelectorAll('.filter-options select')[1].value;
+    const dataInicial = document.getElementById('data-inicial').value;
+    const dataFinal = document.getElementById('data-final').value;
+    // Filtra
+    titulosFiltrados = todosTitulos.filter(titulo => {
+        // Busca texto (em número, colaborador, tipo, descrição, status)
+        let ok = true;
+        if (busca) {
+            const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || '';
+            const texto = [
+                titulo.numero_titulo,
+                colaboradorNome,
+                titulo.tipo,
+                titulo.descricao,
+                titulo.status
+            ].map(x => (x||'').toString().toLowerCase()).join(' ');
+            if (!texto.includes(busca)) ok = false;
+        }
+        // Filtro colaborador
+        if (colaborador && titulo.colaborador_id != colaborador) ok = false;
+        // Filtro status
+        if (status && (titulo.status||'').toLowerCase() !== status.toLowerCase()) ok = false;
+        // Filtro data
+        let dataCampo = '';
+        if (filtroDataPor === 'geracao') dataCampo = titulo.data_geracao;
+        else dataCampo = titulo.data_vencimento;
+        if (dataInicial && (!dataCampo || dataCampo < dataInicial)) ok = false;
+        if (dataFinal && (!dataCampo || dataCampo > dataFinal)) ok = false;
+        return ok;
+    });
+}
 function renderTabelaLimitada() {
     const tbody = document.getElementById('movimentoComissoesTableBody');
     tbody.innerHTML = '';
     const select = document.getElementById('selectPorPagina');
     const limite = parseInt(select.value);
-    if (!todosTitulos.length) {
+    if (!titulosFiltrados.length) {
         tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
         return;
     }
-    const titulosExibir = todosTitulos.slice(0, limite);
+    const titulosExibir = titulosFiltrados.slice(0, limite);
     titulosExibir.forEach(titulo => {
         const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
         const tr = document.createElement('tr');
@@ -1094,6 +1131,10 @@ function renderTabelaLimitada() {
         tbody.appendChild(tr);
     });
 }
+function atualizarTabelaComFiltros() {
+    aplicarFiltros();
+    renderTabelaLimitada();
+}
 async function carregarColaboradores() {
     try {
         const colaboradores = await window.api.get('/colaboradores');
@@ -1101,6 +1142,14 @@ async function carregarColaboradores() {
             colaboradores.forEach(colab => {
                 mapaColaboradores[colab.codigo] = colab.nome;
             });
+            // Preencher filtro de colaborador
+            const selectColab = document.querySelector('.filter-options select');
+            if (selectColab) {
+                selectColab.innerHTML = '<option value="">Colaborador</option>';
+                colaboradores.forEach(colab => {
+                    selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
+                });
+            }
         }
     } catch (e) {
         console.error('Erro ao carregar colaboradores:', e);
@@ -1113,13 +1162,35 @@ async function carregarComissoes() {
         await carregarColaboradores();
         const data = await window.api.get('/movimento_comissoes');
         todosTitulos = Array.isArray(data) ? data : [];
-        renderTabelaLimitada();
+        titulosFiltrados = [...todosTitulos];
+        atualizarTabelaComFiltros();
     } catch (e) {
         console.error('Erro detalhado ao carregar títulos:', e);
         tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
     }
 }
 document.getElementById('selectPorPagina').addEventListener('change', renderTabelaLimitada);
+document.querySelector('.search-box input[type="text"]').addEventListener('input', atualizarTabelaComFiltros);
+document.querySelectorAll('.filter-options select')[0].addEventListener('change', atualizarTabelaComFiltros);
+document.querySelectorAll('.filter-options select')[1].addEventListener('change', atualizarTabelaComFiltros);
+document.getElementById('data-inicial').addEventListener('change', atualizarTabelaComFiltros);
+document.getElementById('data-final').addEventListener('change', atualizarTabelaComFiltros);
+document.getElementById('btn-geracao').addEventListener('click', function() {
+    filtroDataPor = 'geracao';
+    this.style.background = '#1976D2';
+    this.style.color = '#fff';
+    document.getElementById('btn-vencimento').style.background = '#e3f2fd';
+    document.getElementById('btn-vencimento').style.color = '#1976D2';
+    atualizarTabelaComFiltros();
+});
+document.getElementById('btn-vencimento').addEventListener('click', function() {
+    filtroDataPor = 'vencimento';
+    this.style.background = '#1976D2';
+    this.style.color = '#fff';
+    document.getElementById('btn-geracao').style.background = '#e3f2fd';
+    document.getElementById('btn-geracao').style.color = '#1976D2';
+    atualizarTabelaComFiltros();
+});
 window.addEventListener('DOMContentLoaded', carregarComissoes);
 </script>
 </body>
