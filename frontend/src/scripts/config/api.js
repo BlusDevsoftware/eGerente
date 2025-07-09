@@ -67,8 +67,11 @@ async function del(endpoint) {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'DELETE'
         });
-
-        const responseData = await response.json();
+        let responseData = null;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            responseData = await response.json();
+        }
         if (!response.ok) {
             throw { status: response.status, data: responseData };
         }
