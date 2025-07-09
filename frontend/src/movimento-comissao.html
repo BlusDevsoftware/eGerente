@@ -468,6 +468,61 @@
         .btn-aglutinar:hover {
             background: #fb8c00 !important;
         }
+        /* Modal de Confirmação de Exclusão */
+        #modalConfirmExclusao .modal-content {
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(33,150,243,0.13);
+            padding: 32px 28px;
+            max-width: 370px;
+            width: 100%;
+        }
+        #modalConfirmExclusao .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #modalConfirmExclusao .modal-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #e53935;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+        #modalConfirmExclusao .modal-header i {
+            color: #e53935;
+        }
+        #modalConfirmExclusao .modal-body {
+            padding: 24px 32px 0 32px;
+            text-align: center;
+        }
+        #modalConfirmExclusao .modal-footer {
+            padding: 18px 32px 24px 32px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        #modalConfirmExclusao .btn-secondary {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        #modalConfirmExclusao .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        #modalConfirmExclusao .btn-danger {
+            background-color: #e53935;
+            color: white;
+            border: none;
+        }
+        #modalConfirmExclusao .btn-danger:hover {
+            background-color: #c62828;
+        }
     </style>
 </head>
 <body>
@@ -881,6 +936,25 @@
       </div>
     </div>
 
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="margin: 0; font-size: 1.2em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+          <button class="close-modal" onclick="fecharModalConfirmExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
+          <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
+          <div style="font-size: 0.95em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+          <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+          <button id="btnConfirmarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Excluir</button>
+        </div>
+      </div>
+    </div>
+
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -1139,17 +1213,6 @@
                     abrirModalTitulo(titulo, 'editar');
                 };
             });
-            document.querySelectorAll('.delete-btn').forEach(function(btn, idx) {
-                btn.onclick = function() {
-                    const row = btn.closest('tr');
-                    const index = Array.from(row.parentNode.children).indexOf(row);
-                    const titulo = titulosFiltrados[index];
-                    if (confirm('Tem certeza que deseja excluir o título ' + titulo.numero_titulo + '?')) {
-                        row.remove();
-                        // Aqui você pode adicionar lógica para excluir do backend
-                    }
-                };
-            });
         }
         // Rebind sempre que renderizar tabela
         function renderTabelaLimitada() {
@@ -1265,6 +1328,23 @@
             // Aqui você pode implementar a lógica de salvar edição (API PUT)
             fecharModalTitulo();
         });
+
+        let tituloParaExcluir = null;
+        function abrirModalConfirmExclusao(titulo, onConfirm) {
+          tituloParaExcluir = { titulo, onConfirm };
+          document.getElementById('modalConfirmExclusao').style.display = 'flex';
+        }
+        function fecharModalConfirmExclusao() {
+          document.getElementById('modalConfirmExclusao').style.display = 'none';
+          tituloParaExcluir = null;
+        }
+        document.getElementById('btnCancelarExclusao').onclick = fecharModalConfirmExclusao;
+        document.getElementById('btnConfirmarExclusao').onclick = async function() {
+          if (tituloParaExcluir && tituloParaExcluir.onConfirm) {
+            await tituloParaExcluir.onConfirm();
+          }
+          fecharModalConfirmExclusao();
+        };
     </script>
 
     <script src="scripts/navigation.js"></script>
