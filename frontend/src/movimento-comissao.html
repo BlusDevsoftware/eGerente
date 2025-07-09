@@ -960,9 +960,11 @@
             document.getElementById('view-geracao').value = data.geracao || '';
             document.getElementById('view-vencimento').value = data.vencimento || '';
             document.getElementById('view-usuario').value = data.usuario || '';
-            // Tornar todos os campos editáveis, exceto o número
+            // Tornar todos os campos editáveis, exceto o número, colaborador e usuário
             document.querySelectorAll('#viewTituloForm input').forEach(input => input.removeAttribute('readonly'));
             document.getElementById('view-numero').setAttribute('readonly', true);
+            document.getElementById('view-colaborador').setAttribute('readonly', true);
+            document.getElementById('view-usuario').setAttribute('readonly', true);
             modal.style.display = 'flex';
         }
 
@@ -1113,9 +1115,11 @@
             } else {
                 iconEl.className = 'fas fa-edit';
                 textoEl.textContent = 'Editar Título';
-                // Todos editáveis, exceto número
+                // Todos editáveis, exceto número, colaborador e usuário
                 form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
                 document.getElementById('modal-numero').setAttribute('readonly', true);
+                document.getElementById('modal-colaborador').setAttribute('readonly', true);
+                document.getElementById('modal-usuario').setAttribute('readonly', true);
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
             }
             modal.style.display = 'flex';
