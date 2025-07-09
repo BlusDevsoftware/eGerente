@@ -523,6 +523,61 @@
         #modalConfirmExclusao .btn-danger:hover {
             background-color: #c62828;
         }
+        /* Modal de Sucesso de Exclusão */
+        #modalSucessoExclusao .modal-content {
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 24px rgba(33,150,243,0.13);
+            padding: 32px 28px;
+            max-width: 370px;
+            width: 100%;
+        }
+        #modalSucessoExclusao .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #modalSucessoExclusao .modal-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #43a047;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+        #modalSucessoExclusao .modal-header i {
+            color: #43a047;
+        }
+        #modalSucessoExclusao .modal-body {
+            padding: 24px 32px 0 32px;
+            text-align: center;
+        }
+        #modalSucessoExclusao .modal-footer {
+            padding: 18px 32px 24px 32px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #modalSucessoExclusao .btn-success {
+            background-color: #43a047;
+            color: white;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #modalSucessoExclusao .btn-success:hover {
+            background-color: #388e3c;
+        }
     </style>
 </head>
 <body>
@@ -955,6 +1010,23 @@
       </div>
     </div>
 
+    <!-- Modal de Sucesso de Exclusão -->
+    <div id="modalSucessoExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título excluído com sucesso!</h2>
+          <button class="close-modal" onclick="fecharModalSucessoExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+          <i class="fas fa-check-circle" style="font-size: 2.5em; color: #43a047; margin-bottom: 12px;"></i>
+          <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">O título foi removido do sistema.</div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+          <button id="btnOkSucessoExclusao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+        </div>
+      </div>
+    </div>
+
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -1225,7 +1297,7 @@
                             todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
                             titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
                             atualizarTabelaComFiltros();
-                            alert('Título excluído com sucesso!');
+                            abrirModalSucessoExclusao();
                         } catch (e) {
                             console.error('ERRO AO EXCLUIR TÍTULO:', e);
                             alert('Erro ao excluir título.');
@@ -1365,6 +1437,14 @@
           }
           fecharModalConfirmExclusao();
         };
+
+        function abrirModalSucessoExclusao() {
+          document.getElementById('modalSucessoExclusao').style.display = 'flex';
+        }
+        function fecharModalSucessoExclusao() {
+          document.getElementById('modalSucessoExclusao').style.display = 'none';
+        }
+        document.getElementById('btnOkSucessoExclusao').onclick = fecharModalSucessoExclusao;
     </script>
 
     <script src="scripts/navigation.js"></script>
