@@ -75,7 +75,9 @@
             font-size: 1em;
             outline: none;
             margin-left: 8px;
-            width: 180px;
+            width: 220px; /* igual ao select de colaborador */
+            min-width: 160px;
+            max-width: 100%;
         }
         .filter-options select,
         .filter-options input[type='date'] {
@@ -88,6 +90,9 @@
             box-shadow: 0 1px 4px rgba(33,150,243,0.04);
             margin-right: 8px;
             transition: border-color 0.2s, box-shadow 0.2s;
+            width: 220px;
+            min-width: 160px;
+            max-width: 100%;
         }
         .filter-options select:focus,
         .filter-options input[type='date']:focus {
@@ -814,6 +819,68 @@
         </div>
     </div>
 
+    <!-- Modal Visualizar/Edição de Título -->
+    <div id="modalTitulo" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 2000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 700px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+          <h2 id="modalTituloTitulo" style="margin: 0; font-size: 1.5em; color: #222; display: flex; align-items: center; gap: 10px;"><i id="modalTituloIcon" class="fas fa-eye" style="color: #2196F3;"></i> Visualizar Título</h2>
+          <button class="close-modal" onclick="fecharModalTitulo()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <form id="formModalTitulo" autocomplete="off" style="padding: 0 32px 0 32px; margin:0;">
+          <div class="form-row" style="display: flex; gap: 20px; margin-top: 24px;">
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-hashtag"></i> Nº Título</label>
+              <input type="text" id="modal-numero" readonly>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-flag"></i> Status</label>
+              <input type="text" id="modal-status" readonly>
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 20px;">
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-user"></i> Colaborador</label>
+              <input type="text" id="modal-colaborador" readonly>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-cubes"></i> Tipo</label>
+              <input type="text" id="modal-tipo" readonly>
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 20px;">
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-align-left"></i> Descrição</label>
+              <input type="text" id="modal-descricao" readonly>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-coins"></i> Valor</label>
+              <input type="text" id="modal-valor" readonly>
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 20px;">
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-calendar-plus"></i> Data da Geração</label>
+              <input type="text" id="modal-geracao" readonly>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-calendar-check"></i> Data de Vencimento</label>
+              <input type="text" id="modal-vencimento" readonly>
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 20px;">
+            <div class="form-group" style="flex:1;">
+              <label><i class="fas fa-user-shield"></i> Usuário do Lançamento</label>
+              <input type="text" id="modal-usuario" readonly>
+            </div>
+          </div>
+          <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 32px; padding: 24px 0 24px 0; border-top: 1px solid #eee;">
+            <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+            <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -1019,6 +1086,175 @@
                 });
             });
         });
+
+        // Funções para o Modal Visualizar/Editar Título
+        function abrirModalTitulo(titulo, modo) {
+            const modal = document.getElementById('modalTitulo');
+            const form = document.getElementById('formModalTitulo');
+            document.getElementById('modal-numero').value = titulo.numero_titulo || '';
+            document.getElementById('modal-status').value = titulo.status || '';
+            document.getElementById('modal-colaborador').value = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+            document.getElementById('modal-tipo').value = titulo.tipo || '';
+            document.getElementById('modal-descricao').value = titulo.descricao || '';
+            document.getElementById('modal-valor').value = formatarValor(titulo.valor);
+            document.getElementById('modal-geracao').value = formatarData(titulo.data_geracao);
+            document.getElementById('modal-vencimento').value = formatarData(titulo.data_vencimento);
+            document.getElementById('modal-usuario').value = titulo.usuario_lancamento || '';
+            // Título e ícone
+            const tituloEl = document.getElementById('modalTituloTitulo');
+            const iconEl = document.getElementById('modalTituloIcon');
+            if (modo === 'visualizar') {
+                tituloEl.innerHTML = '<i class="fas fa-eye" style="color: #2196F3;"></i> Visualizar Título';
+                iconEl.className = 'fas fa-eye';
+                // Todos readonly
+                form.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
+                document.getElementById('btnSalvarModalTitulo').style.display = 'none';
+            } else {
+                tituloEl.innerHTML = '<i class="fas fa-edit" style="color: #2196F3;"></i> Editar Título';
+                iconEl.className = 'fas fa-edit';
+                // Todos editáveis, exceto número
+                form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
+                document.getElementById('modal-numero').setAttribute('readonly', true);
+                document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
+            }
+            modal.style.display = 'flex';
+        }
+        function fecharModalTitulo() {
+            document.getElementById('modalTitulo').style.display = 'none';
+        }
+        // Integrar aos botões da tabela
+        function bindAcoesTabela() {
+            document.querySelectorAll('.view-btn').forEach(function(btn, idx) {
+                btn.onclick = function() {
+                    const row = btn.closest('tr');
+                    const index = Array.from(row.parentNode.children).indexOf(row);
+                    const titulo = titulosFiltrados[index];
+                    abrirModalTitulo(titulo, 'visualizar');
+                };
+            });
+            document.querySelectorAll('.edit-btn').forEach(function(btn, idx) {
+                btn.onclick = function() {
+                    const row = btn.closest('tr');
+                    const index = Array.from(row.parentNode.children).indexOf(row);
+                    const titulo = titulosFiltrados[index];
+                    abrirModalTitulo(titulo, 'editar');
+                };
+            });
+        }
+        // Rebind sempre que renderizar tabela
+        function renderTabelaLimitada() {
+            const tbody = document.getElementById('movimentoComissoesTableBody');
+            tbody.innerHTML = '';
+            const select = document.getElementById('selectPorPagina');
+            const limite = parseInt(select.value);
+            if (!titulosFiltrados.length) {
+                tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
+                return;
+            }
+            const titulosExibir = titulosFiltrados.slice(0, limite);
+            titulosExibir.forEach(titulo => {
+                const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
+                    <td>${titulo.numero_titulo || ''}</td>
+                    <td>${formatarData(titulo.data_geracao)}</td>
+                    <td>${formatarData(titulo.data_vencimento)}</td>
+                    <td>${colaboradorNome}</td>
+                    <td>${titulo.tipo || ''}</td>
+                    <td>${titulo.descricao || ''}</td>
+                    <td>${formatarValor(titulo.valor)}</td>
+                    <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
+                    <td class="actions">
+                        <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            bindAcoesTabela();
+        }
+        function atualizarTabelaComFiltros() {
+            aplicarFiltros();
+            renderTabelaLimitada();
+        }
+        async function carregarColaboradores() {
+            try {
+                const colaboradores = await window.api.get('/colaboradores');
+                if (Array.isArray(colaboradores)) {
+                    colaboradores.forEach(colab => {
+                        mapaColaboradores[colab.codigo] = colab.nome;
+                    });
+                    // Preencher filtro de colaborador
+                    const selectColab = document.querySelector('.filter-options select');
+                    if (selectColab) {
+                        selectColab.innerHTML = '<option value="">Colaborador</option>';
+                        colaboradores.forEach(colab => {
+                            selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao carregar colaboradores:', e);
+            }
+        }
+        async function carregarComissoes() {
+            const tbody = document.getElementById('movimentoComissoesTableBody');
+            tbody.innerHTML = '<tr><td colspan="10">Carregando...</td></tr>';
+            try {
+                await carregarColaboradores();
+                const data = await window.api.get('/movimento_comissoes');
+                todosTitulos = Array.isArray(data) ? data : [];
+                titulosFiltrados = [...todosTitulos];
+                atualizarTabelaComFiltros();
+            } catch (e) {
+                console.error('Erro detalhado ao carregar títulos:', e);
+                tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
+            }
+        }
+        document.getElementById('selectPorPagina').addEventListener('change', renderTabelaLimitada);
+        document.querySelector('.search-box input[type="text"]').addEventListener('input', atualizarTabelaComFiltros);
+        document.querySelectorAll('.filter-options select')[0].addEventListener('change', atualizarTabelaComFiltros);
+        document.querySelectorAll('.filter-options select')[1].addEventListener('change', atualizarTabelaComFiltros);
+        document.getElementById('data-inicial').addEventListener('change', atualizarTabelaComFiltros);
+        document.getElementById('data-final').addEventListener('change', atualizarTabelaComFiltros);
+        document.getElementById('btn-geracao').addEventListener('click', function() {
+            filtroDataPor = 'geracao';
+            this.style.background = '#1976D2';
+            this.style.color = '#fff';
+            document.getElementById('btn-vencimento').style.background = '#e3f2fd';
+            document.getElementById('btn-vencimento').style.color = '#1976D2';
+            atualizarTabelaComFiltros();
+        });
+        document.getElementById('btn-vencimento').addEventListener('click', function() {
+            filtroDataPor = 'vencimento';
+            this.style.background = '#1976D2';
+            this.style.color = '#fff';
+            document.getElementById('btn-geracao').style.background = '#e3f2fd';
+            document.getElementById('btn-geracao').style.color = '#1976D2';
+            atualizarTabelaComFiltros();
+        });
+        document.getElementById('btn-limpar-filtros').addEventListener('click', function() {
+            document.querySelector('.search-box input[type="text"]').value = '';
+            document.querySelector('.filter-options select').selectedIndex = 0;
+            document.querySelectorAll('.filter-options select')[1].selectedIndex = 0;
+            document.getElementById('data-inicial').value = '';
+            document.getElementById('data-final').value = '';
+            filtroDataPor = 'geracao';
+            document.getElementById('btn-geracao').style.background = '#1976D2';
+            document.getElementById('btn-geracao').style.color = '#fff';
+            document.getElementById('btn-vencimento').style.background = '#e3f2fd';
+            document.getElementById('btn-vencimento').style.color = '#1976D2';
+            atualizarTabelaComFiltros();
+        });
+        window.addEventListener('DOMContentLoaded', carregarComissoes);
+
+        document.getElementById('formModalTitulo').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Aqui você pode implementar a lógica de salvar edição (API PUT)
+            fecharModalTitulo();
+        });
     </script>
 
     <script src="scripts/navigation.js"></script>
@@ -1100,112 +1336,6 @@ function aplicarFiltros() {
         return ok;
     });
 }
-function renderTabelaLimitada() {
-    const tbody = document.getElementById('movimentoComissoesTableBody');
-    tbody.innerHTML = '';
-    const select = document.getElementById('selectPorPagina');
-    const limite = parseInt(select.value);
-    if (!titulosFiltrados.length) {
-        tbody.innerHTML = '<tr><td colspan="10">Nenhum título encontrado.</td></tr>';
-        return;
-    }
-    const titulosExibir = titulosFiltrados.slice(0, limite);
-    titulosExibir.forEach(titulo => {
-        const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
-            <td>${titulo.numero_titulo || ''}</td>
-            <td>${formatarData(titulo.data_geracao)}</td>
-            <td>${formatarData(titulo.data_vencimento)}</td>
-            <td>${colaboradorNome}</td>
-            <td>${titulo.tipo || ''}</td>
-            <td>${titulo.descricao || ''}</td>
-            <td>${formatarValor(titulo.valor)}</td>
-            <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
-            <td class="actions">
-                <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-function atualizarTabelaComFiltros() {
-    aplicarFiltros();
-    renderTabelaLimitada();
-}
-async function carregarColaboradores() {
-    try {
-        const colaboradores = await window.api.get('/colaboradores');
-        if (Array.isArray(colaboradores)) {
-            colaboradores.forEach(colab => {
-                mapaColaboradores[colab.codigo] = colab.nome;
-            });
-            // Preencher filtro de colaborador
-            const selectColab = document.querySelector('.filter-options select');
-            if (selectColab) {
-                selectColab.innerHTML = '<option value="">Colaborador</option>';
-                colaboradores.forEach(colab => {
-                    selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
-                });
-            }
-        }
-    } catch (e) {
-        console.error('Erro ao carregar colaboradores:', e);
-    }
-}
-async function carregarComissoes() {
-    const tbody = document.getElementById('movimentoComissoesTableBody');
-    tbody.innerHTML = '<tr><td colspan="10">Carregando...</td></tr>';
-    try {
-        await carregarColaboradores();
-        const data = await window.api.get('/movimento_comissoes');
-        todosTitulos = Array.isArray(data) ? data : [];
-        titulosFiltrados = [...todosTitulos];
-        atualizarTabelaComFiltros();
-    } catch (e) {
-        console.error('Erro detalhado ao carregar títulos:', e);
-        tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
-    }
-}
-document.getElementById('selectPorPagina').addEventListener('change', renderTabelaLimitada);
-document.querySelector('.search-box input[type="text"]').addEventListener('input', atualizarTabelaComFiltros);
-document.querySelectorAll('.filter-options select')[0].addEventListener('change', atualizarTabelaComFiltros);
-document.querySelectorAll('.filter-options select')[1].addEventListener('change', atualizarTabelaComFiltros);
-document.getElementById('data-inicial').addEventListener('change', atualizarTabelaComFiltros);
-document.getElementById('data-final').addEventListener('change', atualizarTabelaComFiltros);
-document.getElementById('btn-geracao').addEventListener('click', function() {
-    filtroDataPor = 'geracao';
-    this.style.background = '#1976D2';
-    this.style.color = '#fff';
-    document.getElementById('btn-vencimento').style.background = '#e3f2fd';
-    document.getElementById('btn-vencimento').style.color = '#1976D2';
-    atualizarTabelaComFiltros();
-});
-document.getElementById('btn-vencimento').addEventListener('click', function() {
-    filtroDataPor = 'vencimento';
-    this.style.background = '#1976D2';
-    this.style.color = '#fff';
-    document.getElementById('btn-geracao').style.background = '#e3f2fd';
-    document.getElementById('btn-geracao').style.color = '#1976D2';
-    atualizarTabelaComFiltros();
-});
-document.getElementById('btn-limpar-filtros').addEventListener('click', function() {
-    document.querySelector('.search-box input[type="text"]').value = '';
-    document.querySelector('.filter-options select').selectedIndex = 0;
-    document.querySelectorAll('.filter-options select')[1].selectedIndex = 0;
-    document.getElementById('data-inicial').value = '';
-    document.getElementById('data-final').value = '';
-    filtroDataPor = 'geracao';
-    document.getElementById('btn-geracao').style.background = '#1976D2';
-    document.getElementById('btn-geracao').style.color = '#fff';
-    document.getElementById('btn-vencimento').style.background = '#e3f2fd';
-    document.getElementById('btn-vencimento').style.color = '#1976D2';
-    atualizarTabelaComFiltros();
-});
-window.addEventListener('DOMContentLoaded', carregarComissoes);
 </script>
 </body>
 </html> 
