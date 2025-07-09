@@ -1225,6 +1225,7 @@
                             row.remove();
                             alert('Título excluído com sucesso!');
                         } catch (e) {
+                            console.error('ERRO AO EXCLUIR TÍTULO:', e);
                             alert('Erro ao excluir título.');
                         }
                     });
