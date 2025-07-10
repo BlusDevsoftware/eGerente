@@ -1354,7 +1354,7 @@
                     // Preencher filtro de colaborador
                     const selectColab = document.querySelector('.filter-options select');
                     if (selectColab) {
-                        selectColab.innerHTML = '<option value="">Colaborador</option>';
+                        selectColab.innerHTML = '<option value="" disabled selected hidden>Selecione o colaborador</option>';
                         colaboradores.forEach(colab => {
                             selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
                         });
