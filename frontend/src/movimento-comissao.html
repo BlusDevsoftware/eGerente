@@ -1461,10 +1461,31 @@
         });
         window.addEventListener('DOMContentLoaded', carregarComissoes);
 
-        document.getElementById('formModalTitulo').addEventListener('submit', function(e) {
+        document.getElementById('formModalTitulo').addEventListener('submit', async function(e) {
             e.preventDefault();
-            // Aqui você pode implementar a lógica de salvar edição (API PUT)
-            fecharModalTitulo();
+            // Coletar dados do formulário
+            const id = document.getElementById('modal-numero').dataset.id || '';
+            const valor = document.getElementById('modal-valor').value.replace(/[^\d,\.]/g, '').replace(',', '.');
+            const descricao = document.getElementById('modal-descricao').value;
+            // Adicione outros campos editáveis se necessário
+            try {
+                await window.api.put(`/movimento_comissoes/${id}`, {
+                    valor: parseFloat(valor),
+                    descricao: descricao
+                    // Adicione outros campos aqui se necessário
+                });
+                // Atualizar o array local
+                const idx = todosTitulos.findIndex(t => t.numero_titulo == document.getElementById('modal-numero').value);
+                if (idx !== -1) {
+                    todosTitulos[idx].valor = parseFloat(valor);
+                    todosTitulos[idx].descricao = descricao;
+                }
+                atualizarTabelaComFiltros();
+                fecharModalTitulo();
+                abrirModalSucessoEdicao();
+            } catch (e) {
+                alert('Erro ao salvar edição!');
+            }
         });
 
         let tituloParaExcluir = null;
@@ -1660,6 +1681,32 @@ function aplicarFiltros() {
         return ok;
     });
 }
+</script>
+
+<!-- Adicionar modal de sucesso de edição: -->
+<div id="modalSucessoEdicao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título editado com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoEdicao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-check-circle" style="font-size: 2.5em; color: #43a047; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">O título foi atualizado no sistema.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoEdicao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+<script>
+function abrirModalSucessoEdicao() {
+  document.getElementById('modalSucessoEdicao').style.display = 'flex';
+}
+function fecharModalSucessoEdicao() {
+  document.getElementById('modalSucessoEdicao').style.display = 'none';
+}
+document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao;
 </script>
 </body>
 </html> 
