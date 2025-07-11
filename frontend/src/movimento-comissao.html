@@ -468,7 +468,7 @@
         .btn-aglutinar:hover {
             background: #fb8c00 !important;
         }
-        /* Modal de Confirmação de Exclusão */
+        /* Modal de Confirmação de Exclusão (ajustado para parcelamento) */
         #modalConfirmExclusao .modal-content {
             border-radius: 12px;
             background: #fff;
@@ -991,7 +991,7 @@
       </div>
     </div>
 
-    <!-- Modal de Confirmação de Exclusão -->
+    <!-- Modal de Confirmação de Exclusão (ajustado para parcelamento) -->
     <div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
       <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
         <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
@@ -1002,6 +1002,14 @@
           <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
           <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
           <div style="font-size: 0.95em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
+          <div id="opcoesExclusaoParcelamento" style="margin: 18px 0 0 0; display: none; text-align: left;">
+            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor:pointer;">
+              <input type="radio" name="exclusaoParcelamento" value="unico" checked style="accent-color: #e53935;"> Excluir apenas este título
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor:pointer;">
+              <input type="radio" name="exclusaoParcelamento" value="todos" style="accent-color: #e53935;"> Excluir todos os títulos deste parcelamento
+            </label>
+          </div>
         </div>
         <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
           <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
@@ -1023,6 +1031,24 @@
         </div>
         <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
           <button id="btnOkSucessoExclusao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Linha do Tempo do Título -->
+    <div id="modalTimeline" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 420px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="margin: 0; font-size: 1.3em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-clock"></i> Linha do Tempo do Título</h2>
+          <button class="close-modal" onclick="fecharModalTimeline()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px 32px 0 32px; min-height: 180px; max-height: 400px; overflow-y: auto;">
+          <ul id="timelineEventos" style="list-style: none; padding: 0; margin: 0;">
+            <!-- Eventos dinâmicos aqui -->
+          </ul>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+          <button class="btn-secondary" onclick="fecharModalTimeline()" style="padding: 10px 24px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Fechar</button>
         </div>
       </div>
     </div>
@@ -1290,17 +1316,25 @@
                     const row = btn.closest('tr');
                     const index = Array.from(row.parentNode.children).indexOf(row);
                     const titulo = titulosFiltrados[index];
-                    abrirModalConfirmExclusao(titulo, async function() {
-                        try {
+                    abrirModalConfirmExclusao(titulo, async function(modo) {
+                        if (modo === 'unico') {
                             await window.api.delete(`/movimento_comissoes/${titulo.id}`);
-                            // Remove do array de dados
                             todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
                             titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
                             atualizarTabelaComFiltros();
                             abrirModalSucessoExclusao();
-                        } catch (e) {
-                            console.error('ERRO AO EXCLUIR TÍTULO:', e);
-                            alert('Erro ao excluir título.');
+                        } else {
+                            // Excluir todos do parcelamento
+                            const prefixo = (titulo.numero_titulo || '').split('-')[0];
+                            // Seleciona todos os títulos do mesmo parcelamento
+                            const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+                            for (const t of titulosDoGrupo) {
+                                await window.api.delete(`/movimento_comissoes/${t.id}`);
+                            }
+                            todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+                            titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+                            atualizarTabelaComFiltros();
+                            abrirModalSucessoExclusao();
                         }
                     });
                 };
@@ -1422,8 +1456,25 @@
         });
 
         let tituloParaExcluir = null;
+        let modoExclusaoParcelamento = 'unico';
         function abrirModalConfirmExclusao(titulo, onConfirm) {
           tituloParaExcluir = { titulo, onConfirm };
+          // Detecta se é parcelado pelo padrão do número do título
+          const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
+          const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
+          if (match) {
+            opcoesDiv.style.display = 'block';
+            document.querySelector('input[name="exclusaoParcelamento"][value="unico"]').checked = true;
+            modoExclusaoParcelamento = 'unico';
+          } else {
+            opcoesDiv.style.display = 'none';
+            modoExclusaoParcelamento = 'unico';
+          }
+          document.getElementsByName('exclusaoParcelamento').forEach(radio => {
+            radio.onchange = function() {
+              modoExclusaoParcelamento = this.value;
+            };
+          });
           document.getElementById('modalConfirmExclusao').style.display = 'flex';
         }
         function fecharModalConfirmExclusao() {
@@ -1433,7 +1484,7 @@
         document.getElementById('btnCancelarExclusao').onclick = fecharModalConfirmExclusao;
         document.getElementById('btnConfirmarExclusao').onclick = async function() {
           if (tituloParaExcluir && tituloParaExcluir.onConfirm) {
-            await tituloParaExcluir.onConfirm();
+            await tituloParaExcluir.onConfirm(modoExclusaoParcelamento);
           }
           fecharModalConfirmExclusao();
         };
@@ -1445,6 +1496,32 @@
           document.getElementById('modalSucessoExclusao').style.display = 'none';
         }
         document.getElementById('btnOkSucessoExclusao').onclick = fecharModalSucessoExclusao;
+
+        function abrirModalTimeline(eventos) {
+          const modal = document.getElementById('modalTimeline');
+          const ul = document.getElementById('timelineEventos');
+          ul.innerHTML = '';
+          if (Array.isArray(eventos) && eventos.length) {
+            eventos.forEach(ev => {
+              ul.innerHTML += `<li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
+                <div style="width: 32px; height: 32px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffb74d; margin-top: 2px;">
+                  <i class="fas fa-clock" style="color: #ff9800; font-size: 1.2em;"></i>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-weight: 600; color: #333; font-size: 1.05em;">${ev.titulo}</div>
+                  <div style="color: #888; font-size: 0.97em;">${ev.data}</div>
+                  <div style="color: #555; font-size: 0.98em; margin-top: 2px;">${ev.descricao || ''}</div>
+                </div>
+              </li>`;
+            });
+          } else {
+            ul.innerHTML = '<li style="color:#888; text-align:center; margin: 32px 0;">Nenhum evento encontrado para este título.</li>';
+          }
+          modal.style.display = 'flex';
+        }
+        function fecharModalTimeline() {
+          document.getElementById('modalTimeline').style.display = 'none';
+        }
     </script>
 
     <script src="scripts/navigation.js"></script>
