@@ -931,7 +931,7 @@
     <!-- Modal Visualizar/Edição de Título -->
     <div id="modalTitulo" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 2000; align-items: center; justify-content: center;">
       <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 700px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-        <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
           <h2 id="modalTituloTitulo" style="margin: 0; font-size: 1.5em; color: #222; display: flex; align-items: center; gap: 10px;"><i id="modalTituloIcon" class="fas fa-eye" style="color: #2196F3;"></i> <span id="modalTituloTexto">Visualizar Título</span></h2>
           <button class="close-modal" onclick="fecharModalTitulo()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
         </div>
@@ -963,7 +963,10 @@
             </div>
             <div class="form-group" style="flex:1;">
               <label><i class="fas fa-coins" style="color: #2196F3;"></i> Valor</label>
-              <input type="text" id="modal-valor" readonly>
+              <div class="input-group" style="display: flex; align-items: center; background: #f4faff; border-radius: 8px; border: 1.5px solid #90caf9; padding: 0 8px;">
+                <span class="input-prefix" style="color: #1976D2; font-weight: 600; margin-right: 4px;">R$</span>
+                <input type="text" id="modal-valor" readonly style="border: none; background: transparent; color: #1565c0; font-size: 1em; outline: none; width: 100%; padding: 10px 0;">
+              </div>
             </div>
           </div>
           <div class="form-row" style="display: flex; gap: 20px;">
@@ -1163,20 +1166,32 @@
 
         function saveEditModal() {
             // Coletar dados dos campos editáveis
-            const dataEditada = {
-                numero: document.getElementById('view-numero').value,
-                colaborador: document.getElementById('view-colaborador').value,
-                tipo: document.getElementById('view-tipo').value,
-                valor: document.getElementById('view-valor').value,
-                descricao: document.getElementById('view-descricao').value,
-                status: document.getElementById('view-status').value,
-                geracao: document.getElementById('view-geracao').value,
-                vencimento: document.getElementById('view-vencimento').value,
-                usuario: document.getElementById('view-usuario').value
-            };
-            // Aqui você pode enviar para o backend ou atualizar a tabela
-            alert('Título editado com sucesso!');
-            closeViewModal();
+            const numero = document.getElementById('view-numero').value;
+            const valor = document.getElementById('view-valor').value.replace(/[^\d,\.]/g, '').replace(',', '.');
+            const descricao = document.getElementById('view-descricao').value;
+            
+            // Encontrar o título no array local
+            const titulo = todosTitulos.find(t => t.numero_titulo === numero);
+            if (!titulo) {
+                alert('Erro: Título não encontrado!');
+                return;
+            }
+            
+            // Fazer a chamada para a API
+            window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                valor: parseFloat(valor),
+                descricao: descricao
+            }).then(() => {
+                // Atualizar o array local
+                titulo.valor = parseFloat(valor);
+                titulo.descricao = descricao;
+                atualizarTabelaComFiltros();
+                closeViewModal();
+                abrirModalSucessoEdicao();
+            }).catch((error) => {
+                console.error('Erro ao salvar edição:', error);
+                alert('Erro ao salvar edição!');
+            });
         }
 
         // Adiciona evento aos botões de visualizar
@@ -1274,10 +1289,15 @@
             document.getElementById('modal-colaborador').value = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
             document.getElementById('modal-tipo').value = titulo.tipo || '';
             document.getElementById('modal-descricao').value = titulo.descricao || '';
-            document.getElementById('modal-valor').value = formatarValor(titulo.valor);
+            
+            // Formatar valor para exibição
+            const valorFormatado = titulo.valor ? titulo.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00';
+            document.getElementById('modal-valor').value = valorFormatado;
+            
             document.getElementById('modal-geracao').value = formatarData(titulo.data_geracao);
             document.getElementById('modal-vencimento').value = formatarData(titulo.data_vencimento);
             document.getElementById('modal-usuario').value = titulo.usuario_lancamento || '';
+            
             // Título e ícone
             const tituloEl = document.getElementById('modalTituloTitulo');
             const iconEl = document.getElementById('modalTituloIcon');
@@ -1298,6 +1318,25 @@
                 document.getElementById('modal-usuario').setAttribute('readonly', true);
                 document.getElementById('modal-status').setAttribute('readonly', true);
                 document.getElementById('modal-tipo').setAttribute('readonly', true);
+                
+                // Configurar campo valor para edição
+                const valorInput = document.getElementById('modal-valor');
+                valorInput.removeAttribute('readonly');
+                valorInput.addEventListener('input', function(e) {
+                    // Remove tudo exceto números e vírgula
+                    let valor = e.target.value.replace(/[^\d,]/g, '');
+                    // Garante apenas uma vírgula
+                    const partes = valor.split(',');
+                    if (partes.length > 2) {
+                        valor = partes[0] + ',' + partes.slice(1).join('');
+                    }
+                    // Limita a 2 casas decimais
+                    if (partes.length === 2 && partes[1].length > 2) {
+                        valor = partes[0] + ',' + partes[1].substring(0, 2);
+                    }
+                    e.target.value = valor;
+                });
+                
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
             }
             modal.style.display = 'flex';
@@ -1461,6 +1500,8 @@
         });
         window.addEventListener('DOMContentLoaded', carregarComissoes);
 
+        // Evento submit removido - usando apenas saveEditModal()
+        /*
         document.getElementById('formModalTitulo').addEventListener('submit', async function(e) {
             e.preventDefault();
             // Coletar dados do formulário
@@ -1487,6 +1528,7 @@
                 alert('Erro ao salvar edição!');
             }
         });
+        */
 
         let tituloParaExcluir = null;
         let modoExclusaoParcelamento = 'unico';
@@ -1707,6 +1749,40 @@ function fecharModalSucessoEdicao() {
   document.getElementById('modalSucessoEdicao').style.display = 'none';
 }
 document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao;
+        
+        // Evento para salvar o modal de título
+        document.getElementById('btnSalvarModalTitulo').addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            // Coletar dados do formulário
+            const numero = document.getElementById('modal-numero').value;
+            const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
+            const descricao = document.getElementById('modal-descricao').value;
+            
+            // Encontrar o título no array local
+            const titulo = todosTitulos.find(t => t.numero_titulo === numero);
+            if (!titulo) {
+                alert('Erro: Título não encontrado!');
+                return;
+            }
+            
+            try {
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                    valor: parseFloat(valor),
+                    descricao: descricao
+                });
+                
+                // Atualizar o array local
+                titulo.valor = parseFloat(valor);
+                titulo.descricao = descricao;
+                atualizarTabelaComFiltros();
+                fecharModalTitulo();
+                abrirModalSucessoEdicao();
+            } catch (error) {
+                console.error('Erro ao salvar edição:', error);
+                alert('Erro ao salvar edição!');
+            }
+        });
 </script>
 </body>
 </html> 
