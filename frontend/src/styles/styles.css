@@ -2091,3 +2091,7 @@ tr:hover {
     width: 100%;
     text-align: center;
 }
+.selected-row {
+    background-color: #e3f2fd !important;
+    transition: background 0.2s;
+}

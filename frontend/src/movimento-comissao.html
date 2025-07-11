@@ -1047,7 +1047,7 @@
       </div>
     </div>
 
-    <!-- Modal Linha do Tempo do Título -->
+    <!-- Modal de linah do tempo de titulo-->
     <div id="modalTimeline" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
       <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 420px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
         <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
@@ -1376,9 +1376,9 @@
                             atualizarTabelaComFiltros();
                             abrirModalSucessoExclusao();
                         } else {
-                            // Excluir todos do parcelamento
+                            // Excluir todos do parcelamento com referencia do numero do titulo
                             const prefixo = (titulo.numero_titulo || '').split('-')[0];
-                            // Seleciona todos os títulos do mesmo parcelamento
+                            // Seleciona todos os títulos do mesmo parcelamento com referencia do numero do titulo
                             const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
                             for (const t of titulosDoGrupo) {
                                 await window.api.delete(`/movimento_comissoes/${t.id}`);
@@ -1501,35 +1501,6 @@
         });
         window.addEventListener('DOMContentLoaded', carregarComissoes);
 
-        // Evento submit removido - usando apenas saveEditModal()
-        /*
-        document.getElementById('formModalTitulo').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            // Coletar dados do formulário
-            const id = document.getElementById('modal-numero').dataset.id || '';
-            const valor = document.getElementById('modal-valor').value.replace(/[^\d,\.]/g, '').replace(',', '.');
-            const descricao = document.getElementById('modal-descricao').value;
-            // Adicione outros campos editáveis se necessário
-            try {
-                await window.api.put(`/movimento_comissoes/${id}`, {
-                    valor: parseFloat(valor),
-                    descricao: descricao
-                    // Adicione outros campos aqui se necessário
-                });
-                // Atualizar o array local
-                const idx = todosTitulos.findIndex(t => t.numero_titulo == document.getElementById('modal-numero').value);
-                if (idx !== -1) {
-                    todosTitulos[idx].valor = parseFloat(valor);
-                    todosTitulos[idx].descricao = descricao;
-                }
-                atualizarTabelaComFiltros();
-                fecharModalTitulo();
-                abrirModalSucessoEdicao();
-            } catch (e) {
-                alert('Erro ao salvar edição!');
-            }
-        });
-        */
 
         let tituloParaExcluir = null;
         let modoExclusaoParcelamento = 'unico';
@@ -1647,7 +1618,7 @@
 
     <script src="scripts/navigation.js"></script>
     <script>
-    // Reforça a inicialização do menu após todos os scripts
+    // Reforça a inicialização do menu após todos os scripts e mantem a constancia do menu
     window.addEventListener('DOMContentLoaded', function() {
         if (typeof initializeMenu === 'function') {
             initializeMenu();
@@ -1669,7 +1640,7 @@
 let todosTitulos = [];
 let mapaColaboradores = {};
 let titulosFiltrados = [];
-let filtroDataPor = 'geracao'; // 'geracao' ou 'vencimento'
+let filtroDataPor = 'geracao'; // filtro de data por'geracao' ou 'vencimento' 
 
 function formatarValor(valor) {
     return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '';
@@ -1711,11 +1682,11 @@ function aplicarFiltros() {
             ].map(x => (x||'').toString().toLowerCase()).join(' ');
             if (!texto.includes(busca)) ok = false;
         }
-        // Filtro colaborador
+        // Filtro por colaborador
         if (colaborador && titulo.colaborador_id != colaborador) ok = false;
-        // Filtro status
+        // Filtro porstatus
         if (status && (titulo.status||'').toUpperCase() !== status.toUpperCase()) ok = false;
-        // Filtro data
+        // Filtro pordata
         let dataCampo = '';
         if (filtroDataPor === 'geracao') dataCampo = titulo.data_geracao;
         else dataCampo = titulo.data_vencimento;
