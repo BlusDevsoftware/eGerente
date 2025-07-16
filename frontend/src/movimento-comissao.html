@@ -1632,20 +1632,26 @@
             trs.forEach((tr, idx) => {
                 const id = tr.getAttribute('data-id');
                 tr.onclick = function(e) {
-                    if (e.target.classList.contains('action-btn') || e.target.closest('button.action-btn')) return;
+                    console.log('Clique detectado na linha:', idx, 'ID:', id);
+                    if (e.target.classList.contains('action-btn') || e.target.closest('button.action-btn')) {
+                        console.log('Clique em botão de ação, ignorando seleção.');
+                        return;
+                    }
 
                     if (e.ctrlKey || e.metaKey) {
-                        // Seleção múltipla
+                        console.log('Ctrl/Cmd pressionado');
                         if (linhasSelecionadas.includes(id)) {
                             linhasSelecionadas = linhasSelecionadas.filter(x => x !== id);
                             tr.classList.remove('tr-selected');
+                            console.log('Removido da seleção:', id);
                         } else {
                             linhasSelecionadas.push(id);
                             tr.classList.add('tr-selected');
+                            console.log('Adicionado à seleção:', id);
                         }
                         ultimaLinhaSelecionada = idx;
                     } else if (e.shiftKey && ultimaLinhaSelecionada !== null) {
-                        // Seleção de intervalo
+                        console.log('Shift pressionado');
                         const start = Math.min(ultimaLinhaSelecionada, idx);
                         const end = Math.max(ultimaLinhaSelecionada, idx);
                         for (let i = start; i <= end; i++) {
@@ -1653,15 +1659,18 @@
                             if (!linhasSelecionadas.includes(tid)) {
                                 linhasSelecionadas.push(tid);
                                 trs[i].classList.add('tr-selected');
+                                console.log('Intervalo selecionado:', tid);
                             }
                         }
                     } else {
-                        // Seleção simples
+                        console.log('Seleção simples');
                         linhasSelecionadas = [id];
                         ultimaLinhaSelecionada = idx;
                         trs.forEach(row => row.classList.remove('tr-selected'));
                         tr.classList.add('tr-selected');
+                        console.log('Selecionado apenas:', id);
                     }
+                    console.log('linhasSelecionadas agora:', linhasSelecionadas);
                 };
                 // Atualiza visual se já está selecionada
                 if (linhasSelecionadas.includes(id)) {
