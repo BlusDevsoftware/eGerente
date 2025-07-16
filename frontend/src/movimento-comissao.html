@@ -1629,13 +1629,46 @@
 
         function bindSelecaoLinhas() {
             const trs = Array.from(document.querySelectorAll('#movimentoComissoesTableBody tr'));
-            trs.forEach((tr) => {
+            trs.forEach((tr, idx) => {
+                const id = tr.getAttribute('data-id');
                 tr.onclick = function(e) {
-                    // Permite seleção mesmo clicando em qualquer célula, mas se for um botão de ação, só executa a ação do botão
                     if (e.target.classList.contains('action-btn') || e.target.closest('button.action-btn')) return;
-                    this.classList.toggle('tr-selected');
-                    console.log('Linha clicada!');
+
+                    if (e.ctrlKey || e.metaKey) {
+                        // Seleção múltipla
+                        if (linhasSelecionadas.includes(id)) {
+                            linhasSelecionadas = linhasSelecionadas.filter(x => x !== id);
+                            tr.classList.remove('tr-selected');
+                        } else {
+                            linhasSelecionadas.push(id);
+                            tr.classList.add('tr-selected');
+                        }
+                        ultimaLinhaSelecionada = idx;
+                    } else if (e.shiftKey && ultimaLinhaSelecionada !== null) {
+                        // Seleção de intervalo
+                        const start = Math.min(ultimaLinhaSelecionada, idx);
+                        const end = Math.max(ultimaLinhaSelecionada, idx);
+                        for (let i = start; i <= end; i++) {
+                            const tid = trs[i].getAttribute('data-id');
+                            if (!linhasSelecionadas.includes(tid)) {
+                                linhasSelecionadas.push(tid);
+                                trs[i].classList.add('tr-selected');
+                            }
+                        }
+                    } else {
+                        // Seleção simples
+                        linhasSelecionadas = [id];
+                        ultimaLinhaSelecionada = idx;
+                        trs.forEach(row => row.classList.remove('tr-selected'));
+                        tr.classList.add('tr-selected');
+                    }
                 };
+                // Atualiza visual se já está selecionada
+                if (linhasSelecionadas.includes(id)) {
+                    tr.classList.add('tr-selected');
+                } else {
+                    tr.classList.remove('tr-selected');
+                }
             });
         }
 
