@@ -581,6 +581,9 @@
             background: #e3f2fd !important;
             /* Destaque visual para linha selecionada */
         }
+        #movimentoComissoesTableBody tr {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1631,7 +1634,8 @@
                 if (!id) return;
                 tr.setAttribute('data-id', id);
                 tr.onclick = function(e) {
-                    if (e.target.closest('.action-btn')) return; // Não selecionar se clicar em botão de ação
+                    // Permite seleção mesmo clicando em qualquer célula, mas se for um botão de ação, só executa a ação do botão
+                    if (e.target.classList.contains('action-btn') || e.target.closest('button.action-btn')) return;
                     if (e.ctrlKey || e.metaKey) {
                         // Seleção múltipla
                         if (linhasSelecionadas.includes(id)) {
