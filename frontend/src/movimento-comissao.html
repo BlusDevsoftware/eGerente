@@ -577,6 +577,10 @@
         #modalSucessoExclusao .btn-success:hover {
             background-color: #388e3c;
         }
+        .tr-selected {
+            background: #e3f2fd !important;
+            /* Destaque visual para linha selecionada */
+        }
     </style>
 </head>
 <body>
@@ -1403,9 +1407,10 @@
                 return;
             }
             const titulosExibir = titulosFiltrados.slice(0, limite);
-            titulosExibir.forEach(titulo => {
+            titulosExibir.forEach((titulo, idx) => {
                 const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
                 const tr = document.createElement('tr');
+                tr.setAttribute('data-id', titulo.id);
                 tr.innerHTML = `
                     <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
                     <td>${titulo.numero_titulo || ''}</td>
@@ -1425,6 +1430,7 @@
                 tbody.appendChild(tr);
             });
             bindAcoesTabela();
+            bindSelecaoLinhas();
         }
         function atualizarTabelaComFiltros() {
             aplicarFiltros();
@@ -1614,6 +1620,85 @@
         function fecharModalTimeline() {
           document.getElementById('modalTimeline').style.display = 'none';
         }
+
+        let linhasSelecionadas = [];
+        let ultimaLinhaSelecionada = null;
+
+        function bindSelecaoLinhas() {
+            const trs = Array.from(document.querySelectorAll('#movimentoComissoesTableBody tr'));
+            trs.forEach((tr, idx) => {
+                const id = titulosFiltrados[idx]?.id;
+                if (!id) return;
+                tr.setAttribute('data-id', id);
+                tr.onclick = function(e) {
+                    if (e.target.closest('.action-btn')) return; // Não selecionar se clicar em botão de ação
+                    if (e.ctrlKey || e.metaKey) {
+                        // Seleção múltipla
+                        if (linhasSelecionadas.includes(id)) {
+                            linhasSelecionadas = linhasSelecionadas.filter(x => x !== id);
+                            tr.classList.remove('tr-selected');
+                        } else {
+                            linhasSelecionadas.push(id);
+                            tr.classList.add('tr-selected');
+                        }
+                        ultimaLinhaSelecionada = idx;
+                    } else if (e.shiftKey && ultimaLinhaSelecionada !== null) {
+                        // Seleção de intervalo
+                        const start = Math.min(ultimaLinhaSelecionada, idx);
+                        const end = Math.max(ultimaLinhaSelecionada, idx);
+                        for (let i = start; i <= end; i++) {
+                            const tid = titulosFiltrados[i]?.id;
+                            if (tid && !linhasSelecionadas.includes(tid)) {
+                                linhasSelecionadas.push(tid);
+                                trs[i].classList.add('tr-selected');
+                            }
+                        }
+                    } else {
+                        // Seleção simples
+                        linhasSelecionadas = [id];
+                        ultimaLinhaSelecionada = idx;
+                        trs.forEach(row => row.classList.remove('tr-selected'));
+                        tr.classList.add('tr-selected');
+                    }
+                };
+                // Atualiza visual se já está selecionada
+                if (linhasSelecionadas.includes(id)) {
+                    tr.classList.add('tr-selected');
+                } else {
+                    tr.classList.remove('tr-selected');
+                }
+            });
+        }
+
+        // Ajuste dos botões de Baixa e Aglutinar para usar linhasSelecionadas
+        function getTitulosSelecionados() {
+            return todosTitulos.filter(t => linhasSelecionadas.includes(t.id));
+        }
+        document.querySelector('.btn-baixa').addEventListener('click', function() {
+            const selecionados = getTitulosSelecionados();
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um título para baixar!');
+                return;
+            }
+            if (selecionados.length === 1) {
+                // Baixa individual
+                openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
+            } else {
+                // Baixa múltipla (implemente conforme sua lógica)
+                alert('Baixa múltipla para ' + selecionados.length + ' títulos selecionados!');
+                // Aqui você pode abrir um modal específico para múltiplas baixas
+            }
+        });
+        document.querySelector('.btn-aglutinar').addEventListener('click', function() {
+            const selecionados = getTitulosSelecionados();
+            if (selecionados.length < 2) {
+                alert('Selecione pelo menos dois títulos para aglutinar!');
+                return;
+            }
+            // Implemente aqui a lógica de aglutinação
+            alert('Aglutinar ' + selecionados.length + ' títulos!');
+            // Exemplo: abrir modal de confirmação/aglutinação
+        });
     </script>
 
     <script src="scripts/navigation.js"></script>
