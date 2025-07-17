@@ -1691,21 +1691,23 @@
         function getTitulosSelecionados() {
             return todosTitulos.filter(t => linhasSelecionadas.includes(String(t.id)));
         }
-        document.querySelector('.btn-baixa').addEventListener('click', function() {
+        const btnBaixa = document.querySelector('.btn-baixa');
+        if (btnBaixa) {
+          btnBaixa.onclick = function() {
             const selecionados = getTitulosSelecionados();
             if (selecionados.length === 0) {
-                alert('Selecione pelo menos um título para baixar!');
-                return;
+              alert('Selecione pelo menos um título para baixar!');
+              return;
             }
             if (selecionados.length === 1) {
-                // Baixa individual
-                openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
+              // Modal individual
+              openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
             } else {
-                // Baixa múltipla (implemente conforme sua lógica)
-                alert('Baixa múltipla para ' + selecionados.length + ' títulos selecionados!');
-                // Aqui você pode abrir um modal específico para múltiplas baixas
+              // Modal múltiplo
+              abrirModalBaixaMultipla(selecionados);
             }
-        });
+          };
+        }
         document.querySelector('.btn-aglutinar').addEventListener('click', function() {
             const selecionados = getTitulosSelecionados();
             if (selecionados.length < 2) {
