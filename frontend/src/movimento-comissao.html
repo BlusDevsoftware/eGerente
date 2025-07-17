@@ -776,29 +776,29 @@
             <div class="modal-body" style="padding: 32px 40px 0 40px; flex: 1 1 auto; min-height: 180px; text-align: left; background: #fff;">
                 <div id="paymentTituloInfo"></div>
                 <form id="paymentForm">
-                    <div class="form-row" style="display: flex; gap: 32px; margin-bottom: 24px; flex-wrap: wrap;">
-                        <div class="form-group" style="flex:1; min-width: 180px;">
-                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Valor da Comissão</label>
+                    <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
+                        <div class="form-group" style="flex:1; min-width: 220px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Valor da Comissão</label>
                             <div class="input-group" style="display: flex; align-items: center;">
                                 <span class="input-prefix" style="margin-right: 6px; color: #1976D2; font-weight: 600;">R$</span>
-                                <input type="number" id="commissionValue" readonly style="width: 100%; min-width: 180px; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
+                                <input type="number" id="commissionValue" readonly style="width: 100%; min-width: 220px; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                             </div>
                         </div>
-                        <div class="form-group" style="flex:1; min-width: 180px;">
-                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Valor Pago</label>
+                        <div class="form-group" style="flex:1; min-width: 220px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Valor Pago</label>
                             <div class="input-group" style="display: flex; align-items: center;">
                                 <span class="input-prefix" style="margin-right: 6px; color: #1976D2; font-weight: 600;">R$</span>
-                                <input type="number" id="paidValue" step="0.01" required style="width: 100%; min-width: 180px; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
+                                <input type="number" id="paidValue" step="0.01" required style="width: 100%; min-width: 220px; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                             </div>
                         </div>
                     </div>
                     <div class="form-row" style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
                         <div class="form-group" style="flex:1; min-width: 180px;">
-                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Data do Pagamento</label>
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Data do Pagamento</label>
                             <input type="date" id="paymentDate" required style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                         </div>
                         <div class="form-group" style="flex:1; min-width: 180px;">
-                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Status</label>
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Status</label>
                             <select id="paymentStatus" required style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                                 <option value="paid">Pago</option>
                                 <option value="pending">Pendente</option>
@@ -808,7 +808,7 @@
                         </div>
                     </div>
                     <div class="form-group" style="margin-bottom: 24px;">
-                        <label style="font-weight: 500; margin-bottom: 6px; display: block;">Observações</label>
+                        <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Observações</label>
                         <textarea id="paymentNotes" rows="3" placeholder="Adicione observações se necessário" style="width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;"></textarea>
                     </div>
                     <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee; background: #fff; border-radius: 0 0 16px 16px;">
