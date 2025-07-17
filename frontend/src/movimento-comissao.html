@@ -768,37 +768,37 @@
 
     <!-- Payment Modal Melhorado -->
     <div class="modal" id="paymentModal">
-        <div class="modal-content" style="border-radius: 16px; max-width: 520px; width: 98vw; min-width: 320px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; display: flex; flex-direction: column;">
+        <div class="modal-content" style="border-radius: 16px; max-width: 600px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; display: flex; flex-direction: column;">
             <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 16px 16px 0 0;">
                 <h2 style="margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-money-bill-wave"></i> Baixa de Título</h2>
                 <button class="close-modal" onclick="closePaymentModal()" style="background: none; border: none; font-size: 1.5em; color: #e53935; cursor: pointer; padding: 5px; transition: color 0.3s; border-radius: 50%;"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body" style="padding: 28px 36px 0 36px; flex: 1 1 auto; min-height: 180px; text-align: left;">
+            <div class="modal-body" style="padding: 32px 40px 0 40px; flex: 1 1 auto; min-height: 180px; text-align: left; background: #fff;">
                 <form id="paymentForm">
-                    <div class="form-row" style="display: flex; gap: 18px; margin-bottom: 18px;">
-                        <div class="form-group" style="flex:1;">
-                            <label>Valor da Comissão</label>
-                            <div class="input-group">
-                                <span class="input-prefix">R$</span>
-                                <input type="number" id="commissionValue" readonly>
+                    <div class="form-row" style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 180px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Valor da Comissão</label>
+                            <div class="input-group" style="display: flex; align-items: center;">
+                                <span class="input-prefix" style="margin-right: 6px; color: #1976D2; font-weight: 600;">R$</span>
+                                <input type="number" id="commissionValue" readonly style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                             </div>
                         </div>
-                        <div class="form-group" style="flex:1;">
-                            <label>Valor Pago</label>
-                            <div class="input-group">
-                                <span class="input-prefix">R$</span>
-                                <input type="number" id="paidValue" step="0.01" required>
+                        <div class="form-group" style="flex:1; min-width: 180px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Valor Pago</label>
+                            <div class="input-group" style="display: flex; align-items: center;">
+                                <span class="input-prefix" style="margin-right: 6px; color: #1976D2; font-weight: 600;">R$</span>
+                                <input type="number" id="paidValue" step="0.01" required style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                             </div>
                         </div>
                     </div>
-                    <div class="form-row" style="display: flex; gap: 18px; margin-bottom: 18px;">
-                        <div class="form-group" style="flex:1;">
-                            <label>Data do Pagamento</label>
-                            <input type="date" id="paymentDate" required>
+                    <div class="form-row" style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 180px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Data do Pagamento</label>
+                            <input type="date" id="paymentDate" required style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                         </div>
-                        <div class="form-group" style="flex:1;">
-                            <label>Status</label>
-                            <select id="paymentStatus" required>
+                        <div class="form-group" style="flex:1; min-width: 180px;">
+                            <label style="font-weight: 500; margin-bottom: 6px; display: block;">Status</label>
+                            <select id="paymentStatus" required style="width: 100%; padding: 8px 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;">
                                 <option value="paid">Pago</option>
                                 <option value="pending">Pendente</option>
                                 <option value="vencido">Vencido</option>
@@ -806,13 +806,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 18px;">
-                        <label>Observações</label>
-                        <textarea id="paymentNotes" rows="3" placeholder="Adicione observações se necessário"></textarea>
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label style="font-weight: 500; margin-bottom: 6px; display: block;">Observações</label>
+                        <textarea id="paymentNotes" rows="3" placeholder="Adicione observações se necessário" style="width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; background: #f5faff; font-size: 1em;"></textarea>
                     </div>
-                    <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee; background: #fff; border-radius: 0 0 16px 16px;">
-                        <button type="button" class="btn-secondary" onclick="closePaymentModal()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Confirmar Baixa</button>
+                    <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee; background: #fff; border-radius: 0 0 16px 16px;">
+                        <button type="button" class="btn-secondary" onclick="closePaymentModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn-primary" style="padding: 10px 24px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; background-color: #2196F3; color: white; border: none; display: flex; align-items: center; gap: 8px;"><i class="fas fa-save"></i> Confirmar Baixa</button>
                     </div>
                 </form>
             </div>
