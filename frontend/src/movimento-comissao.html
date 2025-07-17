@@ -1861,17 +1861,17 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
 
 <!-- Modal de Baixa Múltipla -->
 <div id="modalBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
-  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 600px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
-      <h2 style="margin: 0; font-size: 1.2em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-double"></i> Baixa Múltipla de Títulos</h2>
-      <button class="close-modal" onclick="fecharModalBaixaMultipla()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 900px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-double"></i> Baixa Múltipla de Títulos</h2>
+      <button class="close-modal" onclick="fecharModalBaixaMultipla()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>
-    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
-      <div id="listaTitulosBaixaMultipla" style="max-height: 300px; overflow-y: auto; margin-bottom: 18px; text-align: left;"></div>
-      <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
-        <button type="button" class="btn-secondary" onclick="fecharModalBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
-        <button type="button" class="btn-primary" onclick="confirmarBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Confirmar Baixa</button>
-      </div>
+    <div class="modal-body" style="padding: 24px 36px 0 36px; flex: 1 1 auto; overflow-y: auto; min-height: 200px; max-height: 60vh; text-align: center;">
+      <div id="listaTitulosBaixaMultipla" style="max-height: 48vh; overflow-y: auto; margin-bottom: 18px; text-align: left;"></div>
+    </div>
+    <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin: 0 36px 24px 36px; padding-top: 12px; border-top: 1px solid #eee;">
+      <button type="button" class="btn-secondary" onclick="fecharModalBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button type="button" class="btn-primary" onclick="confirmarBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Confirmar Baixa</button>
     </div>
   </div>
 </div>
@@ -1886,10 +1886,10 @@ function abrirModalBaixaMultipla(titulos) {
     lista.innerHTML = `
       <div style='font-weight:600; color:#1976D2; margin-bottom:10px;'>Títulos Selecionados para Baixa:</div>
       <div style='overflow-x:auto;'>
-      <table style='width:100%; border-collapse:collapse; background:#fff;'>
-        <thead><tr style='background:#e3f2fd; color:#1976D2;'><th style='padding:6px 4px;'>Nº Título</th><th>Colaborador</th><th>Valor</th><th>Status</th></tr></thead>
+      <table style='width:100%; border-collapse:collapse; background:#fff; font-size:1em;'>
+        <thead><tr style='background:#e3f2fd; color:#1976D2;'><th style='padding:8px 4px;'>Nº Título</th><th>Colaborador</th><th>Valor</th><th>Status</th></tr></thead>
         <tbody>
-        ${titulos.map(t => `<tr><td style='padding:6px 4px;'>${t.numero_titulo}</td><td>${mapaColaboradores[t.colaborador_id]||t.colaborador_id||''}</td><td>${formatarValor(t.valor)}</td><td>${t.status}</td></tr>`).join('')}
+        ${titulos.map(t => `<tr><td style='padding:8px 4px;'>${t.numero_titulo}</td><td>${mapaColaboradores[t.colaborador_id]||t.colaborador_id||''}</td><td>${formatarValor(t.valor)}</td><td>${t.status}</td></tr>`).join('')}
         </tbody></table>
       </div>
     `;
