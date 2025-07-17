@@ -1859,9 +1859,9 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
         });
 </script>
 
-<!-- Modal de Baixa Múltipla -->
+<!-- Modal de Baixa Múltipla Melhorado -->
 <div id="modalBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
-  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 900px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; max-height: 90vh; display: flex; flex-direction: column;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 1200px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; max-height: 90vh; display: flex; flex-direction: column;">
     <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #fff; z-index: 2;">
       <h2 style="margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-double"></i> Baixa Múltipla de Títulos</h2>
       <button class="close-modal" onclick="fecharModalBaixaMultipla()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
@@ -1869,7 +1869,7 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
     <div class="modal-body" style="padding: 18px 36px 0 36px; flex: 1 1 auto; overflow-y: auto; min-height: 200px; max-height: 60vh; text-align: center;">
       <div style='font-weight:600; color:#1976D2; margin-bottom:10px; text-align:left;'>Títulos Selecionados para Baixa:</div>
       <div style='overflow-x:auto; border-radius:8px; border:1.5px solid #e3f2fd; background:#fafcff;'>
-        <table style='width:100%; border-collapse:collapse; background:#fff; font-size:1em; min-width:600px;'>
+        <table style='width:100%; border-collapse:collapse; background:#fff; font-size:1em; min-width:900px;'>
           <thead style='position:sticky; top:0; background:#e3f2fd; z-index:1;'>
             <tr style='background:#e3f2fd; color:#1976D2;'>
               <th style='padding:10px 6px; text-align:left;'>Nº Título</th>
@@ -1891,6 +1891,7 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
     </div>
   </div>
 </div>
+
 <script>
 function abrirModalBaixaMultipla(titulos) {
   const modal = document.getElementById('modalBaixaMultipla');
@@ -1911,34 +1912,7 @@ function abrirModalBaixaMultipla(titulos) {
   }
   modal.style.display = 'flex';
 }
-function fecharModalBaixaMultipla() {
-  document.getElementById('modalBaixaMultipla').style.display = 'none';
-}
-function confirmarBaixaMultipla() {
-  // Aqui você pode implementar a lógica de baixa em lote (API, etc)
-  alert('Baixa múltipla confirmada para ' + linhasSelecionadas.length + ' títulos!');
-  fecharModalBaixaMultipla();
-  // Limpar seleção visual e array
-  linhasSelecionadas = [];
-  ultimaLinhaSelecionada = null;
-  renderTabelaLimitada();
-}
-// Ajuste do botão Baixar para abrir o modal de múltiplos títulos
-const btnBaixa = document.querySelector('.btn-baixa');
-if (btnBaixa) {
-  btnBaixa.onclick = function() {
-    const selecionados = getTitulosSelecionados();
-    if (selecionados.length === 0) {
-      alert('Selecione pelo menos um título para baixar!');
-      return;
-    }
-    if (selecionados.length === 1) {
-      openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
-    } else {
-      abrirModalBaixaMultipla(selecionados);
-    }
-  };
-}
 </script>
+
 </body>
 </html> 
