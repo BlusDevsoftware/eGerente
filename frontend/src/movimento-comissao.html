@@ -774,6 +774,7 @@
                 <button class="close-modal" onclick="closePaymentModal()" style="background: none; border: none; font-size: 1.5em; color: #e53935; cursor: pointer; padding: 5px; transition: color 0.3s; border-radius: 50%;"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="padding: 32px 40px 0 40px; flex: 1 1 auto; min-height: 180px; text-align: left; background: #fff;">
+                <div id="paymentTituloInfo"></div>
                 <form id="paymentForm">
                     <div class="form-row" style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
                         <div class="form-group" style="flex:1; min-width: 180px;">
@@ -1046,11 +1047,23 @@
         });
 
         // Payment Modal Functions
-        function openPaymentModal(commissionId, value) {
+        function openPaymentModal(titulo) {
             document.getElementById('paymentModal').style.display = 'flex';
-            document.getElementById('commissionValue').value = value.toFixed(2);
-            document.getElementById('paidValue').value = value.toFixed(2);
+            document.getElementById('commissionValue').value = titulo.valor?.toFixed(2) || '';
+            document.getElementById('paidValue').value = titulo.valor?.toFixed(2) || '';
             document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            // Exibir dados do título no topo do modal
+            document.getElementById('paymentTituloInfo').innerHTML = `
+              <div style='display:flex; flex-wrap:wrap; gap:18px; margin-bottom:10px; font-size:1.05em;'>
+                <div><b>Nº Título:</b> ${titulo.numero_titulo || ''}</div>
+                <div><b>Colaborador:</b> ${mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || ''}</div>
+                <div><b>Tipo:</b> ${titulo.tipo || ''}</div>
+                <div><b>Status:</b> ${titulo.status || ''}</div>
+                <div><b>Vencimento:</b> ${formatarData(titulo.data_vencimento)}</div>
+                <div><b>Geração:</b> ${formatarData(titulo.data_geracao)}</div>
+                <div style='flex-basis:100%;'><b>Descrição:</b> ${titulo.descricao || ''}</div>
+              </div>
+            `;
         }
 
         function closePaymentModal() {
@@ -1617,7 +1630,7 @@
             }
             if (selecionados.length === 1) {
               // Modal individual
-              openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
+              openPaymentModal(selecionados[0]);
             } else {
               // Modal múltiplo
               abrirModalBaixaMultipla(selecionados);
