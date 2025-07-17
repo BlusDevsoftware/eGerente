@@ -1883,11 +1883,16 @@ function abrirModalBaixaMultipla(titulos) {
   if (titulos.length === 0) {
     lista.innerHTML = '<div style="color:#888;">Nenhum título selecionado.</div>';
   } else {
-    lista.innerHTML = `<table style='width:100%; border-collapse:collapse;'>
-      <thead><tr style='background:#e3f2fd; color:#1976D2;'><th style='padding:6px 4px;'>Nº Título</th><th>Colaborador</th><th>Valor</th><th>Status</th></tr></thead>
-      <tbody>
-      ${titulos.map(t => `<tr><td style='padding:6px 4px;'>${t.numero_titulo}</td><td>${mapaColaboradores[t.colaborador_id]||t.colaborador_id||''}</td><td>${formatarValor(t.valor)}</td><td>${t.status}</td></tr>`).join('')}
-      </tbody></table>`;
+    lista.innerHTML = `
+      <div style='font-weight:600; color:#1976D2; margin-bottom:10px;'>Títulos Selecionados para Baixa:</div>
+      <div style='overflow-x:auto;'>
+      <table style='width:100%; border-collapse:collapse; background:#fff;'>
+        <thead><tr style='background:#e3f2fd; color:#1976D2;'><th style='padding:6px 4px;'>Nº Título</th><th>Colaborador</th><th>Valor</th><th>Status</th></tr></thead>
+        <tbody>
+        ${titulos.map(t => `<tr><td style='padding:6px 4px;'>${t.numero_titulo}</td><td>${mapaColaboradores[t.colaborador_id]||t.colaborador_id||''}</td><td>${formatarValor(t.valor)}</td><td>${t.status}</td></tr>`).join('')}
+        </tbody></table>
+      </div>
+    `;
   }
   modal.style.display = 'flex';
 }
