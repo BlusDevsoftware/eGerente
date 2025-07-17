@@ -888,54 +888,7 @@
     </div>
 
     <!-- Modal de Baixa de Título -->
-    <div id="baixaModal" class="modal">
-        <div class="modal-content" style="max-width: 420px; width: 96%;">
-            <div class="modal-header">
-                <h2><i class="fas fa-money-bill-wave"></i> Baixa de Título</h2>
-                <button class="close-modal" onclick="closeBaixaModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="baixa-tabs">
-                    <button type="button" class="baixa-tab-btn active" onclick="showBaixaTab('total')">Baixa Total</button>
-                    <button type="button" class="baixa-tab-btn" onclick="showBaixaTab('parcial')">Baixa Parcial</button>
-                    <button type="button" class="baixa-tab-btn" onclick="showBaixaTab('diferenciada')">Baixa Diferenciada</button>
-                </div>
-                <form id="baixaForm" autocomplete="off" style="margin:0;">
-                    <div class="baixa-tab-content" id="baixa-total">
-                        <p>Deseja realmente dar baixa total neste título?</p>
-                    </div>
-                    <div class="baixa-tab-content" id="baixa-parcial" style="display:none;">
-                        <div class="form-group">
-                            <label><i class="fas fa-coins"></i> Valor Pago</label>
-                            <input type="number" min="0" step="0.01" id="baixa-parcial-valor" placeholder="Informe o valor pago">
-                        </div>
-                    </div>
-                    <div class="baixa-tab-content" id="baixa-diferenciada" style="display:none;">
-                        <div class="form-group">
-                            <label><i class="fas fa-coins"></i> Valor</label>
-                            <input type="number" min="0" step="0.01" id="baixa-diferenciada-valor" placeholder="Informe o valor">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar-alt"></i> Data</label>
-                            <input type="date" id="baixa-diferenciada-data">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-align-left"></i> Observação</label>
-                            <textarea id="baixa-diferenciada-obs" rows="2" placeholder="Observação"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-actions" style="justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
-                        <button type="button" class="btn-secondary" onclick="closeBaixaModal()">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        <button type="button" class="btn-primary" onclick="confirmarBaixaModal()">
-                            <i class="fas fa-check"></i> Confirmar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <!-- REMOVIDO: Modal antigo de baixa única (#baixaModal) -->
 
     <!-- Modal Visualizar/Edição de Título -->
     <div id="modalTitulo" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 2000; align-items: center; justify-content: center;">
@@ -1236,41 +1189,8 @@
         });
 
         // Funções JS para o modal de baixa
-        function openPaymentModal(numero, valor) {
-            window.tituloBaixaAtual = { numero, valor };
-            showBaixaTab('total');
-            document.getElementById('baixa-parcial-valor').value = '';
-            document.getElementById('baixa-diferenciada-valor').value = '';
-            document.getElementById('baixa-diferenciada-data').value = '';
-            document.getElementById('baixa-diferenciada-obs').value = '';
-            document.getElementById('baixaModal').style.display = 'flex';
-        }
-        function closeBaixaModal() {
-            document.getElementById('baixaModal').style.display = 'none';
-        }
-        function showBaixaTab(tab) {
-            document.querySelectorAll('#baixaModal .baixa-tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('#baixaModal .baixa-tab-content').forEach(div => div.style.display = 'none');
-            document.querySelector(`#baixaModal .baixa-tab-btn[onclick*="${tab}"]`).classList.add('active');
-            document.getElementById('baixa-' + tab).style.display = 'block';
-        }
-        function confirmarBaixaModal() {
-            const tab = document.querySelector('#baixaModal .baixa-tab-btn.active').textContent.trim();
-            if(tab === 'Baixa Total') {
-                alert('Baixa total confirmada!');
-            } else if(tab === 'Baixa Parcial') {
-                const valor = document.getElementById('baixa-parcial-valor').value;
-                if(!valor) return alert('Informe o valor pago!');
-                alert('Baixa parcial confirmada! Valor: ' + valor);
-            } else if(tab === 'Baixa Diferenciada') {
-                const valor = document.getElementById('baixa-diferenciada-valor').value;
-                const data = document.getElementById('baixa-diferenciada-data').value;
-                const obs = document.getElementById('baixa-diferenciada-obs').value;
-                if(!valor || !data) return alert('Preencha todos os campos obrigatórios!');
-                alert('Baixa diferenciada confirmada! Valor: ' + valor + ', Data: ' + data + ', Obs: ' + obs);
-            }
-            closeBaixaModal();
-        }
+        // REMOVIDO: função duplicada openPaymentModal que abria o modal antigo (#baixaModal)
+        // REMOVIDO: funções closeBaixaModal, showBaixaTab, confirmarBaixaModal (relacionadas ao modal antigo)
 
         // Fecha todos os modais ao clicar em qualquer link do menu lateral
         window.addEventListener('DOMContentLoaded', function() {
