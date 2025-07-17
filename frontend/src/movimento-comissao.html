@@ -1689,7 +1689,7 @@
 
         // Ajuste dos botões de Baixa e Aglutinar para usar linhasSelecionadas
         function getTitulosSelecionados() {
-            return todosTitulos.filter(t => linhasSelecionadas.includes(t.id));
+            return todosTitulos.filter(t => linhasSelecionadas.includes(String(t.id)));
         }
         document.querySelector('.btn-baixa').addEventListener('click', function() {
             const selecionados = getTitulosSelecionados();
