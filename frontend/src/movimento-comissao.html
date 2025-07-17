@@ -1858,5 +1858,67 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
             }
         });
 </script>
+
+<!-- Modal de Baixa Múltipla -->
+<div id="modalBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 600px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-double"></i> Baixa Múltipla de Títulos</h2>
+      <button class="close-modal" onclick="fecharModalBaixaMultipla()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <div id="listaTitulosBaixaMultipla" style="max-height: 300px; overflow-y: auto; margin-bottom: 18px; text-align: left;"></div>
+      <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid #eee;">
+        <button type="button" class="btn-secondary" onclick="fecharModalBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+        <button type="button" class="btn-primary" onclick="confirmarBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Confirmar Baixa</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function abrirModalBaixaMultipla(titulos) {
+  const modal = document.getElementById('modalBaixaMultipla');
+  const lista = document.getElementById('listaTitulosBaixaMultipla');
+  lista.innerHTML = '';
+  if (titulos.length === 0) {
+    lista.innerHTML = '<div style="color:#888;">Nenhum título selecionado.</div>';
+  } else {
+    lista.innerHTML = `<table style='width:100%; border-collapse:collapse;'>
+      <thead><tr style='background:#e3f2fd; color:#1976D2;'><th style='padding:6px 4px;'>Nº Título</th><th>Colaborador</th><th>Valor</th><th>Status</th></tr></thead>
+      <tbody>
+      ${titulos.map(t => `<tr><td style='padding:6px 4px;'>${t.numero_titulo}</td><td>${mapaColaboradores[t.colaborador_id]||t.colaborador_id||''}</td><td>${formatarValor(t.valor)}</td><td>${t.status}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+  modal.style.display = 'flex';
+}
+function fecharModalBaixaMultipla() {
+  document.getElementById('modalBaixaMultipla').style.display = 'none';
+}
+function confirmarBaixaMultipla() {
+  // Aqui você pode implementar a lógica de baixa em lote (API, etc)
+  alert('Baixa múltipla confirmada para ' + linhasSelecionadas.length + ' títulos!');
+  fecharModalBaixaMultipla();
+  // Limpar seleção visual e array
+  linhasSelecionadas = [];
+  ultimaLinhaSelecionada = null;
+  renderTabelaLimitada();
+}
+// Ajuste do botão Baixar para abrir o modal de múltiplos títulos
+const btnBaixa = document.querySelector('.btn-baixa');
+if (btnBaixa) {
+  btnBaixa.onclick = function() {
+    const selecionados = getTitulosSelecionados();
+    if (selecionados.length === 0) {
+      alert('Selecione pelo menos um título para baixar!');
+      return;
+    }
+    if (selecionados.length === 1) {
+      openPaymentModal(selecionados[0].numero_titulo, selecionados[0].valor);
+    } else {
+      abrirModalBaixaMultipla(selecionados);
+    }
+  };
+}
+</script>
 </body>
 </html> 
