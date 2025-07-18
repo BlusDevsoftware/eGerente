@@ -1875,6 +1875,24 @@ function fecharModalBaixaMultipla() {
 let baixaParcialDiferenca = 0;
 let baixaParcialConfirmada = false;
 
+// Adicionar evento ao campo Valor Pago para abrir o modal de baixa parcial imediatamente
+const inputValorPago = document.getElementById('paidValue');
+inputValorPago.addEventListener('blur', verificarBaixaParcial);
+inputValorPago.addEventListener('change', verificarBaixaParcial);
+
+function verificarBaixaParcial() {
+  const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
+  const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+  if (valorPago < valorTitulo && !baixaParcialConfirmada) {
+    baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
+    document.getElementById('msgBaixaParcial').innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+    document.getElementById('modalConfirmBaixaParcial').style.display = 'flex';
+    // Remover aviso de novo título se existir
+    let aviso = document.getElementById('avisoNovoTitulo');
+    if (aviso) aviso.remove();
+  }
+}
+
 // Ao tentar submeter o form de baixa
 const paymentForm = document.getElementById('paymentForm');
 paymentForm.addEventListener('submit', function(e) {
