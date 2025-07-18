@@ -1066,6 +1066,9 @@
                 <div style='margin-top:12px; display:flex; align-items:flex-start; gap:8px; font-size:1.05em;'><i class='fas fa-align-left' style='color:#1976D2; margin-top:2px;'></i> <b>Descrição:</b> <span style='margin-left:4px; word-break:break-word;'>${titulo.descricao || ''}</span></div>
               </div>
             `;
+            // Remover aviso de novo título se existir
+            let aviso = document.getElementById('avisoNovoTitulo');
+            if (aviso) aviso.remove();
         }
 
         function closePaymentModal() {
@@ -1916,7 +1919,6 @@ function fecharModalConfirmBaixaParcial() {
 function confirmarBaixaParcial() {
   baixaParcialConfirmada = true;
   document.getElementById('modalConfirmBaixaParcial').style.display = 'none';
-  paymentForm.requestSubmit();
   // Exibir aviso no modal de baixa
   let aviso = document.getElementById('avisoNovoTitulo');
   if (!aviso) {
