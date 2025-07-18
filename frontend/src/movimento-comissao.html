@@ -1941,7 +1941,7 @@ function confirmarBaixaParcial() {
   const colaboradorNome = tituloOriginalBaixa && mapaColaboradores[tituloOriginalBaixa.colaborador_id] ? mapaColaboradores[tituloOriginalBaixa.colaborador_id] : (tituloOriginalBaixa.colaborador_id || '');
   const dataHoje = new Date().toISOString().split('T')[0];
   simulacao.innerHTML = `
-    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 0;'>
+    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 18px;'>
       <h2 style='margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
         <i class="fas fa-receipt"></i> Título Parcial
       </h2>
