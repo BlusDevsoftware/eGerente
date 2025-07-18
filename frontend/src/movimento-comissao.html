@@ -1853,5 +1853,64 @@ function fecharModalBaixaMultipla() {
 }
 </script>
 
+<!-- Modal de confirmação de baixa parcial -->
+<div id="modalConfirmBaixaParcial" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.1em; color: #1976D2; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> Baixa Parcial</h2>
+      <button class="close-modal" onclick="fecharModalConfirmBaixaParcial()" style="background: none; border: none; font-size: 1.5em; color: #e53935; cursor: pointer; padding: 5px; transition: color 0.3s; border-radius: 50%;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+      <div id="msgBaixaParcial" style="font-size: 1.08em; color: #333; margin-bottom: 18px;"></div>
+      <div style="display: flex; justify-content: center; gap: 18px;">
+        <button class="btn-secondary" onclick="fecharModalConfirmBaixaParcial()" style="padding: 8px 22px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Não</button>
+        <button class="btn-primary" onclick="confirmarBaixaParcial()" style="padding: 8px 22px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; background-color: #2196F3; color: white; border: none;">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ... existing code ...
+let baixaParcialDiferenca = 0;
+let baixaParcialConfirmada = false;
+
+// Ao tentar submeter o form de baixa
+const paymentForm = document.getElementById('paymentForm');
+paymentForm.addEventListener('submit', function(e) {
+  const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
+  const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+  if (valorPago < valorTitulo && !baixaParcialConfirmada) {
+    e.preventDefault();
+    baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
+    document.getElementById('msgBaixaParcial').innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+    document.getElementById('modalConfirmBaixaParcial').style.display = 'flex';
+    return false;
+  }
+  // Aqui segue o fluxo normal de baixa (já confirmado)
+  baixaParcialConfirmada = false;
+});
+
+function fecharModalConfirmBaixaParcial() {
+  document.getElementById('modalConfirmBaixaParcial').style.display = 'none';
+  baixaParcialConfirmada = false;
+}
+function confirmarBaixaParcial() {
+  baixaParcialConfirmada = true;
+  document.getElementById('modalConfirmBaixaParcial').style.display = 'none';
+  paymentForm.requestSubmit();
+  // Exibir aviso no modal de baixa
+  let aviso = document.getElementById('avisoNovoTitulo');
+  if (!aviso) {
+    aviso = document.createElement('div');
+    aviso.id = 'avisoNovoTitulo';
+    aviso.style = 'margin-bottom: 12px; color: #1976D2; background: #e3f2fd; border-radius: 6px; padding: 10px 16px; font-weight: 500;';
+    paymentForm.insertBefore(aviso, paymentForm.firstChild.nextSibling);
+  }
+  aviso.innerHTML = `<i class='fas fa-info-circle'></i> Será gerado um novo título com o valor da diferença: <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>`;
+}
+// ... existing code ...
+</script>
+
 </body>
 </html> 
