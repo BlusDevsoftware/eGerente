@@ -1938,14 +1938,24 @@ function confirmarBaixaParcial() {
   }
   // Usar a variável global para o número do título original
   const numeroOriginal = tituloOriginalBaixa && tituloOriginalBaixa.numero_titulo ? tituloOriginalBaixa.numero_titulo : '';
+  const colaboradorNome = tituloOriginalBaixa && mapaColaboradores[tituloOriginalBaixa.colaborador_id] ? mapaColaboradores[tituloOriginalBaixa.colaborador_id] : (tituloOriginalBaixa.colaborador_id || '');
+  const dataHoje = new Date().toISOString().split('T')[0];
   simulacao.innerHTML = `
+    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
+      <h2 style='margin: 0; font-size: 1.15em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
+        <i class="fas fa-receipt"></i> Título Parcial
+      </h2>
+    </div>
     <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 0;">
       <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px 18px; align-items: center;">
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-hashtag' style='color:#1976D2;'></i> <b>Nº Título:</b> <span style='margin-left:4px;'>Simulado-1/1</span></div>
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-receipt' style='color:#1976D2;'></i> <b>Origem:</b> <span style='margin-left:4px;'>${numeroOriginal}</span></div>
+        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-user' style='color:#1976D2;'></i> <b>Colaborador:</b> <span style='margin-left:4px;'>${colaboradorNome}</span></div>
+        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-plus' style='color:#1976D2;'></i> <b>Geração:</b> <span style='margin-left:4px;'>${dataHoje.split('-').reverse().join('/')}</span></div>
+        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-check' style='color:#1976D2;'></i> <b>Vencimento:</b> <input type='date' id='vencimentoTituloParcial' value='${dataHoje}' style='padding: 4px 8px; border-radius: 6px; border: 1px solid #90caf9; background: #fff; color: #1976D2; font-size: 1em; margin-left:4px;'> </div>
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-coins' style='color:#1976D2;'></i> <b>Valor:</b> <span style='margin-left:4px;'>R$ ${baixaParcialDiferenca.replace('.', ',')}</span></div>
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-flag' style='color:#1976D2;'></i> <b>Status:</b> <span style='margin-left:4px;'>PENDENTE</span></div>
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-align-left' style='color:#1976D2;'></i> <b>Descrição:</b> <span style='margin-left:4px;'>Diferença de baixa parcial</span></div>
+        <div style='display:flex; align-items:center; gap:6px; grid-column: 1 / span 3;'><i class='fas fa-align-left' style='color:#1976D2;'></i> <b>Descrição:</b> <span style='margin-left:4px;'>Diferença de baixa parcial</span></div>
       </div>
     </div>
   `;
