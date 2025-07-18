@@ -1941,12 +1941,12 @@ function confirmarBaixaParcial() {
   const colaboradorNome = tituloOriginalBaixa && mapaColaboradores[tituloOriginalBaixa.colaborador_id] ? mapaColaboradores[tituloOriginalBaixa.colaborador_id] : (tituloOriginalBaixa.colaborador_id || '');
   const dataHoje = new Date().toISOString().split('T')[0];
   simulacao.innerHTML = `
-    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
-      <h2 style='margin: 0; font-size: 1.15em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
+    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 0;'>
+      <h2 style='margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
         <i class="fas fa-receipt"></i> Título Parcial
       </h2>
     </div>
-    <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 0;">
+    <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 18px;">
       <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 8px 18px; align-items: center;">  
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-hashtag' style='color:#1976D2;'></i> <b>Nº Título:</b> <span style='margin-left:4px;'>Simulado-1/1</span></div>
         <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-receipt' style='color:#1976D2;'></i> <b>Origem:</b> <span style='margin-left:4px;'>${numeroOriginal}</span></div>
