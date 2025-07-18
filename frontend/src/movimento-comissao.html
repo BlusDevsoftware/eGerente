@@ -1047,15 +1047,19 @@
         });
 
         // Payment Modal Functions
+        // Variável global para armazenar o título original
+        let tituloOriginalBaixa = null;
+
         function openPaymentModal(titulo) {
+            tituloOriginalBaixa = titulo; // Salva referência global
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('commissionValue').value = titulo.valor?.toFixed(2) || '';
             document.getElementById('paidValue').value = titulo.valor?.toFixed(2) || '';
             document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
             // Exibir dados do título no topo do modal, com layout bonito
             document.getElementById('paymentTituloInfo').innerHTML = `
-              <div style=\"background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 18px;\">
-                <div style=\"display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px 18px; align-items: center;\">
+              <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 18px;">
+                <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px 18px; align-items: center;">
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-hashtag' style='color:#1976D2;'></i> <b>Nº Título:</b> <span style='margin-left:4px;'>${titulo.numero_titulo || ''}</span></div>
                   <div style='display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'><i class='fas fa-user' style='color:#1976D2;'></i> <b>Colaborador:</b> <span style='margin-left:4px;'>${mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || ''}</span></div>
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-cubes' style='color:#1976D2;'></i> <b>Tipo:</b> <span style='margin-left:4px;'>${titulo.tipo || ''}</span></div>
@@ -1927,15 +1931,13 @@ function confirmarBaixaParcial() {
   if (!simulacao) {
     simulacao = document.createElement('div');
     simulacao.id = 'simulacaoNovoTitulo';
-    // Mesmo padrão visual do bloco de informações do título
     simulacao.style = 'margin: 18px 0 0 0;';
     // Inserir logo acima dos botões de ação
     const formActions = paymentForm.querySelector('.form-actions');
     paymentForm.insertBefore(simulacao, formActions);
   }
-  // Obter número do título original
-  const numeroTitulo = document.getElementById('commissionValue').closest('form').querySelector('#paymentTituloInfo').textContent.match(/Nº Título:\s*([\w\-\/]+)/);
-  const numeroOriginal = numeroTitulo ? numeroTitulo[1] : '';
+  // Usar a variável global para o número do título original
+  const numeroOriginal = tituloOriginalBaixa && tituloOriginalBaixa.numero_titulo ? tituloOriginalBaixa.numero_titulo : '';
   simulacao.innerHTML = `
     <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 0;">
       <div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px 18px; align-items: center;">
