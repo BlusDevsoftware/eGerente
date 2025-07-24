@@ -677,32 +677,32 @@
                     <h3>Total Comissões</h3>
                     <i class="fas fa-hand-holding-usd"></i>
                 </div>
-                <div class="card-value">R$ 15.750,00</div>
-                <div class="card-change">+12% este mês</div>
+                <div class="card-value" id="card-total-comissoes">R$ 0,00</div>
+                <div class="card-change" id="card-total-comissoes-change"></div>
             </div>
             <div class="card">
                 <div class="card-header">
                     <h3>Pendentes</h3>
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="card-value">R$ 3.250,00</div>
-                <div class="card-change">5 comissões</div>
+                <div class="card-value" id="card-pendentes">R$ 0,00</div>
+                <div class="card-change" id="card-pendentes-change"></div>
             </div>
             <div class="card">
                 <div class="card-header">
                     <h3>Pagas</h3>
                     <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="card-value">R$ 12.500,00</div>
-                <div class="card-change">15 comissões</div>
+                <div class="card-value" id="card-pagas">R$ 0,00</div>
+                <div class="card-change" id="card-pagas-change"></div>
             </div>
             <div class="card">
                 <div class="card-header">
                     <h3>Colaboradores</h3>
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="card-value">8</div>
-                <div class="card-change">Ativos</div>
+                <div class="card-value" id="card-colaboradores">0</div>
+                <div class="card-change" id="card-colaboradores-change"></div>
             </div>
         </div>
 
@@ -1443,6 +1443,7 @@
                 todosTitulos = Array.isArray(data) ? data : [];
                 titulosFiltrados = [...todosTitulos];
                 atualizarTabelaComFiltros();
+                atualizarCardsTotalizadores();
             } catch (e) {
                 console.error('Erro detalhado ao carregar títulos:', e);
                 tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
@@ -1790,6 +1791,24 @@ window.addEventListener('DOMContentLoaded', function() {
     obs.dispatchEvent(new Event('input'));
   }
 });
+// ... existing code ...
+
+// Adicionar função JS para atualizar os cards após carregar os dados:
+function atualizarCardsTotalizadores() {
+    const totalComissoes = todosTitulos.reduce((acc, t) => acc + (t.valor || 0), 0);
+    const pendentes = todosTitulos.filter(t => (t.status||'').toUpperCase() === 'PENDENTE');
+    const pagas = todosTitulos.filter(t => (t.status||'').toUpperCase() === 'PAGO');
+    const totalPendentes = pendentes.reduce((acc, t) => acc + (t.valor || 0), 0);
+    const totalPagas = pagas.reduce((acc, t) => acc + (t.valor || 0), 0);
+    const colaboradoresUnicos = new Set(todosTitulos.map(t => t.colaborador_id)).size;
+    document.getElementById('card-total-comissoes').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('card-pendentes').textContent = totalPendentes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('card-pagas').textContent = totalPagas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('card-colaboradores').textContent = colaboradoresUnicos;
+    document.getElementById('card-pendentes-change').textContent = pendentes.length + ' comissões';
+    document.getElementById('card-pagas-change').textContent = pagas.length + ' comissões';
+    document.getElementById('card-colaboradores-change').textContent = 'Ativos';
+}
 // ... existing code ...
 </script>
 
