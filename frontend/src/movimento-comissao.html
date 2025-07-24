@@ -642,7 +642,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="display: flex; flex-direction: column; height: 100vh;">
         <!-- Header -->
         <div class="header">
             <div class="welcome-text">
@@ -727,7 +727,7 @@
         </div>
 
         <!-- Commissions Table -->
-        <div class="table-scroll">
+        <div class="table-scroll" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
             <table id="movimentoComissoesTable">
                 <thead>
                     <tr>
@@ -749,7 +749,7 @@
             </table>
         </div>
         <!-- Exibir por página (agora fixo no canto inferior direito) -->
-        <div class="filters-container" id="exibirPorPaginaFixo" style="margin-bottom: 0; border-top: 1.5px solid #e3f2fd; border-radius: 10px 10px 0 0;">
+        <div class="filters-container" id="exibirPorPaginaFixo" style="flex-shrink: 0; margin-bottom: 0; border-top: 1.5px solid #e3f2fd; border-radius: 10px 10px 0 0;">
             <span style="font-weight: 600; color: #1976D2;">Exibir</span>
             <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
                 <option value="10">10</option>
