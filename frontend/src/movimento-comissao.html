@@ -591,6 +591,18 @@
             background: #e3f2fd !important;
             transition: background 0.2s;
         }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -1030,6 +1042,11 @@
       </div>
     </div>
 
+    <!-- Loader de carregamento -->
+    <div id="loader-movimento" style="display: none; justify-content: center; align-items: center; height: 200px;">
+        <div class="spinner"></div>
+    </div>
+
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -1409,8 +1426,14 @@
             }
         }
         async function carregarComissoes() {
+            const loader = document.getElementById('loader-movimento');
+            const table = document.getElementById('movimentoComissoesTable');
+            if (loader && table) {
+                loader.style.display = 'flex';
+                table.style.display = 'none';
+            }
             const tbody = document.getElementById('movimentoComissoesTableBody');
-            tbody.innerHTML = '<tr><td colspan="10">Carregando...</td></tr>';
+            tbody.innerHTML = '';
             try {
                 await carregarColaboradores();
                 const data = await window.api.get('/movimento_comissoes');
@@ -1420,6 +1443,11 @@
             } catch (e) {
                 console.error('Erro detalhado ao carregar títulos:', e);
                 tbody.innerHTML = '<tr><td colspan="10">Erro ao carregar títulos.</td></tr>';
+            } finally {
+                if (loader && table) {
+                    loader.style.display = 'none';
+                    table.style.display = '';
+                }
             }
         }
         document.getElementById('selectPorPagina').addEventListener('change', renderTabelaLimitada);
