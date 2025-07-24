@@ -748,19 +748,17 @@
             </table>
         </div>
         <!-- Exibir por página (agora fixo no canto inferior direito) -->
-        <div id="exibirPorPaginaFixo" style="position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: #fff; box-shadow: 0 -2px 8px rgba(33,150,243,0.13); border-top: 1.5px solid #e3f2fd; z-index: 2000;">
-            <div style="max-width: 1400px; margin: 0 auto; padding: 18px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
-                <span style="font-weight: 600; color: #1976D2;">Exibir</span>
-                <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-                <span style="font-weight: 600; color: #1976D2;">Títulos</span>
-                <button class="btn-baixa" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Baixar</button>
-                <button class="btn-aglutinar" style="background: #ff9800; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Aglutinar Títulos</button>
-            </div>
+        <div id="exibirPorPaginaFixo" style="max-width: 1400px; margin: 24px auto 0 auto; padding: 18px 24px; background: #fff; box-shadow: 0 -2px 8px rgba(33,150,243,0.13); border-radius: 10px; border-top: 1.5px solid #e3f2fd; display: flex; justify-content: flex-end; align-items: center; gap: 12px;">
+            <span style="font-weight: 600; color: #1976D2;">Exibir</span>
+            <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span style="font-weight: 600; color: #1976D2;">Títulos</span>
+            <button class="btn-baixa" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Baixar</button>
+            <button class="btn-aglutinar" style="background: #ff9800; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Aglutinar Títulos</button>
         </div>
     </div>
 
@@ -1762,7 +1760,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- Adicionar modal de sucesso de edição: -->
 <div id="modalSucessoEdicao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-space-between;">
       <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título editado com sucesso!</h2>
       <button class="close-modal" onclick="fecharModalSucessoEdicao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>
