@@ -739,7 +739,10 @@
         </div>
 
         <!-- Commissions Table -->
-        <div class="table-scroll" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+        <div class="table-scroll" style="position: relative; flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+            <div id="loader-movimento" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 2; justify-content: center; align-items: center;">
+                <div class="spinner"></div>
+            </div>
             <table id="movimentoComissoesTable">
                 <thead>
                     <tr>
