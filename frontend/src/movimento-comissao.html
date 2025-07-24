@@ -18,6 +18,7 @@
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
             background: #fff;
             margin-bottom: 16px;
+            padding-bottom: 40px;
         }
         .table-scroll table {
             width: 100%;
@@ -748,17 +749,19 @@
             </table>
         </div>
         <!-- Exibir por página (agora fixo no canto inferior direito) -->
-        <div class="filters-container" style="margin-bottom: 0; border-top: 1.5px solid #e3f2fd; border-radius: 10px 10px 0 0;">
-            <span style="font-weight: 600; color: #1976D2;">Exibir</span>
-            <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-            <span style="font-weight: 600; color: #1976D2;">Títulos</span>
-            <button class="btn-baixa" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Baixar</button>
-            <button class="btn-aglutinar" style="background: #ff9800; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Aglutinar Títulos</button>
+        <div style="position: fixed; left: 0; right: 0; bottom: 32px; width: 100vw; z-index: 2000; background: transparent;">
+            <div class="filters-container" id="exibirPorPaginaFixo" style="margin-bottom: 0; border-top: 1.5px solid #e3f2fd; border-radius: 10px 10px 0 0;">
+                <span style="font-weight: 600; color: #1976D2;">Exibir</span>
+                <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span style="font-weight: 600; color: #1976D2;">Títulos</span>
+                <button class="btn-baixa" style="background: #1976D2; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Baixar</button>
+                <button class="btn-aglutinar" style="background: #ff9800; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Aglutinar Títulos</button>
+            </div>
         </div>
     </div>
 
