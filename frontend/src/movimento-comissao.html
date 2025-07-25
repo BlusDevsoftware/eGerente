@@ -1073,6 +1073,7 @@
         let tituloOriginalBaixa = null;
 
         function openPaymentModal(titulo) {
+            console.log('openPaymentModal - titulo:', titulo);
             tituloOriginalBaixa = titulo; // Salva referência global
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('commissionValue').value = titulo.valor?.toFixed(2) || '';
@@ -1258,6 +1259,7 @@
 
         // Funções para o Modal Visualizar/Editar Título
         function abrirModalTitulo(titulo, modo) {
+            console.log('abrirModalTitulo - titulo:', titulo);
             const modal = document.getElementById('modalTitulo');
             const form = document.getElementById('formModalTitulo');
             document.getElementById('modal-numero').value = titulo.numero_titulo || '';
