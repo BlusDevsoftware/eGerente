@@ -1073,7 +1073,7 @@
         let tituloOriginalBaixa = null;
 
         function openPaymentModal(titulo) {
-            console.log('openPaymentModal - titulo:', titulo);
+            console.log('item_id do título:', titulo.item_id);
             tituloOriginalBaixa = titulo; // Salva referência global
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('commissionValue').value = titulo.valor?.toFixed(2) || '';
@@ -1090,7 +1090,7 @@
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-check' style='color:#1976D2;'></i> <b>Vencimento:</b> <span style='margin-left:4px;'>${formatarData(titulo.data_vencimento)}</span></div>
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-plus' style='color:#1976D2;'></i> <b>Geração:</b> <span style='margin-left:4px;'>${formatarData(titulo.data_geracao)}</span></div>
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-user-tie' style='color:#1976D2;'></i> <b>Cliente:</b> <span style='margin-left:4px;'>${mapaClientes[titulo.cliente_id] || titulo.cliente_id || ''}</span></div>
-                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-box' style='color:#1976D2;'></i> <b>Produtos:</b> <span style='margin-left:4px;'>${Array.isArray(titulo.produtos) ? titulo.produtos.map(id => mapaProdutos[id] || id).join(', ') : ''}</span></div>
+                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-box' style='color:#1976D2;'></i> <b>Produto:</b> <span style='margin-left:4px;'>${titulo.item_id || ''}</span></div>
                 </div>
                 <div style='margin-top:12px; display:flex; align-items:flex-start; gap:8px; font-size:1.05em;'><i class='fas fa-align-left' style='color:#1976D2; margin-top:2px;'></i> <b>Descrição:</b> <span style='margin-left:4px; word-break:break-word;'>${titulo.descricao || ''}</span></div>
               </div>
