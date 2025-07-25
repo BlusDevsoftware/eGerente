@@ -1192,7 +1192,8 @@
                 titulo.valor = parseFloat(valor);
                 titulo.descricao = descricao;
                 atualizarTabelaComFiltros();
-                closeViewModal();
+                atualizarCardsTotalizadores();
+                fecharModalTitulo();
                 abrirModalSucessoEdicao();
             }).catch((error) => {
                 console.error('Erro ao salvar edição:', error);
@@ -1863,6 +1864,7 @@ document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao
                 titulo.valor = parseFloat(valor);
                 titulo.descricao = descricao;
                 atualizarTabelaComFiltros();
+                atualizarCardsTotalizadores();
                 fecharModalTitulo();
                 abrirModalSucessoEdicao();
             } catch (error) {
