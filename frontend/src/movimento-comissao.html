@@ -1570,6 +1570,7 @@
           todosTitulos = todosTitulos.filter(t => !titulosExcluir.some(te => te.id === t.id));
           titulosFiltrados = titulosFiltrados.filter(t => !titulosExcluir.some(te => te.id === t.id));
           atualizarTabelaComFiltros();
+          atualizarCardsTotalizadores();
           fecharModalConfirmExclusao();
           abrirModalSucessoExclusao();
         };
