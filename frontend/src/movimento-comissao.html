@@ -1351,6 +1351,7 @@
                             todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
                             titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
                             atualizarTabelaComFiltros();
+                            atualizarCardsTotalizadores();
                             abrirModalSucessoExclusao();
                         } else {
                             // Excluir todos do parcelamento com referencia do numero do titulo
@@ -1363,6 +1364,7 @@
                             todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
                             titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
                             atualizarTabelaComFiltros();
+                            atualizarCardsTotalizadores();
                             abrirModalSucessoExclusao();
                         }
                     });
