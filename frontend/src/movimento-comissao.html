@@ -1088,8 +1088,8 @@
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-flag' style='color:#1976D2;'></i> <b>Status:</b> <span style='margin-left:4px;'>${titulo.status || ''}</span></div>
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-check' style='color:#1976D2;'></i> <b>Vencimento:</b> <span style='margin-left:4px;'>${formatarData(titulo.data_vencimento)}</span></div>
                   <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-plus' style='color:#1976D2;'></i> <b>Geração:</b> <span style='margin-left:4px;'>${formatarData(titulo.data_geracao)}</span></div>
-                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-user-tie' style='color:#1976D2;'></i> <b>Cliente:</b> <span style='margin-left:4px;'>${titulo.cliente_nome || titulo.cliente_id || ''}</span></div>
-                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-box' style='color:#1976D2;'></i> <b>Produtos:</b> <span style='margin-left:4px;'>${titulo.produtos ? titulo.produtos.join(', ') : ''}</span></div>
+                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-user-tie' style='color:#1976D2;'></i> <b>Cliente:</b> <span style='margin-left:4px;'>${mapaClientes[titulo.cliente_id] || titulo.cliente_id || ''}</span></div>
+                  <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-box' style='color:#1976D2;'></i> <b>Produtos:</b> <span style='margin-left:4px;'>${Array.isArray(titulo.produtos) ? titulo.produtos.map(id => mapaProdutos[id] || id).join(', ') : ''}</span></div>
                 </div>
                 <div style='margin-top:12px; display:flex; align-items:flex-start; gap:8px; font-size:1.05em;'><i class='fas fa-align-left' style='color:#1976D2; margin-top:2px;'></i> <b>Descrição:</b> <span style='margin-left:4px; word-break:break-word;'>${titulo.descricao || ''}</span></div>
               </div>
@@ -1726,6 +1726,8 @@ let todosTitulos = [];
 let mapaColaboradores = {};
 let titulosFiltrados = [];
 let filtroDataPor = 'geracao'; // filtro de data por'geracao' ou 'vencimento' 
+let mapaClientes = {};
+let mapaProdutos = {};
 
 function formatarValor(valor) {
     return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || '';
@@ -1815,6 +1817,32 @@ function atualizarCardsTotalizadores() {
     document.getElementById('card-pagas-change').textContent = pagas.length + ' comissões';
     document.getElementById('card-colaboradores-change').textContent = 'Ativos';
 }
+// ... existing code ...
+
+async function carregarClientesEProdutos() {
+    try {
+        const clientes = await window.api.get('/clientes');
+        if (Array.isArray(clientes)) {
+            clientes.forEach(cli => {
+                mapaClientes[cli.id || cli.codigo] = cli.nome;
+            });
+        }
+        const produtos = await window.api.get('/produtos');
+        if (Array.isArray(produtos)) {
+            produtos.forEach(prod => {
+                mapaProdutos[prod.id || prod.codigo] = prod.nome;
+            });
+        }
+    } catch (e) {
+        console.error('Erro ao carregar clientes ou produtos:', e);
+    }
+}
+
+// No carregamento inicial:
+window.addEventListener('DOMContentLoaded', async function() {
+    await carregarClientesEProdutos();
+    carregarComissoes();
+});
 // ... existing code ...
 </script>
 
