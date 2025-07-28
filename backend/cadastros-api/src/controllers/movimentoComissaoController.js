@@ -141,46 +141,82 @@ const excluirMovimento = async (req, res) => {
     }
 };
 
-// Buscar produtos de um título específico
+// Buscar produtos de um título
 const buscarProdutosTitulo = async (req, res) => {
     try {
         const { id } = req.params;
+        const { data: titulo, error: errorTitulo } = await supabase
+            .from('movimento_comissoes')
+            .select('item_id')
+            .eq('id', id)
+            .single();
         
-        // Buscar o título
+        if (errorTitulo) throw errorTitulo;
+        if (!titulo) return res.status(404).json({ error: 'Título não encontrado' });
+        
+        if (!titulo.item_id) {
+            return res.json([]);
+        }
+        
+        const produtos = [];
+        const itemIds = titulo.item_id.split(',');
+        
+        for (const itemId of itemIds) {
+            const [id, descricao] = itemId.trim().split('-');
+            if (id && descricao) {
+                produtos.push({
+                    id: id.trim(),
+                    descricao: descricao.trim()
+                });
+            }
+        }
+        
+        res.json(produtos);
+    } catch (error) {
+        console.error('Erro ao buscar produtos do título:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos do título' });
+    }
+};
+
+// Upload de comprovante de pagamento
+const uploadComprovante = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Verificar se o título existe
         const { data: titulo, error: errorTitulo } = await supabase
             .from('movimento_comissoes')
             .select('*')
             .eq('id', id)
             .single();
-            
+        
         if (errorTitulo) throw errorTitulo;
         if (!titulo) return res.status(404).json({ error: 'Título não encontrado' });
         
-        // Se não há item_id, retornar array vazio
-        if (!titulo.item_id) {
-            return res.json([]);
-        }
+        // Aqui você pode implementar a lógica para salvar o arquivo
+        // Por exemplo, salvar no Supabase Storage ou em um diretório local
+        // Por enquanto, vamos apenas retornar sucesso
         
-        // Processar o item_id que está no formato "codigo-nome,codigo-nome"
-        const itens = titulo.item_id.split(',').map(item => {
-            const match = item.match(/^(\d{5})-(.+)$/);
-            if (match) {
-                return {
-                    produto_id: match[1],
-                    nome: match[2].trim(),
-                    quantidade: 1,
-                    valor_unitario: titulo.valor_venda || 0,
-                    valor_total: titulo.valor_venda || 0
-                };
-            }
-            return null;
-        }).filter(Boolean);
+        // Atualizar o título com a informação do comprovante
+        const { data, error } = await supabase
+            .from('movimento_comissoes')
+            .update({
+                comprovante_anexado: true,
+                data_comprovante: new Date().toISOString()
+            })
+            .eq('id', id)
+            .select()
+            .single();
         
-        res.json(itens);
+        if (error) throw error;
         
+        res.json({ 
+            message: 'Comprovante anexado com sucesso',
+            data: data
+        });
     } catch (error) {
-        console.error('Erro ao buscar produtos do título:', error);
-        res.status(500).json({ error: 'Erro ao buscar produtos do título' });
+        console.error('Erro ao anexar comprovante:', error);
+        res.status(500).json({ error: 'Erro ao anexar comprovante' });
     }
 };
 
@@ -190,5 +226,6 @@ module.exports = {
     criarMovimento,
     atualizarMovimento,
     excluirMovimento,
-    buscarProdutosTitulo
+    buscarProdutosTitulo,
+    uploadComprovante
 }; 

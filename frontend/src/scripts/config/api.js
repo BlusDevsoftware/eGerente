@@ -81,11 +81,32 @@ async function del(endpoint) {
     }
 }
 
+// Função para fazer requisições PUT com FormData (upload de arquivos)
+async function putFormData(endpoint, formData) {
+    try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            method: 'PUT',
+            body: formData // Não definir Content-Type, deixar o browser definir automaticamente
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw { status: response.status, data: responseData };
+        }
+
+        return responseData;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // Exporta as funções da API
 const api = {
     get,
     post,
     put,
+    putFormData,
     delete: del
 };
 

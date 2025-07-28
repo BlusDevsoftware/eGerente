@@ -868,6 +868,37 @@
                         <textarea id="paymentNotes" rows="3" maxlength="200" placeholder="Adicione observações se necessário" style="width: 100%; padding: 10px; border: 1.5px solid #1976D2; border-radius: 6px; background: #f5faff; font-size: 1em;"></textarea>
                         <div id="contadorObservacoes" style="font-size: 0.97em; color: #1976D2; margin-top: 2px; text-align: right;">0/200</div>
                     </div>
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">
+                            <i class="fas fa-paperclip"></i> Comprovante de Pagamento
+                        </label>
+                        <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 20px; text-align: center; background: #f8fbff; transition: all 0.3s;" 
+                             ondrop="handleFileDrop(event)" 
+                             ondragover="handleDragOver(event)" 
+                             ondragleave="handleDragLeave(event)"
+                             id="fileDropZone">
+                            <input type="file" id="paymentReceipt" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" 
+                                   style="display: none;" onchange="handleFileSelect(event)">
+                            <div id="fileDropContent">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2em; color: #1976D2; margin-bottom: 10px;"></i>
+                                <p style="margin: 0; color: #1976D2; font-weight: 500;">Arraste o comprovante aqui ou clique para selecionar</p>
+                                <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
+                                <button type="button" onclick="document.getElementById('paymentReceipt').click()" 
+                                        style="margin-top: 10px; padding: 8px 16px; background: #1976D2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                    Selecionar Arquivo
+                                </button>
+                            </div>
+                            <div id="filePreview" style="display: none;">
+                                <i class="fas fa-file-alt" style="font-size: 1.5em; color: #4CAF50; margin-bottom: 5px;"></i>
+                                <p id="fileName" style="margin: 0; color: #1976D2; font-weight: 500;"></p>
+                                <p id="fileSize" style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;"></p>
+                                <button type="button" onclick="removeFile()" 
+                                        style="margin-top: 5px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
+                                    <i class="fas fa-trash"></i> Remover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 32px; padding-top: 12px; border-top: 1px solid #eee; background: #fff; border-radius: 0 0 16px 16px; margin-bottom: 0;">
                         <button type="button" class="btn-secondary" onclick="closePaymentModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
                         <button type="submit" class="btn-primary" style="padding: 10px 24px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; background-color: #2196F3; color: white; border: none; display: flex; align-items: center; gap: 8px;"><i class="fas fa-save"></i> Confirmar Baixa</button>
@@ -1162,6 +1193,8 @@
 
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
+            // Limpar arquivo selecionado ao fechar o modal
+            removeFile();
         }
 
         // Close modal when clicking outside
@@ -1187,26 +1220,52 @@
             };
             const status = statusMap[document.getElementById('paymentStatus').value] || 'PENDENTE';
             const observacoes = document.getElementById('paymentNotes').value;
+            
+            // Capturar arquivo do comprovante
+            const fileInput = document.getElementById('paymentReceipt');
+            const comprovanteFile = fileInput.files[0];
+            
             const titulo = tituloOriginalBaixa;
             if (!titulo) {
                 alert('Erro: Título não encontrado!');
                 return;
             }
+            
             // Baixa parcial: se valorPago < valorTitulo
             let baixaParcial = valorPago < valorTitulo;
+            
             try {
-                // Atualizar título original no backend
-                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                // Preparar dados para envio
+                const dadosPagamento = {
                     valor_pago: valorPago,
                     data_pagamento: dataPagamento,
                     status: status,
                     observacoes: observacoes
-                });
+                };
+                
+                // Se há arquivo de comprovante, adicionar ao FormData
+                if (comprovanteFile) {
+                    const formData = new FormData();
+                    formData.append('comprovante', comprovanteFile);
+                    
+                    // Adicionar outros dados como campos de texto
+                    Object.keys(dadosPagamento).forEach(key => {
+                        formData.append(key, dadosPagamento[key]);
+                    });
+                    
+                    // Enviar com FormData para suportar upload de arquivo
+                    await window.api.putFormData(`/movimento_comissoes/${titulo.id}/comprovante`, formData);
+                } else {
+                    // Enviar dados normais sem arquivo
+                    await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
+                }
+                
                 // Atualizar array local
                 titulo.valor_pago = valorPago;
                 titulo.data_pagamento = dataPagamento;
                 titulo.status = status;
                 titulo.observacoes = observacoes;
+                
                 // Se for baixa parcial, criar novo título
                 if (baixaParcial) {
                     const diferenca = (valorTitulo - valorPago).toFixed(2);
@@ -1230,6 +1289,7 @@
                     const tituloCriado = Array.isArray(response) ? response[0] : response;
                     todosTitulos.push(tituloCriado);
                 }
+                
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
                 closePaymentModal();
@@ -1997,6 +2057,86 @@
             alert('Aglutinar ' + selecionados.length + ' títulos!');
             // Exemplo: abrir modal de confirmação/aglutinação
         });
+
+        // Funções para manipular upload de arquivos
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                validateAndDisplayFile(file);
+            }
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                validateAndDisplayFile(file);
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            const dropZone = document.getElementById('fileDropZone');
+            dropZone.style.borderColor = '#4CAF50';
+            dropZone.style.background = '#f1f8e9';
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            const dropZone = document.getElementById('fileDropZone');
+            dropZone.style.borderColor = '#1976D2';
+            dropZone.style.background = '#f8fbff';
+        }
+
+        function validateAndDisplayFile(file) {
+            // Validar tipo de arquivo
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Tipo de arquivo não suportado. Use PDF, JPG, PNG ou DOC.');
+                return;
+            }
+
+            // Validar tamanho (máximo 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                alert('Arquivo muito grande. Tamanho máximo: 5MB.');
+                return;
+            }
+
+            // Exibir preview do arquivo
+            displayFilePreview(file);
+        }
+
+        function displayFilePreview(file) {
+            const dropContent = document.getElementById('fileDropContent');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+
+            dropContent.style.display = 'none';
+            filePreview.style.display = 'block';
+        }
+
+        function removeFile() {
+            const dropContent = document.getElementById('fileDropContent');
+            const filePreview = document.getElementById('filePreview');
+            const fileInput = document.getElementById('paymentReceipt');
+
+            dropContent.style.display = 'block';
+            filePreview.style.display = 'none';
+            fileInput.value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
     </script>
 
     <script src="scripts/navigation.js"></script>
@@ -2147,7 +2287,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 <!-- Adicionar modal de sucesso de edição: -->
 <div id="modalSucessoEdicao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-space-between;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
       <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título editado com sucesso!</h2>
       <button class="close-modal" onclick="fecharModalSucessoEdicao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>

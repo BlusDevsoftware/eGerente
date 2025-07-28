@@ -2,25 +2,14 @@ const express = require('express');
 const router = express.Router();
 const movimentoComissaoController = require('../controllers/movimentoComissaoController');
 
-// Listar todos os movimentos
+// Rotas para movimento de comissões
 router.get('/movimento_comissoes', movimentoComissaoController.listarMovimentos);
-
-// Buscar movimento por ID
 router.get('/movimento_comissoes/:id', movimentoComissaoController.buscarMovimento);
-
-// Criar novo movimento
 router.post('/movimento_comissoes', movimentoComissaoController.criarMovimento);
-
-// Atualizar movimento
 router.put('/movimento_comissoes/:id', movimentoComissaoController.atualizarMovimento);
-
-// Excluir movimento
 router.delete('/movimento_comissoes/:id', movimentoComissaoController.excluirMovimento);
-
-// Buscar produtos de um título específico
+router.get('/movimento_comissoes/simular-proximo-numero', movimentoComissaoController.simularProximoNumeroBase);
 router.get('/movimento_comissoes/:id/produtos', movimentoComissaoController.buscarProdutosTitulo);
-
-// Simular próximo número base para um colaborador
-router.get('/movimento_comissoes/proximo_numero_base', movimentoComissaoController.simularProximoNumeroBase);
+router.put('/movimento_comissoes/:id/comprovante', movimentoComissaoController.uploadComprovante);
 
 module.exports = router; 
