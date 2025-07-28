@@ -1160,6 +1160,27 @@
         // Variável global para armazenar o título original
         let tituloOriginalBaixa = null;
 
+        // Configuração do Supabase Client (ajuste para o seu projeto)
+        const supabase = window.supabase
+          ? window.supabase.createClient('https://<YOUR_PROJECT>.supabase.co', '<YOUR_PUBLIC_ANON_KEY>')
+          : supabase.createClient('https://<YOUR_PROJECT>.supabase.co', '<YOUR_PUBLIC_ANON_KEY>');
+
+        async function uploadComprovanteToSupabase(file, idTitulo) {
+          const filePath = `${idTitulo}_${Date.now()}_${file.name}`;
+          const { data, error } = await supabase.storage
+            .from('comprovantesbaixas')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+          if (error) throw error;
+          const { publicUrl } = supabase
+            .storage
+            .from('comprovantesbaixas')
+            .getPublicUrl(filePath).data;
+          return publicUrl;
+        }
+
         function openPaymentModal(titulo) {
             console.log('item_id do título:', titulo.item_id);
             tituloOriginalBaixa = titulo; // Salva referência global
@@ -1224,6 +1245,7 @@
             // Capturar arquivo do comprovante
             const fileInput = document.getElementById('paymentReceipt');
             const comprovanteFile = fileInput.files[0];
+            let comprovanteUrl = null;
             
             const titulo = tituloOriginalBaixa;
             if (!titulo) {
@@ -1235,36 +1257,29 @@
             let baixaParcial = valorPago < valorTitulo;
             
             try {
+                // Se há arquivo de comprovante, faz upload para o Supabase Storage
+                if (comprovanteFile) {
+                    comprovanteUrl = await uploadComprovanteToSupabase(comprovanteFile, titulo.id);
+                }
+                
                 // Preparar dados para envio
                 const dadosPagamento = {
                     valor_pago: valorPago,
                     data_pagamento: dataPagamento,
                     status: status,
-                    observacoes: observacoes
+                    observacoes: observacoes,
+                    comprovante_url: comprovanteUrl
                 };
                 
-                // Se há arquivo de comprovante, adicionar ao FormData
-                if (comprovanteFile) {
-                    const formData = new FormData();
-                    formData.append('comprovante', comprovanteFile);
-                    
-                    // Adicionar outros dados como campos de texto
-                    Object.keys(dadosPagamento).forEach(key => {
-                        formData.append(key, dadosPagamento[key]);
-                    });
-                    
-                    // Enviar com FormData para suportar upload de arquivo
-                    await window.api.putFormData(`/movimento_comissoes/${titulo.id}/comprovante`, formData);
-                } else {
-                    // Enviar dados normais sem arquivo
-                    await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
-                }
+                // Enviar dados para o backend
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
                 
                 // Atualizar array local
                 titulo.valor_pago = valorPago;
                 titulo.data_pagamento = dataPagamento;
                 titulo.status = status;
                 titulo.observacoes = observacoes;
+                titulo.comprovante_url = comprovanteUrl;
                 
                 // Se for baixa parcial, criar novo título
                 if (baixaParcial) {
