@@ -1191,7 +1191,21 @@
         const supabaseClient = supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4');
 
         async function uploadComprovanteToSupabase(file, idTitulo) {
-          const filePath = `${idTitulo}_${Date.now()}_${file.name}`;
+          // Sanitizar o nome do arquivo removendo caracteres especiais
+          const sanitizeFileName = (fileName) => {
+            return fileName
+              .replace(/[^a-zA-Z0-9.-]/g, '_') // Remove caracteres especiais, mantém apenas letras, números, pontos e hífens
+              .replace(/_{2,}/g, '_') // Remove múltiplos underscores consecutivos
+              .replace(/^_|_$/g, ''); // Remove underscores no início e fim
+          };
+          
+          const sanitizedFileName = sanitizeFileName(file.name);
+          const filePath = `${idTitulo}_${Date.now()}_${sanitizedFileName}`;
+          
+          console.log('Nome original do arquivo:', file.name);
+          console.log('Nome sanitizado:', sanitizedFileName);
+          console.log('Caminho completo:', filePath);
+          
           const { data, error } = await supabaseClient.storage
             .from('comprovantesbaixas')
             .upload(filePath, file, {
