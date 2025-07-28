@@ -37,6 +37,7 @@ const buscarMovimento = async (req, res) => {
 const criarMovimento = async (req, res) => {
     try {
         const movimentos = Array.isArray(req.body) ? req.body : [req.body];
+        
         // Buscar o maior número sequencial global já utilizado UMA ÚNICA VEZ
         let ultimoNumero = 0;
         try {
@@ -47,6 +48,12 @@ const criarMovimento = async (req, res) => {
             if (todos && todos.length > 0) {
                 const bases = todos
                     .map(t => {
+                        // Para títulos parciais, extrair o número após PAR-
+                        if (t.numero_titulo && t.numero_titulo.startsWith('PAR-')) {
+                            const match = t.numero_titulo.match(/^PAR-(\d{5,})/);
+                            return match ? parseInt(match[1], 10) : null;
+                        }
+                        // Para títulos normais, extrair o número base
                         const match = (t.numero_titulo || '').match(/^(\d{5,})/);
                         return match ? parseInt(match[1], 10) : null;
                     })
@@ -58,6 +65,7 @@ const criarMovimento = async (req, res) => {
         } catch (e) {
             ultimoNumero = 0;
         }
+        
         // Montar os registros para todos os colaboradores, incrementando o número para cada colaborador
         const registros = [];
         for (let i = 0; i < movimentos.length; i++) {
@@ -65,24 +73,18 @@ const criarMovimento = async (req, res) => {
             const qtd_parcelas = mov.qtd_parcelas ? parseInt(mov.qtd_parcelas) : 1;
             const proximoNumero = ultimoNumero + 1; // incrementa a partir do maior encontrado
             const numeroBaseStr = proximoNumero.toString().padStart(5, '0');
+            
             for (let parcela = 1; parcela <= qtd_parcelas; parcela++) {
                 let numeroTitulo = numeroBaseStr;
                 if (qtd_parcelas > 1) {
                     numeroTitulo += `-${parcela}/${qtd_parcelas}`;
                 }
-                // Se for título parcial, gere o número com prefixo PAR-
+                
+                // Se for título parcial, prefixe com PAR- e use número sequencial único
                 if (mov.id_titulo_origem) {
-                    // Buscar o título de origem
-                    const { data: origem, error: errorOrigem } = await supabase
-                        .from('movimento_comissoes')
-                        .select('numero_titulo')
-                        .eq('id', mov.id_titulo_origem)
-                        .single();
-                    if (errorOrigem) throw errorOrigem;
-                    if (origem && origem.numero_titulo) {
-                        numeroTitulo = `PAR-${origem.numero_titulo}`;
-                    }
+                    numeroTitulo = `PAR-${numeroTitulo}`;
                 }
+                
                 registros.push({
                     ...mov,
                     numero_titulo: numeroTitulo
@@ -90,6 +92,7 @@ const criarMovimento = async (req, res) => {
             }
             ultimoNumero++; // incrementa para o próximo colaborador
         }
+        
         // Inserir todos os registros de uma vez
         const { data, error } = await supabase
             .from('movimento_comissoes')

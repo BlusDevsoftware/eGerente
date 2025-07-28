@@ -38,6 +38,7 @@ const criarMovimento = async (req, res) => {
     try {
         console.log('Payload recebido para movimento_comissoes:', req.body);
         const movimentos = Array.isArray(req.body) ? req.body : [req.body];
+        
         // Buscar o maior número base já utilizado
         let ultimoNumero = 0;
         const { data: todos, error: errorTodos } = await supabase
@@ -47,21 +48,29 @@ const criarMovimento = async (req, res) => {
         if (todos && todos.length > 0) {
             const bases = todos
                 .map(t => {
-                    const match = (t.numero_titulo || '').match(/^\d{5,}/);
-                    return match ? parseInt(match[0], 10) : null;
+                    // Para títulos parciais, extrair o número após PAR-
+                    if (t.numero_titulo && t.numero_titulo.startsWith('PAR-')) {
+                        const match = t.numero_titulo.match(/^PAR-(\d{5,})/);
+                        return match ? parseInt(match[1], 10) : null;
+                    }
+                    // Para títulos normais, extrair o número base
+                    const match = (t.numero_titulo || '').match(/^(\d{5,})/);
+                    return match ? parseInt(match[1], 10) : null;
                 })
                 .filter(n => n !== null && n > 0);
             if (bases.length > 0) {
                 ultimoNumero = Math.max(...bases);
             }
         }
+        
         // Agrupar por colaborador_id
         const grupos = {};
         movimentos.forEach(mov => {
-            const key = mov.colaborador_id; // pode ser ajustado para outro critério de agrupamento
+            const key = mov.colaborador_id;
             if (!grupos[key]) grupos[key] = [];
             grupos[key].push(mov);
         });
+        
         // Para cada grupo, gerar número base e numerar as parcelas
         const registros = [];
         for (const parcelas of Object.values(grupos)) {
@@ -69,10 +78,12 @@ const criarMovimento = async (req, res) => {
             for (let i = 0; i < parcelas.length; i++) {
                 const mov = parcelas[i];
                 let numeroTitulo = `${numeroBaseStr}-${i + 1}/${parcelas.length}`;
-                // Se for título parcial, apenas prefixe com PAR-
+                
+                // Se for título parcial, prefixe com PAR- e use número sequencial único
                 if (mov.id_titulo_origem) {
                     numeroTitulo = `PAR-${numeroTitulo}`;
                 }
+                
                 registros.push({
                     ...mov,
                     numero_titulo: numeroTitulo
@@ -80,6 +91,7 @@ const criarMovimento = async (req, res) => {
             }
             ultimoNumero++;
         }
+        
         // Inserir todos os registros
         const { data, error } = await supabase
             .from('movimento_comissoes')
