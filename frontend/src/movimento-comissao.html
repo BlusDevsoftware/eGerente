@@ -1173,11 +1173,61 @@
         }
 
         // Payment Form Submission
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            // Aqui você pode adicionar a lógica para salvar a baixa
-            alert('Baixa registrada com sucesso!');
-            closePaymentModal();
+            const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
+            const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+            const dataPagamento = document.getElementById('paymentDate').value;
+            const status = document.getElementById('paymentStatus').value;
+            const observacoes = document.getElementById('paymentNotes').value;
+            const titulo = tituloOriginalBaixa;
+            if (!titulo) {
+                alert('Erro: Título não encontrado!');
+                return;
+            }
+            // Baixa parcial: se valorPago < valorTitulo
+            let baixaParcial = valorPago < valorTitulo;
+            try {
+                // Atualizar título original no backend
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                    valor_pago: valorPago,
+                    data_pagamento: dataPagamento,
+                    status: status.toUpperCase(),
+                    observacoes: observacoes
+                });
+                // Atualizar array local
+                titulo.valor_pago = valorPago;
+                titulo.data_pagamento = dataPagamento;
+                titulo.status = status.toUpperCase();
+                titulo.observacoes = observacoes;
+                // Se for baixa parcial, criar novo título
+                if (baixaParcial) {
+                    const diferenca = (valorTitulo - valorPago).toFixed(2);
+                    const novoTitulo = {
+                        ...titulo,
+                        id: Date.now(), // id temporário, será substituído pelo backend se necessário
+                        numero_titulo: `PARCIAL-${titulo.numero_titulo}`,
+                        valor: parseFloat(diferenca),
+                        valor_pago: 0,
+                        data_pagamento: null,
+                        status: 'PENDENTE',
+                        observacoes: 'Diferença de baixa parcial',
+                        data_geracao: new Date().toISOString().split('T')[0],
+                        data_vencimento: document.getElementById('vencimentoTituloParcial') ? document.getElementById('vencimentoTituloParcial').value : new Date().toISOString().split('T')[0]
+                    };
+                    // Salvar novo título no backend
+                    await window.api.post('/movimento_comissoes', novoTitulo);
+                    // Adicionar ao array local
+                    todosTitulos.push(novoTitulo);
+                }
+                atualizarTabelaComFiltros();
+                atualizarCardsTotalizadores();
+                closePaymentModal();
+                abrirModalSucessoEdicao();
+            } catch (error) {
+                console.error('Erro ao registrar baixa:', error);
+                alert('Erro ao registrar baixa!');
+            }
         });
 
         function openViewModal(data) {
@@ -2065,7 +2115,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 <!-- Adicionar modal de sucesso de edição: -->
 <div id="modalSucessoEdicao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-space-between;">
       <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título editado com sucesso!</h2>
       <button class="close-modal" onclick="fecharModalSucessoEdicao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>
