@@ -1079,6 +1079,7 @@
           
           <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 32px; padding: 24px 0 24px 0; border-top: 1px solid #eee;">
             <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+            <button type="button" id="btnCancelarBaixa" class="btn-warning" onclick="confirmarCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none; display: none;"><i class="fas fa-undo"></i> Cancelar Baixa</button>
             <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Salvar</button>
           </div>
         </form>
@@ -1138,6 +1139,52 @@
         </div>
         <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
           <button id="btnOkSucessoExclusao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmação de Cancelar Baixa -->
+    <div id="modalConfirmCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 98%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa</h2>
+          <button class="close-modal" onclick="fecharModalConfirmCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+          <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+          <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a baixa deste título?</div>
+          <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+          <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+            <ul style="margin: 0; padding-left: 20px; color: #e65100;">
+              <li>Alterar o status para "PENDENTE"</li>
+              <li>Zerar o valor pago</li>
+              <li>Limpar a data de pagamento</li>
+              <li>Remover o comprovante (se existir)</li>
+            </ul>
+          </div>
+          <div style="font-size: 0.95em; color: #666; font-style: italic;">Esta ação pode ser desfeita editando o título novamente.</div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+          <button id="btnCancelarConfirmacao" class="btn-secondary" onclick="fecharModalConfirmCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+          <button id="btnConfirmarCancelarBaixa" class="btn-warning" onclick="executarCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-undo"></i> Confirmar Cancelamento</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Sucesso de Cancelamento de Baixa -->
+    <div id="modalSucessoCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+        <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+          <h2 style="margin: 0; font-size: 1.2em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Baixa cancelada com sucesso!</h2>
+          <button class="close-modal" onclick="fecharModalSucessoCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+          <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+          <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">A baixa do título foi cancelada.</div>
+          <div style="font-size: 0.95em; color: #666; margin-bottom: 8px;">O título agora está com status "PENDENTE".</div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+          <button id="btnOkSucessoCancelarBaixa" class="btn-warning" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
         </div>
       </div>
     </div>
@@ -1545,6 +1592,14 @@
                 // Todos readonly
                 form.querySelectorAll('input').forEach(inp => inp.setAttribute('readonly', true));
                 document.getElementById('btnSalvarModalTitulo').style.display = 'none';
+                
+                // Mostrar botão "Cancelar Baixa" se o título estiver pago
+                const btnCancelarBaixa = document.getElementById('btnCancelarBaixa');
+                if (titulo.status === 'PAGO' || titulo.valor_pago > 0) {
+                    btnCancelarBaixa.style.display = 'inline-flex';
+                } else {
+                    btnCancelarBaixa.style.display = 'none';
+                }
             } else {
                 iconEl.className = 'fas fa-edit';
                 textoEl.textContent = 'Editar Título';
@@ -1579,6 +1634,14 @@
                 });
                 
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
+                
+                // Mostrar botão "Cancelar Baixa" se o título estiver pago
+                const btnCancelarBaixa = document.getElementById('btnCancelarBaixa');
+                if (titulo.status === 'PAGO' || titulo.valor_pago > 0) {
+                    btnCancelarBaixa.style.display = 'inline-flex';
+                } else {
+                    btnCancelarBaixa.style.display = 'none';
+                }
             }
             modal.style.display = 'flex';
         }
@@ -2215,6 +2278,109 @@
                 semComprovante.style.display = 'block';
             }
         }
+
+        // Funções para Cancelar Baixa
+        let tituloParaCancelarBaixa = null;
+
+        function confirmarCancelarBaixa() {
+            const tituloId = document.getElementById('modal-numero').value;
+            tituloParaCancelarBaixa = todosTitulos.find(t => t.numero_titulo === tituloId);
+            
+            if (!tituloParaCancelarBaixa) {
+                alert('Erro: Título não encontrado!');
+                return;
+            }
+            
+            // Abrir modal de confirmação
+            document.getElementById('modalConfirmCancelarBaixa').style.display = 'flex';
+        }
+
+        function fecharModalConfirmCancelarBaixa() {
+            document.getElementById('modalConfirmCancelarBaixa').style.display = 'none';
+            tituloParaCancelarBaixa = null;
+        }
+
+        async function executarCancelarBaixa() {
+            if (!tituloParaCancelarBaixa) {
+                alert('Erro: Título não encontrado!');
+                return;
+            }
+            
+            try {
+                console.log('Iniciando cancelamento de baixa para título:', tituloParaCancelarBaixa);
+                
+                // Preparar dados para cancelar baixa
+                const dadosCancelamento = {
+                    status: 'PENDENTE',
+                    valor_pago: 0,
+                    data_pagamento: null,
+                    observacoes: null,
+                    comprovante_url: null
+                };
+                
+                console.log('Dados de cancelamento:', dadosCancelamento);
+                
+                // Fazer a chamada para a API
+                await window.api.put(`/movimento_comissoes/${tituloParaCancelarBaixa.id}`, dadosCancelamento);
+                
+                // Se havia comprovante, remover do Supabase Storage
+                if (tituloParaCancelarBaixa.comprovante_url) {
+                    try {
+                        console.log('Removendo comprovante do Supabase Storage:', tituloParaCancelarBaixa.comprovante_url);
+                        
+                        // Extrair o nome do arquivo da URL
+                        const urlParts = tituloParaCancelarBaixa.comprovante_url.split('/');
+                        const fileName = urlParts[urlParts.length - 1];
+                        
+                        // Remover arquivo do Supabase Storage
+                        const { error } = await supabaseClient.storage
+                            .from('comprovantesbaixas')
+                            .remove([fileName]);
+                        
+                        if (error) {
+                            console.warn('Erro ao remover arquivo do storage:', error);
+                        } else {
+                            console.log('Arquivo removido com sucesso do storage');
+                        }
+                    } catch (storageError) {
+                        console.warn('Erro ao remover arquivo do storage:', storageError);
+                    }
+                }
+                
+                // Atualizar o array local
+                Object.assign(tituloParaCancelarBaixa, dadosCancelamento);
+                
+                // Atualizar interface
+                atualizarTabelaComFiltros();
+                atualizarCardsTotalizadores();
+                
+                // Fechar modais
+                fecharModalConfirmCancelarBaixa();
+                fecharModalTitulo();
+                
+                // Mostrar modal de sucesso
+                document.getElementById('modalSucessoCancelarBaixa').style.display = 'flex';
+                
+                console.log('Cancelamento de baixa realizado com sucesso');
+                
+            } catch (error) {
+                console.error('Erro ao cancelar baixa:', error);
+                alert('Erro ao cancelar baixa!');
+                fecharModalConfirmCancelarBaixa();
+            }
+        }
+
+        function fecharModalSucessoCancelarBaixa() {
+            document.getElementById('modalSucessoCancelarBaixa').style.display = 'none';
+        }
+
+        // Adicionar evento ao botão OK do modal de sucesso
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnOkSucessoCancelarBaixa = document.getElementById('btnOkSucessoCancelarBaixa');
+            if (btnOkSucessoCancelarBaixa) {
+                btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
+            }
+        });
     </script>
 
     <script src="scripts/navigation.js"></script>
