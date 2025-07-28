@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
         /* Tabela padrão do sistema */
         .table-scroll {
@@ -1161,20 +1162,18 @@
         let tituloOriginalBaixa = null;
 
         // Configuração do Supabase Client (ajuste para o seu projeto)
-        const supabase = window.supabase
-          ? window.supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4')
-          : supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4');
+        const supabaseClient = supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4');
 
         async function uploadComprovanteToSupabase(file, idTitulo) {
           const filePath = `${idTitulo}_${Date.now()}_${file.name}`;
-          const { data, error } = await supabase.storage
+          const { data, error } = await supabaseClient.storage
             .from('comprovantesbaixas')
             .upload(filePath, file, {
               cacheControl: '3600',
               upsert: true
             });
           if (error) throw error;
-          const { publicUrl } = supabase
+          const { publicUrl } = supabaseClient
             .storage
             .from('comprovantesbaixas')
             .getPublicUrl(filePath).data;
