@@ -1379,16 +1379,16 @@
             console.log('abrirModalTitulo - titulo:', titulo);
             const modal = document.getElementById('modalTitulo');
             const form = document.getElementById('formModalTitulo');
+            const tituloEl = document.getElementById('modalTituloTitulo');
             document.getElementById('modal-numero').value = titulo.numero_titulo || '';
             // Remover campo de origem do meio do modal, se existir
             let campoOrigem = document.getElementById('modal-numero-origem');
             if (campoOrigem) campoOrigem.remove();
             let labelOrigem = document.getElementById('label-numero-origem');
             if (labelOrigem) labelOrigem.remove();
-            // Exibir número do título de origem ao lado do título do modal, apenas para parciais
-            // const tituloEl = document.getElementById('modalTituloTitulo'); // Removido, já existe acima
             let spanOrigem = document.getElementById('span-numero-origem');
             if (spanOrigem) spanOrigem.remove();
+            // Exibir número do título de origem ao lado do título do modal, apenas para parciais
             if ((titulo.numero_titulo || '').startsWith('PAR-') && titulo.id_titulo_origem) {
                 const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
                 const numeroOrigem = tituloOrigem ? tituloOrigem.numero_titulo : '';
@@ -1420,7 +1420,6 @@
             carregarProdutosTituloInstantaneo(titulo);
             
             // Título e ícone
-            const tituloEl = document.getElementById('modalTituloTitulo');
             const iconEl = document.getElementById('modalTituloIcon');
             const textoEl = document.getElementById('modalTituloTexto');
             if (modo === 'visualizar') {
