@@ -2291,6 +2291,31 @@
                 return;
             }
             
+            // Verificar se há títulos parciais relacionados
+            const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === tituloParaCancelarBaixa.id);
+            const isBaixaParcial = titulosParciais.length > 0;
+            
+            // Atualizar o modal de confirmação com informações específicas
+            const modalBody = document.querySelector('#modalConfirmCancelarBaixa .modal-body');
+            const listaAcoes = modalBody.querySelector('ul');
+            
+            if (isBaixaParcial) {
+                // Adicionar item sobre exclusão de títulos parciais
+                const itemParciais = document.createElement('li');
+                itemParciais.textContent = `Excluir ${titulosParciais.length} título(s) parcial(is) gerado(s)`;
+                itemParciais.style.color = '#e65100';
+                itemParciais.style.fontWeight = 'bold';
+                listaAcoes.appendChild(itemParciais);
+                
+                // Atualizar mensagem de aviso
+                const avisoDiv = modalBody.querySelector('div[style*="font-style: italic"]');
+                if (avisoDiv) {
+                    avisoDiv.innerHTML = '<strong>Atenção:</strong> Esta ação irá excluir permanentemente os títulos parciais. Esta ação não pode ser desfeita.';
+                    avisoDiv.style.color = '#e53935';
+                    avisoDiv.style.fontWeight = 'bold';
+                }
+            }
+            
             // Abrir modal de confirmação
             document.getElementById('modalConfirmCancelarBaixa').style.display = 'flex';
         }
@@ -2308,6 +2333,72 @@
             
             try {
                 console.log('Iniciando cancelamento de baixa para título:', tituloParaCancelarBaixa);
+                
+                // Verificar se é uma baixa parcial (tem títulos parciais relacionados)
+                const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === tituloParaCancelarBaixa.id);
+                const isBaixaParcial = titulosParciais.length > 0;
+                
+                console.log('Títulos parciais encontrados:', titulosParciais);
+                console.log('É baixa parcial:', isBaixaParcial);
+                
+                // Se é baixa parcial, mostrar confirmação adicional
+                if (isBaixaParcial) {
+                    const confirmacao = confirm(
+                        `Este título possui ${titulosParciais.length} título(s) parcial(is) gerado(s).\n\n` +
+                        `Ao cancelar a baixa, todos os títulos parciais serão excluídos.\n\n` +
+                        `Deseja continuar?`
+                    );
+                    
+                    if (!confirmacao) {
+                        console.log('Cancelamento de baixa parcial cancelado pelo usuário');
+                        return;
+                    }
+                    
+                    // Excluir títulos parciais primeiro
+                    console.log('Excluindo títulos parciais...');
+                    for (const tituloParcial of titulosParciais) {
+                        try {
+                            console.log('Excluindo título parcial:', tituloParcial);
+                            
+                            // Remover comprovante se existir
+                            if (tituloParcial.comprovante_url) {
+                                try {
+                                    const urlParts = tituloParcial.comprovante_url.split('/');
+                                    const fileName = urlParts[urlParts.length - 1];
+                                    
+                                    const { error } = await supabaseClient.storage
+                                        .from('comprovantesbaixas')
+                                        .remove([fileName]);
+                                    
+                                    if (error) {
+                                        console.warn('Erro ao remover comprovante do título parcial:', error);
+                                    }
+                                } catch (storageError) {
+                                    console.warn('Erro ao remover comprovante do título parcial:', storageError);
+                                }
+                            }
+                            
+                            // Excluir título parcial da API
+                            await window.api.delete(`/movimento_comissoes/${tituloParcial.id}`);
+                            
+                            console.log('Título parcial excluído com sucesso:', tituloParcial.numero_titulo);
+                            
+                        } catch (error) {
+                            console.error('Erro ao excluir título parcial:', tituloParcial.numero_titulo, error);
+                            throw new Error(`Erro ao excluir título parcial ${tituloParcial.numero_titulo}: ${error.message}`);
+                        }
+                    }
+                    
+                    // Remover títulos parciais do array local
+                    titulosParciais.forEach(tituloParcial => {
+                        const index = todosTitulos.findIndex(t => t.id === tituloParcial.id);
+                        if (index !== -1) {
+                            todosTitulos.splice(index, 1);
+                        }
+                    });
+                    
+                    console.log('Todos os títulos parciais foram excluídos');
+                }
                 
                 // Preparar dados para cancelar baixa
                 const dadosCancelamento = {
@@ -2358,14 +2449,23 @@
                 fecharModalConfirmCancelarBaixa();
                 fecharModalTitulo();
                 
-                // Mostrar modal de sucesso
-                document.getElementById('modalSucessoCancelarBaixa').style.display = 'flex';
+                // Mostrar modal de sucesso com mensagem específica
+                const modalSucesso = document.getElementById('modalSucessoCancelarBaixa');
+                const mensagemSucesso = modalSucesso.querySelector('.modal-body div:first-of-type');
+                
+                if (isBaixaParcial) {
+                    mensagemSucesso.textContent = `A baixa do título foi cancelada e ${titulosParciais.length} título(s) parcial(is) foi/foram excluído(s).`;
+                } else {
+                    mensagemSucesso.textContent = 'A baixa do título foi cancelada.';
+                }
+                
+                modalSucesso.style.display = 'flex';
                 
                 console.log('Cancelamento de baixa realizado com sucesso');
                 
             } catch (error) {
                 console.error('Erro ao cancelar baixa:', error);
-                alert('Erro ao cancelar baixa!');
+                alert(`Erro ao cancelar baixa: ${error.message}`);
                 fecharModalConfirmCancelarBaixa();
             }
         }
