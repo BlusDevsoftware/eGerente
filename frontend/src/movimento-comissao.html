@@ -1051,6 +1051,32 @@
             </div>
           </div>
           
+          <!-- Seção de Comprovante -->
+          <div class="form-section" style="margin-top: 24px; border-top: 1px solid #eee; padding-top: 24px;">
+            <h3 style="margin: 0 0 20px 0; font-size: 1.1em; color: #333; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-paperclip" style="color: #2196F3;"></i> Comprovante de Pagamento
+            </h3>
+            <div id="comprovante-container" style="background: #f8f9fa; border-radius: 8px; padding: 16px; border: 1px solid #e9ecef;">
+              <div id="comprovante-info" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                  <i class="fas fa-file-alt" style="font-size: 1.5em; color: #4CAF50;"></i>
+                  <div>
+                    <div style="font-weight: 500; color: #333;">Comprovante anexado</div>
+                    <div style="font-size: 0.9em; color: #666;">Clique no botão abaixo para visualizar</div>
+                  </div>
+                </div>
+                <button type="button" id="btnVisualizarComprovante" 
+                        style="background: #2196F3; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 6px;">
+                  <i class="fas fa-eye"></i> Visualizar Comprovante
+                </button>
+              </div>
+              <div id="sem-comprovante" style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                Nenhum comprovante anexado a este título
+              </div>
+            </div>
+          </div>
+          
           <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 32px; padding: 24px 0 24px 0; border-top: 1px solid #eee;">
             <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
             <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Salvar</button>
@@ -1492,6 +1518,9 @@
             
             // Carregar produtos do título instantaneamente
             carregarProdutosTituloInstantaneo(titulo);
+            
+            // Carregar comprovante do título
+            carregarComprovanteTitulo(titulo);
             
             // Título e ícone
             const iconEl = document.getElementById('modalTituloIcon');
@@ -2150,6 +2179,27 @@
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Função para carregar comprovante do título
+        function carregarComprovanteTitulo(titulo) {
+            const comprovanteInfo = document.getElementById('comprovante-info');
+            const semComprovante = document.getElementById('sem-comprovante');
+            const btnVisualizar = document.getElementById('btnVisualizarComprovante');
+            
+            // Verificar se há comprovante anexado
+            if (titulo.comprovante_url) {
+                comprovanteInfo.style.display = 'block';
+                semComprovante.style.display = 'none';
+                
+                // Configurar botão para abrir o comprovante
+                btnVisualizar.onclick = function() {
+                    window.open(titulo.comprovante_url, '_blank');
+                };
+            } else {
+                comprovanteInfo.style.display = 'none';
+                semComprovante.style.display = 'block';
+            }
         }
     </script>
 
