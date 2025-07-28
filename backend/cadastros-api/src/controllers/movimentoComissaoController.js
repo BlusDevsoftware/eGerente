@@ -64,13 +64,13 @@ const criarMovimento = async (req, res) => {
         });
         // Para cada grupo, gerar número base e numerar as parcelas
         const registros = [];
-        Object.values(grupos).forEach(parcelas => {
+        for (const parcelas of Object.values(grupos)) {
             const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
-            parcelas.forEach(async (mov, i) => {
+            for (let i = 0; i < parcelas.length; i++) {
+                const mov = parcelas[i];
                 let numeroTitulo = `${numeroBaseStr}-${i + 1}/${parcelas.length}`;
                 // Se for título parcial, gere o número com prefixo PAR-
                 if (mov.id_titulo_origem) {
-                    // Buscar o título de origem
                     const { data: origem, error: errorOrigem } = await supabase
                         .from('movimento_comissoes')
                         .select('numero_titulo')
@@ -85,9 +85,9 @@ const criarMovimento = async (req, res) => {
                     ...mov,
                     numero_titulo: numeroTitulo
                 });
-            });
+            }
             ultimoNumero++;
-        });
+        }
         // Inserir todos os registros
         const { data, error } = await supabase
             .from('movimento_comissoes')
