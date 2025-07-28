@@ -1222,6 +1222,7 @@
                         id_titulo_origem: titulo.id
                     };
                     delete novoTitulo.id; // Garante que não envia o id antigo
+                    delete novoTitulo.numero_titulo; // Garante que não envia o numero_titulo antigo
                     console.log('Novo título parcial enviado para o backend:', novoTitulo); // Log para depuração
                     // Salvar novo título no backend
                     await window.api.post('/movimento_comissoes', novoTitulo);
