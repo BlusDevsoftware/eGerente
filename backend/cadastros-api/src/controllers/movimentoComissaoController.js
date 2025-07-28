@@ -66,10 +66,24 @@ const criarMovimento = async (req, res) => {
         const registros = [];
         Object.values(grupos).forEach(parcelas => {
             const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
-            parcelas.forEach((mov, i) => {
+            parcelas.forEach(async (mov, i) => {
+                let numeroTitulo = `${numeroBaseStr}-${i + 1}/${parcelas.length}`;
+                // Se for título parcial, gere o número com prefixo PAR-
+                if (mov.id_titulo_origem) {
+                    // Buscar o título de origem
+                    const { data: origem, error: errorOrigem } = await supabase
+                        .from('movimento_comissoes')
+                        .select('numero_titulo')
+                        .eq('id', mov.id_titulo_origem)
+                        .single();
+                    if (errorOrigem) throw errorOrigem;
+                    if (origem && origem.numero_titulo) {
+                        numeroTitulo = `PAR-${origem.numero_titulo}`;
+                    }
+                }
                 registros.push({
                     ...mov,
-                    numero_titulo: `${numeroBaseStr}-${i + 1}/${parcelas.length}`
+                    numero_titulo: numeroTitulo
                 });
             });
             ultimoNumero++;
