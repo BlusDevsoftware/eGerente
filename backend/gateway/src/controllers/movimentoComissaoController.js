@@ -70,6 +70,19 @@ const criarMovimento = async (req, res) => {
                 if (qtd_parcelas > 1) {
                     numeroTitulo += `-${parcela}/${qtd_parcelas}`;
                 }
+                // Se for título parcial, gere o número com prefixo PAR-
+                if (mov.id_titulo_origem) {
+                    // Buscar o título de origem
+                    const { data: origem, error: errorOrigem } = await supabase
+                        .from('movimento_comissoes')
+                        .select('numero_titulo')
+                        .eq('id', mov.id_titulo_origem)
+                        .single();
+                    if (errorOrigem) throw errorOrigem;
+                    if (origem && origem.numero_titulo) {
+                        numeroTitulo = `PAR-${origem.numero_titulo}`;
+                    }
+                }
                 registros.push({
                     ...mov,
                     numero_titulo: numeroTitulo
