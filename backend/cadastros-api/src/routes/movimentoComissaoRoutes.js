@@ -17,4 +17,7 @@ router.put('/movimento_comissoes/:id', movimentoComissaoController.atualizarMovi
 // Excluir movimento
 router.delete('/movimento_comissoes/:id', movimentoComissaoController.excluirMovimento);
 
+// Buscar produtos de um título específico
+router.get('/movimento_comissoes/:id/produtos', movimentoComissaoController.buscarProdutosTitulo);
+
 module.exports = router; 

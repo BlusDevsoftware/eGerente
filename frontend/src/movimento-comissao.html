@@ -962,6 +962,23 @@
               <input type="text" id="modal-usuario" readonly>
             </div>
           </div>
+          
+          <!-- Seção de Produtos/Serviços -->
+          <div class="form-section" style="margin-top: 32px; border-top: 1px solid #eee; padding-top: 24px;">
+            <h3 style="margin: 0 0 20px 0; font-size: 1.1em; color: #333; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-cubes" style="color: #2196F3;"></i> Produtos/Serviços do Título
+            </h3>
+            <div id="produtos-container" style="background: #f8f9fa; border-radius: 8px; padding: 16px; border: 1px solid #e9ecef;">
+              <div id="produtos-lista" style="max-height: 200px; overflow-y: auto;">
+                <!-- Produtos serão carregados dinamicamente aqui -->
+                <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                  <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                  Nenhum produto/serviço encontrado para este título
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 32px; padding: 24px 0 24px 0; border-top: 1px solid #eee;">
             <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
             <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Salvar</button>
@@ -1276,6 +1293,9 @@
             document.getElementById('modal-vencimento').value = formatarData(titulo.data_vencimento);
             document.getElementById('modal-usuario').value = titulo.usuario_lancamento || '';
             
+            // Carregar produtos do título
+            carregarProdutosTitulo(titulo.id);
+            
             // Título e ícone
             const tituloEl = document.getElementById('modalTituloTitulo');
             const iconEl = document.getElementById('modalTituloIcon');
@@ -1323,6 +1343,82 @@
             }
             modal.style.display = 'flex';
         }
+        
+        // Função para carregar produtos do título
+        async function carregarProdutosTitulo(tituloId) {
+            try {
+                const produtosContainer = document.getElementById('produtos-lista');
+                const semProdutosDiv = document.getElementById('sem-produtos');
+                
+                // Mostrar loading
+                produtosContainer.innerHTML = `
+                    <div style="text-align: center; color: #6c757d; padding: 20px;">
+                        <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+                        Carregando produtos...
+                    </div>
+                `;
+                
+                // Buscar produtos do título
+                const produtos = await window.api.get(`/movimento_comissoes/${tituloId}/produtos`);
+                
+                if (!produtos || produtos.length === 0) {
+                    produtosContainer.innerHTML = `
+                        <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                            <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                            Nenhum produto/serviço encontrado para este título
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Criar tabela de produtos
+                let produtosHTML = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="background: #e9ecef; border-bottom: 2px solid #dee2e6;">
+                                <th style="padding: 12px 8px; text-align: left; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Produto/Serviço</th>
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Qtd</th>
+                                <th style="padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Valor Unit.</th>
+                                <th style="padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                produtos.forEach((produto, index) => {
+                    const nomeProduto = produto.nome || 'Produto não encontrado';
+                    const quantidade = produto.quantidade || 1;
+                    const valorUnitario = produto.valor_unitario || 0;
+                    const valorTotal = produto.valor_total || (quantidade * valorUnitario);
+                    
+                    produtosHTML += `
+                        <tr style="border-bottom: 1px solid #f1f3f4; ${index % 2 === 0 ? 'background: #fff;' : 'background: #f8f9fa;'}">
+                            <td style="padding: 12px 8px; color: #333; font-weight: 500;">${nomeProduto}</td>
+                            <td style="padding: 12px 8px; text-align: center; color: #666;">${quantidade}</td>
+                            <td style="padding: 12px 8px; text-align: right; color: #666;">R$ ${valorUnitario.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td style="padding: 12px 8px; text-align: right; color: #333; font-weight: 600;">R$ ${valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                    `;
+                });
+                
+                produtosHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                produtosContainer.innerHTML = produtosHTML;
+                
+            } catch (error) {
+                console.error('Erro ao carregar produtos do título:', error);
+                document.getElementById('produtos-lista').innerHTML = `
+                    <div style="text-align: center; color: #dc3545; padding: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i>
+                        Erro ao carregar produtos: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
         function fecharModalTitulo() {
             document.getElementById('modalTitulo').style.display = 'none';
         }
@@ -1851,7 +1947,7 @@ window.addEventListener('DOMContentLoaded', async function() {
 <!-- Adicionar modal de sucesso de edição: -->
 <div id="modalSucessoEdicao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-space-between;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
       <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título editado com sucesso!</h2>
       <button class="close-modal" onclick="fecharModalSucessoEdicao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>

@@ -165,11 +165,55 @@ const simularProximoNumeroBase = async (req, res) => {
     }
 };
 
+// Buscar produtos de um título específico
+const buscarProdutosTitulo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Buscar o título
+        const { data: titulo, error: errorTitulo } = await supabase
+            .from('movimento_comissoes')
+            .select('*')
+            .eq('id', id)
+            .single();
+            
+        if (errorTitulo) throw errorTitulo;
+        if (!titulo) return res.status(404).json({ error: 'Título não encontrado' });
+        
+        // Se não há item_id, retornar array vazio
+        if (!titulo.item_id) {
+            return res.json([]);
+        }
+        
+        // Processar o item_id que está no formato "codigo-nome,codigo-nome"
+        const itens = titulo.item_id.split(',').map(item => {
+            const match = item.match(/^(\d{5})-(.+)$/);
+            if (match) {
+                return {
+                    produto_id: match[1],
+                    nome: match[2].trim(),
+                    quantidade: 1,
+                    valor_unitario: titulo.valor_venda || 0,
+                    valor_total: titulo.valor_venda || 0
+                };
+            }
+            return null;
+        }).filter(Boolean);
+        
+        res.json(itens);
+        
+    } catch (error) {
+        console.error('Erro ao buscar produtos do título:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos do título' });
+    }
+};
+
 module.exports = {
     listarMovimentos,
     buscarMovimento,
     criarMovimento,
     atualizarMovimento,
     excluirMovimento,
-    simularProximoNumeroBase
+    simularProximoNumeroBase,
+    buscarProdutosTitulo
 }; 
