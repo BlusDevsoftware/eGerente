@@ -1162,8 +1162,8 @@
 
         // Configuração do Supabase Client (ajuste para o seu projeto)
         const supabase = window.supabase
-          ? window.supabase.createClient('https://<YOUR_PROJECT>.supabase.co', '<YOUR_PUBLIC_ANON_KEY>')
-          : supabase.createClient('https://<YOUR_PROJECT>.supabase.co', '<YOUR_PUBLIC_ANON_KEY>');
+          ? window.supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4')
+          : supabase.createClient('https://hnxjjsiwptkybhwspmvd.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4');
 
         async function uploadComprovanteToSupabase(file, idTitulo) {
           const filePath = `${idTitulo}_${Date.now()}_${file.name}`;
