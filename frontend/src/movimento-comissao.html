@@ -1212,7 +1212,6 @@
                     const diferenca = (valorTitulo - valorPago).toFixed(2);
                     const novoTitulo = {
                         ...titulo,
-                        numero_titulo: `PAR-${titulo.numero_titulo}`,
                         valor: parseFloat(diferenca),
                         valor_pago: 0,
                         data_pagamento: null,
@@ -1223,6 +1222,7 @@
                         id_titulo_origem: titulo.id
                     };
                     delete novoTitulo.id; // Garante que não envia o id antigo
+                    console.log('Novo título parcial enviado para o backend:', novoTitulo); // Log para depuração
                     // Salvar novo título no backend
                     await window.api.post('/movimento_comissoes', novoTitulo);
                     // Adicionar ao array local
