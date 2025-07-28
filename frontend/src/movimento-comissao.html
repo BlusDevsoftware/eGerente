@@ -1225,9 +1225,10 @@
                     delete novoTitulo.numero_titulo; // Garante que não envia o numero_titulo antigo
                     console.log('Novo título parcial enviado para o backend:', novoTitulo); // Log para depuração
                     // Salvar novo título no backend
-                    await window.api.post('/movimento_comissoes', novoTitulo);
-                    // Adicionar ao array local
-                    todosTitulos.push(novoTitulo);
+                    const response = await window.api.post('/movimento_comissoes', novoTitulo);
+                    // O backend retorna um array ou objeto, pegue o título criado:
+                    const tituloCriado = Array.isArray(response) ? response[0] : response;
+                    todosTitulos.push(tituloCriado);
                 }
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
@@ -1379,31 +1380,28 @@
             const modal = document.getElementById('modalTitulo');
             const form = document.getElementById('formModalTitulo');
             document.getElementById('modal-numero').value = titulo.numero_titulo || '';
-            // Campo de origem (só para parciais)
+            // Remover campo de origem do meio do modal, se existir
             let campoOrigem = document.getElementById('modal-numero-origem');
             if (campoOrigem) campoOrigem.remove();
+            let labelOrigem = document.getElementById('label-numero-origem');
+            if (labelOrigem) labelOrigem.remove();
+            // Exibir número do título de origem ao lado do título do modal, apenas para parciais
+            // const tituloEl = document.getElementById('modalTituloTitulo'); // Removido, já existe acima
+            let spanOrigem = document.getElementById('span-numero-origem');
+            if (spanOrigem) spanOrigem.remove();
             if ((titulo.numero_titulo || '').startsWith('PAR-') && titulo.id_titulo_origem) {
                 const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
                 const numeroOrigem = tituloOrigem ? tituloOrigem.numero_titulo : '';
-                const inputOrigem = document.createElement('input');
-                inputOrigem.type = 'text';
-                inputOrigem.id = 'modal-numero-origem';
-                inputOrigem.value = numeroOrigem;
-                inputOrigem.readOnly = true;
-                inputOrigem.style.marginLeft = '8px';
-                inputOrigem.style.width = '140px';
-                inputOrigem.style.background = '#f5f5f5';
-                inputOrigem.style.color = '#1976D2';
-                inputOrigem.style.fontWeight = 'bold';
-                inputOrigem.title = 'Número do título de origem';
-                // Adiciona ao lado do campo número
-                const numeroInput = document.getElementById('modal-numero');
-                numeroInput.parentNode.appendChild(inputOrigem);
-                // Adiciona label
-                let label = document.createElement('label');
-                label.innerHTML = '<i class="fas fa-link" style="color: #2196F3;"></i> Nº Título de Origem';
-                label.style.marginLeft = '8px';
-                numeroInput.parentNode.insertBefore(label, inputOrigem);
+                if (numeroOrigem) {
+                    spanOrigem = document.createElement('span');
+                    spanOrigem.id = 'span-numero-origem';
+                    spanOrigem.style.marginLeft = '18px';
+                    spanOrigem.style.fontWeight = 'bold';
+                    spanOrigem.style.color = '#1976D2';
+                    spanOrigem.style.fontSize = '1em';
+                    spanOrigem.innerHTML = `<i class='fas fa-link' style='color:#2196F3; margin-right:4px;'></i>Origem: <span style='color:#1976D2;'>${numeroOrigem}</span>`;
+                    tituloEl.appendChild(spanOrigem);
+                }
             }
             document.getElementById('modal-status').value = titulo.status || '';
             document.getElementById('modal-colaborador').value = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
