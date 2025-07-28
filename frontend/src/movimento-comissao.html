@@ -1293,8 +1293,8 @@
             document.getElementById('modal-vencimento').value = formatarData(titulo.data_vencimento);
             document.getElementById('modal-usuario').value = titulo.usuario_lancamento || '';
             
-            // Carregar produtos do título
-            carregarProdutosTitulo(titulo.id);
+            // Carregar produtos do título instantaneamente
+            carregarProdutosTituloInstantaneo(titulo);
             
             // Título e ícone
             const tituloEl = document.getElementById('modalTituloTitulo');
@@ -1344,7 +1344,85 @@
             modal.style.display = 'flex';
         }
         
-        // Função para carregar produtos do título
+        // Função para carregar produtos do título instantaneamente (sem requisição)
+        function carregarProdutosTituloInstantaneo(titulo) {
+            const produtosContainer = document.getElementById('produtos-lista');
+            
+            // Se não há item_id, mostrar mensagem de "sem produtos"
+            if (!titulo.item_id) {
+                produtosContainer.innerHTML = `
+                    <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        Nenhum produto/serviço encontrado para este título
+                    </div>
+                `;
+                return;
+            }
+            
+            // Processar o item_id que está no formato "codigo-nome,codigo-nome"
+            const itens = titulo.item_id.split(',').map(item => {
+                const match = item.match(/^(\d{5})-(.+)$/);
+                if (match) {
+                    return {
+                        produto_id: match[1],
+                        nome: match[2].trim(),
+                        quantidade: 1,
+                        valor_unitario: titulo.valor_venda || 0,
+                        valor_total: titulo.valor_venda || 0
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+            
+            if (itens.length === 0) {
+                produtosContainer.innerHTML = `
+                    <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        Nenhum produto/serviço encontrado para este título
+                    </div>
+                `;
+                return;
+            }
+            
+            // Criar tabela de produtos
+            let produtosHTML = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="background: #e9ecef; border-bottom: 2px solid #dee2e6;">
+                            <th style="padding: 12px 8px; text-align: left; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Produto/Serviço</th>
+                            <th style="padding: 12px 8px; text-align: center; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Qtd</th>
+                            <th style="padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Valor Unit.</th>
+                            <th style="padding: 12px 8px; text-align: right; font-weight: 600; color: #495057; border-bottom: 1px solid #dee2e6;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            itens.forEach((produto, index) => {
+                const nomeProduto = produto.nome || 'Produto não encontrado';
+                const quantidade = produto.quantidade || 1;
+                const valorUnitario = produto.valor_unitario || 0;
+                const valorTotal = produto.valor_total || (quantidade * valorUnitario);
+                
+                produtosHTML += `
+                    <tr style="border-bottom: 1px solid #f1f3f4; ${index % 2 === 0 ? 'background: #fff;' : 'background: #f8f9fa;'}">
+                        <td style="padding: 12px 8px; color: #333; font-weight: 500;">${nomeProduto}</td>
+                        <td style="padding: 12px 8px; text-align: center; color: #666;">${quantidade}</td>
+                        <td style="padding: 12px 8px; text-align: right; color: #666;">R$ ${valorUnitario.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td style="padding: 12px 8px; text-align: right; color: #333; font-weight: 600;">R$ ${valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+            });
+            
+            produtosHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            produtosContainer.innerHTML = produtosHTML;
+        }
+        
+        // Função para carregar produtos do título (mantida para compatibilidade, mas não será mais usada)
         async function carregarProdutosTitulo(tituloId) {
             try {
                 const produtosContainer = document.getElementById('produtos-lista');
