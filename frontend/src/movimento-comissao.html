@@ -1178,7 +1178,14 @@
             const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
             const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
             const dataPagamento = document.getElementById('paymentDate').value;
-            const status = document.getElementById('paymentStatus').value;
+            // Mapear status para português
+            const statusMap = {
+                paid: 'PAGO',
+                pending: 'PENDENTE',
+                vencido: 'VENCIDO',
+                'nao-pago': 'CLIENTE NÃO PAGOU'
+            };
+            const status = statusMap[document.getElementById('paymentStatus').value] || 'PENDENTE';
             const observacoes = document.getElementById('paymentNotes').value;
             const titulo = tituloOriginalBaixa;
             if (!titulo) {
@@ -1192,13 +1199,13 @@
                 await window.api.put(`/movimento_comissoes/${titulo.id}`, {
                     valor_pago: valorPago,
                     data_pagamento: dataPagamento,
-                    status: status.toUpperCase(),
+                    status: status,
                     observacoes: observacoes
                 });
                 // Atualizar array local
                 titulo.valor_pago = valorPago;
                 titulo.data_pagamento = dataPagamento;
-                titulo.status = status.toUpperCase();
+                titulo.status = status;
                 titulo.observacoes = observacoes;
                 // Se for baixa parcial, criar novo título
                 if (baixaParcial) {
