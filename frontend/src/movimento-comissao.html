@@ -2341,20 +2341,125 @@
                 console.log('Títulos parciais encontrados:', titulosParciais);
                 console.log('É baixa parcial:', isBaixaParcial);
                 
-                // Se é baixa parcial, mostrar confirmação adicional
+                // Se é baixa parcial, mostrar caixa de confirmação com digitação de CONFIRMO
                 if (isBaixaParcial) {
-                    const confirmacao = confirm(
-                        `Este título possui ${titulosParciais.length} título(s) parcial(is) gerado(s).\n\n` +
-                        `Ao cancelar a baixa, todos os títulos parciais serão excluídos.\n\n` +
-                        `Deseja continuar?`
-                    );
-                    
-                    if (!confirmacao) {
-                        console.log('Cancelamento de baixa parcial cancelado pelo usuário');
-                        return;
-                    }
-                    
-                    // Excluir títulos parciais primeiro
+                    // Mostrar modal de confirmação com digitação de CONFIRMO
+                    mostrarModalConfirmacaoExclusao(titulosParciais, tituloParaCancelarBaixa);
+                    return;
+                }
+                
+                // Se não é baixa parcial, executar cancelamento normal
+                await executarCancelamentoBaixa(tituloParaCancelarBaixa, []);
+                
+            } catch (error) {
+                console.error('Erro ao cancelar baixa:', error);
+                alert(`Erro ao cancelar baixa: ${error.message}`);
+                fecharModalConfirmCancelarBaixa();
+            }
+        }
+
+        function mostrarModalConfirmacaoExclusao(titulosParciais, tituloOriginal) {
+            // Atualizar o modal de confirmação de exclusão
+            const modal = document.getElementById('modalConfirmExclusao');
+            const tituloModal = modal.querySelector('h2');
+            const corpoModal = modal.querySelector('.modal-body');
+            const footerBtns = document.getElementById('footerExclusaoBtns');
+            const footerConfirmo = document.getElementById('footerConfirmoExclusao');
+            
+            // Atualizar título
+            tituloModal.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa Parcial';
+            
+            // Atualizar corpo do modal
+            corpoModal.innerHTML = `
+                <i class="fas fa-undo" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
+                <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a baixa deste título?</div>
+                <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+                <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #e65100;">
+                        <li>Alterar o status para "PENDENTE"</li>
+                        <li>Zerar o valor pago</li>
+                        <li>Limpar a data de pagamento</li>
+                        <li>Remover o comprovante (se existir)</li>
+                        <li style="font-weight: bold; color: #e53935;">Excluir ${titulosParciais.length} título(s) parcial(is):</li>
+                    </ul>
+                    <div style="margin-top: 12px; padding-left: 20px;">
+                        ${titulosParciais.map(t => `<div style="color: #e53935; font-weight: bold;">• ${t.numero_titulo}</div>`).join('')}
+                    </div>
+                </div>
+                <div style="font-size: 0.95em; color: #e53935; font-weight: bold; font-style: italic;">Esta ação não pode ser desfeita.</div>
+            `;
+            
+            // Mostrar botões de confirmação
+            footerBtns.style.display = 'flex';
+            footerConfirmo.style.display = 'none';
+            
+            // Configurar botão de confirmar para abrir caixa de CONFIRMO
+            const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+            btnConfirmar.onclick = () => {
+                footerBtns.style.display = 'none';
+                footerConfirmo.style.display = 'flex';
+                
+                // Adicionar campo de digitação de CONFIRMO
+                const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+                confirmacaoDiv.style.display = 'block';
+                confirmacaoDiv.innerHTML = `
+                    <div style="font-size:1em; color:#e53935; font-weight:600; margin-bottom:8px;">
+                        Digite <b>CONFIRMO</b> para confirmar o cancelamento da baixa parcial:
+                    </div>
+                    <input id="inputConfirmoExclusao" type="text" 
+                           style="padding:8px 12px; border-radius:4px; border:1.5px solid #e53935; font-size:1.1em; outline:none; width: 220px; text-align:center;"
+                           placeholder="Digite CONFIRMO">
+                    <div id="erroConfirmoExclusao" style="color:#e53935; font-size:0.98em; margin-top:6px; display:none;">
+                        Digite exatamente CONFIRMO para prosseguir.
+                    </div>
+                `;
+                
+                // Focar no input
+                setTimeout(() => {
+                    document.getElementById('inputConfirmoExclusao').focus();
+                }, 100);
+            };
+            
+            // Configurar botão de cancelar
+            const btnCancelar = document.getElementById('btnCancelarExclusao');
+            btnCancelar.onclick = () => {
+                fecharModalConfirmCancelarBaixa();
+                fecharModalConfirmExclusao();
+            };
+            
+            // Configurar botão de voltar
+            const btnVoltar = document.getElementById('btnVoltarConfirmoExclusao');
+            btnVoltar.onclick = () => {
+                footerBtns.style.display = 'flex';
+                footerConfirmo.style.display = 'none';
+                document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
+            };
+            
+            // Configurar botão de finalizar
+            const btnFinalizar = document.getElementById('btnFinalizarExclusao');
+            btnFinalizar.onclick = async () => {
+                const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+                const textoConfirmo = inputConfirmo.value.trim();
+                
+                if (textoConfirmo !== 'CONFIRMO') {
+                    document.getElementById('erroConfirmoExclusao').style.display = 'block';
+                    inputConfirmo.style.borderColor = '#e53935';
+                    return;
+                }
+                
+                // Executar cancelamento
+                await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
+                fecharModalConfirmExclusao();
+            };
+            
+            // Mostrar modal
+            modal.style.display = 'flex';
+        }
+
+        async function executarCancelamentoBaixa(tituloOriginal, titulosParciais) {
+            try {
+                // Se há títulos parciais, excluí-los primeiro
+                if (titulosParciais.length > 0) {
                     console.log('Excluindo títulos parciais...');
                     for (const tituloParcial of titulosParciais) {
                         try {
@@ -2412,15 +2517,15 @@
                 console.log('Dados de cancelamento:', dadosCancelamento);
                 
                 // Fazer a chamada para a API
-                await window.api.put(`/movimento_comissoes/${tituloParaCancelarBaixa.id}`, dadosCancelamento);
+                await window.api.put(`/movimento_comissoes/${tituloOriginal.id}`, dadosCancelamento);
                 
                 // Se havia comprovante, remover do Supabase Storage
-                if (tituloParaCancelarBaixa.comprovante_url) {
+                if (tituloOriginal.comprovante_url) {
                     try {
-                        console.log('Removendo comprovante do Supabase Storage:', tituloParaCancelarBaixa.comprovante_url);
+                        console.log('Removendo comprovante do Supabase Storage:', tituloOriginal.comprovante_url);
                         
                         // Extrair o nome do arquivo da URL
-                        const urlParts = tituloParaCancelarBaixa.comprovante_url.split('/');
+                        const urlParts = tituloOriginal.comprovante_url.split('/');
                         const fileName = urlParts[urlParts.length - 1];
                         
                         // Remover arquivo do Supabase Storage
@@ -2439,7 +2544,7 @@
                 }
                 
                 // Atualizar o array local
-                Object.assign(tituloParaCancelarBaixa, dadosCancelamento);
+                Object.assign(tituloOriginal, dadosCancelamento);
                 
                 // Atualizar interface
                 atualizarTabelaComFiltros();
@@ -2453,7 +2558,7 @@
                 const modalSucesso = document.getElementById('modalSucessoCancelarBaixa');
                 const mensagemSucesso = modalSucesso.querySelector('.modal-body div:first-of-type');
                 
-                if (isBaixaParcial) {
+                if (titulosParciais.length > 0) {
                     mensagemSucesso.textContent = `A baixa do título foi cancelada e ${titulosParciais.length} título(s) parcial(is) foi/foram excluído(s).`;
                 } else {
                     mensagemSucesso.textContent = 'A baixa do título foi cancelada.';
@@ -2468,6 +2573,14 @@
                 alert(`Erro ao cancelar baixa: ${error.message}`);
                 fecharModalConfirmCancelarBaixa();
             }
+        }
+
+        function fecharModalConfirmExclusao() {
+            document.getElementById('modalConfirmExclusao').style.display = 'none';
+            // Resetar campos
+            document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
+            document.getElementById('inputConfirmoExclusao').value = '';
+            document.getElementById('erroConfirmoExclusao').style.display = 'none';
         }
 
         function fecharModalSucessoCancelarBaixa() {
