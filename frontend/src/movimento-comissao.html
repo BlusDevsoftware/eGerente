@@ -2051,11 +2051,12 @@
           // Detecta se é parcelado pelo padrão do número do título
           const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
           const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
-          if (match) {
+          if (match && opcoesDiv) {
             opcoesDiv.style.display = 'block';
-            document.querySelector('input[name="exclusaoParcelamento"][value="unico"]').checked = true;
+            const radioUnico = document.querySelector('input[name="exclusaoParcelamento"][value="unico"]');
+            if (radioUnico) radioUnico.checked = true;
             modoExclusaoParcelamento = 'unico';
-          } else {
+          } else if (opcoesDiv) {
             opcoesDiv.style.display = 'none';
             modoExclusaoParcelamento = 'unico';
           }
@@ -2064,18 +2065,33 @@
               modoExclusaoParcelamento = this.value;
             };
           });
-          document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
-          document.getElementById('animacaoExclusaoDiv').style.display = 'none';
-          document.getElementById('footerExclusaoBtns').style.display = 'flex';
-          document.getElementById('footerConfirmoExclusao').style.display = 'none';
-          document.getElementById('inputConfirmoExclusao').value = '';
-          document.getElementById('erroConfirmoExclusao').style.display = 'none';
-          document.getElementById('modalConfirmExclusao').style.display = 'flex';
+          
+          // Verificar e configurar elementos com segurança
+          const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+          if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+          
+          const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+          if (animacaoDiv) animacaoDiv.style.display = 'none';
+          
+          const footerBtns = document.getElementById('footerExclusaoBtns');
+          if (footerBtns) footerBtns.style.display = 'flex';
+          
+          const footerConfirmo = document.getElementById('footerConfirmoExclusao');
+          if (footerConfirmo) footerConfirmo.style.display = 'none';
+          
+          const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+          if (inputConfirmo) inputConfirmo.value = '';
+          
+          const erroConfirmo = document.getElementById('erroConfirmoExclusao');
+          if (erroConfirmo) erroConfirmo.style.display = 'none';
+          
+          const modal = document.getElementById('modalConfirmExclusao');
+          if (modal) modal.style.display = 'flex';
         }
         function fecharModalConfirmExclusao() {
           const modal = document.getElementById('modalConfirmExclusao');
           if (modal) modal.style.display = 'none';
-          // Resetar campos
+          // Resetar campos com segurança
           const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
           if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
           const inputConfirmo = document.getElementById('inputConfirmoExclusao');
@@ -2092,16 +2108,29 @@
         if (btnVoltarConfirmoExclusao) btnVoltarConfirmoExclusao.onclick = function() { /* lógica de voltar */ };
         const btnFinalizarExclusao = document.getElementById('btnFinalizarExclusao');
         if (btnFinalizarExclusao) btnFinalizarExclusao.onclick = async function() {
-          const input = document.getElementById('inputConfirmoExclusao').value.trim();
+          const inputElement = document.getElementById('inputConfirmoExclusao');
+          if (!inputElement) return;
+          
+          const input = inputElement.value.trim();
           if (input !== 'CONFIRMO') {
-            document.getElementById('erroConfirmoExclusao').style.display = 'block';
-            document.getElementById('inputConfirmoExclusao').focus();
+            const erroElement = document.getElementById('erroConfirmoExclusao');
+            if (erroElement) erroElement.style.display = 'block';
+            inputElement.focus();
             return;
           }
-          document.getElementById('erroConfirmoExclusao').style.display = 'none';
-          document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
-          document.getElementById('footerConfirmoExclusao').style.display = 'none';
-          document.getElementById('animacaoExclusaoDiv').style.display = 'block';
+          
+          const erroElement = document.getElementById('erroConfirmoExclusao');
+          if (erroElement) erroElement.style.display = 'none';
+          
+          const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+          if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+          
+          const footerConfirmo = document.getElementById('footerConfirmoExclusao');
+          if (footerConfirmo) footerConfirmo.style.display = 'none';
+          
+          const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+          if (animacaoDiv) animacaoDiv.style.display = 'block';
+          
           // Animação de exclusão
           let titulosExcluir = [];
           if (modoExclusaoParcelamento === 'unico') {
@@ -2113,7 +2142,10 @@
           titulosParaExcluirAnimacao = titulosExcluir;
           let contador = 0;
           for (const t of titulosExcluir) {
-            document.getElementById('contadorExclusao').textContent = `Excluindo ${contador + 1} de ${titulosExcluir.length}...`;
+            const contadorElement = document.getElementById('contadorExclusao');
+            if (contadorElement) {
+              contadorElement.textContent = `Excluindo ${contador + 1} de ${titulosExcluir.length}...`;
+            }
             await window.api.delete(`/movimento_comissoes/${t.id}`);
             contador++;
             await new Promise(res => setTimeout(res, 350)); // pequena pausa para visualização
@@ -2127,12 +2159,15 @@
         };
 
         function abrirModalSucessoExclusao() {
-          document.getElementById('modalSucessoExclusao').style.display = 'flex';
+          const modal = document.getElementById('modalSucessoExclusao');
+          if (modal) modal.style.display = 'flex';
         }
         function fecharModalSucessoExclusao() {
-          document.getElementById('modalSucessoExclusao').style.display = 'none';
+          const modal = document.getElementById('modalSucessoExclusao');
+          if (modal) modal.style.display = 'none';
         }
-        document.getElementById('btnOkSucessoExclusao').onclick = fecharModalSucessoExclusao;
+        const btnOkSucessoExclusao = document.getElementById('btnOkSucessoExclusao');
+        if (btnOkSucessoExclusao) btnOkSucessoExclusao.onclick = fecharModalSucessoExclusao;
 
         function abrirModalTimeline(eventos) {
           const modal = document.getElementById('modalTimeline');
@@ -2588,7 +2623,8 @@
         }
 
         function fecharModalConfirmExclusao() {
-            document.getElementById('modalConfirmExclusao').style.display = 'none';
+            const modal = document.getElementById('modalConfirmExclusao');
+            if (modal) modal.style.display = 'none';
             // Resetar campos
             document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
             document.getElementById('inputConfirmoExclusao').value = '';
@@ -2596,7 +2632,8 @@
         }
 
         function fecharModalSucessoCancelarBaixa() {
-            document.getElementById('modalSucessoCancelarBaixa').style.display = 'none';
+            const modal = document.getElementById('modalSucessoCancelarBaixa');
+            if (modal) modal.style.display = 'none';
         }
 
         // Adicionar evento ao botão OK do modal de sucesso
@@ -2771,12 +2808,15 @@ window.addEventListener('DOMContentLoaded', async function() {
 </div>
 <script>
 function abrirModalSucessoEdicao() {
-  document.getElementById('modalSucessoEdicao').style.display = 'flex';
+  const modal = document.getElementById('modalSucessoEdicao');
+  if (modal) modal.style.display = 'flex';
 }
 function fecharModalSucessoEdicao() {
-  document.getElementById('modalSucessoEdicao').style.display = 'none';
+  const modal = document.getElementById('modalSucessoEdicao');
+  if (modal) modal.style.display = 'none';
 }
-document.getElementById('btnOkSucessoEdicao').onclick = fecharModalSucessoEdicao;
+const btnOkSucessoEdicao = document.getElementById('btnOkSucessoEdicao');
+if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
         
         // Evento para salvar o modal de título
         document.getElementById('btnSalvarModalTitulo').addEventListener('click', async function(e) {
@@ -2871,7 +2911,8 @@ function abrirModalBaixaMultipla(titulos) {
 
 <script>
 function fecharModalBaixaMultipla() {
-  document.getElementById('modalBaixaMultipla').style.display = 'none';
+  const modal = document.getElementById('modalBaixaMultipla');
+  if (modal) modal.style.display = 'none';
 }
 </script>
 
@@ -2907,8 +2948,12 @@ function verificarBaixaParcial() {
   const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
   if (valorPago < valorTitulo && !baixaParcialConfirmada) {
     baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
-    document.getElementById('msgBaixaParcial').innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
-    document.getElementById('modalConfirmBaixaParcial').style.display = 'flex';
+    const msgElement = document.getElementById('msgBaixaParcial');
+    if (msgElement) {
+      msgElement.innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+    }
+    const modal = document.getElementById('modalConfirmBaixaParcial');
+    if (modal) modal.style.display = 'flex';
     // Remover aviso de novo título se existir
     let aviso = document.getElementById('avisoNovoTitulo');
     if (aviso) aviso.remove();
@@ -2917,27 +2962,30 @@ function verificarBaixaParcial() {
 
 // Ao tentar submeter o form de baixa
 const paymentForm = document.getElementById('paymentForm');
-paymentForm.addEventListener('submit', function(e) {
-  const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
-  const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
-  if (valorPago < valorTitulo && !baixaParcialConfirmada) {
-    e.preventDefault();
-    baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
-    document.getElementById('msgBaixaParcial').innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
-    document.getElementById('modalConfirmBaixaParcial').style.display = 'flex';
-    return false;
-  }
-  // Aqui segue o fluxo normal de baixa (já confirmado)
-  baixaParcialConfirmada = false;
-});
-
-function fecharModalConfirmBaixaParcial() {
-  document.getElementById('modalConfirmBaixaParcial').style.display = 'none';
-  baixaParcialConfirmada = false;
+if (paymentForm) {
+  paymentForm.addEventListener('submit', function(e) {
+    const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
+    const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+    if (valorPago < valorTitulo && !baixaParcialConfirmada) {
+      e.preventDefault();
+      baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
+      const msgElement = document.getElementById('msgBaixaParcial');
+      if (msgElement) {
+        msgElement.innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+      }
+      const modal = document.getElementById('modalConfirmBaixaParcial');
+      if (modal) modal.style.display = 'flex';
+      return false;
+    }
+    // Aqui segue o fluxo normal de baixa (já confirmado)
+    baixaParcialConfirmada = false;
+  });
 }
+
 function confirmarBaixaParcial() {
   baixaParcialConfirmada = true;
-  document.getElementById('modalConfirmBaixaParcial').style.display = 'none';
+  const modal = document.getElementById('modalConfirmBaixaParcial');
+  if (modal) modal.style.display = 'none';
   // Exibir bloco de simulação do novo título no modal de baixa
   let simulacao = document.getElementById('simulacaoNovoTitulo');
   if (!simulacao) {
@@ -2945,8 +2993,10 @@ function confirmarBaixaParcial() {
     simulacao.id = 'simulacaoNovoTitulo';
     simulacao.style = 'margin: 18px 0 0 0;';
     // Inserir logo acima dos botões de ação
-    const formActions = paymentForm.querySelector('.form-actions');
-    paymentForm.insertBefore(simulacao, formActions);
+    const formActions = paymentForm && paymentForm.querySelector('.form-actions');
+    if (formActions) {
+      paymentForm.insertBefore(simulacao, formActions);
+    }
   }
   // Usar a variável global para o número do título original
   const numeroOriginal = tituloOriginalBaixa && tituloOriginalBaixa.numero_titulo ? tituloOriginalBaixa.numero_titulo : '';
