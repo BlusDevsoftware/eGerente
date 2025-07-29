@@ -2475,6 +2475,13 @@
             const tituloModal = modal.querySelector('h2');
             const listaDiv = document.getElementById('listaTitulosParciais');
             const footerBtns = document.getElementById('footerExclusaoBtns');
+            const opcoesParcelamento = document.getElementById('opcoesExclusaoParcelamento');
+            
+            // Esconder as opções de exclusão de parcelamento (não aplicável para cancelamento de baixa)
+            if (opcoesParcelamento) {
+                opcoesParcelamento.style.display = 'none';
+            }
+            
             // Atualizar título
             tituloModal.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa Parcial';
             // Atualizar lista de títulos parciais
