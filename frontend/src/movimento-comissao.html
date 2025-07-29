@@ -1997,8 +1997,14 @@
           document.getElementById('modalConfirmExclusao').style.display = 'flex';
         }
         function fecharModalConfirmExclusao() {
-          document.getElementById('modalConfirmExclusao').style.display = 'none';
-          tituloParaExcluir = null;
+          const modal = document.getElementById('modalConfirmExclusao');
+          if (modal) modal.style.display = 'none';
+          const confirmDiv = document.getElementById('confirmacaoExclusaoDiv');
+          if (confirmDiv) confirmDiv.style.display = 'none';
+          const input = document.getElementById('inputConfirmoExclusao');
+          if (input) input.value = '';
+          const erroDiv = document.getElementById('erroConfirmoExclusao');
+          if (erroDiv) erroDiv.style.display = 'none';
         }
         // Protege todos os pontos de onclick por id
         const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
