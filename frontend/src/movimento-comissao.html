@@ -2109,7 +2109,11 @@
         const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
         if (btnCancelarExclusao) btnCancelarExclusao.onclick = fecharModalConfirmExclusao;
         const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
-        if (btnConfirmarExclusao) btnConfirmarExclusao.onclick = function() { /* lógica de confirmação */ };
+        if (btnConfirmarExclusao) btnConfirmarExclusao.onclick = function() {
+          if (tituloParaExcluir && tituloParaExcluir.onConfirm) {
+            tituloParaExcluir.onConfirm(modoExclusaoParcelamento);
+          }
+        };
         const btnVoltarConfirmoExclusao = document.getElementById('btnVoltarConfirmoExclusao');
         if (btnVoltarConfirmoExclusao) btnVoltarConfirmoExclusao.onclick = function() { /* lógica de voltar */ };
         const btnFinalizarExclusao = document.getElementById('btnFinalizarExclusao');
