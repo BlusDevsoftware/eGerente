@@ -2101,8 +2101,11 @@
         function fecharModalConfirmExclusao() {
           console.log('Executando fecharModalConfirmExclusao...');
           const modal = document.getElementById('modalConfirmExclusao');
+          console.log('Modal encontrado:', modal);
           if (modal) {
+            console.log('Display antes de fechar:', modal.style.display);
             modal.style.display = 'none';
+            console.log('Display após fechar:', modal.style.display);
             console.log('Modal de confirmação fechado com sucesso');
           } else {
             console.log('Modal de confirmação não encontrado');
@@ -2198,8 +2201,12 @@
           titulosFiltrados = titulosFiltrados.filter(t => !titulosExcluir.some(te => te.id === t.id));
           atualizarTabelaComFiltros();
           atualizarCardsTotalizadores();
+          console.log('Antes de fechar modal de confirmação...');
+          console.log('Modal atual:', document.getElementById('modalConfirmExclusao'));
+          console.log('Display atual:', document.getElementById('modalConfirmExclusao')?.style.display);
           fecharModalConfirmExclusao();
           console.log('Modal de confirmação fechado, abrindo modal de sucesso...');
+          console.log('Display após fechar:', document.getElementById('modalConfirmExclusao')?.style.display);
           abrirModalSucessoExclusao();
         };
 
