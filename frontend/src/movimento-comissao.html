@@ -1904,6 +1904,15 @@
                             titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
                             atualizarTabelaComFiltros();
                             atualizarCardsTotalizadores();
+                            
+                            // Teste direto para forçar fechamento
+                            const modalElement = document.getElementById('modalConfirmExclusao');
+                            if (modalElement) {
+                              console.log('Fechando modal diretamente (primeira implementação)...');
+                              modalElement.style.display = 'none';
+                              console.log('Display após fechamento direto:', modalElement.style.display);
+                            }
+                            
                             fecharModalConfirmExclusao();
                             abrirModalSucessoExclusao();
                         } else {
@@ -2206,6 +2215,15 @@
           console.log('Antes de fechar modal de confirmação...');
           console.log('Modal atual:', document.getElementById('modalConfirmExclusao'));
           console.log('Display atual:', document.getElementById('modalConfirmExclusao')?.style.display);
+          
+          // Teste direto para forçar fechamento
+          const modalElement = document.getElementById('modalConfirmExclusao');
+          if (modalElement) {
+            console.log('Fechando modal diretamente...');
+            modalElement.style.display = 'none';
+            console.log('Display após fechamento direto:', modalElement.style.display);
+          }
+          
           fecharModalConfirmExclusao();
           console.log('Modal de confirmação fechado, abrindo modal de sucesso...');
           console.log('Display após fechar:', document.getElementById('modalConfirmExclusao')?.style.display);
