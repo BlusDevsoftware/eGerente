@@ -2675,12 +2675,9 @@
         }
 
         function fecharModalConfirmExclusao() {
-            const modal = document.getElementById('modalConfirmExclusao');
-            if (modal) modal.style.display = 'none';
-            // Resetar campos
-            document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
-            document.getElementById('inputConfirmoExclusao').value = '';
-            document.getElementById('erroConfirmoExclusao').style.display = 'none';
+            // Esta é a função duplicada - redirecionando para a função principal
+            // A função principal está na linha 2100 com verificações de segurança
+            return;
         }
 
         function fecharModalSucessoCancelarBaixa() {
