@@ -1106,11 +1106,6 @@
               <input type="radio" name="exclusaoParcelamento" value="todos" style="accent-color: #e53935;"> Excluir todos os títulos deste parcelamento
             </label>
           </div>
-          <div id="confirmacaoExclusaoDiv" style="display:none; margin-top: 24px;">
-            <div style="font-size:1em; color:#e53935; font-weight:600; margin-bottom:8px;">Digite <b>CONFIRMO</b> para confirmar a exclusão:</div>
-            <input id="inputConfirmoExclusao" type="text" style="padding:8px 12px; border-radius:4px; border:1.5px solid #e53935; font-size:1.1em; outline:none; width: 220px; text-align:center;">
-            <div id="erroConfirmoExclusao" style="color:#e53935; font-size:0.98em; margin-top:6px; display:none;">Digite exatamente CONFIRMO para prosseguir.</div>
-          </div>
           <div id="animacaoExclusaoDiv" style="display:none; margin-top: 24px;">
             <div style="font-size:1.1em; color:#1976D2; font-weight:600; margin-bottom:8px;">Excluindo títulos...</div>
             <div id="contadorExclusao" style="font-size:1.2em; color:#1976D2; font-weight:700;"></div>
@@ -1119,10 +1114,6 @@
         <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
           <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
           <button id="btnConfirmarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Excluir</button>
-        </div>
-        <div class="modal-footer" id="footerConfirmoExclusao" style="display:none; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
-          <button id="btnVoltarConfirmoExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-arrow-left"></i> Voltar</button>
-          <button id="btnFinalizarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Confirmar Exclusão</button>
         </div>
       </div>
     </div>
@@ -2364,18 +2355,15 @@
             const tituloModal = modal.querySelector('h2');
             const listaDiv = document.getElementById('listaTitulosParciais');
             const footerBtns = document.getElementById('footerExclusaoBtns');
-            const footerConfirmo = document.getElementById('footerConfirmoExclusao');
-
             // Atualizar título
             tituloModal.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa Parcial';
-
             // Atualizar lista de títulos parciais
             if (listaDiv) {
                 listaDiv.innerHTML = `
                     <div style="font-size: 1em; color: #888; margin-bottom: 8px;">Esta ação irá:</div>
                     <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 8px;">
                         <ul style="margin: 0; padding-left: 20px; color: #e65100;">
-                            <li>Alterar o status para "PENDENTE"</li>
+                            <li>Alterar o status para \"PENDENTE\"</li>
                             <li>Zerar o valor pago</li>
                             <li>Limpar a data de pagamento</li>
                             <li>Remover o comprovante (se existir)</li>
@@ -2390,8 +2378,15 @@
             }
             // Mostrar botões de confirmação
             footerBtns.style.display = 'flex';
-            footerConfirmo.style.display = 'none';
-            // O restante do fluxo permanece igual
+            // Reatribuir evento do botão de confirmação para executar o cancelamento diretamente
+            const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+            if (btnConfirmar) {
+                btnConfirmar.onclick = async function() {
+                    await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
+                    fecharModalConfirmExclusao();
+                };
+            }
+            modal.style.display = 'flex';
         }
 
         async function executarCancelamentoBaixa(tituloOriginal, titulosParciais) {
