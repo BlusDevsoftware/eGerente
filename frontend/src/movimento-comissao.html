@@ -1594,7 +1594,7 @@
             document.querySelectorAll('.nav-menu a').forEach(function(link) {
                 link.addEventListener('click', function() {
                     // Fecha todos os modais conhecidos
-                    var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado'];
+                    var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado', 'modalTituloPagoNaoPodeExcluir'];
                     modais.forEach(function(id) {
                         var modal = document.getElementById(id);
                         if (modal) modal.style.display = 'none';
@@ -2047,6 +2047,12 @@
         let modoExclusaoParcelamento = 'unico';
         let titulosParaExcluirAnimacao = [];
         function abrirModalConfirmExclusao(titulo, onConfirm) {
+          // Verificar se o título está com status PAGO
+          if (titulo.status && titulo.status.toUpperCase() === 'PAGO') {
+            mostrarModalTituloPagoNaoPodeExcluir(titulo);
+            return;
+          }
+          
           tituloParaExcluir = { titulo, onConfirm };
           // Detecta se é parcelado pelo padrão do número do título
           const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
@@ -2643,6 +2649,96 @@
                 btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
             }
         });
+
+        function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
+          // Criar ou atualizar o modal dinamicamente
+          let modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+          
+          if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalTituloPagoNaoPodeExcluir';
+            modal.className = 'modal';
+            modal.style.cssText = 'display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;';
+            
+            modal.innerHTML = `
+              <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+                <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+                  <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Título Já Pago</h2>
+                  <button class="close-modal" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+                  <i class="fas fa-ban" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+                  <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Não é possível excluir este título!</div>
+                  <div style="font-size: 1em; color: #888; margin-bottom: 18px;">O título está com status "PAGO" e não pode ser excluído.</div>
+                  
+                  <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+                    <div style="font-weight: 600; color: #e65100; margin-bottom: 8px;">Detalhes do Título:</div>
+                    <div style="color: #e65100; font-size: 0.95em;">
+                      <div><strong>Nº Título:</strong> ${titulo.numero_titulo || ''}</div>
+                      <div><strong>Status:</strong> ${titulo.status || ''}</div>
+                      <div><strong>Data de Pagamento:</strong> ${formatarDataLocal(titulo.data_pagamento) || 'Não informada'}</div>
+                      <div><strong>Valor Pago:</strong> ${formatarValorLocal(titulo.valor_pago) || 'Não informado'}</div>
+                      <div><strong>Observações:</strong> ${titulo.observacoes || 'Nenhuma'}</div>
+                    </div>
+                  </div>
+                  
+                  <div style="font-size: 0.95em; color: #666; font-style: italic; margin-bottom: 18px;">
+                    Para excluir este título, você deve primeiro cancelar a baixa através da opção "Cancelar Baixa" no menu de ações.
+                  </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+                  <button class="btn-secondary" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="padding: 10px 24px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Entendi</button>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(modal);
+          } else {
+            // Atualizar o conteúdo do modal existente
+            const tituloElement = modal.querySelector('.modal-body div:nth-child(4) div:nth-child(2) div:nth-child(1)');
+            if (tituloElement) tituloElement.innerHTML = `<strong>Nº Título:</strong> ${titulo.numero_titulo || ''}`;
+            
+            const statusElement = modal.querySelector('.modal-body div:nth-child(4) div:nth-child(2) div:nth-child(2)');
+            if (statusElement) statusElement.innerHTML = `<strong>Status:</strong> ${titulo.status || ''}`;
+            
+            const dataPagamentoElement = modal.querySelector('.modal-body div:nth-child(4) div:nth-child(2) div:nth-child(3)');
+            if (dataPagamentoElement) dataPagamentoElement.innerHTML = `<strong>Data de Pagamento:</strong> ${formatarDataLocal(titulo.data_pagamento) || 'Não informada'}`;
+            
+            const valorPagoElement = modal.querySelector('.modal-body div:nth-child(4) div:nth-child(2) div:nth-child(4)');
+            if (valorPagoElement) valorPagoElement.innerHTML = `<strong>Valor Pago:</strong> ${formatarValorLocal(titulo.valor_pago) || 'Não informado'}`;
+            
+            const observacoesElement = modal.querySelector('.modal-body div:nth-child(4) div:nth-child(2) div:nth-child(5)');
+            if (observacoesElement) observacoesElement.innerHTML = `<strong>Observações:</strong> ${titulo.observacoes || 'Nenhuma'}`;
+          }
+          
+          modal.style.display = 'flex';
+        }
+        
+        function fecharModalTituloPagoNaoPodeExcluir() {
+          const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+          if (modal) modal.style.display = 'none';
+        }
+        
+        // Event listener para fechar modal ao clicar fora
+        window.addEventListener('click', function(event) {
+          const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+          if (event.target === modal) {
+            fecharModalTituloPagoNaoPodeExcluir();
+          }
+        });
+        
+        // Funções auxiliares locais para formatação
+        function formatarValorLocal(valor) {
+          if (!valor) return '';
+          return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+        
+        function formatarDataLocal(data) {
+          if (!data) return '';
+          const d = new Date(data);
+          if (isNaN(d)) return data;
+          return d.toLocaleDateString('pt-BR');
+        }
     </script>
 
     <script src="scripts/navigation.js"></script>
@@ -2655,7 +2751,7 @@
         // Fecha todos os modais ao clicar em qualquer link do menu lateral
         document.querySelectorAll('.nav-menu a').forEach(function(link) {
             link.addEventListener('click', function() {
-                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado'];
+                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado', 'modalTituloPagoNaoPodeExcluir'];
                 modais.forEach(function(id) {
                     var modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
