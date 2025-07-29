@@ -2395,30 +2395,37 @@
             
             // Configurar botão de confirmar para abrir caixa de CONFIRMO
             const btnConfirmar = document.getElementById('btnConfirmarExclusao');
-            btnConfirmar.onclick = () => {
-                footerBtns.style.display = 'none';
-                footerConfirmo.style.display = 'flex';
-                
-                // Adicionar campo de digitação de CONFIRMO
-                const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
-                confirmacaoDiv.style.display = 'block';
-                confirmacaoDiv.innerHTML = `
-                    <div style="font-size:1em; color:#e53935; font-weight:600; margin-bottom:8px;">
-                        Digite <b>CONFIRMO</b> para confirmar o cancelamento da baixa parcial:
-                    </div>
-                    <input id="inputConfirmoExclusao" type="text" 
-                           style="padding:8px 12px; border-radius:4px; border:1.5px solid #e53935; font-size:1.1em; outline:none; width: 220px; text-align:center;"
-                           placeholder="Digite CONFIRMO">
-                    <div id="erroConfirmoExclusao" style="color:#e53935; font-size:0.98em; margin-top:6px; display:none;">
-                        Digite exatamente CONFIRMO para prosseguir.
-                    </div>
-                `;
-                
-                // Focar no input
-                setTimeout(() => {
-                    document.getElementById('inputConfirmoExclusao').focus();
-                }, 100);
-            };
+            if (btnConfirmar) {
+                btnConfirmar.onclick = () => {
+                    if (!footerBtns || !footerConfirmo) {
+                        alert('Erro interno: botões do rodapé não encontrados!');
+                        return;
+                    }
+                    footerBtns.style.display = 'none';
+                    footerConfirmo.style.display = 'flex';
+                    const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+                    if (!confirmacaoDiv) {
+                        alert('Erro interno: campo de confirmação não encontrado!');
+                        return;
+                    }
+                    confirmacaoDiv.style.display = 'block';
+                    confirmacaoDiv.innerHTML = `
+                        <div style="font-size:1em; color:#e53935; font-weight:600; margin-bottom:8px;">
+                            Digite <b>CONFIRMO</b> para confirmar o cancelamento da baixa parcial:
+                        </div>
+                        <input id="inputConfirmoExclusao" type="text" 
+                               style="padding:8px 12px; border-radius:4px; border:1.5px solid #e53935; font-size:1.1em; outline:none; width: 220px; text-align:center;"
+                               placeholder="Digite CONFIRMO">
+                        <div id="erroConfirmoExclusao" style="color:#e53935; font-size:0.98em; margin-top:6px; display:none;">
+                            Digite exatamente CONFIRMO para prosseguir.
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        const input = document.getElementById('inputConfirmoExclusao');
+                        if (input) input.focus();
+                    }, 100);
+                };
+            }
             
             // Configurar botão de cancelar
             const btnCancelar = document.getElementById('btnCancelarExclusao');
@@ -2429,28 +2436,40 @@
             
             // Configurar botão de voltar
             const btnVoltar = document.getElementById('btnVoltarConfirmoExclusao');
-            btnVoltar.onclick = () => {
-                footerBtns.style.display = 'flex';
-                footerConfirmo.style.display = 'none';
-                document.getElementById('confirmacaoExclusaoDiv').style.display = 'none';
-            };
+            if (btnVoltar) {
+                btnVoltar.onclick = () => {
+                    if (!footerBtns || !footerConfirmo) {
+                        alert('Erro interno: botões do rodapé não encontrados!');
+                        return;
+                    }
+                    footerBtns.style.display = 'flex';
+                    footerConfirmo.style.display = 'none';
+                    const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+                    if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+                };
+            }
             
             // Configurar botão de finalizar
             const btnFinalizar = document.getElementById('btnFinalizarExclusao');
-            btnFinalizar.onclick = async () => {
-                const inputConfirmo = document.getElementById('inputConfirmoExclusao');
-                const textoConfirmo = inputConfirmo.value.trim();
-                
-                if (textoConfirmo !== 'CONFIRMO') {
-                    document.getElementById('erroConfirmoExclusao').style.display = 'block';
-                    inputConfirmo.style.borderColor = '#e53935';
-                    return;
-                }
-                
-                // Executar cancelamento
-                await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
-                fecharModalConfirmExclusao();
-            };
+            if (btnFinalizar) {
+                btnFinalizar.onclick = async () => {
+                    const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+                    if (!inputConfirmo) {
+                        alert('Campo de confirmação não encontrado!');
+                        return;
+                    }
+                    const textoConfirmo = inputConfirmo.value.trim();
+                    if (textoConfirmo !== 'CONFIRMO') {
+                        const erroDiv = document.getElementById('erroConfirmoExclusao');
+                        if (erroDiv) erroDiv.style.display = 'block';
+                        inputConfirmo.style.borderColor = '#e53935';
+                        return;
+                    }
+                    // Executar cancelamento
+                    await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
+                    fecharModalConfirmExclusao();
+                };
+            }
             
             // Mostrar modal
             modal.style.display = 'flex';
