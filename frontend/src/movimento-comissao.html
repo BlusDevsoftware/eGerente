@@ -1999,6 +1999,13 @@
         function fecharModalConfirmExclusao() {
           const modal = document.getElementById('modalConfirmExclusao');
           if (modal) modal.style.display = 'none';
+          // Resetar campos
+          const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+          if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+          const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+          if (inputConfirmo) inputConfirmo.value = '';
+          const erroConfirmo = document.getElementById('erroConfirmoExclusao');
+          if (erroConfirmo) erroConfirmo.style.display = 'none';
         }
         // Protege todos os pontos de onclick por id
         const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
