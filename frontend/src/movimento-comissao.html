@@ -2099,8 +2099,14 @@
           if (modal) modal.style.display = 'flex';
         }
         function fecharModalConfirmExclusao() {
+          console.log('Executando fecharModalConfirmExclusao...');
           const modal = document.getElementById('modalConfirmExclusao');
-          if (modal) modal.style.display = 'none';
+          if (modal) {
+            modal.style.display = 'none';
+            console.log('Modal de confirmação fechado com sucesso');
+          } else {
+            console.log('Modal de confirmação não encontrado');
+          }
           // Resetar campos com segurança
           const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
           if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
@@ -2193,6 +2199,7 @@
           atualizarTabelaComFiltros();
           atualizarCardsTotalizadores();
           fecharModalConfirmExclusao();
+          console.log('Modal de confirmação fechado, abrindo modal de sucesso...');
           abrirModalSucessoExclusao();
         };
 
