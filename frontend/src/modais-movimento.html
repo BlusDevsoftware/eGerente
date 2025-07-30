@@ -14,22 +14,44 @@
       <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
       <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
       <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
-      <div id="listaTitulosParciais" style="margin-bottom: 18px;"></div>
-      <div id="opcoesExclusaoParcelamento" style="margin: 18px 0 0 0; display: none; text-align: left;">
-        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor:pointer;">
-          <input type="radio" name="exclusaoParcelamento" value="unico" checked style="accent-color: #e53935;"> Excluir apenas este título
+      
+      <!-- Informações do título -->
+      <div style="background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left;">
+        <div style="margin-bottom: 8px;"><strong>Número:</strong> <span id="numeroTituloExclusao"></span></div>
+        <div style="margin-bottom: 8px;"><strong>Colaborador:</strong> <span id="colaboradorTituloExclusao"></span></div>
+        <div style="margin-bottom: 8px;"><strong>Valor:</strong> <span id="valorTituloExclusao"></span></div>
+        <div><strong>Status:</strong> <span id="statusTituloExclusao"></span></div>
+      </div>
+      
+      <!-- Opções de exclusão para parcelamentos -->
+      <div id="opcoesExclusaoParcelamento" style="display: none; background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left;">
+        <div style="font-weight: 500; margin-bottom: 12px; color: #333;">Opções de exclusão:</div>
+        <label style="display: flex; align-items: center; margin-bottom: 8px; cursor: pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="unico" checked style="margin-right: 8px;">
+          <span>Excluir apenas este título</span>
         </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor:pointer;">
-          <input type="radio" name="exclusaoParcelamento" value="todos" style="accent-color: #e53935;"> Excluir todos os títulos deste parcelamento
+        <label style="display: flex; align-items: center; cursor: pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="todos" style="margin-right: 8px;">
+          <span>Excluir todos os títulos do parcelamento</span>
         </label>
       </div>
-      <div id="animacaoExclusaoDiv" style="display:none; margin-top: 24px;">
-        <div style="font-size:1.1em; color:#1976D2; font-weight:600; margin-bottom:12px;">Excluindo títulos...</div>
-        <div id="contadorExclusao" style="font-size:1.2em; color:#1976D2; font-weight:700; margin-bottom:8px;"></div>
-        <div id="percentualExclusao" style="font-size:1em; color:#666; margin-bottom:12px;"></div>
-        <div style="width:100%; background-color:#e3f2fd; border-radius:8px; height:8px; overflow:hidden;">
-          <div id="barraProgressoExclusao" style="width:0%; height:100%; background-color:#1976D2; border-radius:8px; transition:width 0.3s ease;"></div>
+      
+      <!-- Lista de títulos parciais -->
+      <div id="listaTitulosParciais" style="display: none; background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 18px; text-align: left;">
+        <div style="font-weight: 500; margin-bottom: 8px; color: #333;">Títulos relacionados:</div>
+        <div id="titulosParciaisLista" style="max-height: 100px; overflow-y: auto; font-size: 0.9em;"></div>
+      </div>
+      
+      <!-- Animação de exclusão -->
+      <div id="animacaoExclusaoDiv" style="display: none; margin-bottom: 18px;">
+        <div style="font-weight: 500; margin-bottom: 12px; color: #1976D2;">
+          <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+          Excluindo título...
         </div>
+        <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 8px; overflow: hidden;">
+          <div id="barraProgressoExclusao" style="width: 0%; height: 100%; background-color: #1976D2; border-radius: 8px; transition: width 0.3s ease;"></div>
+        </div>
+        <div id="textoProgressoExclusao" style="font-size: 0.9em; color: #666; margin-top: 8px;">Iniciando exclusão...</div>
       </div>
     </div>
     <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
@@ -152,11 +174,34 @@ async function confirmarExclusao(modo) {
   const titulo = tituloParaExcluir.titulo;
   console.log('Executando exclusão do título:', titulo.numero_titulo, 'modo:', modo);
   
+  // Mostrar animação de exclusão
+  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+  const footerBtns = document.getElementById('footerExclusaoBtns');
+  const barraProgresso = document.getElementById('barraProgressoExclusao');
+  const textoProgresso = document.getElementById('textoProgressoExclusao');
+  
+  if (animacaoDiv) animacaoDiv.style.display = 'block';
+  if (footerBtns) footerBtns.style.display = 'none';
+  if (barraProgresso) barraProgresso.style.width = '0%';
+  if (textoProgresso) textoProgresso.textContent = 'Iniciando exclusão...';
+  
   try {
     if (modo === 'unico') {
       // Excluir apenas o título atual
       console.log('Excluindo título único:', titulo.id);
+      
+      // Atualizar progresso
+      if (barraProgresso) barraProgresso.style.width = '50%';
+      if (textoProgresso) textoProgresso.textContent = 'Excluindo título...';
+      
       await window.api.delete(`/movimento_comissoes/${titulo.id}`);
+      
+      // Atualizar progresso
+      if (barraProgresso) barraProgresso.style.width = '100%';
+      if (textoProgresso) textoProgresso.textContent = 'Título excluído com sucesso!';
+      
+      // Aguardar um pouco para mostrar o progresso completo
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Atualizar arrays locais
       todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
@@ -176,9 +221,27 @@ async function confirmarExclusao(modo) {
       
       console.log('Excluindo parcelamento completo:', titulosDoGrupo.length, 'títulos');
       
-      for (const t of titulosDoGrupo) {
+      // Calcular progresso por título
+      const progressoPorTitulo = 100 / titulosDoGrupo.length;
+      
+      for (let i = 0; i < titulosDoGrupo.length; i++) {
+        const t = titulosDoGrupo[i];
+        
+        // Atualizar progresso
+        const progressoAtual = (i + 1) * progressoPorTitulo;
+        if (barraProgresso) barraProgresso.style.width = progressoAtual + '%';
+        if (textoProgresso) textoProgresso.textContent = `Excluindo título ${i + 1} de ${titulosDoGrupo.length}...`;
+        
         await window.api.delete(`/movimento_comissoes/${t.id}`);
+        
+        // Pequeno delay para mostrar o progresso
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
+      
+      if (textoProgresso) textoProgresso.textContent = 'Todos os títulos excluídos com sucesso!';
+      
+      // Aguardar um pouco para mostrar o progresso completo
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
       titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
@@ -192,7 +255,19 @@ async function confirmarExclusao(modo) {
     
   } catch (error) {
     console.error('Erro ao excluir título:', error);
+    
+    // Mostrar erro no progresso
+    if (textoProgresso) textoProgresso.textContent = 'Erro ao excluir título!';
+    if (barraProgresso) barraProgresso.style.backgroundColor = '#e53935';
+    
+    // Aguardar um pouco e mostrar alerta
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     alert(`Erro ao excluir título: ${error.message}`);
+    
+    // Restaurar botões
+    if (footerBtns) footerBtns.style.display = 'flex';
+    if (animacaoDiv) animacaoDiv.style.display = 'none';
   }
 }
 
@@ -208,6 +283,12 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   
   tituloParaExcluir = { titulo, onConfirm };
   console.log('tituloParaExcluir definido como:', tituloParaExcluir);
+  
+  // Preencher informações do título no modal
+  document.getElementById('numeroTituloExclusao').textContent = titulo.numero_titulo || '';
+  document.getElementById('colaboradorTituloExclusao').textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+  document.getElementById('valorTituloExclusao').textContent = formatarValorLocal(titulo.valor);
+  document.getElementById('statusTituloExclusao').textContent = titulo.status || '';
   
   // Detecta se é parcelado pelo padrão do número do título
   const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
