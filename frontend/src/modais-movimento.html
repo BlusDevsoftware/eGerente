@@ -197,23 +197,29 @@ async function confirmarExclusao(modo) {
 }
 
 function abrirModalConfirmExclusao(titulo, onConfirm) {
+  console.log('abrirModalConfirmExclusao chamada com:', titulo);
+  
   // Verificar se o título está com status PAGO
   if (titulo.status && titulo.status.toUpperCase() === 'PAGO') {
+    console.log('Título está pago, mostrando modal de aviso...');
     mostrarModalTituloPagoNaoPodeExcluir(titulo);
     return;
   }
   
   tituloParaExcluir = { titulo, onConfirm };
+  console.log('tituloParaExcluir definido como:', tituloParaExcluir);
   
   // Detecta se é parcelado pelo padrão do número do título
   const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
   const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
   if (match && opcoesDiv) {
+    console.log('Título é parcelado, mostrando opções...');
     opcoesDiv.style.display = 'block';
     const radioUnico = document.querySelector('input[name="exclusaoParcelamento"][value="unico"]');
     if (radioUnico) radioUnico.checked = true;
     modoExclusaoParcelamento = 'unico';
   } else if (opcoesDiv) {
+    console.log('Título não é parcelado, ocultando opções...');
     opcoesDiv.style.display = 'none';
     modoExclusaoParcelamento = 'unico';
   }
@@ -221,6 +227,7 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   document.getElementsByName('exclusaoParcelamento').forEach(radio => {
     radio.onchange = function() {
       modoExclusaoParcelamento = this.value;
+      console.log('Modo de exclusão alterado para:', modoExclusaoParcelamento);
     };
   });
   
@@ -235,7 +242,12 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   if (footerBtns) footerBtns.style.display = 'flex';
   
   const modal = document.getElementById('modalConfirmExclusao');
-  if (modal) modal.style.display = 'flex';
+  if (modal) {
+    console.log('Abrindo modal de confirmação de exclusão...');
+    modal.style.display = 'flex';
+  } else {
+    console.error('Modal modalConfirmExclusao não encontrado!');
+  }
 }
 
 function fecharModalConfirmExclusao() {
@@ -383,13 +395,25 @@ document.addEventListener('DOMContentLoaded', function() {
   if (btnCancelarExclusao) btnCancelarExclusao.onclick = fecharModalConfirmExclusao;
   
   const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
-  if (btnConfirmarExclusao) btnConfirmarExclusao.onclick = function() {
-    if (typeof confirmarExclusao === 'function') {
-      confirmarExclusao(modoExclusaoParcelamento);
-    } else {
-      console.error('Função confirmarExclusao não encontrada');
-    }
-  };
+  if (btnConfirmarExclusao) {
+    console.log('Botão de confirmar exclusão encontrado, configurando event listener...');
+    btnConfirmarExclusao.onclick = function() {
+      console.log('Botão Excluir clicado!');
+      console.log('tituloParaExcluir:', tituloParaExcluir);
+      console.log('modoExclusaoParcelamento:', modoExclusaoParcelamento);
+      console.log('confirmarExclusao é função?', typeof confirmarExclusao);
+      
+      if (typeof confirmarExclusao === 'function') {
+        console.log('Chamando confirmarExclusao...');
+        confirmarExclusao(modoExclusaoParcelamento);
+      } else {
+        console.error('Função confirmarExclusao não encontrada');
+        alert('Erro: Função de exclusão não encontrada');
+      }
+    };
+  } else {
+    console.error('Botão btnConfirmarExclusao não encontrado!');
+  }
   
   const btnOkSucessoExclusao = document.getElementById('btnOkSucessoExclusao');
   if (btnOkSucessoExclusao) btnOkSucessoExclusao.onclick = fecharModalSucessoExclusao;
