@@ -164,7 +164,7 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
     modoExclusaoParcelamento = 'unico';
   }
   
-  document.getNames('exclusaoParcelamento').forEach(radio => {
+  document.getElementsByName('exclusaoParcelamento').forEach(radio => {
     radio.onchange = function() {
       modoExclusaoParcelamento = this.value;
     };
