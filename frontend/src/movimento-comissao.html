@@ -1137,6 +1137,9 @@
                     newScript.textContent = script.textContent;
                     document.head.appendChild(newScript);
                     window.modaisCarregados = true; // Marcar como carregado
+                    
+                    // Configurar event listeners após carregar os modais
+                    setTimeout(configurarEventListenersModais, 100);
                 }
                 
                 console.log('Modais carregados com sucesso');
@@ -1145,6 +1148,53 @@
                 // Fallback: criar modais básicos se não conseguir carregar
                 criarModaisFallback();
             }
+        }
+        
+        // Função para configurar event listeners dos modais
+        function configurarEventListenersModais() {
+            console.log('Configurando event listeners dos modais...');
+            
+            // Event listeners para botões dos modais
+            const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
+            if (btnCancelarExclusao) {
+                console.log('Configurando btnCancelarExclusao...');
+                btnCancelarExclusao.onclick = fecharModalConfirmExclusao;
+            }
+            
+            const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+            if (btnConfirmarExclusao) {
+                console.log('Configurando btnConfirmarExclusao...');
+                btnConfirmarExclusao.onclick = function() {
+                    console.log('Botão Excluir clicado!');
+                    console.log('tituloParaExcluir:', tituloParaExcluir);
+                    console.log('modoExclusaoParcelamento:', modoExclusaoParcelamento);
+                    console.log('confirmarExclusao é função?', typeof confirmarExclusao);
+                    
+                    if (typeof confirmarExclusao === 'function') {
+                        console.log('Chamando confirmarExclusao...');
+                        confirmarExclusao(modoExclusaoParcelamento);
+                    } else {
+                        console.error('Função confirmarExclusao não encontrada');
+                        alert('Erro: Função de exclusão não encontrada');
+                    }
+                };
+            } else {
+                console.error('Botão btnConfirmarExclusao não encontrado!');
+            }
+            
+            const btnOkSucessoExclusao = document.getElementById('btnOkSucessoExclusao');
+            if (btnOkSucessoExclusao) {
+                console.log('Configurando btnOkSucessoExclusao...');
+                btnOkSucessoExclusao.onclick = fecharModalSucessoExclusao;
+            }
+            
+            const btnOkSucessoCancelarBaixa = document.getElementById('btnOkSucessoCancelarBaixa');
+            if (btnOkSucessoCancelarBaixa) {
+                console.log('Configurando btnOkSucessoCancelarBaixa...');
+                btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
+            }
+            
+            console.log('Event listeners dos modais configurados com sucesso!');
         }
         
         // Função fallback para criar modais básicos
