@@ -1,0 +1,393 @@
+<!-- ========================================
+     MODAIS DE EXCLUSÃO E CANCELAMENTO DE BAIXA
+     Sistema de Movimento de Comissões
+     ======================================== -->
+
+<!-- Modal de Confirmação de Exclusão -->
+<div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+      <button class="close-modal" onclick="fecharModalConfirmExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
+      <div id="listaTitulosParciais" style="margin-bottom: 18px;"></div>
+      <div id="opcoesExclusaoParcelamento" style="margin: 18px 0 0 0; display: none; text-align: left;">
+        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor:pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="unico" checked style="accent-color: #e53935;"> Excluir apenas este título
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor:pointer;">
+          <input type="radio" name="exclusaoParcelamento" value="todos" style="accent-color: #e53935;"> Excluir todos os títulos deste parcelamento
+        </label>
+      </div>
+      <div id="animacaoExclusaoDiv" style="display:none; margin-top: 24px;">
+        <div style="font-size:1.1em; color:#1976D2; font-weight:600; margin-bottom:12px;">Excluindo títulos...</div>
+        <div id="contadorExclusao" style="font-size:1.2em; color:#1976D2; font-weight:700; margin-bottom:8px;"></div>
+        <div id="percentualExclusao" style="font-size:1em; color:#666; margin-bottom:12px;"></div>
+        <div style="width:100%; background-color:#e3f2fd; border-radius:8px; height:8px; overflow:hidden;">
+          <div id="barraProgressoExclusao" style="width:0%; height:100%; background-color:#1976D2; border-radius:8px; transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Exclusão -->
+<div id="modalSucessoExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 370px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Título excluído com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-check-circle" style="font-size: 2.5em; color: #43a047; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">O título foi removido do sistema.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoExclusao" class="btn-success" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #43a047; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Cancelar Baixa -->
+<div id="modalConfirmCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 98%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa</h2>
+      <button class="close-modal" onclick="fecharModalConfirmCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a baixa deste título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+      <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+        <ul style="margin: 0; padding-left: 20px; color: #e65100;">
+          <li>Alterar o status para "PENDENTE"</li>
+          <li>Zerar o valor pago</li>
+          <li>Limpar a data de pagamento</li>
+          <li>Remover o comprovante (se existir)</li>
+        </ul>
+      </div>
+      <div style="font-size: 0.95em; color: #666; font-style: italic;">Esta ação pode ser desfeita editando o título novamente.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnCancelarConfirmacao" class="btn-secondary" onclick="fecharModalConfirmCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarCancelarBaixa" class="btn-warning" onclick="executarCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-undo"></i> Confirmar Cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Cancelamento de Baixa -->
+<div id="modalSucessoCancelarBaixa" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Baixa cancelada com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoCancelarBaixa()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #ff9800; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">A baixa do título foi cancelada.</div>
+      <div style="font-size: 0.95em; color: #666; margin-bottom: 8px;">O título agora está com status "PENDENTE".</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoCancelarBaixa" class="btn-warning" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Título Pago Não Pode Excluir -->
+<div id="modalTituloPagoNaoPodeExcluir" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Título Já Pago</h2>
+      <button class="close-modal" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-check-circle" style="font-size: 2.5em; color: #4CAF50; margin-bottom: 16px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Este título já foi pago!</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+        O título <strong id="numeroTituloPago"></strong> já possui status <strong>PAGO</strong> e não pode ser excluído.
+      </div>
+      <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+        <div style="margin-bottom: 8px;"><strong>Data do Pagamento:</strong> <span id="dataPagamentoTitulo"></span></div>
+        <div style="margin-bottom: 8px;"><strong>Valor Pago:</strong> <span id="valorPagoTitulo"></span></div>
+        <div id="observacoesTitulo" style="display: none;"><strong>Observações:</strong> <span id="textoObservacoesTitulo"></span></div>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button class="btn-secondary" onclick="fecharModalTituloPagoNaoPodeExcluir()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     JAVASCRIPT DOS MODAIS
+     ======================================== -->
+
+<script>
+// Variáveis globais para os modais
+let tituloParaExcluir = null;
+let tituloParaCancelarBaixa = null;
+let modoExclusaoParcelamento = 'unico';
+let titulosParaExcluirAnimacao = [];
+
+// ========================================
+// FUNÇÕES DE EXCLUSÃO
+// ========================================
+
+function abrirModalConfirmExclusao(titulo, onConfirm) {
+  // Verificar se o título está com status PAGO
+  if (titulo.status && titulo.status.toUpperCase() === 'PAGO') {
+    mostrarModalTituloPagoNaoPodeExcluir(titulo);
+    return;
+  }
+  
+  tituloParaExcluir = { titulo, onConfirm };
+  
+  // Detecta se é parcelado pelo padrão do número do título
+  const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
+  const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
+  if (match && opcoesDiv) {
+    opcoesDiv.style.display = 'block';
+    const radioUnico = document.querySelector('input[name="exclusaoParcelamento"][value="unico"]');
+    if (radioUnico) radioUnico.checked = true;
+    modoExclusaoParcelamento = 'unico';
+  } else if (opcoesDiv) {
+    opcoesDiv.style.display = 'none';
+    modoExclusaoParcelamento = 'unico';
+  }
+  
+  document.getNames('exclusaoParcelamento').forEach(radio => {
+    radio.onchange = function() {
+      modoExclusaoParcelamento = this.value;
+    };
+  });
+  
+  // Verificar e configurar elementos com segurança
+  const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+  if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+  
+  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+  if (animacaoDiv) animacaoDiv.style.display = 'none';
+  
+  const footerBtns = document.getElementById('footerExclusaoBtns');
+  if (footerBtns) footerBtns.style.display = 'flex';
+  
+  const modal = document.getElementById('modalConfirmExclusao');
+  if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalConfirmExclusao() {
+  console.log('Executando fecharModalConfirmExclusao...');
+  const modal = document.getElementById('modalConfirmExclusao');
+  console.log('Modal encontrado:', modal);
+  if (modal) {
+    console.log('Display antes de fechar:', modal.style.display);
+    modal.style.display = 'none';
+    console.log('Display após fechar:', modal.style.display);
+    console.log('Modal de confirmação fechado com sucesso');
+  } else {
+    console.log('Modal de confirmação não encontrado');
+  }
+  
+  // Resetar campos com segurança
+  const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
+  if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
+  const inputConfirmo = document.getElementById('inputConfirmoExclusao');
+  if (inputConfirmo) inputConfirmo.value = '';
+  const erroConfirmo = document.getElementById('erroConfirmoExclusao');
+  if (erroConfirmo) erroConfirmo.style.display = 'none';
+}
+
+function abrirModalSucessoExclusao() {
+  const modal = document.getElementById('modalSucessoExclusao');
+  if (modal) modal.style.display = 'flex';
+}
+
+function fecharModalSucessoExclusao() {
+  const modal = document.getElementById('modalSucessoExclusao');
+  if (modal) modal.style.display = 'none';
+}
+
+// ========================================
+// FUNÇÕES DE CANCELAMENTO DE BAIXA
+// ========================================
+
+function abrirModalConfirmCancelarBaixa(titulo) {
+  tituloParaCancelarBaixa = titulo;
+  
+  // Verificar se há títulos parciais relacionados
+  const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === tituloParaCancelarBaixa.id);
+  const isBaixaParcial = titulosParciais.length > 0;
+  
+  // Atualizar o modal de confirmação com informações específicas
+  const modalBody = document.querySelector('#modalConfirmCancelarBaixa .modal-body');
+  const listaAcoes = modalBody.querySelector('ul');
+  
+  if (isBaixaParcial) {
+    // Adicionar item sobre exclusão de títulos parciais
+    const itemParciais = document.createElement('li');
+    itemParciais.textContent = `Excluir ${titulosParciais.length} título(s) parcial(is) gerado(s)`;
+    itemParciais.style.color = '#e65100';
+    itemParciais.style.fontWeight = 'bold';
+    listaAcoes.appendChild(itemParciais);
+    
+    // Atualizar mensagem de aviso
+    const avisoDiv = modalBody.querySelector('div[style*="font-style: italic"]');
+    if (avisoDiv) {
+      avisoDiv.innerHTML = '<strong>Atenção:</strong> Esta ação irá excluir permanentemente os títulos parciais. Esta ação não pode ser desfeita.';
+      avisoDiv.style.color = '#e53935';
+      avisoDiv.style.fontWeight = 'bold';
+    }
+  }
+  
+  // Abrir modal de confirmação
+  document.getElementById('modalConfirmCancelarBaixa').style.display = 'flex';
+}
+
+function fecharModalConfirmCancelarBaixa() {
+  document.getElementById('modalConfirmCancelarBaixa').style.display = 'none';
+  tituloParaCancelarBaixa = null;
+}
+
+function fecharModalSucessoCancelarBaixa() {
+  const modal = document.getElementById('modalSucessoCancelarBaixa');
+  if (modal) modal.style.display = 'none';
+}
+
+// ========================================
+// FUNÇÕES AUXILIARES
+// ========================================
+
+function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
+  const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+  
+  // Atualizar informações do título
+  document.getElementById('numeroTituloPago').textContent = titulo.numero_titulo || '';
+  document.getElementById('dataPagamentoTitulo').textContent = formatarDataLocal(titulo.data_pagamento);
+  document.getElementById('valorPagoTitulo').textContent = formatarValorLocal(titulo.valor_pago);
+  
+  const observacoesDiv = document.getElementById('observacoesTitulo');
+  const textoObservacoes = document.getElementById('textoObservacoesTitulo');
+  
+  if (titulo.observacoes) {
+    textoObservacoes.textContent = titulo.observacoes;
+    observacoesDiv.style.display = 'block';
+  } else {
+    observacoesDiv.style.display = 'none';
+  }
+  
+  modal.style.display = 'flex';
+}
+
+function fecharModalTituloPagoNaoPodeExcluir() {
+  const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
+  if (modal) modal.style.display = 'none';
+}
+
+// Função para fechar todos os modais relacionados ao cancelamento de baixa
+function fecharTodosModaisCancelamento() {
+  console.log('Fechando todos os modais de cancelamento...');
+  
+  // Lista de todos os modais que podem estar abertos
+  const modaisParaFechar = [
+    'modalConfirmCancelarBaixa',
+    'modalConfirmExclusao',
+    'modalTitulo',
+    'modalSucessoCancelarBaixa'
+  ];
+  
+  modaisParaFechar.forEach(modalId => {
+    const modal = document.getElementById(modalId);
+    if (modal && modal.style.display !== 'none') {
+      console.log(`Fechando modal: ${modalId}`);
+      modal.style.display = 'none';
+    }
+  });
+  
+  // Resetar variáveis globais
+  tituloParaCancelarBaixa = null;
+  tituloParaExcluir = null;
+  
+  console.log('Todos os modais de cancelamento foram fechados');
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Event listeners para botões dos modais
+  const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
+  if (btnCancelarExclusao) btnCancelarExclusao.onclick = fecharModalConfirmExclusao;
+  
+  const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+  if (btnConfirmarExclusao) btnConfirmarExclusao.onclick = function() {
+    if (tituloParaExcluir && tituloParaExcluir.onConfirm) {
+      tituloParaExcluir.onConfirm(modoExclusaoParcelamento);
+    }
+  };
+  
+  const btnOkSucessoExclusao = document.getElementById('btnOkSucessoExclusao');
+  if (btnOkSucessoExclusao) btnOkSucessoExclusao.onclick = fecharModalSucessoExclusao;
+  
+  const btnOkSucessoCancelarBaixa = document.getElementById('btnOkSucessoCancelarBaixa');
+  if (btnOkSucessoCancelarBaixa) {
+    btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
+  }
+  
+  // Event listener para fechar modais ao clicar fora
+  window.addEventListener('click', function(event) {
+    const modalConfirmExclusao = document.getElementById('modalConfirmExclusao');
+    if (event.target === modalConfirmExclusao) {
+      fecharModalConfirmExclusao();
+    }
+    
+    const modalConfirmCancelarBaixa = document.getElementById('modalConfirmCancelarBaixa');
+    if (event.target === modalConfirmCancelarBaixa) {
+      fecharModalConfirmCancelarBaixa();
+    }
+    
+    const modalSucessoCancelarBaixa = document.getElementById('modalSucessoCancelarBaixa');
+    if (event.target === modalSucessoCancelarBaixa) {
+      fecharModalSucessoCancelarBaixa();
+    }
+    
+    const modalTituloPagoNaoPodeExcluir = document.getElementById('modalTituloPagoNaoPodeExcluir');
+    if (event.target === modalTituloPagoNaoPodeExcluir) {
+      fecharModalTituloPagoNaoPodeExcluir();
+    }
+  });
+  
+  // Event listener para tecla Escape - fechar todos os modais de cancelamento
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      console.log('Tecla Escape pressionada, fechando modais de cancelamento...');
+      fecharTodosModaisCancelamento();
+    }
+  });
+});
+
+// ========================================
+// FUNÇÕES DE FORMATAÇÃO (se não existirem no arquivo principal)
+// ========================================
+
+function formatarValorLocal(valor) {
+  if (!valor) return 'R$ 0,00';
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatarDataLocal(data) {
+  if (!data) return 'Não informada';
+  const d = new Date(data);
+  if (isNaN(d)) return data;
+  return d.toLocaleDateString('pt-BR');
+}
+</script> 
