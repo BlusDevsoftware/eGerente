@@ -2575,8 +2575,16 @@
             const btnConfirmar = document.getElementById('btnConfirmarExclusao');
             if (btnConfirmar) {
                 btnConfirmar.onclick = async function() {
-                    await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
-                    fecharModalConfirmExclusao();
+                    try {
+                        await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
+                        // CORREÇÃO: Usar a função que fecha todos os modais
+                        console.log('Cancelamento concluído, fechando todos os modais...');
+                        fecharTodosModaisCancelamento();
+                    } catch (error) {
+                        console.error('Erro durante cancelamento:', error);
+                        // Em caso de erro, também fechar todos os modais
+                        fecharTodosModaisCancelamento();
+                    }
                 };
             }
             modal.style.display = 'flex';
@@ -2676,9 +2684,11 @@
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
                 
-                // Fechar modais
-                fecharModalConfirmCancelarBaixa();
-                fecharModalTitulo();
+                // Fechar modais - CORREÇÃO: Forçar fechamento de todos os modais relacionados
+                console.log('Fechando modais após cancelamento de baixa...');
+                
+                // Usar a nova função que fecha todos os modais relacionados
+                fecharTodosModaisCancelamento();
                 
                 // Mostrar modal de sucesso com mensagem específica
                 const modalSucesso = document.getElementById('modalSucessoCancelarBaixa');
@@ -2697,7 +2707,9 @@
             } catch (error) {
                 console.error('Erro ao cancelar baixa:', error);
                 alert(`Erro ao cancelar baixa: ${error.message}`);
-                fecharModalConfirmCancelarBaixa();
+                
+                // Fechar modais mesmo em caso de erro
+                fecharTodosModaisCancelamento();
             }
         }
 
@@ -2808,6 +2820,64 @@
           if (isNaN(d)) return data;
           return d.toLocaleDateString('pt-BR');
         }
+
+        // NOVA FUNÇÃO: Fechar todos os modais relacionados ao cancelamento de baixa
+        function fecharTodosModaisCancelamento() {
+            console.log('Fechando todos os modais de cancelamento...');
+            
+            // Lista de todos os modais que podem estar abertos
+            const modaisParaFechar = [
+                'modalConfirmCancelarBaixa',
+                'modalConfirmExclusao',
+                'modalTitulo',
+                'modalSucessoCancelarBaixa'
+            ];
+            
+            modaisParaFechar.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && modal.style.display !== 'none') {
+                    console.log(`Fechando modal: ${modalId}`);
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Resetar variáveis globais
+            tituloParaCancelarBaixa = null;
+            tituloParaExcluir = null;
+            
+            console.log('Todos os modais de cancelamento foram fechados');
+        }
+
+        // EVENT LISTENERS ADICIONAIS: Fechar modais ao clicar fora
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event listener para fechar modal de confirmação de exclusão ao clicar fora
+            window.addEventListener('click', function(event) {
+                const modalConfirmExclusao = document.getElementById('modalConfirmExclusao');
+                if (event.target === modalConfirmExclusao) {
+                    fecharModalConfirmExclusao();
+                }
+                
+                // Modal de confirmação de cancelamento de baixa
+                const modalConfirmCancelarBaixa = document.getElementById('modalConfirmCancelarBaixa');
+                if (event.target === modalConfirmCancelarBaixa) {
+                    fecharModalConfirmCancelarBaixa();
+                }
+                
+                // Modal de sucesso de cancelamento de baixa
+                const modalSucessoCancelarBaixa = document.getElementById('modalSucessoCancelarBaixa');
+                if (event.target === modalSucessoCancelarBaixa) {
+                    fecharModalSucessoCancelarBaixa();
+                }
+            });
+        });
+
+        // Event listener para tecla Escape - fechar todos os modais de cancelamento
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                console.log('Tecla Escape pressionada, fechando modais de cancelamento...');
+                fecharTodosModaisCancelamento();
+            }
+        });
     </script>
 
     <script src="scripts/navigation.js"></script>
