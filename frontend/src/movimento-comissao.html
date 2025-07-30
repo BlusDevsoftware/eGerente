@@ -1859,40 +1859,7 @@
                     const row = btn.closest('tr');
                     const index = Array.from(row.parentNode.children).indexOf(row);
                     const titulo = titulosFiltrados[index];
-                    abrirModalConfirmExclusao(titulo, async function(modo) {
-                        if (modo === 'unico') {
-                            await window.api.delete(`/movimento_comissoes/${titulo.id}`);
-                            todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
-                            titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
-                            atualizarTabelaComFiltros();
-                            atualizarCardsTotalizadores();
-                            
-                            // Teste direto para forçar fechamento
-                            const modalElement = document.getElementById('modalConfirmExclusao');
-                            if (modalElement) {
-                              console.log('Fechando modal diretamente (primeira implementação)...');
-                              modalElement.style.display = 'none';
-                              console.log('Display após fechamento direto:', modalElement.style.display);
-                            }
-                            
-                            fecharModalConfirmExclusao();
-                            abrirModalSucessoExclusao();
-                        } else {
-                            // Excluir todos do parcelamento com referencia do numero do titulo
-                            const prefixo = (titulo.numero_titulo || '').split('-')[0];
-                            // Seleciona todos os títulos do mesmo parcelamento com referencia do numero do titulo
-                            const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
-                            for (const t of titulosDoGrupo) {
-                                await window.api.delete(`/movimento_comissoes/${t.id}`);
-                            }
-                            todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
-                            titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
-                            atualizarTabelaComFiltros();
-                            atualizarCardsTotalizadores();
-                            fecharModalConfirmExclusao();
-                            abrirModalSucessoExclusao();
-                        }
-                    });
+                    abrirModalConfirmExclusao(titulo, confirmarExclusao);
                 };
             });
         }
@@ -2662,6 +2629,53 @@
                 fecharTodosModaisCancelamento();
             }
         });
+
+        // Função para confirmar exclusão de título
+        async function confirmarExclusao(modo) {
+            if (!tituloParaExcluir || !tituloParaExcluir.titulo) {
+                console.error('Nenhum título para excluir');
+                return;
+            }
+            
+            const titulo = tituloParaExcluir.titulo;
+            
+            try {
+                if (modo === 'unico') {
+                    // Excluir apenas o título atual
+                    await window.api.delete(`/movimento_comissoes/${titulo.id}`);
+                    todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
+                    titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
+                    atualizarTabelaComFiltros();
+                    atualizarCardsTotalizadores();
+                    
+                    fecharModalConfirmExclusao();
+                    abrirModalSucessoExclusao();
+                    
+                } else if (modo === 'todos') {
+                    // Excluir todos os títulos do parcelamento
+                    const prefixo = (titulo.numero_titulo || '').split('-')[0];
+                    const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+                    
+                    for (const t of titulosDoGrupo) {
+                        await window.api.delete(`/movimento_comissoes/${t.id}`);
+                    }
+                    
+                    todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+                    titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+                    atualizarTabelaComFiltros();
+                    atualizarCardsTotalizadores();
+                    
+                    fecharModalConfirmExclusao();
+                    abrirModalSucessoExclusao();
+                }
+                
+            } catch (error) {
+                console.error('Erro ao excluir título:', error);
+                alert(`Erro ao excluir título: ${error.message}`);
+            }
+        }
+
+        // Funções para Cancelar Baixa
     </script>
 
     <script src="scripts/navigation.js"></script>
