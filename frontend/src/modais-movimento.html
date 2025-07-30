@@ -142,6 +142,60 @@ let titulosParaExcluirAnimacao = [];
 // FUNÇÕES DE EXCLUSÃO
 // ========================================
 
+// Função para confirmar exclusão de título
+async function confirmarExclusao(modo) {
+  if (!tituloParaExcluir || !tituloParaExcluir.titulo) {
+    console.error('Nenhum título para excluir');
+    return;
+  }
+  
+  const titulo = tituloParaExcluir.titulo;
+  console.log('Executando exclusão do título:', titulo.numero_titulo, 'modo:', modo);
+  
+  try {
+    if (modo === 'unico') {
+      // Excluir apenas o título atual
+      console.log('Excluindo título único:', titulo.id);
+      await window.api.delete(`/movimento_comissoes/${titulo.id}`);
+      
+      // Atualizar arrays locais
+      todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
+      titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
+      
+      // Atualizar interface
+      atualizarTabelaComFiltros();
+      atualizarCardsTotalizadores();
+      
+      fecharModalConfirmExclusao();
+      abrirModalSucessoExclusao();
+      
+    } else if (modo === 'todos') {
+      // Excluir todos os títulos do parcelamento
+      const prefixo = (titulo.numero_titulo || '').split('-')[0];
+      const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+      
+      console.log('Excluindo parcelamento completo:', titulosDoGrupo.length, 'títulos');
+      
+      for (const t of titulosDoGrupo) {
+        await window.api.delete(`/movimento_comissoes/${t.id}`);
+      }
+      
+      todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+      titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
+      
+      atualizarTabelaComFiltros();
+      atualizarCardsTotalizadores();
+      
+      fecharModalConfirmExclusao();
+      abrirModalSucessoExclusao();
+    }
+    
+  } catch (error) {
+    console.error('Erro ao excluir título:', error);
+    alert(`Erro ao excluir título: ${error.message}`);
+  }
+}
+
 function abrirModalConfirmExclusao(titulo, onConfirm) {
   // Verificar se o título está com status PAGO
   if (titulo.status && titulo.status.toUpperCase() === 'PAGO') {
