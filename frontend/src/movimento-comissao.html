@@ -982,104 +982,119 @@
       <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 1000px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; display: flex; flex-direction: column;">
         <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 16px 16px 0 0;">
           <h2 id="modalTituloTitulo" style="margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i id="modalTituloIcon" class="fas fa-eye"></i> <span id="modalTituloTexto">Visualizar Título</span></h2>
-          <button class="close-modal" onclick="fecharModalTitulo()" style="background: none; border: none; font-size: 1.5em; color: #e53935; cursor: pointer; padding: 5px; transition: color 0.3s; border-radius: 50%;"><i class="fas fa-times"></i></button>
+          <button class="close-modal" onclick="fecharModalTitulo()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s; border-radius: 50%;"><i class="fas fa-times"></i></button>
         </div>
-        <div class="modal-body" style="padding: 32px 40px 0 40px; flex: 1 1 auto; min-height: 180px; text-align: left; background: #fff;">
+        <div class="modal-body" style="padding: 24px 36px 0 36px; flex: 1 1 auto; min-height: 180px; text-align: left; background: #fff; overflow-y: auto;">
           <form id="formModalTitulo" autocomplete="off" style="margin:0;">
-            <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Número do Título</label>
-                <input type="text" id="modal-numero" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Status</label>
-                <input type="text" id="modal-status" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-          </div>
-            <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Colaborador</label>
-                <input type="text" id="modal-colaborador" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Tipo</label>
-                <input type="text" id="modal-tipo" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-          </div>
-            <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Descrição</label>
-                <input type="text" id="modal-descricao" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Valor</label>
-                <input type="text" id="modal-valor" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-          </div>
-            <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Data da Geração</label>
-                <input type="text" id="modal-geracao" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Data de Vencimento</label>
-                <input type="text" id="modal-vencimento" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-          </div>
-            <div class="form-row" style="display: flex; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
-              <div class="form-group" style="flex:1; min-width: 220px;">
-                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Usuário do Lançamento</label>
-                <input type="text" id="modal-usuario" readonly style="width: 100%; padding: 8px 10px; border: 1.5px solid #e3f2fd; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
-            </div>
-          </div>
-          
-          <!-- Seção de Produtos/Serviços -->
-          <div class="form-section" style="margin-top: 24px; border-top: 1px solid #eee; padding-top: 20px;">
-            <h3 style="margin: 0 0 16px 0; font-size: 1em; color: #333; display: flex; align-items: center; gap: 8px;">
-              <i class="fas fa-cubes" style="color: #2196F3;"></i> Produtos/Serviços do Título
-            </h3>
-            <div id="produtos-container" style="background: #f8f9fa; border-radius: 8px; padding: 12px; border: 1px solid #e9ecef;">
-              <div id="produtos-lista" style="max-height: 150px; overflow-y: auto;">
-                <!-- Produtos serão carregados dinamicamente aqui -->
-                <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 16px;">
-                  <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
-                  Nenhum produto/serviço encontrado para este título
+            
+            <!-- Seção: Informações Principais -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-info-circle" style="color: #1976D2;"></i> Informações Principais
+              </h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Número do Título</label>
+                  <input type="text" id="modal-numero" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Status</label>
+                  <input type="text" id="modal-status" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Colaborador</label>
+                  <input type="text" id="modal-colaborador" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Tipo</label>
+                  <input type="text" id="modal-tipo" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
                 </div>
               </div>
             </div>
-          </div>
+
+            <!-- Seção: Valores e Datas -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-dollar-sign" style="color: #1976D2;"></i> Valores e Datas
+              </h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Valor</label>
+                  <input type="text" id="modal-valor" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Data da Geração</label>
+                  <input type="text" id="modal-geracao" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Data de Vencimento</label>
+                  <input type="text" id="modal-vencimento" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+                <div class="form-group">
+                  <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Usuário do Lançamento</label>
+                  <input type="text" id="modal-usuario" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção: Descrição -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-align-left" style="color: #1976D2;"></i> Descrição
+              </h3>
+              <div class="form-group">
+                <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2; font-size: 0.9em;">Descrição do Título</label>
+                <input type="text" id="modal-descricao" readonly style="width: 100%; padding: 10px 12px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 0.95em; color: #1976D2; font-weight: 500;">
+              </div>
+            </div>
           
-          <!-- Seção de Comprovante -->
-          <div class="form-section" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
-            <h3 style="margin: 0 0 16px 0; font-size: 1em; color: #333; display: flex; align-items: center; gap: 8px;">
-              <i class="fas fa-paperclip" style="color: #2196F3;"></i> Comprovante de Pagamento
-            </h3>
-            <div id="comprovante-container" style="background: #f8f9fa; border-radius: 8px; padding: 12px; border: 1px solid #e9ecef;">
-              <div id="comprovante-info" style="display: none;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                  <i class="fas fa-file-alt" style="font-size: 1.3em; color: #4CAF50;"></i>
-                  <div>
-                    <div style="font-weight: 500; color: #333; font-size: 0.9em;">Comprovante anexado</div>
-                    <div style="font-size: 0.8em; color: #666;">Clique no botão abaixo para visualizar</div>
+            <!-- Seção de Produtos/Serviços -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-cubes" style="color: #1976D2;"></i> Produtos/Serviços do Título
+              </h3>
+              <div id="produtos-container" style="background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #e3f2fd;">
+                <div id="produtos-lista" style="max-height: 150px; overflow-y: auto;">
+                  <!-- Produtos serão carregados dinamicamente aqui -->
+                  <div id="sem-produtos" style="text-align: center; color: #6c757d; font-style: italic; padding: 16px;">
+                    <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                    Nenhum produto/serviço encontrado para este título
                   </div>
                 </div>
-                <button type="button" id="btnVisualizarComprovante" 
-                        style="background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; display: flex; align-items: center; gap: 6px;">
-                  <i class="fas fa-eye"></i> Visualizar Comprovante
-                </button>
-              </div>
-              <div id="sem-comprovante" style="text-align: center; color: #6c757d; font-style: italic; padding: 16px;">
-                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
-                Nenhum comprovante anexado a este título
               </div>
             </div>
-          </div>
+          
+            <!-- Seção de Comprovante -->
+            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-paperclip" style="color: #1976D2;"></i> Comprovante de Pagamento
+              </h3>
+              <div id="comprovante-container" style="background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #e3f2fd;">
+                <div id="comprovante-info" style="display: none;">
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <i class="fas fa-file-alt" style="font-size: 1.3em; color: #4CAF50;"></i>
+                    <div>
+                      <div style="font-weight: 500; color: #333; font-size: 0.9em;">Comprovante anexado</div>
+                      <div style="font-size: 0.8em; color: #666;">Clique no botão abaixo para visualizar</div>
+                    </div>
+                  </div>
+                  <button type="button" id="btnVisualizarComprovante" 
+                          style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                    <i class="fas fa-eye"></i> Visualizar Comprovante
+                  </button>
+                </div>
+                <div id="sem-comprovante" style="text-align: center; color: #6c757d; font-style: italic; padding: 16px;">
+                  <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                  Nenhum comprovante anexado a este título
+                </div>
+              </div>
+            </div>
           </form>
         </div>
-        <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 32px; padding: 24px 40px 24px 40px; border-top: 1px solid #eee;">
-            <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
-            <button type="button" id="btnCancelarBaixa" class="btn-warning" onclick="confirmarCancelarBaixa()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none; display: none;"><i class="fas fa-undo"></i> Cancelar Baixa</button>
-            <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Salvar</button>
+        <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding: 20px 36px 24px 36px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 16px 16px;">
+            <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; transition: all 0.3s ease;"><i class="fas fa-times"></i> Cancelar</button>
+            <button type="button" id="btnCancelarBaixa" class="btn-warning" onclick="confirmarCancelarBaixa()" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none; display: none; transition: all 0.3s ease;"><i class="fas fa-undo"></i> Cancelar Baixa</button>
+            <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #1976D2; color: white; border: none; transition: all 0.3s ease;"><i class="fas fa-save"></i> Salvar</button>
           </div>
       </div>
     </div>
