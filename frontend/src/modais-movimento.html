@@ -455,7 +455,8 @@ function abrirModalConfirmCancelarBaixa(titulo) {
 
 function fecharModalConfirmCancelarBaixa() {
   document.getElementById('modalConfirmCancelarBaixa').style.display = 'none';
-  tituloParaCancelarBaixa = null;
+  // Não resetar tituloParaCancelarBaixa aqui, pois pode ser necessário para executarCancelarBaixa
+  // A variável será resetada apenas após o cancelamento ser executado com sucesso
 }
 
 function fecharModalSucessoCancelarBaixa() {
@@ -515,8 +516,8 @@ function fecharTodosModaisCancelamento() {
     }
   });
   
-  // Resetar variáveis globais
-  tituloParaCancelarBaixa = null;
+  // Resetar variáveis globais apenas após operação completa
+  // tituloParaCancelarBaixa = null; // Comentado para evitar reset prematuro
   tituloParaExcluir = null;
   
   console.log('Todos os modais de cancelamento foram fechados');

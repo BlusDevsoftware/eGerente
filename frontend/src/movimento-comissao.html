@@ -2054,7 +2054,7 @@
 
         // Variáveis globais para os modais (não duplicar - estão no arquivo modais-movimento.html)
         // let tituloParaExcluir = null;
-        // let tituloParaCancelarBaixa = null;
+        let tituloParaCancelarBaixa = null;
         // let modoExclusaoParcelamento = 'unico';
         // let titulosParaExcluirAnimacao = [];
 
@@ -2279,13 +2279,24 @@
 
         // Funções para Cancelar Baixa
         function confirmarCancelarBaixa() {
+            console.log('confirmarCancelarBaixa chamada');
+            
             const tituloId = document.getElementById('modal-numero').value;
+            console.log('tituloId encontrado:', tituloId);
+            
             const titulo = todosTitulos.find(t => t.numero_titulo === tituloId);
+            console.log('título encontrado:', titulo);
+            console.log('todosTitulos:', todosTitulos);
             
             if (!titulo) {
+                console.error('Título não encontrado no array todosTitulos');
                 alert('Erro: Título não encontrado!');
                 return;
             }
+            
+            // Definir a variável global para o cancelamento
+            tituloParaCancelarBaixa = titulo;
+            console.log('tituloParaCancelarBaixa definido:', tituloParaCancelarBaixa);
             
             // Verificar se há títulos parciais relacionados
             const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === titulo.id);
@@ -2320,7 +2331,11 @@
         // As funções fecharModalConfirmCancelarBaixa, fecharModalSucessoCancelarBaixa, etc. estão no arquivo separado
 
         async function executarCancelarBaixa() {
+            console.log('executarCancelarBaixa chamada');
+            console.log('tituloParaCancelarBaixa:', tituloParaCancelarBaixa);
+            
             if (!tituloParaCancelarBaixa) {
+                console.error('tituloParaCancelarBaixa é null ou undefined');
                 alert('Erro: Título não encontrado!');
                 return;
             }
@@ -2396,10 +2411,12 @@
                         // CORREÇÃO: Usar a função que fecha todos os modais
                         console.log('Cancelamento concluído, fechando todos os modais...');
                         fecharTodosModaisCancelamento();
+                        resetarVariaveisCancelamento();
                     } catch (error) {
                         console.error('Erro durante cancelamento:', error);
                         // Em caso de erro, também fechar todos os modais
                         fecharTodosModaisCancelamento();
+                        resetarVariaveisCancelamento();
                     }
                 };
             }
@@ -2520,12 +2537,18 @@
                 
                 console.log('Cancelamento de baixa realizado com sucesso');
                 
+                // Resetar variáveis após sucesso
+                resetarVariaveisCancelamento();
+                
             } catch (error) {
                 console.error('Erro ao cancelar baixa:', error);
                 alert(`Erro ao cancelar baixa: ${error.message}`);
                 
                 // Fechar modais mesmo em caso de erro
                 fecharTodosModaisCancelamento();
+                
+                // Resetar variáveis mesmo em caso de erro
+                resetarVariaveisCancelamento();
             }
         }
 
@@ -2738,6 +2761,12 @@
                 console.error('Erro ao excluir título:', error);
                 alert(`Erro ao excluir título: ${error.message}`);
             }
+        }
+
+        // Função para resetar variáveis após cancelamento bem-sucedido
+        function resetarVariaveisCancelamento() {
+            tituloParaCancelarBaixa = null;
+            console.log('Variáveis de cancelamento resetadas');
         }
 
         // Funções para Cancelar Baixa
