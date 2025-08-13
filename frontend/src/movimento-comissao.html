@@ -1767,26 +1767,24 @@
                             uploadSection.id = 'upload-comprovante-section';
                             uploadSection.style.marginTop = '16px';
                             uploadSection.innerHTML = `
-                                <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 16px; text-align: center; background: #f8fbff;">
+                                <div id="novo-comprovante-dropzone" style="border: 2px dashed #1976D2; border-radius: 8px; padding: 16px; text-align: center; background: #f8fbff; transition: all 0.3s;">
                                     <input type="file" id="novoComprovante" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
-                                    <button type="button" onclick="document.getElementById('novoComprovante').click()" 
-                                            style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-                                        <i class="fas fa-upload"></i> Alterar Comprovante
-                                    </button>
-                                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
-                                </div>
-                                <div id="novo-comprovante-preview" style="display: none; margin-top: 12px; padding: 12px; background: #e8f5e8; border-radius: 6px; border: 1px solid #4caf50;">
-                                    <div style="display: flex; align-items: center; gap: 8px; color: #2e7d32; font-weight: 500;">
-                                        <i class="fas fa-file-alt"></i>
-                                        <span id="novo-comprovante-nome"></span>
+                                    <div id="novo-comprovante-content">
+                                        <button type="button" onclick="document.getElementById('novoComprovante').click()" 
+                                                style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                            <i class="fas fa-upload"></i> Alterar Comprovante
+                                        </button>
+                                        <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
                                     </div>
-                                    <div style="font-size: 0.8em; color: #666; margin-top: 4px;">
-                                        <span id="novo-comprovante-tamanho"></span>
+                                    <div id="novo-comprovante-preview" style="display: none;">
+                                        <i class="fas fa-file-alt" style="font-size: 1.5em; color: #4CAF50; margin-bottom: 5px;"></i>
+                                        <p id="novo-comprovante-nome" style="margin: 0; color: #1976D2; font-weight: 500;"></p>
+                                        <p id="novo-comprovante-tamanho" style="margin: 5px 0 0 0; color: #666; font-size: 0.8em;"></p>
+                                        <button type="button" onclick="removerNovoComprovante()" 
+                                                style="margin-top: 8px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
+                                            <i class="fas fa-trash"></i> Remover
+                                        </button>
                                     </div>
-                                    <button type="button" onclick="removerNovoComprovante()" 
-                                            style="margin-top: 8px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
-                                        <i class="fas fa-trash"></i> Remover
-                                    </button>
                                 </div>
                             `;
                             comprovanteContainer.appendChild(uploadSection);
@@ -1806,35 +1804,35 @@
                     
                 } else {
                     // Se não está pago, edição normal
-                    // Todos editáveis, exceto número, colaborador, usuário, status e tipo
-                    form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
-                    document.getElementById('modal-numero').setAttribute('readonly', true);
-                    document.getElementById('modal-colaborador').setAttribute('readonly', true);
-                    document.getElementById('modal-usuario').setAttribute('readonly', true);
-                    document.getElementById('modal-status').setAttribute('readonly', true);
-                    document.getElementById('modal-tipo').setAttribute('readonly', true);
-                    
-                    // Configurar campo valor para edição
-                    const valorInput = document.getElementById('modal-valor');
-                    valorInput.removeAttribute('readonly');
-                    valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
-                    valorInput.addEventListener('input', function(e) {
-                        let v = e.target.value.replace(/\D/g, '');
-                        v = (parseInt(v, 10) || 0).toString();
-                        while (v.length < 3) v = '0' + v;
-                        let reais = v.slice(0, -2);
-                        let centavos = v.slice(-2);
-                        reais = reais.replace(/^0+/, '') || '0';
-                        reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                        e.target.value = `R$ ${reais},${centavos}`;
-                    });
-                    // Ao focar, seleciona só o número
-                    valorInput.addEventListener('focus', function(e) {
-                        setTimeout(() => {
-                            let val = e.target.value.replace(/^R\$\s*/, '');
-                            e.target.setSelectionRange(val.length, val.length);
-                        }, 0);
-                    });
+                // Todos editáveis, exceto número, colaborador, usuário, status e tipo
+                form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
+                document.getElementById('modal-numero').setAttribute('readonly', true);
+                document.getElementById('modal-colaborador').setAttribute('readonly', true);
+                document.getElementById('modal-usuario').setAttribute('readonly', true);
+                document.getElementById('modal-status').setAttribute('readonly', true);
+                document.getElementById('modal-tipo').setAttribute('readonly', true);
+                
+                // Configurar campo valor para edição
+                const valorInput = document.getElementById('modal-valor');
+                valorInput.removeAttribute('readonly');
+                valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
+                valorInput.addEventListener('input', function(e) {
+                    let v = e.target.value.replace(/\D/g, '');
+                    v = (parseInt(v, 10) || 0).toString();
+                    while (v.length < 3) v = '0' + v;
+                    let reais = v.slice(0, -2);
+                    let centavos = v.slice(-2);
+                    reais = reais.replace(/^0+/, '') || '0';
+                    reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+                    e.target.value = `R$ ${reais},${centavos}`;
+                });
+                // Ao focar, seleciona só o número
+                valorInput.addEventListener('focus', function(e) {
+                    setTimeout(() => {
+                        let val = e.target.value.replace(/^R\$\s*/, '');
+                        e.target.setSelectionRange(val.length, val.length);
+                    }, 0);
+                });
                 }
                 
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
@@ -2021,11 +2019,16 @@
         
         // Função para mostrar preview do novo comprovante
         function mostrarPreviewNovoComprovante(file) {
+            const content = document.getElementById('novo-comprovante-content');
             const preview = document.getElementById('novo-comprovante-preview');
             const nome = document.getElementById('novo-comprovante-nome');
             const tamanho = document.getElementById('novo-comprovante-tamanho');
             
-            if (preview && nome && tamanho) {
+            if (content && preview && nome && tamanho) {
+                // Esconder conteúdo original
+                content.style.display = 'none';
+                
+                // Mostrar preview
                 nome.textContent = file.name;
                 tamanho.textContent = formatarTamanhoArquivo(file.size);
                 preview.style.display = 'block';
@@ -2035,10 +2038,15 @@
         // Função para remover novo comprovante
         function removerNovoComprovante() {
             const novoComprovante = document.getElementById('novoComprovante');
+            const content = document.getElementById('novo-comprovante-content');
             const preview = document.getElementById('novo-comprovante-preview');
             
             if (novoComprovante) {
                 novoComprovante.value = '';
+            }
+            
+            if (content) {
+                content.style.display = 'block';
             }
             
             if (preview) {
@@ -3085,14 +3093,14 @@ if (btnSalvarModalTitulo) {
                 const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
                 const descricao = document.getElementById('modal-descricao').value;
                 
-                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
-                    valor: parseFloat(valor),
-                    descricao: descricao
-                });
-                
-                // Atualizar array local
-                titulo.valor = parseFloat(valor);
-                titulo.descricao = descricao;
+            await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                valor: parseFloat(valor),
+                descricao: descricao
+            });
+            
+            // Atualizar array local
+            titulo.valor = parseFloat(valor);
+            titulo.descricao = descricao;
             }
             
             // Atualizar interface
