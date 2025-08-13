@@ -2529,11 +2529,29 @@
         }
 
         function mostrarModalConfirmacaoExclusao(titulosParciais, tituloOriginal) {
+            console.log('mostrarModalConfirmacaoExclusao chamada com:', { titulosParciais, tituloOriginal });
+            console.log('mapaColaboradores disponível:', mapaColaboradores);
+            
             const modal = document.getElementById('modalConfirmExclusao');
+            console.log('Modal encontrado:', modal);
+            
+            if (!modal) {
+                console.error('Modal modalConfirmExclusao não encontrado!');
+                alert('Erro: Modal não encontrado. Recarregue a página.');
+                return;
+            }
+            
             const tituloModal = modal.querySelector('h2');
             const listaDiv = document.getElementById('listaTitulosParciais');
             const footerBtns = document.getElementById('footerExclusaoBtns');
             const opcoesParcelamento = document.getElementById('opcoesExclusaoParcelamento');
+            
+            console.log('Elementos do modal:', {
+                tituloModal,
+                listaDiv,
+                footerBtns,
+                opcoesParcelamento
+            });
             
             // Esconder as opções de exclusão de parcelamento (não aplicável para cancelamento de baixa)
             if (opcoesParcelamento) {
@@ -2542,8 +2560,42 @@
             
             // Atualizar título
             tituloModal.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Baixa Parcial';
+            
             // Atualizar lista de títulos parciais
             if (listaDiv) {
+                console.log('Títulos parciais para exibir:', titulosParciais);
+                
+                const htmlTitulosParciais = titulosParciais.map(t => {
+                    const colaboradorNome = mapaColaboradores[t.colaborador_id] || t.colaborador_id || 'N/A';
+                    const valorFormatado = (t.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    const status = t.status || 'N/A';
+                    const descricao = t.descricao || 'N/A';
+                    
+                    console.log('Dados do título parcial:', {
+                        numero: t.numero_titulo,
+                        colaborador_id: t.colaborador_id,
+                        colaborador_nome: colaboradorNome,
+                        valor: t.valor,
+                        valor_formatado: valorFormatado,
+                        status: status,
+                        descricao: descricao
+                    });
+                    
+                    return `
+                        <div style='color: #e53935; font-weight: bold; margin-bottom: 12px; padding: 8px; background: #fff5f5; border-radius: 6px;'>
+                            <div style='font-size: 1.1em; margin-bottom: 8px;'>• ${t.numero_titulo}</div>
+                            <div style='color: #666; font-weight: normal; font-size: 0.9em; margin-left: 16px;'>
+                                <div style='margin-bottom: 4px;'><strong>Colaborador:</strong> ${colaboradorNome}</div>
+                                <div style='margin-bottom: 4px;'><strong>Valor:</strong> R$ ${valorFormatado}</div>
+                                <div style='margin-bottom: 4px;'><strong>Status:</strong> ${status}</div>
+                                <div style='margin-bottom: 4px;'><strong>Descrição:</strong> ${descricao}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                console.log('HTML gerado para títulos parciais:', htmlTitulosParciais);
+                
                 listaDiv.innerHTML = `
                     <div style="font-size: 1em; color: #888; margin-bottom: 8px;">Esta ação irá:</div>
                     <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 8px;">
@@ -2555,27 +2607,29 @@
                             <li style="font-weight: bold; color: #e53935;">Excluir ${titulosParciais.length} título(s) parcial(is):</li>
                         </ul>
                         <div style="margin-top: 12px; padding-left: 20px;">
-                            ${titulosParciais.map(t => `
-                                <div style='color: #e53935; font-weight: bold; margin-bottom: 8px;'>
-                                    • ${t.numero_titulo}
-                                    <div style='color: #666; font-weight: normal; font-size: 0.9em; margin-left: 20px; margin-top: 4px;'>
-                                        <div><strong>Colaborador:</strong> ${mapaColaboradores[t.colaborador_id] || t.colaborador_id || 'N/A'}</div>
-                                        <div><strong>Valor:</strong> R$ ${(t.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                                        <div><strong>Status:</strong> ${t.status || 'N/A'}</div>
-                                        <div><strong>Descrição:</strong> ${t.descricao || 'N/A'}</div>
-                                    </div>
-                                </div>
-                            `).join('')}
+                            ${htmlTitulosParciais}
                         </div>
                     </div>
                     <div style="font-size: 0.95em; color: #e53935; font-weight: bold; font-style: italic;">Esta ação não pode ser desfeita.</div>
                 `;
+                
+                console.log('Lista atualizada com sucesso');
+            } else {
+                console.error('Elemento listaTitulosParciais não encontrado!');
             }
+            
             // Mostrar botões de confirmação 
-            footerBtns.style.display = 'flex';
+            if (footerBtns) {
+                footerBtns.style.display = 'flex';
+                console.log('Footer dos botões exibido');
+            } else {
+                console.error('Elemento footerExclusaoBtns não encontrado!');
+            }
+            
             // Reatribuir evento do botão de confirmação para executar o cancelamento diretamente
             const btnConfirmar = document.getElementById('btnConfirmarExclusao');
             if (btnConfirmar) {
+                console.log('Botão confirmar encontrado, configurando evento...');
                 btnConfirmar.onclick = async function() {
                     try {
                         await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
@@ -2590,8 +2644,12 @@
                         resetarVariaveisCancelamento();
                     }
                 };
+            } else {
+                console.error('Botão btnConfirmarExclusao não encontrado!');
             }
+            
             modal.style.display = 'flex';
+            console.log('Modal exibido com sucesso');
         }
 
         async function executarCancelamentoBaixa(tituloOriginal, titulosParciais) {
