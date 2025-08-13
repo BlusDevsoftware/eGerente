@@ -2760,6 +2760,17 @@ function formatarValor(valor) {
 }
 function formatarData(data) {
     if (!data) return '';
+    
+    // Se a data já está no formato YYYY-MM-DD, converter diretamente
+    if (typeof data === 'string' && data.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const partes = data.split('-');
+        const dia = partes[2];
+        const mes = partes[1];
+        const ano = partes[0];
+        return `${dia}/${mes}/${ano}`;
+    }
+    
+    // Para outros formatos, usar a lógica original
     const d = new Date(data);
     if (isNaN(d)) return data;
     return d.toLocaleDateString('pt-BR');
