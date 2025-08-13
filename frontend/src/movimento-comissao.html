@@ -1476,6 +1476,17 @@
             document.getElementById('paymentModal').style.display = 'none';
             // Limpar arquivo selecionado ao fechar o modal
             removeFile();
+            
+            // Limpar simulação do título parcial
+            const simulacao = document.getElementById('simulacaoNovoTitulo');
+            if (simulacao) {
+                simulacao.remove();
+                console.log('Simulação do título parcial removida');
+            }
+            
+            // Resetar variáveis de baixa parcial
+            baixaParcialConfirmada = false;
+            baixaParcialDiferenca = 0;
         }
 
         // Close modal when clicking outside
@@ -3264,19 +3275,34 @@ function confirmarBaixaParcial() {
     console.log('Criando elemento de simulação...');
     simulacao = document.createElement('div');
     simulacao.id = 'simulacaoNovoTitulo';
-    simulacao.style = 'margin: 18px 0 0 0;';
+    simulacao.style = 'margin: 18px 0 0 0; display: block !important; visibility: visible !important; opacity: 1 !important;';
     
     // Inserir logo acima dos botões de ação
     const paymentForm = document.getElementById('paymentForm');
-    const formActions = paymentForm && paymentForm.querySelector('.form-actions');
-    if (formActions) {
-      paymentForm.insertBefore(simulacao, formActions);
-      console.log('Simulação inserida no formulário');
+    if (paymentForm) {
+      // Tentar inserir antes dos botões de ação
+      const formActions = paymentForm.querySelector('.form-actions');
+      if (formActions) {
+        paymentForm.insertBefore(simulacao, formActions);
+        console.log('Simulação inserida antes dos botões de ação');
+        console.log('Form actions encontrado:', formActions);
+        console.log('Simulação inserida em:', simulacao.parentElement);
+      } else {
+        // Se não encontrar form-actions, inserir no final do formulário
+        paymentForm.appendChild(simulacao);
+        console.log('Simulação inserida no final do formulário');
+        console.log('Form actions não encontrado, inserindo no final');
+        console.log('Simulação inserida em:', simulacao.parentElement);
+      }
     } else {
-      console.error('Form actions não encontrado!');
+      console.error('Formulário de pagamento não encontrado!');
     }
   } else {
     console.log('Elemento de simulação já existe');
+    // Garantir que está visível
+    simulacao.style.display = 'block';
+    simulacao.style.visibility = 'visible';
+    simulacao.style.opacity = '1';
   }
   
   // Usar a variável global para o número do título original
@@ -3291,27 +3317,67 @@ function confirmarBaixaParcial() {
     baixaParcialDiferenca
   });
   
+  // Criar HTML da simulação com melhor formatação
   simulacao.innerHTML = `
-    <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 18px;'>
-      <h2 style='margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
-        <i class="fas fa-receipt"></i> Título Parcial
-      </h2>
-    </div>
-    <div style="background: #f5faff; border: 1.5px solid #e3f2fd; border-radius: 10px; padding: 18px 14px 10px 14px; margin-bottom: 18px;">
-      <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 8px 18px; align-items: center;">  
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-hashtag' style='color:#1976D2;'></i> <b>Nº Título:</b> <span style='margin-left:4px;'>Simulado-1/1</span></div>
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-receipt' style='color:#1976D2;'></i> <b>Origem:</b> <span style='margin-left:4px;'>${numeroOriginal}</span></div>
-        <div style='display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;'><i class='fas fa-user' style='color:#1976D2;'></i> <b>Colaborador:</b> <span style='margin-left:4px;'>${colaboradorNome}</span></div>
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-calendar-plus' style='color:#1976D2;'></i> <b>Geração:</b> <span style='margin-left:4px;'>${dataHoje.split('-').reverse().join('/')}</span></div>
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-coins' style='color:#1976D2;'></i> <b>Valor:</b> <span style='margin-left:4px;'>R$ ${baixaParcialDiferenca.replace('.', ',')}</span></div>
-        <div style='display:flex; align-items:center; gap:6px;'><i class='fas fa-flag' style='color:#1976D2;'></i> <b>Status:</b> <span style='margin-left:4px;'>PENDENTE</span></div>
-        <div style='display:flex; align-items:center; gap:6px; grid-column: 1 / span 2;'><i class='fas fa-align-left' style='color:#1976D2;'></i> <b>Descrição:</b> <span style='margin-left:4px;'>Diferença de baixa parcial</span></div>
-        <div style='display:flex; align-items:center; gap:6px; grid-column: 3;'><i class='fas fa-calendar-check' style='color:#1976D2;'></i> <b>Vencimento:</b> <input type='date' id='vencimentoTituloParcial' value='${dataHoje}' style='padding: 4px 8px; border-radius: 6px; border: 1.5px solid #1976D2; background: #fff; color: #1976D2; font-size: 1em; margin-left:4px;'></div>
+    <div style="background: #e3f2fd; border: 2px solid #1976D2; border-radius: 12px; padding: 20px; margin: 20px 0;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <i class="fas fa-receipt" style="font-size: 1.5em; color: #1976D2;"></i>
+        <h3 style="margin: 0; font-size: 1.2em; color: #1976D2; font-weight: 700;">Título Parcial Simulado</h3>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Nº Título</div>
+          <div style="color: #333;">Simulado-1/1</div>
+        </div>
+        
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Origem</div>
+          <div style="color: #333;">${numeroOriginal}</div>
+        </div>
+        
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Colaborador</div>
+          <div style="color: #333;">${colaboradorNome}</div>
+        </div>
+        
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Valor</div>
+          <div style="color: #333; font-weight: 600;">R$ ${baixaParcialDiferenca.replace('.', ',')}</div>
+        </div>
+        
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Status</div>
+          <div style="color: #333;">PENDENTE</div>
+        </div>
+        
+        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
+          <input type="date" id="vencimentoTituloParcial" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
+        </div>
+      </div>
+      
+      <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+        <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Descrição</div>
+        <div style="color: #333;">Diferença de baixa parcial - Título ${numeroOriginal}</div>
+      </div>
+      
+      <div style="margin-top: 16px; padding: 12px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: #e65100; font-weight: 600;">
+          <i class="fas fa-info-circle"></i>
+          <span>Este título parcial será gerado automaticamente após a baixa</span>
+        </div>
       </div>
     </div>
   `;
   
   console.log('Simulação do título parcial criada com sucesso');
+  
+  // Verificar se a simulação está visível
+  console.log('Simulação criada:', simulacao);
+  console.log('Simulação visível:', simulacao.style.display);
+  console.log('Simulação offsetHeight:', simulacao.offsetHeight);
+  console.log('Simulação parent:', simulacao.parentElement);
   
   // Remover aviso antigo, se existir
   let aviso = document.getElementById('avisoNovoTitulo');
