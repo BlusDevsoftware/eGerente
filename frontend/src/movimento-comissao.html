@@ -1130,7 +1130,17 @@
         // Função para carregar os modais de exclusão e cancelamento de baixa
         async function carregarModais() {
             try {
-                const response = await fetch('modais-movimento.html');
+                // Tentar carregar do diretório atual primeiro
+                let response = await fetch('./modais-movimento.html');
+                if (!response.ok) {
+                    // Se não encontrar, tentar do diretório pai
+                    response = await fetch('../modais-movimento.html');
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const html = await response.text();
                 
                 // Extrair apenas o conteúdo dos modais (remover comentários e script)
@@ -1140,6 +1150,10 @@
                 // Pegar apenas os elementos div dos modais
                 const modais = doc.querySelectorAll('div[id^="modal"]');
                 const container = document.getElementById('modais-container');
+                
+                if (modais.length === 0) {
+                    throw new Error('Nenhum modal encontrado no arquivo');
+                }
                 
                 modais.forEach(modal => {
                     container.appendChild(modal.cloneNode(true));
@@ -1153,8 +1167,8 @@
                     document.head.appendChild(newScript);
                     window.modaisCarregados = true; // Marcar como carregado
                     
-                    // Configurar event listeners após carregar os modais
-                    setTimeout(configurarEventListenersModais, 100);
+                    // Aguardar um pouco mais para garantir que as funções estejam disponíveis
+                    setTimeout(configurarEventListenersModais, 200);
                 }
                 
                 console.log('Modais carregados com sucesso');
@@ -1168,6 +1182,31 @@
         // Função para configurar event listeners dos modais
         function configurarEventListenersModais() {
             console.log('Configurando event listeners dos modais...');
+            
+            // Verificar se as funções necessárias estão disponíveis
+            if (typeof fecharModalConfirmExclusao === 'undefined') {
+                console.warn('Função fecharModalConfirmExclusao não encontrada, criando fallback...');
+                window.fecharModalConfirmExclusao = function() {
+                    const modal = document.getElementById('modalConfirmExclusao');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
+            
+            if (typeof fecharModalSucessoExclusao === 'undefined') {
+                console.warn('Função fecharModalSucessoExclusao não encontrada, criando fallback...');
+                window.fecharModalSucessoExclusao = function() {
+                    const modal = document.getElementById('modalSucessoExclusao');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
+            
+            if (typeof fecharModalSucessoCancelarBaixa === 'undefined') {
+                console.warn('Função fecharModalSucessoCancelarBaixa não encontrada, criando fallback...');
+                window.fecharModalSucessoCancelarBaixa = function() {
+                    const modal = document.getElementById('modalSucessoCancelarBaixa');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
             
             // Event listeners para botões dos modais
             const btnCancelarExclusao = document.getElementById('btnCancelarExclusao');
@@ -1214,6 +1253,30 @@
         
         // Função fallback para criar modais básicos
         function criarModaisFallback() {
+            console.log('Criando modais fallback...');
+            
+            // Criar funções básicas se não existirem
+            if (typeof fecharModalSucessoExclusao === 'undefined') {
+                window.fecharModalSucessoExclusao = function() {
+                    const modal = document.getElementById('modalSucessoExclusao');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
+            
+            if (typeof fecharModalConfirmExclusao === 'undefined') {
+                window.fecharModalConfirmExclusao = function() {
+                    const modal = document.getElementById('modalConfirmExclusao');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
+            
+            if (typeof fecharModalSucessoCancelarBaixa === 'undefined') {
+                window.fecharModalSucessoCancelarBaixa = function() {
+                    const modal = document.getElementById('modalSucessoCancelarBaixa');
+                    if (modal) modal.style.display = 'none';
+                };
+            }
+            
             const container = document.getElementById('modais-container');
             container.innerHTML = `
                 <div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
@@ -1226,7 +1289,19 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="modalSucessoExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+                    <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; padding: 24px;">
+                        <h2>Sucesso!</h2>
+                        <p>Título excluído com sucesso!</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="fecharModalSucessoExclusao()" class="btn-primary">OK</button>
+                        </div>
+                    </div>
+                </div>
             `;
+            
+            console.log('Modais fallback criados com sucesso');
         }
         
         // Carregar modais quando a página carregar (apenas uma vez)
@@ -2054,7 +2129,7 @@
 
         // Variáveis globais para os modais (não duplicar - estão no arquivo modais-movimento.html)
         // let tituloParaExcluir = null;
-        let tituloParaCancelarBaixa = null;
+        // let tituloParaCancelarBaixa = null; // Removido - já declarado no arquivo de modais
         // let modoExclusaoParcelamento = 'unico';
         // let titulosParaExcluirAnimacao = [];
 
@@ -2552,10 +2627,10 @@
             }
         }
 
-        function fecharModalConfirmExclusao() {
-            // FUNÇÃO DUPLICADA - REMOVIDA
-            // A função principal está na linha 2100
-        }
+        // function fecharModalConfirmExclusao() {
+        //     // FUNÇÃO DUPLICADA - REMOVIDA
+        //     // A função principal está na linha 2100
+        // }
 
         function fecharModalSucessoCancelarBaixa() {
             const modal = document.getElementById('modalSucessoCancelarBaixa');
@@ -2718,7 +2793,8 @@
             }
         });
 
-        // Função para confirmar exclusão de título
+        // Função para confirmar exclusão de título (COMENTADA - já definida no arquivo de modais)
+        /*
         async function confirmarExclusao(modo) {
             if (!tituloParaExcluir || !tituloParaExcluir.titulo) {
                 console.error('Nenhum título para excluir');
@@ -2762,6 +2838,7 @@
                 alert(`Erro ao excluir título: ${error.message}`);
             }
         }
+        */
 
         // Função para resetar variáveis após cancelamento bem-sucedido
         function resetarVariaveisCancelamento() {
