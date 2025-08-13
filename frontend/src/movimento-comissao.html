@@ -1759,19 +1759,25 @@
                     // Adicionar campo de comprovante editável (se não existir)
                     const comprovanteContainer = document.getElementById('comprovante-container');
                     if (comprovanteContainer) {
-                        const uploadSection = document.createElement('div');
-                        uploadSection.style.marginTop = '16px';
-                        uploadSection.innerHTML = `
-                            <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 16px; text-align: center; background: #f8fbff;">
-                                <input type="file" id="novoComprovante" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
-                                <button type="button" onclick="document.getElementById('novoComprovante').click()" 
-                                        style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-                                    <i class="fas fa-upload"></i> Alterar Comprovante
-                                </button>
-                                <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
-                            </div>
-                        `;
-                        comprovanteContainer.appendChild(uploadSection);
+                        // Verificar se já existe o campo de upload
+                        let uploadSection = document.getElementById('upload-comprovante-section');
+                        
+                        if (!uploadSection) {
+                            uploadSection = document.createElement('div');
+                            uploadSection.id = 'upload-comprovante-section';
+                            uploadSection.style.marginTop = '16px';
+                            uploadSection.innerHTML = `
+                                <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 16px; text-align: center; background: #f8fbff;">
+                                    <input type="file" id="novoComprovante" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
+                                    <button type="button" onclick="document.getElementById('novoComprovante').click()" 
+                                            style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                        <i class="fas fa-upload"></i> Alterar Comprovante
+                                    </button>
+                                    <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
+                                </div>
+                            `;
+                            comprovanteContainer.appendChild(uploadSection);
+                        }
                     }
                     
                 } else {
@@ -1975,6 +1981,18 @@
         
         function fecharModalTitulo() {
             document.getElementById('modalTitulo').style.display = 'none';
+            
+            // Limpar campo de upload de comprovante se existir
+            const uploadSection = document.getElementById('upload-comprovante-section');
+            if (uploadSection) {
+                uploadSection.remove();
+            }
+            
+            // Limpar input de arquivo se existir
+            const novoComprovante = document.getElementById('novoComprovante');
+            if (novoComprovante) {
+                novoComprovante.value = '';
+            }
         }
         // Integrar aos botões da tabela
         function bindAcoesTabela() {
