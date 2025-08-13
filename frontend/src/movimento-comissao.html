@@ -1497,95 +1497,7 @@
             }
         }
 
-        // Payment Form Submission
-        // DESABILITADO - Event listener duplicado que causava baixa automática
-        // document.getElementById('paymentForm').addEventListener('submit', async function(e) {
-        //     e.preventDefault();
-        //     const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
-        //     const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
-        //     const dataPagamento = document.getElementById('paymentDate').value;
-        //     // Mapear status para português
-        //     const statusMap = {
-        //         paid: 'PAGO',
-        //         pending: 'PENDENTE',
-        //         vencido: 'VENCIDO',
-        //         'nao-pago': 'CLIENTE NÃO PAGOU'
-        //     };
-        //     const status = statusMap[document.getElementById('paymentStatus').value] || 'PENDENTE';
-        //     const observacoes = document.getElementById('paymentNotes').value;
-        //     
-        //     // Capturar arquivo do comprovante
-        //     const fileInput = document.getElementById('paymentReceipt');
-        //     const comprovanteFile = fileInput.files[0];
-        //     let comprovanteUrl = null;
-        //     
-        //     const titulo = tituloOriginalBaixa;
-        //     if (!titulo) {
-        //         alert('Erro: Título não encontrado!');
-        //         return;
-        //     }
-        //     
-        //     // Baixa parcial: se valorPago < valorTitulo
-        //     let baixaParcial = valorPago < valorTitulo;
-        //     
-        //     try {
-        //         // Se há arquivo de comprovante, faz upload para o Supabase Storage
-        //         if (comprovanteFile) {
-        //             comprovanteUrl = await uploadComprovanteToSupabase(comprovanteFile, titulo.id);
-        //         }
-        //         
-        //         // Preparar dados para envio
-        //         const dadosPagamento = {
-        //             valor_pago: valorPago,
-        //             data_pagamento: dataPagamento,
-        //             status: status,
-        //             observacoes: observacoes,
-        //             comprovante_url: comprovanteUrl
-        //         };
-        //         
-        //         // Enviar dados para o backend
-        //         await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
-        //         
-        //         // Atualizar array local
-        //         titulo.valor_pago = valorPago;
-        //         titulo.data_pagamento = dataPagamento;
-        //         titulo.status = status;
-        //         titulo.observacoes = observacoes;
-        //         titulo.comprovante_url = comprovanteUrl;
-        //         
-        //         // Se for baixa parcial, criar novo título
-        //         if (baixaParcial) {
-        //             const diferenca = (valorTitulo - valorPago).toFixed(2);
-        //             const novoTitulo = {
-        //                 ...titulo,
-        //                 valor: parseFloat(diferenca),
-        //                 valor_pago: 0,
-        //                 data_pagamento: null,
-        //                 status: 'PENDENTE',
-        //                 observacoes: 'Diferença de baixa parcial',
-        //                 data_geracao: new Date().toISOString().split('T')[0],
-        //                 data_vencimento: document.getElementById('vencimentoTituloParcial') ? document.getElementById('vencimentoTituloParcial').value : new Date().toISOString().split('T')[0],
-        //                 id_titulo_origem: titulo.id
-        //             };
-        //             delete novoTitulo.id; // Garante que não envia o id antigo
-        //             delete novoTitulo.numero_titulo; // Garante que não envia o numero_titulo antigo
-        //             console.log('Novo título parcial enviado para o backend:', novoTitulo); // Log para depuração
-        //             // Salvar novo título no backend
-        //             const response = await window.api.post('/movimento_comissoes', novoTitulo);
-        //             // O backend retorna um array ou objeto, pegue o título criado:
-        //             const tituloCriado = Array.isArray(response) ? response[0] : response;
-        //             todosTitulos.push(tituloCriado);
-        //         }
-        //         
-        //         atualizarTabelaComFiltros();
-        //         atualizarCardsTotalizadores();
-        //         closePaymentModal();
-        //         abrirModalSucessoEdicao();
-        //     } catch (error) {
-        //         console.error('Erro ao registrar baixa:', error);
-        //         alert('Erro ao registrar baixa!');
-        //     }
-        // });
+
 
         function openViewModal(data) {
             const modal = document.getElementById('viewModal');
@@ -2805,52 +2717,6 @@
             }
         });
 
-        // Função para confirmar exclusão de título (COMENTADA - já definida no arquivo de modais)
-        /*
-        async function confirmarExclusao(modo) {
-            if (!tituloParaExcluir || !tituloParaExcluir.titulo) {
-                console.error('Nenhum título para excluir');
-                return;
-            }
-            
-            const titulo = tituloParaExcluir.titulo;
-            
-            try {
-                if (modo === 'unico') {
-                    // Excluir apenas o título atual
-                    await window.api.delete(`/movimento_comissoes/${titulo.id}`);
-                    todosTitulos = todosTitulos.filter(t => t.id !== titulo.id);
-                    titulosFiltrados = titulosFiltrados.filter(t => t.id !== titulo.id);
-                    atualizarTabelaComFiltros();
-                    atualizarCardsTotalizadores();
-                    
-                    fecharModalConfirmExclusao();
-                    abrirModalSucessoExclusao();
-                    
-                } else if (modo === 'todos') {
-                    // Excluir todos os títulos do parcelamento
-                    const prefixo = (titulo.numero_titulo || '').split('-')[0];
-                    const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
-                    
-                    for (const t of titulosDoGrupo) {
-                        await window.api.delete(`/movimento_comissoes/${t.id}`);
-                    }
-                    
-                    todosTitulos = todosTitulos.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
-                    titulosFiltrados = titulosFiltrados.filter(t => !(t.numero_titulo || '').startsWith(prefixo + '-'));
-                    atualizarTabelaComFiltros();
-                    atualizarCardsTotalizadores();
-                    
-                    fecharModalConfirmExclusao();
-                    abrirModalSucessoExclusao();
-                }
-                
-            } catch (error) {
-                console.error('Erro ao excluir título:', error);
-                alert(`Erro ao excluir título: ${error.message}`);
-            }
-        }
-        */
 
         // Função para resetar variáveis após cancelamento bem-sucedido
         function resetarVariaveisCancelamento() {
@@ -3477,6 +3343,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Se for baixa parcial, criar novo título
         if (baixaParcial) {
           const diferenca = (valorTitulo - valorPago).toFixed(2);
+          
+          // Usar a data capturada antes de fechar o modal
+          const dataVencimento = dataVencimentoCapturada || new Date().toISOString().split('T')[0];
+          
+          console.log('Data de vencimento do título parcial:', dataVencimento);
+          console.log('Data capturada antes de fechar modal:', dataVencimentoCapturada);
+          
           const novoTitulo = {
             ...titulo,
             valor: parseFloat(diferenca),
@@ -3485,7 +3358,7 @@ document.addEventListener('DOMContentLoaded', function() {
             status: 'PENDENTE',
             observacoes: 'Diferença de baixa parcial',
             data_geracao: new Date().toISOString().split('T')[0],
-            data_vencimento: document.getElementById('vencimentoTituloParcial') ? document.getElementById('vencimentoTituloParcial').value : new Date().toISOString().split('T')[0],
+            data_vencimento: dataVencimento,
             id_titulo_origem: titulo.id
           };
           delete novoTitulo.id; // Garante que não envia o id antigo
@@ -3500,6 +3373,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         atualizarTabelaComFiltros();
         atualizarCardsTotalizadores();
+        
+        // Capturar dados antes de fechar o modal
+        let dataVencimentoCapturada = null;
+        if (baixaParcial) {
+          const vencimentoInput = document.getElementById('vencimentoTituloParcial');
+          dataVencimentoCapturada = vencimentoInput ? vencimentoInput.value : new Date().toISOString().split('T')[0];
+          console.log('Data de vencimento capturada antes de fechar modal:', dataVencimentoCapturada);
+        }
+        
         closePaymentModal();
         abrirModalSucessoEdicao();
         
