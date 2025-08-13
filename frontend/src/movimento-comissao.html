@@ -3408,6 +3408,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data_pagamento: null,
             status: 'PENDENTE',
             observacoes: `Diferença de baixa parcial - Título ${titulo.numero_titulo}`,
+            descricao: `Diferença de baixa parcial - Título ${titulo.numero_titulo}`,
             data_geracao: new Date().toISOString().split('T')[0],
             data_vencimento: dataVencimento,
             id_titulo_origem: titulo.id
@@ -3418,6 +3419,8 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log('=== DADOS ENVIADOS PARA O BACKEND ===');
           console.log('Título completo:', novoTitulo);
           console.log('Data de vencimento no objeto:', novoTitulo.data_vencimento);
+          console.log('Descrição no objeto:', novoTitulo.descricao);
+          console.log('Observações no objeto:', novoTitulo.observacoes);
           console.log('=====================================');
           
           console.log('Novo título parcial enviado para o backend:', novoTitulo);
