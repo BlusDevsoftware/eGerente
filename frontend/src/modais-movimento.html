@@ -4,13 +4,13 @@
      ======================================== -->
 
 <!-- Modal de Confirmação de Exclusão -->
-<div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
-  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+<div id="modalConfirmExclusao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; min-height: auto; max-height: 90vh; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; margin: auto; overflow: hidden; display: flex; flex-direction: column;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
       <h2 style="margin: 0; font-size: 1.35em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
       <button class="close-modal" onclick="fecharModalConfirmExclusao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
     </div>
-    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center; flex: 1; overflow-y: auto; min-height: 0;">
       <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; color: #e53935; margin-bottom: 12px;"></i>
       <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja excluir este título?</div>
       <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação não pode ser desfeita.</div>
@@ -33,8 +33,22 @@
         <div style="font-weight: 500; margin-bottom: 8px; color: #333;">Títulos relacionados:</div>
         <div id="titulosParciaisLista" style="max-height: 100px; overflow-y: auto; font-size: 0.9em;"></div>
       </div>
+      
+      <!-- Seção de animação de exclusão -->
+      <div id="animacaoExclusaoDiv" style="display: none; margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;">
+        <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+          <span id="textoProgressoExclusao">Iniciando exclusão...</span>
+        </div>
+        <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+          <div id="barraProgressoExclusao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+        </div>
+        <div style="font-size: 0.9em; color: #666; font-style: italic;">
+          Processando exclusão...
+        </div>
+      </div>
     </div>
-    <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+    <div class="modal-footer" id="footerExclusaoBtns" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee; flex-shrink: 0;">
       <button id="btnCancelarExclusao" class="btn-secondary" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
       <button id="btnConfirmarExclusao" class="btn-danger" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #e53935; color: white; border: none;"><i class="fas fa-trash"></i> Excluir</button>
     </div>
@@ -331,13 +345,24 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   }
   
   if (colaboradorElement) {
-    colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+    // Verificar se mapaColaboradores existe antes de usar
+    if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores) {
+      colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+    } else {
+      colaboradorElement.textContent = titulo.colaborador_id || '';
+    }
   } else {
     console.warn('Elemento colaboradorTituloExclusao não encontrado');
   }
   
   if (valorElement) {
-    valorElement.textContent = formatarValorLocal(titulo.valor);
+    // Verificar se formatarValorLocal existe antes de usar
+    if (typeof formatarValorLocal === 'function') {
+      valorElement.textContent = formatarValorLocal(titulo.valor);
+    } else {
+      // Fallback se a função não estiver disponível
+      valorElement.textContent = titulo.valor ? `R$ ${parseFloat(titulo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
+    }
   } else {
     console.warn('Elemento valorTituloExclusao não encontrado');
   }
@@ -475,11 +500,43 @@ function fecharModalSucessoCancelarBaixa() {
 function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
   const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
   if (modal) {
-    // Preencher informações do título
-    document.getElementById('numeroTituloPago').textContent = titulo.numero_titulo || '';
-    document.getElementById('dataPagamentoTitulo').textContent = formatarDataLocal(titulo.data_pagamento) || 'Não informada';
-    document.getElementById('valorPagoTitulo').textContent = formatarValorLocal(titulo.valor_pago) || 'Não informado';
-    document.getElementById('colaboradorTituloPago').textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+    // Preencher informações do título com verificações de segurança
+    const numeroElement = document.getElementById('numeroTituloPago');
+    const dataPagamentoElement = document.getElementById('dataPagamentoTitulo');
+    const valorPagoElement = document.getElementById('valorPagoTitulo');
+    const colaboradorElement = document.getElementById('colaboradorTituloPago');
+    
+    if (numeroElement) {
+      numeroElement.textContent = titulo.numero_titulo || '';
+    }
+    
+    if (dataPagamentoElement) {
+      // Verificar se formatarDataLocal existe antes de usar
+      if (typeof formatarDataLocal === 'function') {
+        dataPagamentoElement.textContent = formatarDataLocal(titulo.data_pagamento) || 'Não informada';
+      } else {
+        dataPagamentoElement.textContent = titulo.data_pagamento || 'Não informada';
+      }
+    }
+    
+    if (valorPagoElement) {
+      // Verificar se formatarValorLocal existe antes de usar
+      if (typeof formatarValorLocal === 'function') {
+        valorPagoElement.textContent = formatarValorLocal(titulo.valor_pago) || 'Não informado';
+      } else {
+        // Fallback se a função não estiver disponível
+        valorPagoElement.textContent = titulo.valor_pago ? `R$ ${parseFloat(titulo.valor_pago).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
+      }
+    }
+    
+    if (colaboradorElement) {
+      // Verificar se mapaColaboradores existe antes de usar
+      if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores) {
+        colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+      } else {
+        colaboradorElement.textContent = titulo.colaborador_id || '';
+      }
+    }
     
     // Mostrar observações se existirem
     const observacoesDiv = document.getElementById('observacoesTitulo');
