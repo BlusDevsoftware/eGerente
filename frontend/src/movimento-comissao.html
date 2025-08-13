@@ -1775,8 +1775,32 @@
                                     </button>
                                     <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
                                 </div>
+                                <div id="novo-comprovante-preview" style="display: none; margin-top: 12px; padding: 12px; background: #e8f5e8; border-radius: 6px; border: 1px solid #4caf50;">
+                                    <div style="display: flex; align-items: center; gap: 8px; color: #2e7d32; font-weight: 500;">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span id="novo-comprovante-nome"></span>
+                                    </div>
+                                    <div style="font-size: 0.8em; color: #666; margin-top: 4px;">
+                                        <span id="novo-comprovante-tamanho"></span>
+                                    </div>
+                                    <button type="button" onclick="removerNovoComprovante()" 
+                                            style="margin-top: 8px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
+                                </div>
                             `;
                             comprovanteContainer.appendChild(uploadSection);
+                            
+                            // Adicionar event listener para mostrar preview do arquivo
+                            const novoComprovanteInput = document.getElementById('novoComprovante');
+                            if (novoComprovanteInput) {
+                                novoComprovanteInput.addEventListener('change', function(e) {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        mostrarPreviewNovoComprovante(file);
+                                    }
+                                });
+                            }
                         }
                     }
                     
@@ -1993,6 +2017,42 @@
             if (novoComprovante) {
                 novoComprovante.value = '';
             }
+        }
+        
+        // Função para mostrar preview do novo comprovante
+        function mostrarPreviewNovoComprovante(file) {
+            const preview = document.getElementById('novo-comprovante-preview');
+            const nome = document.getElementById('novo-comprovante-nome');
+            const tamanho = document.getElementById('novo-comprovante-tamanho');
+            
+            if (preview && nome && tamanho) {
+                nome.textContent = file.name;
+                tamanho.textContent = formatarTamanhoArquivo(file.size);
+                preview.style.display = 'block';
+            }
+        }
+        
+        // Função para remover novo comprovante
+        function removerNovoComprovante() {
+            const novoComprovante = document.getElementById('novoComprovante');
+            const preview = document.getElementById('novo-comprovante-preview');
+            
+            if (novoComprovante) {
+                novoComprovante.value = '';
+            }
+            
+            if (preview) {
+                preview.style.display = 'none';
+            }
+        }
+        
+        // Função para formatar tamanho do arquivo
+        function formatarTamanhoArquivo(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         // Integrar aos botões da tabela
         function bindAcoesTabela() {
