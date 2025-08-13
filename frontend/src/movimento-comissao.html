@@ -2847,6 +2847,12 @@
             const modalBody = modal.querySelector('.modal-body');
             const footerBtns = document.getElementById('footerExclusaoBtns');
             
+            // Remover animação anterior se existir
+            const animacaoAnterior = document.getElementById('animacaoExclusaoDiv');
+            if (animacaoAnterior) {
+                animacaoAnterior.remove();
+            }
+            
             // Esconder botões
             footerBtns.style.display = 'none';
             
