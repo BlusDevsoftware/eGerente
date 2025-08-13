@@ -3660,9 +3660,12 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Valor pago:', valorPago);
       console.log('Baixa parcial confirmada:', baixaParcialConfirmada);
       
+      // SEMPRE prevenir o comportamento padrão primeiro
+      e.preventDefault();
+      
+      // Verificar se é baixa parcial e não foi confirmada
       if (valorPago < valorTitulo && !baixaParcialConfirmada) {
         console.log('Baixa parcial detectada no submit - PREVENINDO ENVIO');
-        e.preventDefault();
         
         baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
         const msgElement = document.getElementById('msgBaixaParcial');
@@ -3674,15 +3677,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modal) {
           modal.style.display = 'flex';
           console.log('Modal de confirmação exibido no submit');
+        } else {
+          console.error('Modal de confirmação de baixa parcial não encontrado!');
         }
         
         return false;
       }
       
       console.log('Baixa normal ou parcial já confirmada - PROCESSANDO BAIXA');
-      e.preventDefault();
       
-      // Mostrar animação de baixa
+      // Mostrar animação de baixa APENAS quando for processar
       mostrarAnimacaoBaixa();
       
       // Declarar variável para capturar data de vencimento
@@ -3918,7 +3922,6 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log(`Progresso Baixa: ${percentual}% - ${texto}`);
       }
   }
-});
 </script>
 
 </body>
