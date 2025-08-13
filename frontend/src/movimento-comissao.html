@@ -2600,6 +2600,14 @@
                 
                 console.log('HTML gerado para títulos parciais:', htmlTitulosParciais);
                 
+                // Verificar estado do elemento antes de atualizar
+                console.log('Estado do listaDiv antes da atualização:', {
+                    display: listaDiv.style.display,
+                    visibility: listaDiv.style.visibility,
+                    opacity: listaDiv.style.opacity,
+                    innerHTML: listaDiv.innerHTML
+                });
+                
                 listaDiv.innerHTML = `
                     <div style="font-size: 1em; color: #888; margin-bottom: 8px;">Esta ação irá:</div>
                     <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 8px;">
@@ -2617,14 +2625,27 @@
                     <div style="font-size: 0.95em; color: #e53935; font-weight: bold; font-style: italic;">Esta ação não pode ser desfeita.</div>
                 `;
                 
-                console.log('Lista atualizada com sucesso');
+                // Verificar estado do elemento após a atualização
+                console.log('Estado do listaDiv após a atualização:', {
+                    display: listaDiv.style.display,
+                    visibility: listaDiv.style.visibility,
+                    opacity: listaDiv.style.opacity,
+                    innerHTML: listaDiv.innerHTML.substring(0, 200) + '...'
+                });
+                
+                // Garantir que o elemento esteja visível
+                listaDiv.style.display = 'block';
+                listaDiv.style.visibility = 'visible';
+                listaDiv.style.opacity = '1';
+                
+                console.log('Lista atualizada com sucesso e visibilidade garantida');
             } else {
                 console.error('Elemento listaTitulosParciais não encontrado!');
             }
             
             // Mostrar botões de confirmação 
             if (footerBtns) {
-                footerBtns.style.display = 'flex';
+            footerBtns.style.display = 'flex';
                 console.log('Footer dos botões exibido');
             } else {
                 console.error('Elemento footerExclusaoBtns não encontrado!');
@@ -2654,6 +2675,19 @@
             
             modal.style.display = 'flex';
             console.log('Modal exibido com sucesso');
+            
+            // Verificar estado final do modal e seus elementos
+            setTimeout(() => {
+                console.log('Estado final do modal após 100ms:', {
+                    modalDisplay: modal.style.display,
+                    modalVisibility: modal.style.visibility,
+                    modalOpacity: modal.style.opacity,
+                    listaDivDisplay: listaDiv ? listaDiv.style.display : 'N/A',
+                    listaDivVisibility: listaDiv ? listaDiv.style.visibility : 'N/A',
+                    listaDivOpacity: listaDiv ? listaDiv.style.opacity : 'N/A',
+                    listaDivInnerHTML: listaDiv ? listaDiv.innerHTML.substring(0, 100) + '...' : 'N/A'
+                });
+            }, 100);
             
             // Aguardar um pouco e então permitir fechamento ao clicar fora
             setTimeout(() => {
