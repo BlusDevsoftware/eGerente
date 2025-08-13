@@ -1728,35 +1728,84 @@
             } else {
                 iconEl.className = 'fas fa-edit';
                 textoEl.textContent = 'Editar Título';
-                // Todos editáveis, exceto número, colaborador, usuário, status e tipo
-                form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
-                document.getElementById('modal-numero').setAttribute('readonly', true);
-                document.getElementById('modal-colaborador').setAttribute('readonly', true);
-                document.getElementById('modal-usuario').setAttribute('readonly', true);
-                document.getElementById('modal-status').setAttribute('readonly', true);
-                document.getElementById('modal-tipo').setAttribute('readonly', true);
                 
-                // Configurar campo valor para edição
-                const valorInput = document.getElementById('modal-valor');
-                valorInput.removeAttribute('readonly');
-                valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
-                valorInput.addEventListener('input', function(e) {
-                    let v = e.target.value.replace(/\D/g, '');
-                    v = (parseInt(v, 10) || 0).toString();
-                    while (v.length < 3) v = '0' + v;
-                    let reais = v.slice(0, -2);
-                    let centavos = v.slice(-2);
-                    reais = reais.replace(/^0+/, '') || '0';
-                    reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                    e.target.value = `R$ ${reais},${centavos}`;
-                });
-                // Ao focar, seleciona só o número
-                valorInput.addEventListener('focus', function(e) {
-                    setTimeout(() => {
-                        let val = e.target.value.replace(/^R\$\s*/, '');
-                        e.target.setSelectionRange(val.length, val.length);
-                    }, 0);
-                });
+                // Verificar se o título está pago
+                const tituloPago = titulo.status === 'PAGO' || titulo.valor_pago > 0;
+                
+                if (tituloPago) {
+                    // Se está pago, apenas campos de pagamento editáveis
+                    textoEl.textContent = 'Editar Informações de Pagamento';
+                    
+                    // Tornar todos os campos readonly por padrão
+                    form.querySelectorAll('input, textarea').forEach(inp => inp.setAttribute('readonly', true));
+                    
+                    // Permitir edição apenas dos campos de pagamento
+                    const dataPagamentoInput = document.getElementById('modal-data-pagamento');
+                    const observacoesInput = document.getElementById('modal-observacoes');
+                    
+                    if (dataPagamentoInput) {
+                        dataPagamentoInput.removeAttribute('readonly');
+                        dataPagamentoInput.type = 'date';
+                        // Converter data formatada para formato de input date
+                        if (titulo.data_pagamento) {
+                            dataPagamentoInput.value = titulo.data_pagamento;
+                        }
+                    }
+                    
+                    if (observacoesInput) {
+                        observacoesInput.removeAttribute('readonly');
+                    }
+                    
+                    // Adicionar campo de comprovante editável (se não existir)
+                    const comprovanteContainer = document.getElementById('comprovante-container');
+                    if (comprovanteContainer) {
+                        const uploadSection = document.createElement('div');
+                        uploadSection.style.marginTop = '16px';
+                        uploadSection.innerHTML = `
+                            <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 16px; text-align: center; background: #f8fbff;">
+                                <input type="file" id="novoComprovante" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
+                                <button type="button" onclick="document.getElementById('novoComprovante').click()" 
+                                        style="background: #1976D2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                                    <i class="fas fa-upload"></i> Alterar Comprovante
+                                </button>
+                                <p style="margin: 8px 0 0 0; color: #666; font-size: 0.8em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
+                            </div>
+                        `;
+                        comprovanteContainer.appendChild(uploadSection);
+                    }
+                    
+                } else {
+                    // Se não está pago, edição normal
+                    // Todos editáveis, exceto número, colaborador, usuário, status e tipo
+                    form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
+                    document.getElementById('modal-numero').setAttribute('readonly', true);
+                    document.getElementById('modal-colaborador').setAttribute('readonly', true);
+                    document.getElementById('modal-usuario').setAttribute('readonly', true);
+                    document.getElementById('modal-status').setAttribute('readonly', true);
+                    document.getElementById('modal-tipo').setAttribute('readonly', true);
+                    
+                    // Configurar campo valor para edição
+                    const valorInput = document.getElementById('modal-valor');
+                    valorInput.removeAttribute('readonly');
+                    valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
+                    valorInput.addEventListener('input', function(e) {
+                        let v = e.target.value.replace(/\D/g, '');
+                        v = (parseInt(v, 10) || 0).toString();
+                        while (v.length < 3) v = '0' + v;
+                        let reais = v.slice(0, -2);
+                        let centavos = v.slice(-2);
+                        reais = reais.replace(/^0+/, '') || '0';
+                        reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+                        e.target.value = `R$ ${reais},${centavos}`;
+                    });
+                    // Ao focar, seleciona só o número
+                    valorInput.addEventListener('focus', function(e) {
+                        setTimeout(() => {
+                            let val = e.target.value.replace(/^R\$\s*/, '');
+                            e.target.setSelectionRange(val.length, val.length);
+                        }, 0);
+                    });
+                }
                 
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
                 
@@ -2917,25 +2966,56 @@ if (btnSalvarModalTitulo) {
         
         // Coletar dados do formulário
         const numero = document.getElementById('modal-numero').value;
-        const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
-        const descricao = document.getElementById('modal-descricao').value;
-        
-        // Encontrar o título no array local
         const titulo = todosTitulos.find(t => t.numero_titulo === numero);
         if (!titulo) {
             alert('Erro: Título não encontrado!');
             return;
         }
         
+        // Verificar se o título está pago
+        const tituloPago = titulo.status === 'PAGO' || titulo.valor_pago > 0;
+        
         try {
-            await window.api.put(`/movimento_comissoes/${titulo.id}`, {
-                valor: parseFloat(valor),
-                descricao: descricao
-            });
-            
-            // Atualizar array local
-            titulo.valor = parseFloat(valor);
-            titulo.descricao = descricao;
+            if (tituloPago) {
+                // Se está pago, salvar apenas informações de pagamento
+                const dataPagamento = document.getElementById('modal-data-pagamento').value;
+                const observacoes = document.getElementById('modal-observacoes').value;
+                const novoComprovante = document.getElementById('novoComprovante');
+                
+                const dadosPagamento = {
+                    data_pagamento: dataPagamento,
+                    observacoes: observacoes
+                };
+                
+                // Se há novo comprovante, fazer upload
+                if (novoComprovante && novoComprovante.files[0]) {
+                    const comprovanteUrl = await uploadComprovanteToSupabase(novoComprovante.files[0], titulo.id);
+                    dadosPagamento.comprovante_url = comprovanteUrl;
+                }
+                
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
+                
+                // Atualizar array local
+                titulo.data_pagamento = dataPagamento;
+                titulo.observacoes = observacoes;
+                if (dadosPagamento.comprovante_url) {
+                    titulo.comprovante_url = dadosPagamento.comprovante_url;
+                }
+                
+            } else {
+                // Se não está pago, salvar normalmente
+                const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
+                const descricao = document.getElementById('modal-descricao').value;
+                
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                    valor: parseFloat(valor),
+                    descricao: descricao
+                });
+                
+                // Atualizar array local
+                titulo.valor = parseFloat(valor);
+                titulo.descricao = descricao;
+            }
             
             // Atualizar interface
             atualizarTabelaComFiltros();
