@@ -3682,6 +3682,9 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Baixa normal ou parcial já confirmada - PROCESSANDO BAIXA');
       e.preventDefault();
       
+      // Mostrar animação de baixa
+      mostrarAnimacaoBaixa();
+      
       // Declarar variável para capturar data de vencimento
       let dataVencimentoCapturada = null;
       
@@ -3712,9 +3715,16 @@ document.addEventListener('DOMContentLoaded', function() {
       let baixaParcial = valorPago < valorTitulo;
       
       try {
+        // Atualizar progresso inicial
+        atualizarProgressoBaixa(10, 'Iniciando processamento da baixa...');
+        
         // Se há arquivo de comprovante, faz upload para o Supabase Storage
         if (comprovanteFile) {
+          atualizarProgressoBaixa(20, 'Fazendo upload do comprovante...');
           comprovanteUrl = await uploadComprovanteToSupabase(comprovanteFile, titulo.id);
+          atualizarProgressoBaixa(40, 'Comprovante enviado com sucesso!');
+        } else {
+          atualizarProgressoBaixa(30, 'Processando dados de pagamento...');
         }
         
         // Preparar dados para envio
@@ -3727,7 +3737,9 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // Enviar dados para o backend
+        atualizarProgressoBaixa(50, 'Registrando baixa no sistema...');
         await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
+        atualizarProgressoBaixa(70, 'Baixa registrada com sucesso!');
         
         // Atualizar array local
         titulo.valor_pago = valorPago;
@@ -3738,6 +3750,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Se for baixa parcial, criar novo título
         if (baixaParcial) {
+          atualizarProgressoBaixa(80, 'Processando baixa parcial...');
           const diferenca = (valorTitulo - valorPago).toFixed(2);
           
           // Capturar data de vencimento ANTES de criar o novo título
@@ -3783,6 +3796,8 @@ document.addEventListener('DOMContentLoaded', function() {
           
           console.log('=== FIM INVESTIGAÇÃO ===');
           
+          atualizarProgressoBaixa(85, 'Criando título parcial...');
+          
           const novoTitulo = {
             ...titulo,
             valor: parseFloat(diferenca),
@@ -3807,11 +3822,18 @@ document.addEventListener('DOMContentLoaded', function() {
           
           console.log('Novo título parcial enviado para o backend:', novoTitulo);
           // Salvar novo título no backend
+          atualizarProgressoBaixa(90, 'Salvando título parcial no sistema...');
           const response = await window.api.post('/movimento_comissoes', novoTitulo);
           // O backend retorna um array ou objeto, pegue o título criado:
           const tituloCriado = Array.isArray(response) ? response[0] : response;
           todosTitulos.push(tituloCriado);
+          atualizarProgressoBaixa(95, 'Título parcial criado com sucesso!');
         }
+        
+        atualizarProgressoBaixa(100, 'Baixa concluída com sucesso!');
+        
+        // Aguardar um pouco para mostrar o progresso final
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
         atualizarTabelaComFiltros();
         atualizarCardsTotalizadores();
@@ -3835,6 +3857,66 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   } else {
     console.error('Formulário de pagamento não encontrado!');
+  }
+});
+
+  // Função para mostrar animação de baixa
+  function mostrarAnimacaoBaixa() {
+      const modal = document.getElementById('paymentModal');
+      const modalBody = modal.querySelector('.modal-body');
+      const footerBtns = modal.querySelector('.form-actions');
+      
+      // Remover animação anterior se existir
+      const animacaoAnterior = document.getElementById('animacaoBaixaDiv');
+      if (animacaoAnterior) {
+          animacaoAnterior.remove();
+      }
+      
+      // Esconder botões
+      footerBtns.style.display = 'none';
+      
+      // Criar e mostrar animação de baixa
+      const animacaoDiv = document.createElement('div');
+      animacaoDiv.id = 'animacaoBaixaDiv';
+      animacaoDiv.style.cssText = `
+          margin: 20px 0; 
+          text-align: center;
+          background: #f8f9fa;
+          border-radius: 12px;
+          padding: 20px;
+          border: 1px solid #e9ecef;
+      `;
+      
+      animacaoDiv.innerHTML = `
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+              <span id="textoProgressoBaixa">Iniciando baixa...</span>
+          </div>
+          <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+              <div id="barraProgressoBaixa" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+          </div>
+          <div style="font-size: 0.9em; color: #666; font-style: italic;">
+              Processando pagamento...
+          </div>
+      `;
+      
+      // Inserir animação no modal (antes dos botões)
+      modalBody.insertBefore(animacaoDiv, footerBtns);
+      
+      console.log('Animação de baixa exibida');
+  }
+  
+  // Função para atualizar progresso da baixa
+  function atualizarProgressoBaixa(percentual, texto) {
+      const barraProgresso = document.getElementById('barraProgressoBaixa');
+      const textoProgresso = document.getElementById('textoProgressoBaixa');
+      
+      if (barraProgresso && textoProgresso) {
+          barraProgresso.style.width = `${percentual}%`;
+          textoProgresso.textContent = texto;
+          
+          console.log(`Progresso Baixa: ${percentual}% - ${texto}`);
+      }
   }
 });
 </script>

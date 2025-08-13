@@ -318,11 +318,35 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   tituloParaExcluir = { titulo, onConfirm };
   console.log('tituloParaExcluir definido como:', tituloParaExcluir);
   
-  // Preencher informações do título no modal
-  document.getElementById('numeroTituloExclusao').textContent = titulo.numero_titulo || '';
-  document.getElementById('colaboradorTituloExclusao').textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
-  document.getElementById('valorTituloExclusao').textContent = formatarValorLocal(titulo.valor);
-  document.getElementById('statusTituloExclusao').textContent = titulo.status || '';
+  // Preencher informações do título no modal com verificações de segurança
+  const numeroElement = document.getElementById('numeroTituloExclusao');
+  const colaboradorElement = document.getElementById('colaboradorTituloExclusao');
+  const valorElement = document.getElementById('valorTituloExclusao');
+  const statusElement = document.getElementById('statusTituloExclusao');
+  
+  if (numeroElement) {
+    numeroElement.textContent = titulo.numero_titulo || '';
+  } else {
+    console.warn('Elemento numeroTituloExclusao não encontrado');
+  }
+  
+  if (colaboradorElement) {
+    colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+  } else {
+    console.warn('Elemento colaboradorTituloExclusao não encontrado');
+  }
+  
+  if (valorElement) {
+    valorElement.textContent = formatarValorLocal(titulo.valor);
+  } else {
+    console.warn('Elemento valorTituloExclusao não encontrado');
+  }
+  
+  if (statusElement) {
+    statusElement.textContent = titulo.status || '';
+  } else {
+    console.warn('Elemento statusTituloExclusao não encontrado');
+  }
   
   // Detecta se é parcelado pelo padrão do número do título
   const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
