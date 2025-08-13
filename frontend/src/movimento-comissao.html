@@ -3184,71 +3184,113 @@ function fecharModalBaixaMultipla() {
 // ... existing code ...
 let baixaParcialDiferenca = 0;
 let baixaParcialConfirmada = false;
+// let tituloOriginalBaixa = null; // Removido - já declarado acima
+
+// Função para fechar o modal de confirmação de baixa parcial
+function fecharModalConfirmBaixaParcial() {
+  console.log('=== FECHANDO MODAL DE CONFIRMAÇÃO ===');
+  const modal = document.getElementById('modalConfirmBaixaParcial');
+  if (modal) {
+    modal.style.display = 'none';
+    console.log('Modal fechado com sucesso');
+  } else {
+    console.error('Modal modalConfirmBaixaParcial não encontrado para fechar!');
+  }
+  // Resetar a confirmação
+  baixaParcialConfirmada = false;
+  console.log('Confirmação resetada:', baixaParcialConfirmada);
+}
 
 // Adicionar evento ao campo Valor Pago para abrir o modal de baixa parcial imediatamente
 const inputValorPago = document.getElementById('paidValue');
-inputValorPago.addEventListener('blur', verificarBaixaParcial);
-inputValorPago.addEventListener('change', verificarBaixaParcial);
+if (inputValorPago) {
+  inputValorPago.addEventListener('blur', verificarBaixaParcial);
+  inputValorPago.addEventListener('change', verificarBaixaParcial);
+}
 
 function verificarBaixaParcial() {
+  console.log('=== VERIFICANDO BAIXA PARCIAL ===');
   const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
   const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+  
+  console.log('Valor do título:', valorTitulo);
+  console.log('Valor pago:', valorPago);
+  console.log('Baixa parcial confirmada:', baixaParcialConfirmada);
+  
   if (valorPago < valorTitulo && !baixaParcialConfirmada) {
+    console.log('Baixa parcial detectada!');
     baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
+    console.log('Diferença calculada:', baixaParcialDiferenca);
+    
     const msgElement = document.getElementById('msgBaixaParcial');
     if (msgElement) {
       msgElement.innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+      console.log('Mensagem atualizada no modal');
+    } else {
+      console.error('Elemento msgBaixaParcial não encontrado!');
     }
+    
     const modal = document.getElementById('modalConfirmBaixaParcial');
-    if (modal) modal.style.display = 'flex';
+    if (modal) {
+      modal.style.display = 'flex';
+      console.log('Modal de confirmação exibido');
+    } else {
+      console.error('Modal modalConfirmBaixaParcial não encontrado!');
+    }
+    
     // Remover aviso de novo título se existir
     let aviso = document.getElementById('avisoNovoTitulo');
     if (aviso) aviso.remove();
+  } else {
+    console.log('Não é baixa parcial ou já foi confirmada');
   }
 }
 
-// Ao tentar submeter o form de baixa
-const paymentForm = document.getElementById('paymentForm');
-if (paymentForm) {
-  paymentForm.addEventListener('submit', function(e) {
-    const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
-    const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
-    if (valorPago < valorTitulo && !baixaParcialConfirmada) {
-      e.preventDefault();
-      baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
-      const msgElement = document.getElementById('msgBaixaParcial');
-      if (msgElement) {
-        msgElement.innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
-      }
-      const modal = document.getElementById('modalConfirmBaixaParcial');
-      if (modal) modal.style.display = 'flex';
-      return false;
-    }
-    // Aqui segue o fluxo normal de baixa (já confirmado)
-    baixaParcialConfirmada = false;
-  });
-}
-
+// Função para confirmar a baixa parcial
 function confirmarBaixaParcial() {
+  console.log('=== CONFIRMANDO BAIXA PARCIAL ===');
   baixaParcialConfirmada = true;
+  console.log('Baixa parcial confirmada:', baixaParcialConfirmada);
+  
   const modal = document.getElementById('modalConfirmBaixaParcial');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.style.display = 'none';
+    console.log('Modal de confirmação fechado');
+  }
+  
   // Exibir bloco de simulação do novo título no modal de baixa
   let simulacao = document.getElementById('simulacaoNovoTitulo');
   if (!simulacao) {
+    console.log('Criando elemento de simulação...');
     simulacao = document.createElement('div');
     simulacao.id = 'simulacaoNovoTitulo';
     simulacao.style = 'margin: 18px 0 0 0;';
+    
     // Inserir logo acima dos botões de ação
+    const paymentForm = document.getElementById('paymentForm');
     const formActions = paymentForm && paymentForm.querySelector('.form-actions');
     if (formActions) {
       paymentForm.insertBefore(simulacao, formActions);
+      console.log('Simulação inserida no formulário');
+    } else {
+      console.error('Form actions não encontrado!');
     }
+  } else {
+    console.log('Elemento de simulação já existe');
   }
+  
   // Usar a variável global para o número do título original
   const numeroOriginal = tituloOriginalBaixa && tituloOriginalBaixa.numero_titulo ? tituloOriginalBaixa.numero_titulo : '';
   const colaboradorNome = tituloOriginalBaixa && mapaColaboradores[tituloOriginalBaixa.colaborador_id] ? mapaColaboradores[tituloOriginalBaixa.colaborador_id] : (tituloOriginalBaixa.colaborador_id || '');
   const dataHoje = new Date().toISOString().split('T')[0];
+  
+  console.log('Dados para simulação:', {
+    numeroOriginal,
+    colaboradorNome,
+    dataHoje,
+    baixaParcialDiferenca
+  });
+  
   simulacao.innerHTML = `
     <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 18px;'>
       <h2 style='margin: 0; font-size: 1.3em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;'>
@@ -3268,11 +3310,57 @@ function confirmarBaixaParcial() {
       </div>
     </div>
   `;
+  
+  console.log('Simulação do título parcial criada com sucesso');
+  
   // Remover aviso antigo, se existir
   let aviso = document.getElementById('avisoNovoTitulo');
   if (aviso) aviso.remove();
 }
-// ... existing code ...
+
+// Adicionar event listener para o formulário de pagamento
+document.addEventListener('DOMContentLoaded', function() {
+  const paymentForm = document.getElementById('paymentForm');
+  if (paymentForm) {
+    console.log('Formulário de pagamento encontrado, adicionando event listener...');
+    
+    paymentForm.addEventListener('submit', function(e) {
+      console.log('=== SUBMIT DO FORMULÁRIO DE PAGAMENTO ===');
+      
+      const valorTitulo = parseFloat(document.getElementById('commissionValue').value.replace(',', '.'));
+      const valorPago = parseFloat(document.getElementById('paidValue').value.replace(',', '.'));
+      
+      console.log('Valor do título:', valorTitulo);
+      console.log('Valor pago:', valorPago);
+      console.log('Baixa parcial confirmada:', baixaParcialConfirmada);
+      
+      if (valorPago < valorTitulo && !baixaParcialConfirmada) {
+        console.log('Baixa parcial detectada no submit - PREVENINDO ENVIO');
+        e.preventDefault();
+        
+        baixaParcialDiferenca = (valorTitulo - valorPago).toFixed(2);
+        const msgElement = document.getElementById('msgBaixaParcial');
+        if (msgElement) {
+          msgElement.innerHTML = `Será gerado um novo título com o valor da diferença <b>R$ ${baixaParcialDiferenca.replace('.', ',')}</b>.<br>Deseja continuar?`;
+        }
+        
+        const modal = document.getElementById('modalConfirmBaixaParcial');
+        if (modal) {
+          modal.style.display = 'flex';
+          console.log('Modal de confirmação exibido no submit');
+        }
+        
+        return false;
+      }
+      
+      console.log('Baixa normal ou parcial já confirmada - permitindo envio');
+      // Resetar a confirmação para próxima baixa
+      baixaParcialConfirmada = false;
+    });
+  } else {
+    console.error('Formulário de pagamento não encontrado!');
+  }
+});
 </script>
 
 </body>
