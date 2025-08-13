@@ -3351,17 +3351,44 @@ document.addEventListener('DOMContentLoaded', function() {
           const vencimentoInput = document.getElementById('vencimentoTituloParcial');
           let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
           
+          console.log('=== INVESTIGAÇÃO DA DATA ===');
+          console.log('Input encontrado:', vencimentoInput);
+          
           if (vencimentoInput && vencimentoInput.value) {
             // Pegar a data exata informada pelo usuário
-            dataVencimento = vencimentoInput.value;
-            console.log('Data informada pelo usuário:', dataVencimento);
+            const dataOriginal = vencimentoInput.value;
+            console.log('Data original do input:', dataOriginal);
+            console.log('Tipo da data original:', typeof dataOriginal);
+            
+            // Função para tratar data como local (evitar problemas de fuso horário)
+            function tratarDataComoLocal(dataString) {
+              const partes = dataString.split('-');
+              const ano = parseInt(partes[0]);
+              const mes = parseInt(partes[1]) - 1; // Mês começa em 0
+              const dia = parseInt(partes[2]);
+              
+              // Criar data como local (não UTC)
+              const dataLocal = new Date(ano, mes, dia);
+              console.log('Data criada como local:', dataLocal);
+              
+              // Retornar no formato YYYY-MM-DD
+              const anoLocal = dataLocal.getFullYear();
+              const mesLocal = String(dataLocal.getMonth() + 1).padStart(2, '0');
+              const diaLocal = String(dataLocal.getDate()).padStart(2, '0');
+              const dataFormatada = `${anoLocal}-${mesLocal}-${diaLocal}`;
+              
+              console.log('Data formatada:', dataFormatada);
+              return dataFormatada;
+            }
+            
+            // Usar a função para tratar a data
+            dataVencimento = tratarDataComoLocal(dataOriginal);
+            console.log('Data final que será usada:', dataVencimento);
+          } else {
+            console.log('Input não encontrado ou sem valor');
           }
           
-          console.log('=== DEBUG DATA DE VENCIMENTO ===');
-          console.log('Data de vencimento final:', dataVencimento);
-          console.log('Input de vencimento encontrado:', vencimentoInput);
-          console.log('Valor do input:', vencimentoInput ? vencimentoInput.value : 'não encontrado');
-          console.log('================================');
+          console.log('=== FIM INVESTIGAÇÃO ===');
           
           const novoTitulo = {
             ...titulo,
@@ -3376,6 +3403,12 @@ document.addEventListener('DOMContentLoaded', function() {
           };
           delete novoTitulo.id; // Garante que não envia o id antigo
           delete novoTitulo.numero_titulo; // Garante que não envia o numero_titulo antigo
+          
+          console.log('=== DADOS ENVIADOS PARA O BACKEND ===');
+          console.log('Título completo:', novoTitulo);
+          console.log('Data de vencimento no objeto:', novoTitulo.data_vencimento);
+          console.log('=====================================');
+          
           console.log('Novo título parcial enviado para o backend:', novoTitulo);
           // Salvar novo título no backend
           const response = await window.api.post('/movimento_comissoes', novoTitulo);
