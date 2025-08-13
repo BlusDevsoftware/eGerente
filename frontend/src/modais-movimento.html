@@ -377,12 +377,31 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
     return;
   }
   
+  // Verificar se as funções necessárias estão disponíveis
+  if (typeof todosTitulos === 'undefined' || !Array.isArray(todosTitulos)) {
+    console.error('Lista de títulos não está disponível ou não é um array');
+    alert('Erro: Lista de títulos não está disponível. Por favor, atualize a página.');
+    return;
+  }
+  
+  // Verificar se o título ainda existe na lista atualizada
+  const tituloAtualizado = todosTitulos.find(t => t.id === titulo.id);
+  if (!tituloAtualizado) {
+    console.error('Título não encontrado na lista atualizada');
+    alert('Erro: Título não encontrado. Por favor, atualize a página.');
+    return;
+  }
+  
+  // Usar o título atualizado da lista
+  const tituloParaUsar = tituloAtualizado;
+  console.log('Usando título atualizado da lista:', tituloParaUsar);
+  
   // Resetar estado anterior do modal para evitar conflitos
   tituloParaExcluir = null;
   modoExclusaoParcelamento = 'unico';
   
   // Definir novo título para exclusão
-  tituloParaExcluir = { titulo, onConfirm };
+  tituloParaExcluir = { titulo: tituloParaUsar, onConfirm };
   console.log('tituloParaExcluir definido como:', tituloParaExcluir);
   
   // Resetar e configurar elementos do modal
@@ -418,7 +437,7 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   const statusElement = document.getElementById('statusTituloExclusao');
   
   if (numeroElement) {
-    numeroElement.textContent = titulo.numero_titulo || '';
+    numeroElement.textContent = tituloParaUsar.numero_titulo || '';
   } else {
     console.warn('Elemento numeroTituloExclusao não encontrado');
   }
@@ -426,9 +445,9 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   if (colaboradorElement) {
     // Verificar se mapaColaboradores existe antes de usar
     if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores) {
-      colaboradorElement.textContent = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
+      colaboradorElement.textContent = mapaColaboradores[tituloParaUsar.colaborador_id] || tituloParaUsar.colaborador_id || '';
     } else {
-      colaboradorElement.textContent = titulo.colaborador_id || '';
+      colaboradorElement.textContent = tituloParaUsar.colaborador_id || '';
     }
   } else {
     console.warn('Elemento colaboradorTituloExclusao não encontrado');
@@ -437,23 +456,23 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   if (valorElement) {
     // Verificar se formatarValorLocal existe antes de usar
     if (typeof formatarValorLocal === 'function') {
-      valorElement.textContent = formatarValorLocal(titulo.valor);
+      valorElement.textContent = formatarValorLocal(tituloParaUsar.valor);
     } else {
       // Fallback se a função não estiver disponível
-      valorElement.textContent = titulo.valor ? `R$ ${parseFloat(titulo.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
+      valorElement.textContent = tituloParaUsar.valor ? `R$ ${parseFloat(tituloParaUsar.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
     }
   } else {
     console.warn('Elemento valorTituloExclusao não encontrado');
   }
   
   if (statusElement) {
-    statusElement.textContent = titulo.status || '';
+    statusElement.textContent = tituloParaUsar.status || '';
   } else {
     console.warn('Elemento statusTituloExclusao não encontrado');
   }
   
   // Detecta se é parcelado pelo padrão do número do título
-  const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
+  const match = (tituloParaUsar.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
   if (match && opcoesDiv) {
     console.log('Título é parcelado, mostrando opções...');
     opcoesDiv.style.display = 'block';
@@ -677,7 +696,28 @@ function fecharTodosModaisCancelamento() {
     listaTitulosParciais.style.display = 'none';
   }
   
-  console.log('Todos os modais de cancelamento foram fechados e variáveis resetadas');
+  // ATUALIZAR LISTA DE TÍTULOS APÓS CANCELAMENTO DE BAIXA
+  // Isso garante que a exclusão múltipla funcione com o status atualizado
+  if (typeof atualizarTabelaComFiltros === 'function') {
+    console.log('Atualizando tabela e lista de títulos após cancelamento...');
+    try {
+      // Atualizar a tabela para refletir as mudanças
+      atualizarTabelaComFiltros();
+      
+      // Atualizar os cards totalizadores
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+      
+      console.log('Tabela e títulos atualizados com sucesso após cancelamento');
+    } catch (error) {
+      console.warn('Erro ao atualizar tabela após cancelamento:', error);
+    }
+  } else {
+    console.warn('Função atualizarTabelaComFiltros não está disponível');
+  }
+  
+  console.log('Todos os modais de cancelamento foram fechados, variáveis resetadas e títulos atualizados');
 }
 
 // ========================================
