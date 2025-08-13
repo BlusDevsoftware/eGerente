@@ -222,6 +222,46 @@ async function confirmarExclusao(modo) {
   const titulo = tituloParaExcluir.titulo;
   console.log('Executando exclusão do título:', titulo.numero_titulo, 'modo:', modo);
   
+  // Verificar se há títulos pagos antes de excluir múltiplos
+  if (modo === 'todos') {
+    const prefixo = (titulo.numero_titulo || '').split('-')[0];
+    const titulosDoGrupo = todosTitulos.filter(t => (t.numero_titulo || '').startsWith(prefixo + '-'));
+    
+    // Verificar se algum título está pago
+    const titulosPagos = titulosDoGrupo.filter(t => t.status && t.status.toUpperCase() === 'PAGO');
+    
+    if (titulosPagos.length > 0) {
+      console.log('Encontrados títulos pagos no grupo:', titulosPagos);
+      
+      // Fechar modal de confirmação
+      fecharModalConfirmExclusao();
+      
+      // Mostrar modal de aviso para o primeiro título pago encontrado
+      const primeiroTituloPago = titulosPagos[0];
+      mostrarModalTituloPagoNaoPodeExcluir(primeiroTituloPago);
+      
+      // Adicionar informação sobre quantos títulos estão pagos
+      const avisoDiv = document.querySelector('#modalTituloPagoNaoPodeExcluir .modal-body div[style*="background: #fff3e0"]');
+      if (avisoDiv) {
+        avisoDiv.innerHTML = `
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <i class="fas fa-exclamation-triangle" style="color: #e53935; font-size: 1.2em; margin-top: 2px;"></i>
+            <div style="text-align: left;">
+              <div style="font-weight: 600; color: #e53935; margin-bottom: 6px;">Atenção: Grupo de Títulos com Pagamentos!</div>
+              <div style="font-size: 0.95em; color: #e53935;">
+                Este grupo possui <strong>${titulosPagos.length} título(s) já pago(s)</strong> que não podem ser excluídos.
+                <br><br>
+                Para excluir o grupo completo, você deve primeiro <strong>cancelar a baixa</strong> de todos os títulos pagos através da opção "Cancelar Baixa" no menu de ações de cada título.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      return; // Parar a execução
+    }
+  }
+  
   // Mostrar animação de exclusão
   const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
   const footerBtns = document.getElementById('footerExclusaoBtns');
@@ -311,7 +351,15 @@ async function confirmarExclusao(modo) {
     // Aguardar um pouco e mostrar alerta
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    alert(`Erro ao excluir título: ${error.message}`);
+    // Melhorar mensagem de erro
+    let mensagemErro = 'Erro desconhecido ao excluir título';
+    if (error && error.message) {
+      mensagemErro = error.message;
+    } else if (error && typeof error === 'string') {
+      mensagemErro = error;
+    }
+    
+    alert(`Erro ao excluir título: ${mensagemErro}`);
     
     // Restaurar botões
     if (footerBtns) footerBtns.style.display = 'flex';
