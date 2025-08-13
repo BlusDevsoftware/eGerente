@@ -2809,6 +2809,32 @@
                 // Aguardar um pouco para mostrar o progresso final
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
+                // ATUALIZAR INTERFACE APÓS CANCELAMENTO
+                console.log('Atualizando interface após cancelamento...');
+                
+                // Verificar dados antes da atualização
+                console.log('Dados antes da atualização:', {
+                    tituloOriginal: tituloOriginal,
+                    titulosParciais: titulosParciais,
+                    totalTitulos: todosTitulos.length,
+                    tituloOriginalAtualizado: todosTitulos.find(t => t.id === tituloOriginal.id)
+                });
+                
+                // Atualizar tabela com os novos dados
+                atualizarTabelaComFiltros();
+                
+                // Atualizar cards totalizadores
+                atualizarCardsTotalizadores();
+                
+                // Verificar dados após a atualização
+                console.log('Dados após a atualização:', {
+                    totalTitulos: todosTitulos.length,
+                    tituloOriginalAtualizado: todosTitulos.find(t => t.id === tituloOriginal.id),
+                    titulosParciaisRestantes: todosTitulos.filter(t => t.id_titulo_origem === tituloOriginal.id)
+                });
+                
+                console.log('Interface atualizada com sucesso!');
+                
             } catch (error) {
                 console.error('Erro durante cancelamento de baixa:', error);
                 throw error;
