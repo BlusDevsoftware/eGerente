@@ -3289,6 +3289,9 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Baixa normal ou parcial já confirmada - PROCESSANDO BAIXA');
       e.preventDefault();
       
+      // Declarar variável para capturar data de vencimento
+      let dataVencimentoCapturada = null;
+      
       // Processar a baixa
       const dataPagamento = document.getElementById('paymentDate').value;
       // Mapear status para português
@@ -3375,7 +3378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         atualizarCardsTotalizadores();
         
         // Capturar dados antes de fechar o modal
-        let dataVencimentoCapturada = null;
         if (baixaParcial) {
           const vencimentoInput = document.getElementById('vencimentoTituloParcial');
           dataVencimentoCapturada = vencimentoInput ? vencimentoInput.value : new Date().toISOString().split('T')[0];
