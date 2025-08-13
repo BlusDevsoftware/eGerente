@@ -2532,12 +2532,16 @@
             console.log('mostrarModalConfirmacaoExclusao chamada com:', { titulosParciais, tituloOriginal });
             console.log('mapaColaboradores disponível:', mapaColaboradores);
             
+            // Marcar que o modal está sendo aberto
+            modalSendoAberto = true;
+            
             const modal = document.getElementById('modalConfirmExclusao');
             console.log('Modal encontrado:', modal);
             
             if (!modal) {
                 console.error('Modal modalConfirmExclusao não encontrado!');
                 alert('Erro: Modal não encontrado. Recarregue a página.');
+                modalSendoAberto = false;
                 return;
             }
             
@@ -2650,6 +2654,12 @@
             
             modal.style.display = 'flex';
             console.log('Modal exibido com sucesso');
+            
+            // Aguardar um pouco e então permitir fechamento ao clicar fora
+            setTimeout(() => {
+                modalSendoAberto = false;
+                console.log('Modal liberado para fechamento ao clicar fora');
+            }, 500);
         }
 
         async function executarCancelamentoBaixa(tituloOriginal, titulosParciais) {
@@ -2916,12 +2926,14 @@
             console.log('Todos os modais de cancelamento foram fechados');
         }
 
-        // EVENT LISTENERS ADICIONAIS: Fechar modais ao clicar fora
+        // Variável de controle para evitar fechamento automático do modal
+        let modalSendoAberto = false;
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Event listener para fechar modal de confirmação de exclusão ao clicar fora
             window.addEventListener('click', function(event) {
                 const modalConfirmExclusao = document.getElementById('modalConfirmExclusao');
-                if (event.target === modalConfirmExclusao) {
+                if (event.target === modalConfirmExclusao && !modalSendoAberto) {
                     fecharModalConfirmExclusao();
                 }
                 
@@ -2933,7 +2945,7 @@
                 
                 // Modal de sucesso de cancelamento de baixa
                 const modalSucessoCancelarBaixa = document.getElementById('modalSucessoCancelarBaixa');
-                if (event.target === modalSucessoCancelarBaixa) {
+                if (modalSucessoCancelarBaixa) {
                     fecharModalSucessoCancelarBaixa();
                 }
             });
