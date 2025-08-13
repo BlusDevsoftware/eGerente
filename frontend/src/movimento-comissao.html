@@ -2657,7 +2657,12 @@
                 console.log('Botão confirmar encontrado, configurando evento...');
                 btnConfirmar.onclick = async function() {
                     try {
+                        // Mostrar animação de exclusão
+                        mostrarAnimacaoExclusao();
+                        
+                        // Executar o cancelamento
                         await executarCancelamentoBaixa(tituloOriginal, titulosParciais);
+                        
                         // CORREÇÃO: Usar a função que fecha todos os modais
                         console.log('Cancelamento concluído, fechando todos os modais...');
                         fecharTodosModaisCancelamento();
@@ -2701,9 +2706,18 @@
                 // Se há títulos parciais, excluí-los primeiro
                 if (titulosParciais.length > 0) {
                     console.log('Excluindo títulos parciais...');
-                    for (const tituloParcial of titulosParciais) {
+                    
+                    // Atualizar progresso inicial
+                    atualizarProgressoExclusao(0, 'Iniciando exclusão dos títulos parciais...');
+                    
+                    for (let i = 0; i < titulosParciais.length; i++) {
+                        const tituloParcial = titulosParciais[i];
                         try {
                             console.log('Excluindo título parcial:', tituloParcial);
+                            
+                            // Atualizar progresso
+                            const progresso = ((i + 1) / titulosParciais.length) * 100;
+                            atualizarProgressoExclusao(progresso, `Excluindo título parcial ${tituloParcial.numero_titulo}...`);
                             
                             // Remover comprovante se existir
                             if (tituloParcial.comprovante_url) {
@@ -2734,6 +2748,9 @@
                         }
                     }
                     
+                    // Atualizar progresso final
+                    atualizarProgressoExclusao(100, 'Títulos parciais excluídos com sucesso!');
+                    
                     // Remover títulos parciais do array local
                     titulosParciais.forEach(tituloParcial => {
                         const index = todosTitulos.findIndex(t => t.id === tituloParcial.id);
@@ -2742,86 +2759,112 @@
                         }
                     });
                     
-                    console.log('Todos os títulos parciais foram excluídos');
+                    // Aguardar um pouco para mostrar o progresso final
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
                 
-                // Preparar dados para cancelar baixa
-                const dadosCancelamento = {
+                // Atualizar progresso para cancelamento do título original
+                atualizarProgressoExclusao(100, 'Cancelando baixa do título original...');
+                
+                // Cancelar baixa do título original
+                const dadosAtualizacao = {
                     status: 'PENDENTE',
                     valor_pago: 0,
                     data_pagamento: null,
-                    observacoes: null,
                     comprovante_url: null
                 };
                 
-                console.log('Dados de cancelamento:', dadosCancelamento);
-                
-                // Fazer a chamada para a API
-                await window.api.put(`/movimento_comissoes/${tituloOriginal.id}`, dadosCancelamento);
-                
-                // Se havia comprovante, remover do Supabase Storage
+                // Remover comprovante se existir
                 if (tituloOriginal.comprovante_url) {
                     try {
-                        console.log('Removendo comprovante do Supabase Storage:', tituloOriginal.comprovante_url);
-                        
-                        // Extrair o nome do arquivo da URL
                         const urlParts = tituloOriginal.comprovante_url.split('/');
                         const fileName = urlParts[urlParts.length - 1];
                         
-                        // Remover arquivo do Supabase Storage
                         const { error } = await supabaseClient.storage
                             .from('comprovantesbaixas')
                             .remove([fileName]);
                         
                         if (error) {
-                            console.warn('Erro ao remover arquivo do storage:', error);
-                        } else {
-                            console.log('Arquivo removido com sucesso do storage');
+                            console.warn('Erro ao remover comprovante do título original:', error);
                         }
                     } catch (storageError) {
-                        console.warn('Erro ao remover arquivo do storage:', storageError);
+                        console.warn('Erro ao remover comprovante do título original:', storageError);
                     }
                 }
                 
-                // Atualizar o array local
-                Object.assign(tituloOriginal, dadosCancelamento);
+                // Atualizar título original na API
+                await window.api.put(`/movimento_comissoes/${tituloOriginal.id}`, dadosAtualizacao);
                 
-                // Atualizar interface
-                atualizarTabelaComFiltros();
-                atualizarCardsTotalizadores();
-                
-                // Fechar modais - CORREÇÃO: Forçar fechamento de todos os modais relacionados
-                console.log('Fechando modais após cancelamento de baixa...');
-                
-                // Usar a nova função que fecha todos os modais relacionados
-                fecharTodosModaisCancelamento();
-                
-                // Mostrar modal de sucesso com mensagem específica
-                const modalSucesso = document.getElementById('modalSucessoCancelarBaixa');
-                const mensagemSucesso = modalSucesso.querySelector('.modal-body div:first-of-type');
-                
-                if (titulosParciais.length > 0) {
-                    mensagemSucesso.textContent = `A baixa do título foi cancelada e ${titulosParciais.length} título(s) parcial(is) foi/foram excluído(s).`;
-                } else {
-                    mensagemSucesso.textContent = 'A baixa do título foi cancelada.';
+                // Atualizar título local
+                const indexTituloOriginal = todosTitulos.findIndex(t => t.id === tituloOriginal.id);
+                if (indexTituloOriginal !== -1) {
+                    todosTitulos[indexTituloOriginal] = { ...todosTitulos[indexTituloOriginal], ...dadosAtualizacao };
                 }
                 
-                modalSucesso.style.display = 'flex';
+                console.log('Baixa cancelada com sucesso para título:', tituloOriginal.numero_titulo);
                 
-                console.log('Cancelamento de baixa realizado com sucesso');
+                // Atualizar progresso final
+                atualizarProgressoExclusao(100, 'Cancelamento concluído com sucesso!');
                 
-                // Resetar variáveis após sucesso
-                resetarVariaveisCancelamento();
+                // Aguardar um pouco para mostrar o progresso final
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
             } catch (error) {
-                console.error('Erro ao cancelar baixa:', error);
-                alert(`Erro ao cancelar baixa: ${error.message}`);
+                console.error('Erro durante cancelamento de baixa:', error);
+                throw error;
+            }
+        }
+        
+        // Função para mostrar animação de exclusão
+        function mostrarAnimacaoExclusao() {
+            const modal = document.getElementById('modalConfirmExclusao');
+            const modalBody = modal.querySelector('.modal-body');
+            const footerBtns = document.getElementById('footerExclusaoBtns');
+            
+            // Esconder botões
+            footerBtns.style.display = 'none';
+            
+            // Criar e mostrar animação de exclusão
+            const animacaoDiv = document.createElement('div');
+            animacaoDiv.id = 'animacaoExclusaoDiv';
+            animacaoDiv.style.cssText = `
+                margin-bottom: 18px; 
+                text-align: center;
+                background: #f8f9fa;
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid #e9ecef;
+            `;
+            
+            animacaoDiv.innerHTML = `
+                <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+                    <span id="textoProgressoExclusao">Iniciando exclusão...</span>
+                </div>
+                <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="barraProgressoExclusao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+                </div>
+                <div style="font-size: 0.9em; color: #666; font-style: italic;">
+                    Processando cancelamento de baixa...
+                </div>
+            `;
+            
+            // Inserir animação no modal
+            modalBody.appendChild(animacaoDiv);
+            
+            console.log('Animação de exclusão exibida');
+        }
+        
+        // Função para atualizar progresso da exclusão
+        function atualizarProgressoExclusao(percentual, texto) {
+            const barraProgresso = document.getElementById('barraProgressoExclusao');
+            const textoProgresso = document.getElementById('textoProgressoExclusao');
+            
+            if (barraProgresso && textoProgresso) {
+                barraProgresso.style.width = `${percentual}%`;
+                textoProgresso.textContent = texto;
                 
-                // Fechar modais mesmo em caso de erro
-                fecharTodosModaisCancelamento();
-                
-                // Resetar variáveis mesmo em caso de erro
-                resetarVariaveisCancelamento();
+                console.log(`Progresso: ${percentual}% - ${texto}`);
             }
         }
 
