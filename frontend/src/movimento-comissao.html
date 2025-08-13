@@ -2548,14 +2548,24 @@
                     <div style="font-size: 1em; color: #888; margin-bottom: 8px;">Esta ação irá:</div>
                     <div style="text-align: left; background: #fff3e0; border: 1px solid #ffcc02; border-radius: 8px; padding: 16px; margin-bottom: 8px;">
                         <ul style="margin: 0; padding-left: 20px; color: #e65100;">
-                            <li>Alterar o status para \"PENDENTE\"</li>
+                            <li>Alterar o status para "PENDENTE"</li>
                             <li>Zerar o valor pago</li>
                             <li>Limpar a data de pagamento</li>
                             <li>Remover o comprovante (se existir)</li>
                             <li style="font-weight: bold; color: #e53935;">Excluir ${titulosParciais.length} título(s) parcial(is):</li>
                         </ul>
                         <div style="margin-top: 12px; padding-left: 20px;">
-                            ${titulosParciais.map(t => `<div style='color: #e53935; font-weight: bold;'>• ${t.numero_titulo}</div>`).join('')}
+                            ${titulosParciais.map(t => `
+                                <div style='color: #e53935; font-weight: bold; margin-bottom: 8px;'>
+                                    • ${t.numero_titulo}
+                                    <div style='color: #666; font-weight: normal; font-size: 0.9em; margin-left: 20px; margin-top: 4px;'>
+                                        <div><strong>Colaborador:</strong> ${mapaColaboradores[t.colaborador_id] || t.colaborador_id || 'N/A'}</div>
+                                        <div><strong>Valor:</strong> R$ ${(t.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                        <div><strong>Status:</strong> ${t.status || 'N/A'}</div>
+                                        <div><strong>Descrição:</strong> ${t.descricao || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                     <div style="font-size: 0.95em; color: #e53935; font-weight: bold; font-style: italic;">Esta ação não pode ser desfeita.</div>
