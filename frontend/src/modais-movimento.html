@@ -377,8 +377,39 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
     return;
   }
   
+  // Resetar estado anterior do modal para evitar conflitos
+  tituloParaExcluir = null;
+  modoExclusaoParcelamento = 'unico';
+  
+  // Definir novo título para exclusão
   tituloParaExcluir = { titulo, onConfirm };
   console.log('tituloParaExcluir definido como:', tituloParaExcluir);
+  
+  // Resetar e configurar elementos do modal
+  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
+  const footerBtns = document.getElementById('footerExclusaoBtns');
+  const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
+  const listaTitulosParciais = document.getElementById('listaTitulosParciais');
+  
+  // Resetar animação
+  if (animacaoDiv) {
+    animacaoDiv.style.display = 'none';
+  }
+  
+  // Mostrar botões
+  if (footerBtns) {
+    footerBtns.style.display = 'flex';
+  }
+  
+  // Resetar opções de parcelamento
+  if (opcoesDiv) {
+    opcoesDiv.style.display = 'none';
+  }
+  
+  // Resetar lista de títulos parciais
+  if (listaTitulosParciais) {
+    listaTitulosParciais.style.display = 'none';
+  }
   
   // Preencher informações do título no modal com verificações de segurança
   const numeroElement = document.getElementById('numeroTituloExclusao');
@@ -423,7 +454,6 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
   
   // Detecta se é parcelado pelo padrão do número do título
   const match = (titulo.numero_titulo || '').match(/^(\d+)-\d+\/\d+$/);
-  const opcoesDiv = document.getElementById('opcoesExclusaoParcelamento');
   if (match && opcoesDiv) {
     console.log('Título é parcelado, mostrando opções...');
     opcoesDiv.style.display = 'block';
@@ -436,6 +466,7 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
     modoExclusaoParcelamento = 'unico';
   }
   
+  // Configurar event listeners para as opções de parcelamento
   document.getElementsByName('exclusaoParcelamento').forEach(radio => {
     radio.onchange = function() {
       modoExclusaoParcelamento = this.value;
@@ -443,16 +474,7 @@ function abrirModalConfirmExclusao(titulo, onConfirm) {
     };
   });
   
-  // Verificar e configurar elementos com segurança
-  const confirmacaoDiv = document.getElementById('confirmacaoExclusaoDiv');
-  if (confirmacaoDiv) confirmacaoDiv.style.display = 'none';
-  
-  const animacaoDiv = document.getElementById('animacaoExclusaoDiv');
-  if (animacaoDiv) animacaoDiv.style.display = 'none';
-  
-  const footerBtns = document.getElementById('footerExclusaoBtns');
-  if (footerBtns) footerBtns.style.display = 'flex';
-  
+  // Abrir modal
   const modal = document.getElementById('modalConfirmExclusao');
   if (modal) {
     console.log('Abrindo modal de confirmação de exclusão...');
@@ -614,7 +636,8 @@ function fecharTodosModaisCancelamento() {
     'modalConfirmCancelarBaixa',
     'modalConfirmExclusao',
     'modalTitulo',
-    'modalSucessoCancelarBaixa'
+    'modalSucessoCancelarBaixa',
+    'modalTituloPagoNaoPodeExcluir'
   ];
   
   modaisParaFechar.forEach(modalId => {
@@ -625,11 +648,36 @@ function fecharTodosModaisCancelamento() {
     }
   });
   
-  // Resetar variáveis globais apenas após operação completa
-  // tituloParaCancelarBaixa = null; // Comentado para evitar reset prematuro
+  // Resetar TODAS as variáveis globais para evitar conflitos
+  tituloParaCancelarBaixa = null;
   tituloParaExcluir = null;
+  modoExclusaoParcelamento = 'unico';
+  titulosParaExcluirAnimacao = [];
   
-  console.log('Todos os modais de cancelamento foram fechados');
+  // Resetar elementos de animação se existirem
+  const animacaoExclusaoDiv = document.getElementById('animacaoExclusaoDiv');
+  if (animacaoExclusaoDiv) {
+    animacaoExclusaoDiv.style.display = 'none';
+  }
+  
+  const footerExclusaoBtns = document.getElementById('footerExclusaoBtns');
+  if (footerExclusaoBtns) {
+    footerExclusaoBtns.style.display = 'flex';
+  }
+  
+  // Resetar opções de parcelamento se existirem
+  const opcoesExclusaoParcelamento = document.getElementById('opcoesExclusaoParcelamento');
+  if (opcoesExclusaoParcelamento) {
+    opcoesExclusaoParcelamento.style.display = 'none';
+  }
+  
+  // Resetar lista de títulos parciais se existir
+  const listaTitulosParciais = document.getElementById('listaTitulosParciais');
+  if (listaTitulosParciais) {
+    listaTitulosParciais.style.display = 'none';
+  }
+  
+  console.log('Todos os modais de cancelamento foram fechados e variáveis resetadas');
 }
 
 // ========================================
