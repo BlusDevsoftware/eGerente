@@ -3220,7 +3220,7 @@ function confirmarBaixaParcial() {
         
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloParcial" value="${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
+          <input type="date" id="vencimentoTituloParcial" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
         </div>
       </div>
       
@@ -3349,14 +3349,18 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Capturar data de vencimento ANTES de criar o novo título
           const vencimentoInput = document.getElementById('vencimentoTituloParcial');
-          const dataVencimento = vencimentoInput ? vencimentoInput.value : new Date().toISOString().split('T')[0];
+          let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
+          
+          if (vencimentoInput && vencimentoInput.value) {
+            // Pegar a data exata informada pelo usuário
+            dataVencimento = vencimentoInput.value;
+            console.log('Data informada pelo usuário:', dataVencimento);
+          }
           
           console.log('=== DEBUG DATA DE VENCIMENTO ===');
-          console.log('Data de vencimento capturada do input:', dataVencimento);
+          console.log('Data de vencimento final:', dataVencimento);
           console.log('Input de vencimento encontrado:', vencimentoInput);
           console.log('Valor do input:', vencimentoInput ? vencimentoInput.value : 'não encontrado');
-          console.log('Tipo do valor:', typeof (vencimentoInput ? vencimentoInput.value : 'não encontrado'));
-          console.log('Data atual como fallback:', new Date().toISOString().split('T')[0]);
           console.log('================================');
           
           const novoTitulo = {
