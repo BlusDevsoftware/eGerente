@@ -3082,8 +3082,8 @@ function fecharModalConfirmBaixaParcial() {
 // Adicionar evento ao campo Valor Pago para abrir o modal de baixa parcial imediatamente
 const inputValorPago = document.getElementById('paidValue');
 if (inputValorPago) {
-  inputValorPago.addEventListener('blur', verificarBaixaParcial);
-  inputValorPago.addEventListener('change', verificarBaixaParcial);
+inputValorPago.addEventListener('blur', verificarBaixaParcial);
+inputValorPago.addEventListener('change', verificarBaixaParcial);
 }
 
 function verificarBaixaParcial() {
@@ -3149,8 +3149,8 @@ function confirmarBaixaParcial() {
     if (paymentForm) {
       // Tentar inserir antes dos botões de ação
       const formActions = paymentForm.querySelector('.form-actions');
-      if (formActions) {
-        paymentForm.insertBefore(simulacao, formActions);
+    if (formActions) {
+      paymentForm.insertBefore(simulacao, formActions);
         console.log('Simulação inserida antes dos botões de ação');
         console.log('Form actions encontrado:', formActions);
         console.log('Simulação inserida em:', simulacao.parentElement);
@@ -3190,7 +3190,7 @@ function confirmarBaixaParcial() {
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
         <i class="fas fa-receipt" style="font-size: 1.5em; color: #1976D2;"></i>
         <h3 style="margin: 0; font-size: 1.2em; color: #1976D2; font-weight: 700;">Título Parcial Simulado</h3>
-      </div>
+    </div>
       
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 16px;">
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
@@ -3220,7 +3220,7 @@ function confirmarBaixaParcial() {
         
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloParcial" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
+          <input type="date" id="vencimentoTituloParcial" value="${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
         </div>
       </div>
       
@@ -3347,11 +3347,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (baixaParcial) {
           const diferenca = (valorTitulo - valorPago).toFixed(2);
           
-          // Usar a data capturada antes de fechar o modal
-          const dataVencimento = dataVencimentoCapturada || new Date().toISOString().split('T')[0];
+          // Capturar data de vencimento ANTES de criar o novo título
+          const vencimentoInput = document.getElementById('vencimentoTituloParcial');
+          const dataVencimento = vencimentoInput ? vencimentoInput.value : new Date().toISOString().split('T')[0];
           
-          console.log('Data de vencimento do título parcial:', dataVencimento);
-          console.log('Data capturada antes de fechar modal:', dataVencimentoCapturada);
+          console.log('=== DEBUG DATA DE VENCIMENTO ===');
+          console.log('Data de vencimento capturada do input:', dataVencimento);
+          console.log('Input de vencimento encontrado:', vencimentoInput);
+          console.log('Valor do input:', vencimentoInput ? vencimentoInput.value : 'não encontrado');
+          console.log('Tipo do valor:', typeof (vencimentoInput ? vencimentoInput.value : 'não encontrado'));
+          console.log('Data atual como fallback:', new Date().toISOString().split('T')[0]);
+          console.log('================================');
           
           const novoTitulo = {
             ...titulo,
