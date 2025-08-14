@@ -3406,7 +3406,87 @@ if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
           </tbody>
         </table>
       </div>
+      
+      <!-- Seção de Informações de Pagamento em Lote -->
+      <div style="margin-top: 24px; text-align: left;">
+        <div style='font-weight:600; color:#1976D2; margin-bottom:16px;'>Informações de Pagamento em Lote:</div>
+        
+        <!-- Primeira linha: Valor e Data -->
+        <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end;">
+          <div style="flex:1; min-width: 220px;">
+            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Valor Total dos Títulos</label>
+            <div style="display: flex; align-items: center; background: #f5faff; border-radius: 8px; border: 1.5px solid #1976D2; padding: 0 8px; margin-bottom: 0;">
+              <span style="min-width: 32px; text-align: center; color: #1976D2; font-weight: 600; background: transparent;">R$</span>
+              <input type="text" id="totalValorMultipla" readonly style="flex: 1; min-width: 0; padding: 8px 10px; border: none; background: #f5faff; font-size: 1em; color: #1976D2; font-weight: 600;">
+            </div>
+          </div>
+          <div style="flex:1; min-width: 220px;">
+            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Data do Pagamento</label>
+            <input type="date" id="dataPagamentoMultipla" required style="width: 100%; padding: 8px 10px; border: 1px solid #1976D2; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
+          </div>
+        </div>
+        
+        <!-- Segunda linha: Status e Quantidade -->
+        <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+          <div style="flex:1; min-width: 180px;">
+            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Status</label>
+            <select id="statusPagamentoMultipla" required style="width: 100%; padding: 8px 10px; border: 1px solid #1976D2; border-radius: 6px; background: #f5faff; font-size: 1em; color: #1976D2;">
+              <option value="PAGO">PAGO</option>
+              <option value="PENDENTE">PENDENTE</option>
+              <option value="VENCIDO">VENCIDO</option>
+            </select>
+          </div>
+          <div style="flex:1; min-width: 180px;">
+            <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Quantidade de Títulos</label>
+            <input type="text" id="quantidadeTitulosMultipla" readonly style="width: 100%; padding: 8px 10px; border: 1px solid #e3f2fd; border-radius: 6px; background: #fff; font-size: 1em; color: #1976D2; font-weight: 600;">
+          </div>
+        </div>
+        
+        <!-- Terceira linha: Observações -->
+        <div style="margin-bottom: 20px;">
+          <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">Observações Gerais</label>
+          <textarea id="observacoesMultipla" rows="3" maxlength="200" placeholder="Observações que se aplicam a todos os títulos" style="width: 100%; padding: 10px; border: 1.5px solid #1976D2; border-radius: 6px; background: #f5faff; font-size: 1em; resize: none;"></textarea>
+          <div style="font-size: 0.9em; color: #1976D2; margin-top: 4px; text-align: right;">
+            <span id="contadorObservacoesMultipla">0</span>/200
+          </div>
+        </div>
+        
+        <!-- Comprovante de Pagamento -->
+        <div style="margin-bottom: 20px;">
+          <label style="font-weight: 500; margin-bottom: 6px; display: block; color: #1976D2;">
+            <i class="fas fa-paperclip"></i> Comprovante de Pagamento
+          </label>
+          <div style="border: 2px dashed #1976D2; border-radius: 8px; padding: 20px; text-align: center; background: #f8fbff; transition: all 0.3s;" 
+               ondrop="handleFileDropMultipla(event)" 
+               ondragover="handleDragOverMultipla(event)" 
+               ondragleave="handleDragLeaveMultipla(event)"
+               id="fileDropZoneMultipla">
+            <input type="file" id="comprovanteMultipla" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" 
+                   style="display: none;" onchange="handleFileSelectMultipla(event)">
+            <div id="fileDropContentMultipla">
+              <i class="fas fa-cloud-upload-alt" style="font-size: 2em; color: #1976D2; margin-bottom: 10px;"></i>
+              <p style="margin: 0; color: #1976D2; font-weight: 500;">Arraste o comprovante aqui ou clique para selecionar</p>
+              <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;">Formatos aceitos: PDF, JPG, PNG, DOC</p>
+              <button type="button" onclick="document.getElementById('comprovanteMultipla').click()" 
+                      style="margin-top: 10px; padding: 8px 16px; background: #1976D2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+                Selecionar Arquivo
+              </button>
+            </div>
+            <div id="filePreviewMultipla" style="display: none;">
+              <i class="fas fa-file-alt" style="font-size: 1.5em; color: #4CAF50; margin-bottom: 5px;"></i>
+              <p id="fileNameMultipla" style="margin: 0; color: #1976D2; font-weight: 500;"></p>
+              <p id="fileSizeMultipla" style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;"></p>
+              <button type="button" onclick="removeFileMultipla()" 
+                      style="margin-top: 5px; padding: 4px 8px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
+                <i class="fas fa-trash"></i> Remover
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <!-- Botões de Ação -->
     <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 10px; margin: 0 36px 24px 36px; padding-top: 12px; border-top: 1px solid #eee; background: #fff; position: sticky; bottom: 0; z-index: 2;">
       <button type="button" class="btn-secondary" onclick="fecharModalBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
       <button type="button" class="btn-primary" onclick="confirmarBaixaMultipla()" style="padding: 10px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #2196F3; color: white; border: none;"><i class="fas fa-save"></i> Confirmar Baixa</button>
@@ -3419,6 +3499,7 @@ function abrirModalBaixaMultipla(titulos) {
   const modal = document.getElementById('modalBaixaMultipla');
   const tbody = document.getElementById('tbodyBaixaMultipla');
   tbody.innerHTML = '';
+  
   if (titulos.length === 0) {
     tbody.innerHTML = `<tr><td colspan='5' style='color:#888; text-align:center; padding:18px;'>Nenhum título selecionado.</td></tr>`;
   } else {
@@ -3431,15 +3512,220 @@ function abrirModalBaixaMultipla(titulos) {
         <td style='padding:8px 6px; text-align:center;'>${formatarData(t.data_vencimento)}</td>
       </tr>
     `).join('');
+    
+    // Calcular e exibir total
+    const total = titulos.reduce((sum, t) => sum + (t.valor || 0), 0);
+    const totalFormatado = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    document.getElementById('totalValorMultipla').value = totalFormatado;
+    document.getElementById('quantidadeTitulosMultipla').value = titulos.length;
+    
+    // Configurar data atual
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('dataPagamentoMultipla').value = hoje;
+    
+    // Configurar contador de observações
+    const observacoesInput = document.getElementById('observacoesMultipla');
+    const contador = document.getElementById('contadorObservacoesMultipla');
+    
+    if (observacoesInput && contador) {
+      observacoesInput.addEventListener('input', function() {
+        contador.textContent = this.value.length;
+      });
+    }
   }
+  
   modal.style.display = 'flex';
 }
-</script>
 
-<script>
-function fecharModalBaixaMultipla() {
-  const modal = document.getElementById('modalBaixaMultipla');
-  if (modal) modal.style.display = 'none';
+// Funções auxiliares para upload de arquivos múltiplos
+function handleFileSelectMultipla(event) {
+  const file = event.target.files[0];
+  if (file) {
+    validateAndDisplayFileMultipla(file);
+  }
+}
+
+function handleFileDropMultipla(event) {
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  if (file) {
+    validateAndDisplayFileMultipla(file);
+  }
+}
+
+function handleDragOverMultipla(event) {
+  event.preventDefault();
+  const dropZone = document.getElementById('fileDropZoneMultipla');
+  dropZone.style.borderColor = '#4CAF50';
+  dropZone.style.background = '#f1f8e9';
+}
+
+function handleDragLeaveMultipla(event) {
+  event.preventDefault();
+  const dropZone = document.getElementById('fileDropZoneMultipla');
+  dropZone.style.borderColor = '#1976D2';
+  dropZone.style.background = '#f8fbff';
+}
+
+function validateAndDisplayFileMultipla(file) {
+  // Validar tipo de arquivo
+  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  if (!allowedTypes.includes(file.type)) {
+    alert('Tipo de arquivo não suportado. Use PDF, JPG, PNG ou DOC.');
+    return;
+  }
+
+  // Validar tamanho (máximo 5MB)
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    alert('Arquivo muito grande. Tamanho máximo: 5MB.');
+    return;
+  }
+
+  // Exibir preview do arquivo
+  displayFilePreviewMultipla(file);
+}
+
+function displayFilePreviewMultipla(file) {
+  const dropContent = document.getElementById('fileDropContentMultipla');
+  const filePreview = document.getElementById('filePreviewMultipla');
+  const fileName = document.getElementById('fileNameMultipla');
+  const fileSize = document.getElementById('fileSizeMultipla');
+
+  fileName.textContent = file.name;
+  fileSize.textContent = formatFileSize(file.size);
+
+  dropContent.style.display = 'none';
+  filePreview.style.display = 'block';
+}
+
+function removeFileMultipla() {
+  const dropContent = document.getElementById('fileDropContentMultipla');
+  const filePreview = document.getElementById('filePreviewMultipla');
+  const fileInput = document.getElementById('comprovanteMultipla');
+
+  dropContent.style.display = 'block';
+  filePreview.style.display = 'none';
+  fileInput.value = '';
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Função para confirmar baixa múltipla
+async function confirmarBaixaMultipla() {
+  const titulos = getTitulosSelecionados();
+  if (titulos.length === 0) {
+    alert('Nenhum título selecionado para baixa!');
+    return;
+  }
+  
+  // Validar campos obrigatórios
+  const dataPagamento = document.getElementById('dataPagamentoMultipla').value;
+  const status = document.getElementById('statusPagamentoMultipla').value;
+  const observacoes = document.getElementById('observacoesMultipla').value;
+  
+  if (!dataPagamento) {
+    alert('Por favor, informe a data do pagamento!');
+    return;
+  }
+  
+  if (!status) {
+    alert('Por favor, selecione o status!');
+    return;
+  }
+  
+  // Confirmar ação
+  const confirmacao = confirm(`Confirmar baixa de ${titulos.length} título(s)?\n\nEsta ação irá:\n- Alterar o status para "${status}"\n- Definir a data de pagamento como ${formatarData(dataPagamento)}\n- Aplicar as observações em todos os títulos\n\nDeseja continuar?`);
+  
+  if (!confirmacao) {
+    return;
+  }
+  
+  try {
+    // Mostrar loading
+    const btnConfirmar = document.querySelector('#modalBaixaMultipla .btn-primary');
+    const textoOriginal = btnConfirmar.innerHTML;
+    btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+    btnConfirmar.disabled = true;
+    
+    // Processar cada título
+    let sucessos = 0;
+    let erros = 0;
+    
+    for (let i = 0; i < titulos.length; i++) {
+      const titulo = titulos[i];
+      
+      try {
+        // Preparar dados para envio
+        const dadosPagamento = {
+          valor_pago: titulo.valor, // Baixa total
+          data_pagamento: dataPagamento,
+          status: status,
+          observacoes: observacoes
+        };
+        
+        // Enviar para o backend
+        await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
+        
+        // Atualizar array local
+        titulo.valor_pago = titulo.valor;
+        titulo.data_pagamento = dataPagamento;
+        titulo.status = status;
+        titulo.observacoes = observacoes;
+        
+        sucessos++;
+        
+        // Atualizar progresso
+        btnConfirmar.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processando... (${i + 1}/${titulos.length})`;
+        
+      } catch (error) {
+        console.error(`Erro ao processar título ${titulo.numero_titulo}:`, error);
+        erros++;
+      }
+    }
+    
+    // Restaurar botão
+    btnConfirmar.innerHTML = textoOriginal;
+    btnConfirmar.disabled = false;
+    
+    // Mostrar resultado
+    if (erros === 0) {
+      alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.`);
+      
+      // Fechar modal e atualizar interface
+      fecharModalBaixaMultipla();
+      
+      // Atualizar tabela e cards
+      if (typeof atualizarTabelaComFiltros === 'function') {
+        atualizarTabelaComFiltros();
+      }
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+      
+    } else {
+      alert(`⚠️ Baixa múltipla parcialmente realizada!\n\n✅ ${sucessos} título(s) processado(s) com sucesso\n❌ ${erros} título(s) com erro\n\nVerifique o console para mais detalhes.`);
+      
+      // Fechar modal mesmo com erros
+      fecharModalBaixaMultipla();
+    }
+    
+  } catch (error) {
+    console.error('Erro geral na baixa múltipla:', error);
+    alert(`❌ Erro na baixa múltipla: ${error.message}`);
+    
+    // Restaurar botão
+    const btnConfirmar = document.querySelector('#modalBaixaMultipla .btn-primary');
+    btnConfirmar.innerHTML = '<i class="fas fa-save"></i> Confirmar Baixa';
+    btnConfirmar.disabled = false;
+  }
 }
 </script>
 
