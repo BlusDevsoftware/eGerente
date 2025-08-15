@@ -3649,8 +3649,23 @@ async function confirmarBaixaMultipla() {
     return;
   }
   
+  // Obter arquivo de comprovante se existir
+  const comprovanteInput = document.getElementById('comprovanteMultipla');
+  let comprovanteUrl = null;
+  
+  if (comprovanteInput && comprovanteInput.files && comprovanteInput.files[0]) {
+    try {
+      // Fazer upload do comprovante para o Supabase Storage
+      const comprovanteFile = comprovanteInput.files[0];
+      comprovanteUrl = await uploadComprovanteToSupabase(comprovanteFile, 'baixa-multipla');
+    } catch (error) {
+      console.error('Erro ao fazer upload do comprovante:', error);
+      alert('Erro ao fazer upload do comprovante. A baixa será processada sem o comprovante.');
+    }
+  }
+  
   // Confirmar ação
-  const confirmacao = confirm(`Confirmar baixa de ${titulos.length} título(s)?\n\nEsta ação irá:\n- Alterar o status para "${status}"\n- Definir a data de pagamento como ${formatarData(dataPagamento)}\n- Aplicar as observações em todos os títulos\n\nDeseja continuar?`);
+  const confirmacao = confirm(`Confirmar baixa de ${titulos.length} título(s)?\n\nEsta ação irá:\n- Alterar o status para "${status}"\n- Definir a data de pagamento como ${formatarData(dataPagamento)}\n- Aplicar as observações em todos os títulos\n- ${comprovanteUrl ? 'Vincular o comprovante a todos os títulos' : 'Processar sem comprovante'}\n\nDeseja continuar?`);
   
   if (!confirmacao) {
     return;
@@ -3676,7 +3691,8 @@ async function confirmarBaixaMultipla() {
           valor_pago: titulo.valor, // Baixa total
           data_pagamento: dataPagamento,
           status: status,
-          observacoes: observacoes
+          observacoes: observacoes,
+          comprovante_url: comprovanteUrl // Incluir comprovante para todos os títulos
         };
         
         // Enviar para o backend
@@ -3687,6 +3703,7 @@ async function confirmarBaixaMultipla() {
         titulo.data_pagamento = dataPagamento;
         titulo.status = status;
         titulo.observacoes = observacoes;
+        titulo.comprovante_url = comprovanteUrl; // Atualizar comprovante local
         
         sucessos++;
         
@@ -3705,7 +3722,7 @@ async function confirmarBaixaMultipla() {
     
     // Mostrar resultado
     if (erros === 0) {
-      alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.`);
+      alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.\n${comprovanteUrl ? 'Comprovante vinculado a todos os títulos.' : 'Processado sem comprovante.'}`);
       
       // Fechar modal e atualizar interface
       fecharModalBaixaMultipla();
