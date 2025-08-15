@@ -118,6 +118,75 @@
   </div>
 </div>
 
+<!-- Modal de Sucesso de Baixa Múltipla -->
+<div id="modalSucessoBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(76,175,80,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Baixa Múltipla Realizada!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoBaixaMultipla()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <div style="background: #e8f5e8; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fas fa-check-double" style="font-size: 2.5em; color: #4CAF50;"></i>
+      </div>
+      
+      <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 8px; color: #333;">Baixa múltipla concluída com sucesso!</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 24px;">
+        Todos os títulos selecionados foram processados e atualizados no sistema.
+      </div>
+      
+      <!-- Resumo da operação -->
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: left;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle" style="color: #1976D2;"></i>
+          Resumo da Operação
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.95em;">
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Títulos Processados</div>
+            <div id="quantidadeTitulosSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Data do Pagamento</div>
+            <div id="dataPagamentoSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Status Aplicado</div>
+            <div id="statusAplicadoSucesso" style="color: #4CAF50; font-weight: 600;"></div>
+          </div>
+          
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Comprovante</div>
+            <div id="comprovanteSucesso" style="color: #333; font-weight: 600;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mensagem de confirmação -->
+      <div style="background: #e8f5e8; border: 1px solid #4CAF50; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 1.2em;"></i>
+          <div style="text-align: left;">
+            <div style="font-weight: 600; color: #2e7d32; margin-bottom: 4px;">Operação Concluída!</div>
+            <div style="font-size: 0.95em; color: #2e7d32;">
+              Todos os títulos foram atualizados com sucesso no sistema.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 12px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoBaixaMultipla" class="btn-success" style="padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #4CAF50; color: white; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
+        <i class="fas fa-check"></i>
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal de Título Pago Não Pode Excluir -->
 <div id="modalTituloPagoNaoPodeExcluir" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.13); padding: 0;">
@@ -579,7 +648,32 @@ function fecharModalConfirmCancelarBaixa() {
 
 function fecharModalSucessoCancelarBaixa() {
   const modal = document.getElementById('modalSucessoCancelarBaixa');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função para mostrar modal de sucesso de baixa múltipla
+function mostrarModalSucessoBaixaMultipla(dados) {
+  // Preencher informações no modal
+  document.getElementById('quantidadeTitulosSucesso').textContent = dados.quantidade;
+  document.getElementById('dataPagamentoSucesso').textContent = dados.dataPagamento;
+  document.getElementById('statusAplicadoSucesso').textContent = dados.status;
+  document.getElementById('comprovanteSucesso').textContent = dados.comprovante ? 'Sim' : 'Não';
+  
+  // Mostrar o modal
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+// Função para fechar modal de sucesso de baixa múltipla
+function fecharModalSucessoBaixaMultipla() {
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 // ========================================
@@ -654,8 +748,9 @@ function fecharTodosModaisCancelamento() {
   const modaisParaFechar = [
     'modalConfirmCancelarBaixa',
     'modalConfirmExclusao',
-    'modalTitulo',
+    'modalSucessoExclusao',
     'modalSucessoCancelarBaixa',
+    'modalSucessoBaixaMultipla',
     'modalTituloPagoNaoPodeExcluir'
   ];
   
@@ -726,4 +821,16 @@ function fecharTodosModaisCancelamento() {
 
 // Event listeners serão configurados no arquivo principal após carregamento dos modais
 // Removidos para evitar duplicação e conflitos
+
+  // Configurar botão OK do modal de sucesso de cancelamento de baixa
+  const btnOkSucessoCancelarBaixa = document.getElementById('btnOkSucessoCancelarBaixa');
+  if (btnOkSucessoCancelarBaixa) {
+    btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
+  }
+  
+  // Configurar botão OK do modal de sucesso de baixa múltipla
+  const btnOkSucessoBaixaMultipla = document.getElementById('btnOkSucessoBaixaMultipla');
+  if (btnOkSucessoBaixaMultipla) {
+    btnOkSucessoBaixaMultipla.addEventListener('click', fecharModalSucessoBaixaMultipla);
+  }
 </script> 
