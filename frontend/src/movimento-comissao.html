@@ -3664,12 +3664,12 @@ async function confirmarBaixaMultipla() {
     }
   }
   
-  // Confirmar ação
-  const confirmacao = confirm(`Confirmar baixa de ${titulos.length} título(s)?\n\nEsta ação irá:\n- Alterar o status para "${status}"\n- Definir a data de pagamento como ${formatarData(dataPagamento)}\n- Aplicar as observações em todos os títulos\n- ${comprovanteUrl ? 'Vincular o comprovante a todos os títulos' : 'Processar sem comprovante'}\n\nDeseja continuar?`);
+  // Remover confirmação - baixa múltipla acontece diretamente
+  // const confirmacao = confirm(`Confirmar baixa de ${titulos.length} título(s)?\n\nEsta ação irá:\n- Alterar o status para "${status}"\n- Definir a data de pagamento como ${formatarData(dataPagamento)}\n- Aplicar as observações em todos os títulos\n- ${comprovanteUrl ? 'Vincular o comprovante a todos os títulos' : 'Processar sem comprovante'}\n\nDeseja continuar?`);
   
-  if (!confirmacao) {
-    return;
-  }
+  // if (!confirmacao) {
+  //   return;
+  // }
   
   try {
     // Mostrar loading
