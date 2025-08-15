@@ -2890,17 +2890,22 @@
                 </div>
             `;
             
-            // Inserir animação no modal de forma mais segura
-            if (modalBody && footerBtns) {
-                try {
-                    modalBody.insertBefore(animacaoDiv, footerBtns);
-                } catch (error) {
-                    console.warn('Erro ao inserir antes dos botões, inserindo no final:', error);
+            // Inserir animação no modal de forma mais robusta
+            if (modalBody) {
+                // Verificar se footerBtns é realmente filho de modalBody
+                if (footerBtns && modalBody.contains(footerBtns)) {
+                    try {
+                        modalBody.insertBefore(animacaoDiv, footerBtns);
+                    } catch (error) {
+                        console.warn('Erro ao inserir antes dos botões, inserindo no final:', error);
+                        modalBody.appendChild(animacaoDiv);
+                    }
+                } else {
+                    // Se footerBtns não for filho de modalBody, inserir no final
                     modalBody.appendChild(animacaoDiv);
                 }
-            } else if (modalBody) {
-                modalBody.appendChild(animacaoDiv);
             } else {
+                // Fallback: inserir no modal diretamente
                 modal.appendChild(animacaoDiv);
             }
             
@@ -3837,6 +3842,7 @@ function mostrarAnimacaoBaixaMultipla() {
         </div>
     `;
     
+    // Inserir animação no modal de forma mais robusta
     // Inserir animação no modal de forma mais segura
     if (modalBody && footerBtns) {
         try {
