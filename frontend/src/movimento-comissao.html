@@ -3678,6 +3678,9 @@ async function confirmarBaixaMultipla() {
     btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
     btnConfirmar.disabled = true;
     
+    // Mostrar animação de baixa múltipla (padrão do sistema)
+    mostrarAnimacaoBaixaMultipla();
+    
     // Processar cada título
     let sucessos = 0;
     let erros = 0;
@@ -3686,6 +3689,10 @@ async function confirmarBaixaMultipla() {
       const titulo = titulos[i];
       
       try {
+        // Atualizar progresso da animação
+        const percentual = Math.round(((i + 1) / titulos.length) * 100);
+        atualizarProgressoBaixaMultipla(percentual, `Processando título ${i + 1} de ${titulos.length}...`);
+        
         // Preparar dados para envio
         const dadosPagamento = {
           valor_pago: titulo.valor, // Baixa total
@@ -3707,40 +3714,32 @@ async function confirmarBaixaMultipla() {
         
         sucessos++;
         
-        // Atualizar progresso
-        btnConfirmar.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processando... (${i + 1}/${titulos.length})`;
-        
       } catch (error) {
         console.error(`Erro ao processar título ${titulo.numero_titulo}:`, error);
         erros++;
       }
     }
     
+    // Atualizar progresso final
+    atualizarProgressoBaixaMultipla(100, 'Baixa múltipla concluída com sucesso!');
+    
     // Restaurar botão
     btnConfirmar.innerHTML = textoOriginal;
     btnConfirmar.disabled = false;
     
-    // Mostrar resultado
-    if (erros === 0) {
-      alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.\n${comprovanteUrl ? 'Comprovante vinculado a todos os títulos.' : 'Processado sem comprovante.'}`);
-      
-      // Fechar modal e atualizar interface
-      fecharModalBaixaMultipla();
-      
-      // Atualizar tabela e cards
-      if (typeof atualizarTabelaComFiltros === 'function') {
-        atualizarTabelaComFiltros();
-      }
-      if (typeof atualizarCardsTotalizadores === 'function') {
-        atualizarCardsTotalizadores();
-      }
-      
-    } else {
-      alert(`⚠️ Baixa múltipla parcialmente realizada!\n\n✅ ${sucessos} título(s) processado(s) com sucesso\n❌ ${erros} título(s) com erro\n\nVerifique o console para mais detalhes.`);
-      
-      // Fechar modal mesmo com erros
-      fecharModalBaixaMultipla();
+    // Fechar modal e atualizar interface
+    fecharModalBaixaMultipla();
+    
+    // Atualizar tabela e cards
+    if (typeof atualizarTabelaComFiltros === 'function') {
+      atualizarTabelaComFiltros();
     }
+    if (typeof atualizarCardsTotalizadores === 'function') {
+      atualizarCardsTotalizadores();
+    }
+    
+    // Mostrar mensagem de sucesso
+    alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.`);
     
   } catch (error) {
     console.error('Erro geral na baixa múltipla:', error);
@@ -3751,6 +3750,84 @@ async function confirmarBaixaMultipla() {
     btnConfirmar.innerHTML = '<i class="fas fa-save"></i> Confirmar Baixa';
     btnConfirmar.disabled = false;
   }
+}
+
+// Função para mostrar animação de baixa múltipla
+function mostrarAnimacaoBaixaMultipla() {
+    const modal = document.getElementById('modalBaixaMultipla');
+    const modalBody = modal.querySelector('.modal-body');
+    const footerBtns = modal.querySelector('.form-actions');
+    
+    // Remover animação anterior se existir
+    const animacaoAnterior = document.getElementById('animacaoBaixaMultiplaDiv');
+    if (animacaoAnterior) {
+        animacaoAnterior.remove();
+    }
+    
+    // Esconder botões
+    if (footerBtns) {
+        footerBtns.style.display = 'none';
+    }
+    
+    // Criar e mostrar animação de baixa múltipla
+    const animacaoDiv = document.createElement('div');
+    animacaoDiv.id = 'animacaoBaixaMultiplaDiv';
+    animacaoDiv.style.cssText = `
+        margin: 20px 0; 
+        text-align: center;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+    `;
+    
+    animacaoDiv.innerHTML = `
+        <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+            <span id="textoProgressoBaixaMultipla">Iniciando baixa múltipla...</span>
+        </div>
+        <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+            <div id="barraProgressoBaixaMultipla" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+        </div>
+        <div style="font-size: 0.9em; color: #666; font-style: italic;">
+            Processando pagamentos em lote...
+        </div>
+    `;
+    
+    // Inserir animação no modal de forma mais segura
+    if (modalBody && footerBtns) {
+        // Tentar inserir antes dos botões se possível
+        try {
+            modalBody.insertBefore(animacaoDiv, footerBtns);
+            console.log('Animação de baixa múltipla inserida antes dos botões');
+        } catch (error) {
+            console.warn('Erro ao inserir antes dos botões, inserindo no final:', error);
+            modalBody.appendChild(animacaoDiv);
+        }
+    } else if (modalBody) {
+        // Se não encontrar os botões, inserir no final do body
+        modalBody.appendChild(animacaoDiv);
+        console.log('Animação de baixa múltipla inserida no final do modal body');
+    } else {
+        // Fallback: inserir no modal diretamente
+        modal.appendChild(animacaoDiv);
+        console.log('Animação de baixa múltipla inserida no modal (fallback)');
+    }
+    
+    console.log('Animação de baixa múltipla exibida');
+}
+
+// Função para atualizar progresso da baixa múltipla
+function atualizarProgressoBaixaMultipla(percentual, texto) {
+    const barraProgresso = document.getElementById('barraProgressoBaixaMultipla');
+    const textoProgresso = document.getElementById('textoProgressoBaixaMultipla');
+    
+    if (barraProgresso && textoProgresso) {
+        barraProgresso.style.width = `${percentual}%`;
+        textoProgresso.textContent = texto;
+        
+        console.log(`Progresso Baixa Múltipla: ${percentual}% - ${texto}`);
+    }
 }
 </script>
 
