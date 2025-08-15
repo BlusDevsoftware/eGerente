@@ -2890,8 +2890,19 @@
                 </div>
             `;
             
-            // Inserir animação no modal
-            modalBody.appendChild(animacaoDiv);
+            // Inserir animação no modal de forma mais segura
+            if (modalBody && footerBtns) {
+                try {
+                    modalBody.insertBefore(animacaoDiv, footerBtns);
+                } catch (error) {
+                    console.warn('Erro ao inserir antes dos botões, inserindo no final:', error);
+                    modalBody.appendChild(animacaoDiv);
+                }
+            } else if (modalBody) {
+                modalBody.appendChild(animacaoDiv);
+            } else {
+                modal.appendChild(animacaoDiv);
+            }
             
             console.log('Animação de exclusão exibida');
         }
@@ -3828,22 +3839,16 @@ function mostrarAnimacaoBaixaMultipla() {
     
     // Inserir animação no modal de forma mais segura
     if (modalBody && footerBtns) {
-        // Tentar inserir antes dos botões se possível
         try {
             modalBody.insertBefore(animacaoDiv, footerBtns);
-            console.log('Animação de baixa múltipla inserida antes dos botões');
         } catch (error) {
             console.warn('Erro ao inserir antes dos botões, inserindo no final:', error);
             modalBody.appendChild(animacaoDiv);
         }
     } else if (modalBody) {
-        // Se não encontrar os botões, inserir no final do body
         modalBody.appendChild(animacaoDiv);
-        console.log('Animação de baixa múltipla inserida no final do modal body');
     } else {
-        // Fallback: inserir no modal diretamente
         modal.appendChild(animacaoDiv);
-        console.log('Animação de baixa múltipla inserida no modal (fallback)');
     }
     
     console.log('Animação de baixa múltipla exibida');
