@@ -3512,30 +3512,17 @@ function abrirModalBaixaMultipla(titulos) {
         <td style='padding:8px 6px; text-align:center;'>${formatarData(t.data_vencimento)}</td>
       </tr>
     `).join('');
-    
-    // Calcular e exibir total
-    const total = titulos.reduce((sum, t) => sum + (t.valor || 0), 0);
-    const totalFormatado = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    
-    document.getElementById('totalValorMultipla').value = totalFormatado;
-    document.getElementById('quantidadeTitulosMultipla').value = titulos.length;
-    
-    // Configurar data atual
-    const hoje = new Date().toISOString().split('T')[0];
-    document.getElementById('dataPagamentoMultipla').value = hoje;
-    
-    // Configurar contador de observações
-    const observacoesInput = document.getElementById('observacoesMultipla');
-    const contador = document.getElementById('contadorObservacoesMultipla');
-    
-    if (observacoesInput && contador) {
-      observacoesInput.addEventListener('input', function() {
-        contador.textContent = this.value.length;
-      });
-    }
   }
   
   modal.style.display = 'flex';
+}
+
+// Função para fechar o modal de múltiplas baixas
+function fecharModalBaixaMultipla() {
+  const modal = document.getElementById('modalBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 // Funções auxiliares para upload de arquivos múltiplos
