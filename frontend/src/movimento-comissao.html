@@ -3681,6 +3681,9 @@ async function confirmarBaixaMultipla() {
     // Mostrar animação de baixa múltipla (padrão do sistema)
     mostrarAnimacaoBaixaMultipla();
     
+    // Aguardar um pouco para a animação aparecer
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Processar cada título
     let sucessos = 0;
     let erros = 0;
@@ -3692,6 +3695,9 @@ async function confirmarBaixaMultipla() {
         // Atualizar progresso da animação
         const percentual = Math.round(((i + 1) / titulos.length) * 100);
         atualizarProgressoBaixaMultipla(percentual, `Processando título ${i + 1} de ${titulos.length}...`);
+        
+        // Aguardar um pouco para mostrar o progresso
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Preparar dados para envio
         const dadosPagamento = {
@@ -3723,24 +3729,34 @@ async function confirmarBaixaMultipla() {
     // Atualizar progresso final
     atualizarProgressoBaixaMultipla(100, 'Baixa múltipla concluída com sucesso!');
     
+    // Aguardar um pouco para mostrar o progresso final
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     // Restaurar botão
     btnConfirmar.innerHTML = textoOriginal;
     btnConfirmar.disabled = false;
     
-    // Fechar modal e atualizar interface
-    fecharModalBaixaMultipla();
-    
-    // Atualizar tabela e cards
-    if (typeof atualizarTabelaComFiltros === 'function') {
-      atualizarTabelaComFiltros();
+    // Mostrar resultado
+    if (erros === 0) {
+      alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.\n${comprovanteUrl ? 'Comprovante vinculado a todos os títulos.' : 'Processado sem comprovante.'}`);
+      
+      // Fechar modal e atualizar interface
+      fecharModalBaixaMultipla();
+      
+      // Atualizar tabela e cards
+      if (typeof atualizarTabelaComFiltros === 'function') {
+        atualizarTabelaComFiltros();
+      }
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+      
+    } else {
+      alert(`⚠️ Baixa múltipla parcialmente realizada!\n\n✅ ${sucessos} título(s) processado(s) com sucesso\n❌ ${erros} título(s) com erro\n\nVerifique o console para mais detalhes.`);
+      
+      // Fechar modal mesmo com erros
+      fecharModalBaixaMultipla();
     }
-    if (typeof atualizarCardsTotalizadores === 'function') {
-      atualizarCardsTotalizadores();
-    }
-    
-    // Mostrar mensagem de sucesso
-    alert(`✅ Baixa múltipla realizada com sucesso!\n\n${sucessos} título(s) processado(s) com sucesso.`);
-    
   } catch (error) {
     console.error('Erro geral na baixa múltipla:', error);
     alert(`❌ Erro na baixa múltipla: ${error.message}`);
