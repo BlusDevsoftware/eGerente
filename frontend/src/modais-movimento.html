@@ -651,6 +651,15 @@ function fecharModalSucessoCancelarBaixa() {
   if (modal) {
     modal.style.display = 'none';
   }
+  // Fechar também o modal de visualização/edição, se estiver aberto
+  const modalTitulo = document.getElementById('modalTitulo');
+  if (modalTitulo) {
+    modalTitulo.style.display = 'none';
+  }
+  const viewModal = document.getElementById('viewModal');
+  if (viewModal) {
+    viewModal.style.display = 'none';
+  }
 }
 
 // Função para mostrar modal de sucesso de baixa múltipla
