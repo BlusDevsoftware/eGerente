@@ -1413,6 +1413,14 @@
                 if (typeof removeFile === 'function') {
                     try { removeFile(); } catch (e) { /* noop */ }
                 }
+                // Limpar observações e resetar contador
+                const notes = document.getElementById('paymentNotes');
+                if (notes) {
+                    notes.value = '';
+                    try { notes.dispatchEvent(new Event('input')); } catch (e) {}
+                    const counter = document.getElementById('contadorObservacoes');
+                    if (counter) counter.textContent = '0/200';
+                }
             }
             
             tituloOriginalBaixa = titulo; // Salva referência global
@@ -1535,6 +1543,14 @@
             if (paymentModalEl) {
                 const formActions = paymentModalEl.querySelector('.form-actions');
                 if (formActions) formActions.style.display = 'flex';
+            }
+            // Limpar observações e resetar contador
+            const notes = document.getElementById('paymentNotes');
+            if (notes) {
+                notes.value = '';
+                try { notes.dispatchEvent(new Event('input')); } catch (e) {}
+                const counter = document.getElementById('contadorObservacoes');
+                if (counter) counter.textContent = '0/200';
             }
         }
 
