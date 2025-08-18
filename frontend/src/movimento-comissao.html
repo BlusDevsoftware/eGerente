@@ -1803,6 +1803,13 @@
                 }
             }
             document.getElementById('modal-status').value = titulo.status || '';
+            // Garantir que o input de status aparece por padrão e remover seletor antigo
+            (function resetStatusEditor() {
+                const statusInputReset = document.getElementById('modal-status');
+                if (statusInputReset) statusInputReset.style.display = '';
+                const oldSelectReset = document.getElementById('modal-edit-status-select');
+                if (oldSelectReset && oldSelectReset.parentElement) oldSelectReset.parentElement.removeChild(oldSelectReset);
+            })();
             document.getElementById('modal-colaborador').value = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
             document.getElementById('modal-tipo').value = titulo.tipo || '';
             
@@ -2139,6 +2146,12 @@
             if (novoComprovante) {
                 novoComprovante.value = '';
             }
+            
+            // Restaurar editor de status (mostrar input e remover select)
+            const oldSelect2 = document.getElementById('modal-edit-status-select');
+            if (oldSelect2 && oldSelect2.parentElement) oldSelect2.parentElement.removeChild(oldSelect2);
+            const statusInput2 = document.getElementById('modal-status');
+            if (statusInput2) statusInput2.style.display = '';
         }
         
         // Função para mostrar preview do novo comprovante
