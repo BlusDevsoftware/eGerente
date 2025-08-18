@@ -1400,6 +1400,21 @@
                 return;
             }
             
+            // Resetar estado visual do modal antes de abrir (caso tenha sido usado antes)
+            const paymentModalEl = document.getElementById('paymentModal');
+            if (paymentModalEl) {
+                // Remover animação de baixa anterior, se houver
+                const animacaoBaixaDiv = document.getElementById('animacaoBaixaDiv');
+                if (animacaoBaixaDiv) animacaoBaixaDiv.remove();
+                // Reexibir botões de ação do formulário
+                const formActions = paymentModalEl.querySelector('.form-actions');
+                if (formActions) formActions.style.display = 'flex';
+                // Garantir que a zona de arquivo esteja limpa
+                if (typeof removeFile === 'function') {
+                    try { removeFile(); } catch (e) { /* noop */ }
+                }
+            }
+            
             tituloOriginalBaixa = titulo; // Salva referência global
             document.getElementById('paymentModal').style.display = 'flex';
             document.getElementById('commissionValue').value = titulo.valor?.toFixed(2) || '';
@@ -1512,6 +1527,15 @@
             // Resetar variáveis de baixa parcial
             baixaParcialConfirmada = false;
             baixaParcialDiferenca = 0;
+
+            // Remover animação de baixa e reexibir botões para próxima abertura
+            const animacaoBaixaDiv = document.getElementById('animacaoBaixaDiv');
+            if (animacaoBaixaDiv) animacaoBaixaDiv.remove();
+            const paymentModalEl = document.getElementById('paymentModal');
+            if (paymentModalEl) {
+                const formActions = paymentModalEl.querySelector('.form-actions');
+                if (formActions) formActions.style.display = 'flex';
+            }
         }
 
         // Close modal when clicking outside
