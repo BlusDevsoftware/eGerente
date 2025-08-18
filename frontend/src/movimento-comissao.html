@@ -2947,6 +2947,9 @@
         function fecharModalSucessoCancelarBaixa() {
             const modal = document.getElementById('modalSucessoCancelarBaixa');
             if (modal) modal.style.display = 'none';
+            // Garantir que o modal de visualização/edição seja fechado
+            const modalTitulo = document.getElementById('modalTitulo');
+            if (modalTitulo) modalTitulo.style.display = 'none';
         }
 
         // Adicionar evento ao botão OK do modal de sucesso
