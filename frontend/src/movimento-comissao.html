@@ -2210,7 +2210,29 @@
             try {
                 await carregarColaboradores();
                 const data = await window.api.get('/movimento_comissoes');
-                todosTitulos = Array.isArray(data) ? data : [];
+
+                // Atualizar status para VENCIDO quando vencimento < hoje e não pago
+                const todayStr = new Date().toISOString().split('T')[0];
+                const atualizacoes = [];
+                const titulos = Array.isArray(data) ? data : [];
+                titulos.forEach(t => {
+                    const statusAtual = (t.status || '').toUpperCase();
+                    const venc = t.data_vencimento;
+                    const naoPago = statusAtual !== 'PAGO';
+                    if (naoPago && venc && typeof venc === 'string' && venc < todayStr && statusAtual !== 'VENCIDO') {
+                        t.status = 'VENCIDO';
+                        // persistir no backend sem bloquear a UI
+                        atualizacoes.push(
+                            window.api.put(`/movimento_comissoes/${t.id}`, { status: 'VENCIDO' }).catch(() => {})
+                        );
+                    }
+                });
+                // Disparar atualizações em background
+                if (atualizacoes.length) {
+                    Promise.allSettled(atualizacoes).catch(() => {});
+                }
+
+                todosTitulos = titulos;
                 titulosFiltrados = [...todosTitulos];
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
