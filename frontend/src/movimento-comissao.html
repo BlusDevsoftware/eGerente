@@ -1630,7 +1630,7 @@
 
                 const optPlaceholder = document.createElement('option');
                 optPlaceholder.value = '';
-                optPlaceholder.textContent = 'Alterar status para...';
+                optPlaceholder.textContent = 'Selecionar novo status...';
                 optPlaceholder.disabled = true;
                 optPlaceholder.selected = true;
                 select.appendChild(optPlaceholder);
@@ -1640,8 +1640,14 @@
                 optClienteNaoPagou.textContent = 'CLIENTE NÃO PAGOU';
                 select.appendChild(optClienteNaoPagou);
 
-                // Inserir seletor abaixo do input de status
+                // Esconder o input e inserir o select abaixo
+                if (statusInput) statusInput.style.display = 'none';
                 statusInput.parentElement.appendChild(select);
+                // Focar o select para facilitar a edição
+                setTimeout(() => select.focus(), 0);
+            } else {
+                // Para outros status, manter input visível porém readonly
+                if (statusInput) statusInput.setAttribute('readonly', true);
             }
 
             modal.style.display = 'flex';
@@ -1652,9 +1658,11 @@
             // Sempre restaurar campos para readonly ao fechar
             document.querySelectorAll('#viewTituloForm input').forEach(input => input.setAttribute('readonly', true));
             document.getElementById('editActions').style.display = 'none';
-            // Remover seletor de status de edição, se existir
+            // Remover seletor de status de edição, se existir, e reexibir input
             const oldSelect = document.getElementById('edit-status-select');
             if (oldSelect && oldSelect.parentElement) oldSelect.parentElement.removeChild(oldSelect);
+            const statusInput = document.getElementById('view-status');
+            if (statusInput) statusInput.style.display = '';
         }
 
         function saveEditModal() {
