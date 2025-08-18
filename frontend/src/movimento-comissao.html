@@ -2530,6 +2530,20 @@
                 // Se não é baixa parcial, executar cancelamento normal
                 await executarCancelamentoBaixa(tituloParaCancelarBaixa, []);
                 
+                // Fechar modais e abrir modal de sucesso (fluxo sem parciais)
+                if (typeof fecharTodosModaisCancelamento === 'function') {
+                    fecharTodosModaisCancelamento();
+                } else if (typeof fecharModalConfirmCancelarBaixa === 'function') {
+                    fecharModalConfirmCancelarBaixa();
+                }
+                const modalSucesso = document.getElementById('modalSucessoCancelarBaixa');
+                if (modalSucesso) {
+                    modalSucesso.style.display = 'flex';
+                }
+                if (typeof resetarVariaveisCancelamento === 'function') {
+                    resetarVariaveisCancelamento();
+                }
+                
             } catch (error) {
                 console.error('Erro ao cancelar baixa:', error);
                 alert(`Erro ao cancelar baixa: ${error.message}`);
@@ -3079,7 +3093,7 @@
                 
                 // Modal de sucesso de cancelamento de baixa
                 const modalSucessoCancelarBaixa = document.getElementById('modalSucessoCancelarBaixa');
-                if (modalSucessoCancelarBaixa) {
+                if (event.target === modalSucessoCancelarBaixa) {
                     fecharModalSucessoCancelarBaixa();
                 }
             });
