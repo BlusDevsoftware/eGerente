@@ -1619,7 +1619,7 @@
             const oldSelect = document.getElementById('edit-status-select');
             if (oldSelect && oldSelect.parentElement) oldSelect.parentElement.removeChild(oldSelect);
 
-            if (statusAtualUpper === 'PENDENTE' || statusAtualUpper === 'VENCIDO') {
+            if (statusAtualUpper !== 'PAGO') {
                 const select = document.createElement('select');
                 select.id = 'edit-status-select';
                 select.style.width = '100%';
@@ -1632,13 +1632,15 @@
                 optPlaceholder.value = '';
                 optPlaceholder.textContent = 'Selecionar novo status...';
                 optPlaceholder.disabled = true;
-                optPlaceholder.selected = true;
                 select.appendChild(optPlaceholder);
 
-                const optClienteNaoPagou = document.createElement('option');
-                optClienteNaoPagou.value = 'CLIENTE NÃO PAGOU';
-                optClienteNaoPagou.textContent = 'CLIENTE NÃO PAGOU';
-                select.appendChild(optClienteNaoPagou);
+                // Opções permitidas: qualquer uma exceto PAGO
+                ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'].forEach(op => {
+                    const opt = document.createElement('option');
+                    opt.value = op; opt.textContent = op;
+                    if (statusAtualUpper === op) opt.selected = true;
+                    select.appendChild(opt);
+                });
 
                 // Esconder o input e inserir o select abaixo
                 if (statusInput) statusInput.style.display = 'none';
@@ -1646,7 +1648,7 @@
                 // Focar o select para facilitar a edição
                 setTimeout(() => select.focus(), 0);
             } else {
-                // Para outros status, manter input visível porém readonly
+                // Para PAGO, manter input visível porém readonly (já bloqueado acima)
                 if (statusInput) statusInput.setAttribute('readonly', true);
             }
 
@@ -1689,12 +1691,8 @@
             const statusSelect = document.getElementById('edit-status-select');
             let novoStatus = null;
             if (statusSelect && statusSelect.value) {
-                // Permitir apenas transição para CLIENTE NÃO PAGOU
-                if ((titulo.status || '').toUpperCase() === 'PENDENTE' || (titulo.status || '').toUpperCase() === 'VENCIDO') {
-                    if (statusSelect.value === 'CLIENTE NÃO PAGOU') {
-                        novoStatus = 'CLIENTE NÃO PAGOU';
-                    }
-                }
+                // Aceitar qualquer status selecionado, exceto PAGO (não ofertado)
+                novoStatus = statusSelect.value;
             }
 
             // Montar payload
@@ -1943,27 +1941,33 @@
                     document.getElementById('modal-status').setAttribute('readonly', true);
                     document.getElementById('modal-tipo').setAttribute('readonly', true);
                     
-                    // Habilitar mudança de status PENDENTE/VENCIDO -> CLIENTE NÃO PAGOU
+                    // Sempre habilitar mudança de status (exceto para PAGO)
                     const statusAtualUpper = (titulo.status || '').toUpperCase();
                     const statusInput = document.getElementById('modal-status');
                     const oldSelect = document.getElementById('modal-edit-status-select');
                     if (oldSelect && oldSelect.parentElement) oldSelect.parentElement.removeChild(oldSelect);
-                    
-                    if (statusAtualUpper === 'PENDENTE' || statusAtualUpper === 'VENCIDO') {
-                        statusInput.style.display = 'none';
-                        const select = document.createElement('select');
-                        select.id = 'modal-edit-status-select';
-                        select.style.width = '100%';
-                        select.style.padding = '10px 12px';
-                        select.style.border = '1px solid #e3f2fd';
-                        select.style.borderRadius = '6px';
-                        select.style.background = '#fff';
-                        select.innerHTML = `
-                            <option value="" disabled selected>Selecionar novo status...</option>
-                            <option value="CLIENTE NÃO PAGOU">CLIENTE NÃO PAGOU</option>
-                        `;
-                        statusInput.parentElement.appendChild(select);
-                    }
+                    if (statusInput) statusInput.style.display = 'none';
+                    const select = document.createElement('select');
+                    select.id = 'modal-edit-status-select';
+                    select.style.width = '100%';
+                    select.style.padding = '10px 12px';
+                    select.style.border = '1px solid #e3f2fd';
+                    select.style.borderRadius = '6px';
+                    select.style.background = '#fff';
+                    // Opções permitidas
+                    const opcoes = ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'];
+                    // Placeholder
+                    const optPh = document.createElement('option');
+                    optPh.disabled = true; optPh.value = '';
+                    optPh.textContent = 'Selecionar novo status...';
+                    select.appendChild(optPh);
+                    opcoes.forEach(op => {
+                        const o = document.createElement('option');
+                        o.value = op; o.textContent = op;
+                        if (statusAtualUpper === op) o.selected = true;
+                        select.appendChild(o);
+                    });
+                    statusInput.parentElement.appendChild(select);
                     
                     // Configurar campo valor para edição
                     const valorInput = document.getElementById('modal-valor');
