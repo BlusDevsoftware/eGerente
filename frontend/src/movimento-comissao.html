@@ -1935,35 +1935,57 @@
                     
                 } else {
                     // Se não está pago, edição normal
-                // Todos editáveis, exceto número, colaborador, usuário, status e tipo
-                form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
-                document.getElementById('modal-numero').setAttribute('readonly', true);
-                document.getElementById('modal-colaborador').setAttribute('readonly', true);
-                document.getElementById('modal-usuario').setAttribute('readonly', true);
-                document.getElementById('modal-status').setAttribute('readonly', true);
-                document.getElementById('modal-tipo').setAttribute('readonly', true);
-                
-                // Configurar campo valor para edição
-                const valorInput = document.getElementById('modal-valor');
-                valorInput.removeAttribute('readonly');
-                valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
-                valorInput.addEventListener('input', function(e) {
-                    let v = e.target.value.replace(/\D/g, '');
-                    v = (parseInt(v, 10) || 0).toString();
-                    while (v.length < 3) v = '0' + v;
-                    let reais = v.slice(0, -2);
-                    let centavos = v.slice(-2);
-                    reais = reais.replace(/^0+/, '') || '0';
-                    reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-                    e.target.value = `R$ ${reais},${centavos}`;
-                });
-                // Ao focar, seleciona só o número
-                valorInput.addEventListener('focus', function(e) {
-                    setTimeout(() => {
-                        let val = e.target.value.replace(/^R\$\s*/, '');
-                        e.target.setSelectionRange(val.length, val.length);
-                    }, 0);
-                });
+                    // Todos editáveis, exceto número, colaborador, usuário, status e tipo
+                    form.querySelectorAll('input').forEach(inp => inp.removeAttribute('readonly'));
+                    document.getElementById('modal-numero').setAttribute('readonly', true);
+                    document.getElementById('modal-colaborador').setAttribute('readonly', true);
+                    document.getElementById('modal-usuario').setAttribute('readonly', true);
+                    document.getElementById('modal-status').setAttribute('readonly', true);
+                    document.getElementById('modal-tipo').setAttribute('readonly', true);
+                    
+                    // Habilitar mudança de status PENDENTE/VENCIDO -> CLIENTE NÃO PAGOU
+                    const statusAtualUpper = (titulo.status || '').toUpperCase();
+                    const statusInput = document.getElementById('modal-status');
+                    const oldSelect = document.getElementById('modal-edit-status-select');
+                    if (oldSelect && oldSelect.parentElement) oldSelect.parentElement.removeChild(oldSelect);
+                    
+                    if (statusAtualUpper === 'PENDENTE' || statusAtualUpper === 'VENCIDO') {
+                        statusInput.style.display = 'none';
+                        const select = document.createElement('select');
+                        select.id = 'modal-edit-status-select';
+                        select.style.width = '100%';
+                        select.style.padding = '10px 12px';
+                        select.style.border = '1px solid #e3f2fd';
+                        select.style.borderRadius = '6px';
+                        select.style.background = '#fff';
+                        select.innerHTML = `
+                            <option value="" disabled selected>Selecionar novo status...</option>
+                            <option value="CLIENTE NÃO PAGOU">CLIENTE NÃO PAGOU</option>
+                        `;
+                        statusInput.parentElement.appendChild(select);
+                    }
+                    
+                    // Configurar campo valor para edição
+                    const valorInput = document.getElementById('modal-valor');
+                    valorInput.removeAttribute('readonly');
+                    valorInput.value = valorInput.value.replace(/^R\$\s*/, '');
+                    valorInput.addEventListener('input', function(e) {
+                        let v = e.target.value.replace(/\D/g, '');
+                        v = (parseInt(v, 10) || 0).toString();
+                        while (v.length < 3) v = '0' + v;
+                        let reais = v.slice(0, -2);
+                        let centavos = v.slice(-2);
+                        reais = reais.replace(/^0+/, '') || '0';
+                        reais = reais.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+                        e.target.value = `R$ ${reais},${centavos}`;
+                    });
+                    // Ao focar, seleciona só o número
+                    valorInput.addEventListener('focus', function(e) {
+                        setTimeout(() => {
+                            let val = e.target.value.replace(/^R\$\s*/, '');
+                            e.target.setSelectionRange(val.length, val.length);
+                        }, 0);
+                    });
                 }
                 
                 document.getElementById('btnSalvarModalTitulo').style.display = 'inline-flex';
@@ -3473,15 +3495,20 @@ if (btnSalvarModalTitulo) {
                 // Se não está pago, salvar normalmente
                 const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
                 const descricao = document.getElementById('modal-descricao').value;
+                const statusSelect = document.getElementById('modal-edit-status-select');
+                const payload = {
+                    valor: parseFloat(valor),
+                    descricao: descricao
+                };
+                if (statusSelect && statusSelect.value) {
+                    payload.status = statusSelect.value;
+                }
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
                 
-            await window.api.put(`/movimento_comissoes/${titulo.id}`, {
-                valor: parseFloat(valor),
-                descricao: descricao
-            });
-            
-            // Atualizar array local
-            titulo.valor = parseFloat(valor);
-            titulo.descricao = descricao;
+                // Atualizar array local
+                titulo.valor = parseFloat(valor);
+                titulo.descricao = descricao;
+                if (payload.status) titulo.status = payload.status;
             }
             
             // Atualizar interface
@@ -3536,6 +3563,7 @@ if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
             const numero = document.getElementById('modal-numero').value;
             const valor = document.getElementById('modal-valor').value.replace(/[^\d,]/g, '').replace(',', '.');
             const descricao = document.getElementById('modal-descricao').value;
+            const statusSelect = document.getElementById('modal-edit-status-select');
             
             // Encontrar o título no array local
             const titulo = todosTitulos.find(t => t.numero_titulo === numero);
@@ -3545,14 +3573,21 @@ if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
             }
             
             try {
-                await window.api.put(`/movimento_comissoes/${titulo.id}`, {
+                const payload = {
                     valor: parseFloat(valor),
                     descricao: descricao
-                });
+                };
+                if (statusSelect && statusSelect.value) {
+                    payload.status = statusSelect.value;
+                }
+                
+                await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
                 
                 // Atualizar o array local
                 titulo.valor = parseFloat(valor);
                 titulo.descricao = descricao;
+                if (payload.status) titulo.status = payload.status;
+                
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
                 fecharModalTitulo();
