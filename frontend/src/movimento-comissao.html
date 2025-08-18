@@ -3347,10 +3347,10 @@ function formatarData(data) {
 function statusClass(status) {
     if (!status) return '';
     const s = status.toLowerCase();
-    if (s.includes('pago')) return 'paid';
+    if (s.includes('não pagou') || s.includes('nao pagou')) return 'nao-pago';
     if (s.includes('pendente')) return 'pending';
     if (s.includes('vencido')) return 'vencido';
-    if (s.includes('não pagou') || s.includes('nao pagou')) return 'nao-pago';
+    if (s.includes('pago')) return 'paid';
     return '';
 }
 function aplicarFiltros() {
