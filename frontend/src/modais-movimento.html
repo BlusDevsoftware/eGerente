@@ -149,13 +149,13 @@
           </div>
           
           <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
-            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Data do Pagamento</div>
+            <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Data de Pagamento</div>
             <div id="dataPagamentoSucesso" style="color: #333; font-weight: 600;"></div>
           </div>
           
           <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
             <div style="font-weight: 500; color: #1976D2; margin-bottom: 4px;">Status Aplicado</div>
-            <div id="statusAplicadoSucesso" style="color: #4CAF50; font-weight: 600;"></div>
+            <div id="statusAplicadoSucesso" style="color: #333; font-weight: 600;"></div>
           </div>
           
           <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
@@ -164,25 +164,9 @@
           </div>
         </div>
       </div>
-      
-      <!-- Mensagem de confirmação -->
-      <div style="background: #e8f5e8; border: 1px solid #4CAF50; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 1.2em;"></i>
-          <div style="text-align: left;">
-            <div style="font-weight: 600; color: #2e7d32; margin-bottom: 4px;">Operação Concluída!</div>
-            <div style="font-size: 0.95em; color: #2e7d32;">
-              Todos os títulos foram atualizados com sucesso no sistema.
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-    <div class="modal-footer" style="display: flex; justify-content: center; gap: 12px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
-      <button id="btnOkSucessoBaixaMultipla" class="btn-success" style="padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #4CAF50; color: white; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
-        <i class="fas fa-check"></i>
-        OK
-      </button>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoBaixaMultipla" class="btn-success" onclick="fecharModalSucessoBaixaMultipla()" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #4CAF50; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
     </div>
   </div>
 </div>
@@ -262,6 +246,102 @@
         <i class="fas fa-times"></i>
         Entendi
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     MODAIS DE CANCELAMENTO DE AGLUTINAÇÃO
+     ======================================== -->
+
+<!-- Modal de Confirmação de Cancelar Aglutinação -->
+<div id="modalConfirmCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 98%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-exclamation-triangle"></i> Confirmar Cancelamento de Aglutinação</h2>
+      <button class="close-modal" onclick="fecharModalConfirmCancelarAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.15em; font-weight: 500; margin-bottom: 8px;">Tem certeza que deseja cancelar a aglutinação deste título?</div>
+      <div style="font-size: 1em; color: #888; margin-bottom: 18px;">Esta ação irá:</div>
+      <div style="text-align: left; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+        <ul style="margin: 0; padding-left: 20px; color: #6a1b9a;">
+          <li>Excluir o título aglutinado</li>
+          <li>Restaurar os títulos originais com status "PENDENTE"</li>
+          <li>Manter os valores e datas originais</li>
+          <li>Remover a referência de aglutinação</li>
+        </ul>
+      </div>
+      
+      <!-- Informações do título aglutinado -->
+      <div id="infoTituloAglutinado" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left; display: none;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 12px;">Título Aglutinado:</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9em;">
+          <div><strong>Número:</strong> <span id="numeroTituloAglutinado"></span></div>
+          <div><strong>Valor:</strong> <span id="valorTituloAglutinado"></span></div>
+          <div><strong>Colaborador:</strong> <span id="colaboradorTituloAglutinado"></span></div>
+          <div><strong>Vencimento:</strong> <span id="vencimentoTituloAglutinado"></span></div>
+        </div>
+      </div>
+      
+      <!-- Lista de títulos originais -->
+      <div id="listaTitulosOriginais" style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 18px; text-align: left; display: none;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 12px;">Títulos Originais a Restaurar:</div>
+        <div id="titulosOriginaisLista" style="max-height: 120px; overflow-y: auto; font-size: 0.9em;"></div>
+      </div>
+      
+      <div style="font-size: 0.95em; color: #666; font-style: italic;">Esta ação pode ser desfeita criando uma nova aglutinação.</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 24px 40px 32px 40px; border-top: 1px solid #eee;">
+      <button id="btnCancelarConfirmacaoAglutinacao" class="btn-secondary" onclick="fecharModalConfirmCancelarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button id="btnConfirmarCancelarAglutinacao" class="btn-warning" onclick="executarCancelarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #9c27b0; color: white; border: none;"><i class="fas fa-undo"></i> Confirmar Cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Sucesso de Cancelamento de Aglutinação -->
+<div id="modalSucessoCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 400px; width: 96%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Aglutinação cancelada com sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoCancelarAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 32px 0 32px; text-align: center;">
+      <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0; margin-bottom: 12px;"></i>
+      <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 8px;">A aglutinação foi cancelada.</div>
+      <div style="font-size: 0.95em; color: #666; margin-bottom: 8px;">Os títulos originais foram restaurados com status "PENDENTE".</div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: center; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
+      <button id="btnOkSucessoCancelarAglutinacao" class="btn-warning" style="padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #9c27b0; color: white; border: none;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Progresso de Cancelamento de Aglutinação -->
+<div id="modalProgressoCancelarAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 98%; box-shadow: 0 8px 32px rgba(156,39,176,0.13); padding: 0;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-spinner fa-spin"></i> Cancelando Aglutinação</h2>
+    </div>
+    <div class="modal-body" style="padding: 32px 40px 0 40px; text-align: center;">
+      <div style="background: #f3e5f5; border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <i class="fas fa-undo" style="font-size: 2.5em; color: #9c27b0;"></i>
+      </div>
+      
+      <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 8px; color: #333;">Processando cancelamento...</div>
+      <div style="font-size: 1em; color: #666; margin-bottom: 24px;">
+        <span id="textoProgressoCancelarAglutinacao">Iniciando cancelamento da aglutinação...</span>
+      </div>
+      
+      <!-- Barra de progresso -->
+      <div style="width: 100%; background-color: #f3e5f5; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+        <div id="barraProgressoCancelarAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #9c27b0, #ba68c8); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(156,39,176,0.3);"></div>
+      </div>
+      
+      <div style="font-size: 0.9em; color: #666; font-style: italic;">
+        Por favor, aguarde...
+      </div>
     </div>
   </div>
 </div>
@@ -802,28 +882,149 @@ function fecharModalSucessoCancelarBaixa() {
   }
   const viewModal = document.getElementById('viewModal');
   if (viewModal) {
+    modal.style.display = 'none';
+  }
+}
+
+// ========================================
+// FUNÇÕES DE CANCELAMENTO DE AGLUTINAÇÃO
+// ========================================
+
+// Variável global para armazenar o título aglutinado a ser cancelado
+let tituloParaCancelarAglutinacao = null;
+
+function abrirModalConfirmCancelarAglutinacao(titulo) {
+  console.log('[CANCELAR AGLUTINAÇÃO] Abrindo modal para título:', titulo);
+  tituloParaCancelarAglutinacao = titulo;
+  
+  // Verificar se é um título aglutinado
+  if (!titulo.ids_aglutinados && !titulo.numero_titulo?.includes('AGL-')) {
+    console.warn('[CANCELAR AGLUTINAÇÃO] Título não é aglutinado:', titulo);
+    alert('Este título não é uma aglutinação e não pode ser cancelado.');
+    return;
+  }
+  
+  // Buscar títulos originais se houver ids_aglutinados
+  let titulosOriginais = [];
+  if (titulo.ids_aglutinados) {
+    const ids = titulo.ids_aglutinados.split(',').map(id => parseInt(id.trim()));
+    titulosOriginais = todosTitulos.filter(t => ids.includes(t.id));
+  }
+  
+  // Preencher informações do título aglutinado
+  const infoTitulo = document.getElementById('infoTituloAglutinado');
+  const numeroEl = document.getElementById('numeroTituloAglutinado');
+  const valorEl = document.getElementById('valorTituloAglutinado');
+  const colabEl = document.getElementById('colaboradorAglutinado');
+  const vencEl = document.getElementById('vencimentoTituloAglutinado');
+  
+  if (infoTitulo && numeroEl && valorEl && colabEl && vencEl) {
+    numeroEl.textContent = titulo.numero_titulo || 'N/A';
+    valorEl.textContent = typeof formatarValorLocal === 'function' 
+      ? formatarValorLocal(titulo.valor) 
+      : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    
+    const colaboradorNome = mapaColaboradores && mapaColaboradores[titulo.colaborador_id] 
+      ? mapaColaboradores[titulo.colaborador_id] 
+      : titulo.colaborador_id || 'N/A';
+    colabEl.textContent = colaboradorNome;
+    
+    vencEl.textContent = titulo.data_vencimento 
+      ? (typeof formatarData === 'function' ? formatarData(titulo.data_vencimento) : titulo.data_vencimento)
+      : 'N/A';
+    
+    infoTitulo.style.display = 'block';
+  }
+  
+  // Preencher lista de títulos originais
+  const listaTitulos = document.getElementById('listaTitulosOriginais');
+  const titulosOriginaisLista = document.getElementById('titulosOriginaisLista');
+  
+  if (listaTitulos && titulosOriginaisLista) {
+    if (titulosOriginais.length > 0) {
+      titulosOriginaisLista.innerHTML = '';
+      titulosOriginais.forEach((t, idx) => {
+        const numero = t.numero_titulo || 'N/A';
+        const valor = typeof formatarValorLocal === 'function' 
+          ? formatarValorLocal(t.valor) 
+          : `R$ ${(t.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        const venc = t.data_vencimento 
+          ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento)
+          : 'N/A';
+        
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e9ecef; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="background:#f3e5f5; color:#9c27b0; padding:2px 6px; border-radius:10px; font-weight:600; font-size:0.8em;">${idx+1}</span>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-weight:600; color:#333; font-size:0.9em;">${numero}</span>
+              <span style="color:#666; font-size:0.8em;">Vencimento: ${venc}</span>
+            </div>
+          </div>
+          <div style="font-weight:700; color:#333; font-size:0.9em;">${valor}</div>
+        `;
+        titulosOriginaisLista.appendChild(item);
+      });
+      
+      listaTitulos.style.display = 'block';
+    } else {
+      listaTitulos.style.display = 'none';
+    }
+  }
+  
+  // Abrir modal de confirmação
+  document.getElementById('modalConfirmCancelarAglutinacao').style.display = 'flex';
+}
+
+function fecharModalConfirmCancelarAglutinacao() {
+  document.getElementById('modalConfirmCancelarAglutinacao').style.display = 'none';
+  // Não resetar tituloParaCancelarAglutinacao aqui, pois pode ser necessário para executarCancelarAglutinacao
+}
+
+function fecharModalSucessoCancelarAglutinacao() {
+  const modal = document.getElementById('modalSucessoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  // Fechar também o modal de visualização/edição, se estiver aberto
+  const modalTitulo = document.getElementById('modalTitulo');
+  if (modalTitulo) {
+    modalTitulo.style.display = 'none';
+  }
+  const viewModal = document.getElementById('viewModal');
+  if (viewModal) {
     viewModal.style.display = 'none';
   }
 }
 
-// Função para mostrar modal de sucesso de baixa múltipla
-function mostrarModalSucessoBaixaMultipla(dados) {
-  // Preencher informações no modal
-  document.getElementById('quantidadeTitulosSucesso').textContent = dados.quantidade;
-  document.getElementById('dataPagamentoSucesso').textContent = dados.dataPagamento;
-  document.getElementById('statusAplicadoSucesso').textContent = dados.status;
-  document.getElementById('comprovanteSucesso').textContent = dados.comprovante ? 'Sim' : 'Não';
+// Função para atualizar progresso do cancelamento de aglutinação
+function atualizarProgressoCancelarAglutinacao(percentual, texto) {
+  const barra = document.getElementById('barraProgressoCancelarAglutinacao');
+  const textoEl = document.getElementById('textoProgressoCancelarAglutinacao');
   
-  // Mostrar o modal
-  const modal = document.getElementById('modalSucessoBaixaMultipla');
-  if (modal) {
-    modal.style.display = 'flex';
+  if (barra) {
+    barra.style.width = `${percentual}%`;
+  }
+  
+  if (textoEl) {
+    textoEl.textContent = texto;
   }
 }
 
-// Função para fechar modal de sucesso de baixa múltipla
-function fecharModalSucessoBaixaMultipla() {
-  const modal = document.getElementById('modalSucessoBaixaMultipla');
+// Função para mostrar modal de progresso
+function mostrarModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'flex';
+    // Resetar progresso
+    atualizarProgressoCancelarAglutinacao(0, 'Iniciando cancelamento da aglutinação...');
+  }
+}
+
+// Função para fechar modal de progresso
+function fecharModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
   if (modal) {
     modal.style.display = 'none';
   }
@@ -1462,45 +1663,22 @@ function fecharTodosModaisCancelamento() {
     'modalSucessoBaixaMultipla',
     'modalTituloPagoNaoPodeExcluir',
     'modalTitulo',
-    'viewModal'
+    'viewModal',
+    'modalConfirmCancelarAglutinacao',
+    'modalSucessoCancelarAglutinacao',
+    'modalProgressoCancelarAglutinacao'
   ];
   
   modaisParaFechar.forEach(modalId => {
     const modal = document.getElementById(modalId);
-    if (modal && modal.style.display !== 'none') {
-      console.log(`Fechando modal: ${modalId}`);
+    if (modal) {
       modal.style.display = 'none';
     }
   });
   
-  // Resetar TODAS as variáveis globais para evitar conflitos
+  // Resetar variáveis globais
   tituloParaCancelarBaixa = null;
-  tituloParaExcluir = null;
-  modoExclusaoParcelamento = 'unico';
-  titulosParaExcluirAnimacao = [];
-  
-  // Resetar elementos de animação se existirem
-  const animacaoExclusaoDiv = document.getElementById('animacaoExclusaoDiv');
-  if (animacaoExclusaoDiv) {
-    animacaoExclusaoDiv.style.display = 'none';
-  }
-  
-  const footerExclusaoBtns = document.getElementById('footerExclusaoBtns');
-  if (footerExclusaoBtns) {
-    footerExclusaoBtns.style.display = 'flex';
-  }
-  
-  // Resetar opções de parcelamento se existirem
-  const opcoesExclusaoParcelamento = document.getElementById('opcoesExclusaoParcelamento');
-  if (opcoesExclusaoParcelamento) {
-    opcoesExclusaoParcelamento.style.display = 'none';
-  }
-  
-  // Resetar lista de títulos parciais se existir
-  const listaTitulosParciais = document.getElementById('listaTitulosParciais');
-  if (listaTitulosParciais) {
-    listaTitulosParciais.style.display = 'none';
-  }
+  tituloParaCancelarAglutinacao = null;
   
   // ATUALIZAR LISTA DE TÍTULOS APÓS CANCELAMENTO DE BAIXA
   // Isso garante que a exclusão múltipla funcione com o status atualizado
@@ -1543,6 +1721,12 @@ function fecharTodosModaisCancelamento() {
   const btnOkSucessoBaixaMultipla = document.getElementById('btnOkSucessoBaixaMultipla');
   if (btnOkSucessoBaixaMultipla) {
     btnOkSucessoBaixaMultipla.addEventListener('click', fecharModalSucessoBaixaMultipla);
+  }
+  
+  // Configurar botão OK do modal de sucesso de cancelamento de aglutinação
+  const btnOkSucessoCancelarAglutinacao = document.getElementById('btnOkSucessoCancelarAglutinacao');
+  if (btnOkSucessoCancelarAglutinacao) {
+    btnOkSucessoCancelarAglutinacao.addEventListener('click', fecharModalSucessoCancelarAglutinacao);
   }
 
 // Garantir renderização inicial da simulação após montar o modal
@@ -1726,5 +1910,157 @@ function abrirModalBloqueioMinimoAglutinacao() {
 function fecharModalBloqueioMinimoAglutinacao() {
   const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
   if (modal) modal.style.display = 'none';
+}
+
+// Função para fechar modal de progresso
+function fecharModalProgressoCancelarAglutinacao() {
+  const modal = document.getElementById('modalProgressoCancelarAglutinacao');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função principal para executar o cancelamento de aglutinação
+async function executarCancelarAglutinacao() {
+  console.log('[CANCELAR AGLUTINAÇÃO] Iniciando execução para título:', tituloParaCancelarAglutinacao);
+  
+  if (!tituloParaCancelarAglutinacao) {
+    console.error('[CANCELAR AGLUTINAÇÃO] Título não encontrado');
+    alert('Erro: Título não encontrado!');
+    return;
+  }
+  
+  try {
+    // Fechar modal de confirmação e mostrar progresso
+    fecharModalConfirmCancelarAglutinacao();
+    mostrarModalProgressoCancelarAglutinacao();
+    
+    // Atualizar progresso inicial
+    atualizarProgressoCancelarAglutinacao(10, 'Preparando cancelamento...');
+    
+    // Buscar títulos originais
+    let titulosOriginais = [];
+    if (tituloParaCancelarAglutinacao.ids_aglutinados) {
+      const ids = tituloParaCancelarAglutinacao.ids_aglutinados.split(',').map(id => parseInt(id.trim()));
+      titulosOriginais = todosTitulos.filter(t => ids.includes(t.id));
+    }
+    
+    console.log('[CANCELAR AGLUTINAÇÃO] Títulos originais encontrados:', titulosOriginais);
+    
+    // Atualizar progresso
+    atualizarProgressoCancelarAglutinacao(20, 'Restaurando títulos originais...');
+    
+    // Restaurar títulos originais se existirem
+    if (titulosOriginais.length > 0) {
+      for (let i = 0; i < titulosOriginais.length; i++) {
+        const tituloOriginal = titulosOriginais[i];
+        const progresso = 20 + ((i + 1) / titulosOriginais.length) * 40;
+        
+        atualizarProgressoCancelarAglutinacao(progresso, `Restaurando título ${tituloOriginal.numero_titulo}...`);
+        
+        try {
+          // Restaurar status para PENDENTE e remover referência de aglutinação
+          const dadosRestauracao = {
+            status: 'PENDENTE',
+            id_titulo_aglutinado: null
+          };
+          
+          // Atualizar na API
+          await window.api.put(`/movimento_comissoes/${tituloOriginal.id}`, dadosRestauracao);
+          
+          // Atualizar localmente
+          const indexLocal = todosTitulos.findIndex(t => t.id === tituloOriginal.id);
+          if (indexLocal !== -1) {
+            todosTitulos[indexLocal] = { ...todosTitulos[indexLocal], ...dadosRestauracao };
+          }
+          
+          console.log('[CANCELAR AGLUTINAÇÃO] Título original restaurado:', tituloOriginal.numero_titulo);
+          
+        } catch (error) {
+          console.error('[CANCELAR AGLUTINAÇÃO] Erro ao restaurar título original:', tituloOriginal.numero_titulo, error);
+          throw new Error(`Erro ao restaurar título original ${tituloOriginal.numero_titulo}: ${error.message}`);
+        }
+      }
+    }
+    
+    // Atualizar progresso
+    atualizarProgressoCancelarAglutinacao(70, 'Excluindo título aglutinado...');
+    
+    // Excluir título aglutinado da API
+    await window.api.delete(`/movimento_comissoes/${tituloParaCancelarAglutinacao.id}`);
+    
+    // Remover da lista local
+    const indexAglutinado = todosTitulos.findIndex(t => t.id === tituloParaCancelarAglutinacao.id);
+    if (indexAglutinado !== -1) {
+      todosTitulos.splice(indexAglutinado, 1);
+    }
+    
+    // Atualizar progresso final
+    atualizarProgressoCancelarAglutinacao(90, 'Finalizando cancelamento...');
+    
+    // Aguardar um pouco para mostrar o progresso final
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Atualizar progresso final
+    atualizarProgressoCancelarAglutinacao(100, 'Cancelamento concluído com sucesso!');
+    
+    // Aguardar um pouco para mostrar o progresso final
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Fechar modal de progresso
+    fecharModalProgressoCancelarAglutinacao();
+    
+    // ATUALIZAR INTERFACE APÓS CANCELAMENTO
+    console.log('[CANCELAR AGLUTINAÇÃO] Atualizando interface...');
+    
+    // Recarregar dados da API para obter status atualizados
+    try {
+      if (typeof carregarComissoes === 'function') {
+        console.log('[CANCELAR AGLUTINAÇÃO] Recarregando dados da API...');
+        await carregarComissoes();
+      } else {
+        // Fallback: atualizar UI local
+        if (typeof atualizarTabelaComFiltros === 'function') {
+          atualizarTabelaComFiltros();
+        }
+        if (typeof atualizarCardsTotalizadores === 'function') {
+          atualizarCardsTotalizadores();
+        }
+      }
+    } catch (error) {
+      console.error('[CANCELAR AGLUTINAÇÃO] Erro ao atualizar interface:', error);
+      // Fallback em caso de erro
+      if (typeof atualizarTabelaComFiltros === 'function') {
+        atualizarTabelaComFiltros();
+      }
+      if (typeof atualizarCardsTotalizadores === 'function') {
+        atualizarCardsTotalizadores();
+      }
+    }
+    
+    // Mostrar modal de sucesso
+    const modalSucesso = document.getElementById('modalSucessoCancelarAglutinacao');
+    if (modalSucesso) {
+      modalSucesso.style.display = 'flex';
+    }
+    
+    // Resetar variáveis
+    tituloParaCancelarAglutinacao = null;
+    
+    console.log('[CANCELAR AGLUTINAÇÃO] Cancelamento concluído com sucesso!');
+    
+  } catch (error) {
+    console.error('[CANCELAR AGLUTINAÇÃO] Erro durante execução:', error);
+    
+    // Fechar modal de progresso
+    fecharModalProgressoCancelarAglutinacao();
+    
+    // Mostrar erro
+    const msg = error?.data?.error || error?.message || 'Erro ao cancelar aglutinação';
+    alert(`Erro ao cancelar aglutinação: ${msg}`);
+    
+    // Resetar variáveis
+    tituloParaCancelarAglutinacao = null;
+  }
 }
 </script> 

@@ -1127,6 +1127,7 @@
         <div class="form-actions" id="modalTituloAcoes" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding: 20px 36px 24px 36px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 16px 16px;">
             <button type="button" class="btn-secondary" onclick="fecharModalTitulo()" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; transition: all 0.3s ease;"><i class="fas fa-times"></i> Cancelar</button>
             <button type="button" id="btnCancelarBaixa" class="btn-warning" onclick="confirmarCancelarBaixa()" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none; display: none; transition: all 0.3s ease;"><i class="fas fa-undo"></i> Cancelar Baixa</button>
+            <button type="button" id="btnCancelarAglutinacao" class="btn-warning" onclick="abrirModalConfirmCancelarAglutinacao(tituloAtual)" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #9c27b0; color: white; border: none; display: none; transition: all 0.3s ease;"><i class="fas fa-undo"></i> Cancelar Aglutinação</button>
             <button type="submit" id="btnSalvarModalTitulo" class="btn-primary" style="padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #1976D2; color: white; border: none; transition: all 0.3s ease;"><i class="fas fa-save"></i> Salvar</button>
           </div>
       </div>
@@ -1862,6 +1863,16 @@
                 } else {
                     btnCancelarBaixa.style.display = 'none';
                 }
+                
+                // Mostrar botão "Cancelar Aglutinação" se o título for aglutinado
+                const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
+                if (btnCancelarAglutinacao) {
+                    if (titulo.status === 'AGLUTINADO' || titulo.numero_titulo?.includes('AGL-')) {
+                        btnCancelarAglutinacao.style.display = 'inline-flex';
+                    } else {
+                        btnCancelarAglutinacao.style.display = 'none';
+                    }
+                }
             } else {
                 iconEl.className = 'fas fa-edit';
                 textoEl.textContent = 'Editar Título';
@@ -2008,6 +2019,16 @@
                     btnCancelarBaixa.style.display = 'inline-flex';
                 } else {
                     btnCancelarBaixa.style.display = 'none';
+                }
+                
+                // Mostrar botão "Cancelar Aglutinação" se o título for aglutinado
+                const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
+                if (btnCancelarAglutinacao) {
+                    if (titulo.status === 'AGLUTINADO' || titulo.numero_titulo?.includes('AGL-')) {
+                        btnCancelarAglutinacao.style.display = 'inline-flex';
+                    } else {
+                        btnCancelarAglutinacao.style.display = 'none';
+                    }
                 }
             }
             modal.style.display = 'flex';
