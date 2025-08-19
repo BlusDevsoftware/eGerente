@@ -2520,6 +2520,10 @@
             // Abrir modal de aglutinação com os títulos selecionados
             if (typeof abrirModalAglutinacao === 'function') {
                 abrirModalAglutinacao(selecionados);
+                // Forçar render imediato da UI do modal após abertura
+                try { if (typeof renderAglutinacaoUIFromState === 'function') renderAglutinacaoUIFromState(); } catch(_) {}
+                setTimeout(() => { try { if (typeof renderAglutinacaoUIFromState === 'function') renderAglutinacaoUIFromState(); } catch(_) {} }, 0);
+                requestAnimationFrame(() => { try { if (typeof renderAglutinacaoUIFromState === 'function') renderAglutinacaoUIFromState(); } catch(_) {} });
             } else {
                 alert('Modal de aglutinação não está disponível no momento.');
             }
