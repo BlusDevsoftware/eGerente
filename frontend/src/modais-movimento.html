@@ -832,9 +832,10 @@ function abrirModalAglutinacao(titulos) {
         const valorFmt = (typeof formatarValorLocal === 'function')
           ? formatarValorLocal(valorNum)
           : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
         const linha = document.createElement('div');
         linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px;';
-        linha.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span style="background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;">${idx+1}</span><span style="font-weight:600; color:#333;">${numero}</span></div><div style="font-weight:700; color:#333;">${valorFmt}</div>`;
+        linha.innerHTML = `<div style=\"display:flex; align-items:center; gap:8px;\"><span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx+1}</span><div style=\"display:flex; flex-direction:column;\"><span style=\"font-weight:600; color:#333;\">${numero}</span><span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span></div></div><div style=\"font-weight:700; color:#333;\">${valorFmt}</div>`;
         listaEl.appendChild(linha);
       });
     }
