@@ -7,6 +7,8 @@ router.get('/movimento_comissoes', movimentoComissaoController.listarMovimentos)
 router.post('/movimento_comissoes', movimentoComissaoController.criarMovimento);
 // NOVO: aglutinação de títulos (deve vir antes das rotas com parâmetros)
 router.post('/movimento_comissoes/aglutinar', movimentoComissaoController.aglutinarTitulos);
+// NOVO: diagnóstico do schema (temporário para debug)
+router.get('/movimento_comissoes/_diagnostico_schema', movimentoComissaoController.diagnosticarSchemaAglutinacao);
 router.get('/movimento_comissoes/:id', movimentoComissaoController.buscarMovimento);
 router.put('/movimento_comissoes/:id', movimentoComissaoController.atualizarMovimento);
 router.delete('/movimento_comissoes/:id', movimentoComissaoController.excluirMovimento);
