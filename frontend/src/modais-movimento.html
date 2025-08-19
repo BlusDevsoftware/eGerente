@@ -864,7 +864,15 @@ function abrirModalAglutinacao(titulos) {
             openViewModal(titulo);
           } else {
             alert('Função de visualização não disponível.');
+            return;
           }
+          // Garantir que o modal de visualização fique acima do modal de aglutinação
+          setTimeout(() => {
+            const viewModalEl = document.getElementById('viewModal');
+            const modalTituloEl = document.getElementById('modalTitulo');
+            if (viewModalEl) viewModalEl.style.zIndex = '6000';
+            if (modalTituloEl) modalTituloEl.style.zIndex = '6000';
+          }, 0);
         };
       });
     }
