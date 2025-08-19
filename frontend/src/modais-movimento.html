@@ -371,6 +371,28 @@
   </div>
 </div>
 
+<!-- NOVO: Modal de Bloqueio por Mínimo de Títulos -->
+<div id="modalBloqueioMinimoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; box-shadow: 0 8px 32px rgba(25,118,210,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.22em; color: #1976D2; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-info-circle"></i> Aglutinação requer no mínimo 2 títulos</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioMinimoAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#e3f2fd; border:1px solid #bbdefb; color:#0d47a1; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-circle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Para realizar a aglutinação é necessário manter pelo menos <strong>2 títulos</strong> selecionados.</div>
+          <div style="font-size:0.95em; margin-top:4px;">Adicione mais títulos à seleção ou conclua/cancele esta operação.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioMinimoAglutinacao()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================================
      JAVASCRIPT DOS MODAIS
      ======================================== -->
@@ -1184,6 +1206,11 @@ function renderAglutinacaoUIFromState() {
 function handleRemoverTituloClick(ev) {
   const btn = ev.currentTarget;
   const id = btn.getAttribute('data-id');
+  // Bloquear se o mínimo for alcançado
+  if (Array.isArray(titulosParaAglutinar) && titulosParaAglutinar.length <= 2) {
+    abrirModalBloqueioMinimoAglutinacao();
+    return;
+  }
   // Remover do array local
   titulosParaAglutinar = titulosParaAglutinar.filter(x => String(x.id) !== String(id));
 
@@ -1197,14 +1224,14 @@ function handleRemoverTituloClick(ev) {
     }
   } catch (_) {}
 
-  // Atualizar cabeçalho (quantidade, total, colaborador)
+  // Atualizar cabeçalho (quantidade, total, colaborador) e UI
   const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
   const totalEl = document.getElementById('valorTotalAglutinar');
   const colabEl = document.getElementById('colaboradorAglutinacao');
   const listaEl = document.getElementById('listaTitulosAglutinacao');
   if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
 
-  // Re-renderizar lista compacta
+  // Re-renderizar lista
   if (listaEl) {
     listaEl.innerHTML = '';
     titulosParaAglutinar.forEach((t, idx2) => {
@@ -1215,23 +1242,11 @@ function handleRemoverTituloClick(ev) {
       const linha2 = document.createElement('div');
       linha2.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
       linha2.innerHTML = `
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;">${idx2+1}</span>
-          <div style="display:flex; flex-direction:column;">
-            <span style="font-weight:600; color:#333;">${numero}</span>
-            <span style="color:#666; font-size:0.85em;">Vencimento: ${dtVenc}</span>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div style="font-weight:700; color:#333;">${valorFmt}</div>
-          <button type="button" class="btn-visualizar-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;"><i class="fas fa-eye"></i> Visualizar</button>
-          <button type="button" class="btn-remover-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;"><i class="fas fa-times"></i> Remover</button>
-        </div>
-      `;
+        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx2+1}</span>\n          <div style=\"display:flex; flex-direction:column;\">\n            <span style=\"font-weight:600; color:#333;\">${numero}</span>\n            <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>\n          </div>\n        </div>\n        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>\n          <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>\n          <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>\n        </div>\n      `;
       listaEl.appendChild(linha2);
     });
 
-    // Rebind dos botões após re-renderização
+    // Rebind dos botões
     const reBotoesVer = listaEl.querySelectorAll('button.btn-visualizar-titulo');
     reBotoesVer.forEach(b => b.onclick = function(ev2) {
       const id2 = ev2.currentTarget.getAttribute('data-id');
@@ -1446,6 +1461,11 @@ setTimeout(() => {
 function handleRemoverTituloClick(ev) {
   const btn = ev.currentTarget;
   const id = btn.getAttribute('data-id');
+  // Bloquear se o mínimo for alcançado
+  if (Array.isArray(titulosParaAglutinar) && titulosParaAglutinar.length <= 2) {
+    abrirModalBloqueioMinimoAglutinacao();
+    return;
+  }
   // Remover do array local
   titulosParaAglutinar = titulosParaAglutinar.filter(x => String(x.id) !== String(id));
 
@@ -1459,14 +1479,14 @@ function handleRemoverTituloClick(ev) {
     }
   } catch (_) {}
 
-  // Atualizar cabeçalho (quantidade, total, colaborador)
+  // Atualizar cabeçalho (quantidade, total, colaborador) e UI
   const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
   const totalEl = document.getElementById('valorTotalAglutinar');
   const colabEl = document.getElementById('colaboradorAglutinacao');
   const listaEl = document.getElementById('listaTitulosAglutinacao');
   if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
 
-  // Re-renderizar lista compacta
+  // Re-renderizar lista
   if (listaEl) {
     listaEl.innerHTML = '';
     titulosParaAglutinar.forEach((t, idx2) => {
@@ -1477,23 +1497,11 @@ function handleRemoverTituloClick(ev) {
       const linha2 = document.createElement('div');
       linha2.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px; gap:10px;';
       linha2.innerHTML = `
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;">${idx2+1}</span>
-          <div style="display:flex; flex-direction:column;">
-            <span style="font-weight:600; color:#333;">${numero}</span>
-            <span style="color:#666; font-size:0.85em;">Vencimento: ${dtVenc}</span>
-          </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div style="font-weight:700; color:#333;">${valorFmt}</div>
-          <button type="button" class="btn-visualizar-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;"><i class="fas fa-eye"></i> Visualizar</button>
-          <button type="button" class="btn-remover-titulo" data-id="${t.id}" style="padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;"><i class="fas fa-times"></i> Remover</button>
-        </div>
-      `;
+        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <span style=\"background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;\">${idx2+1}</span>\n          <div style=\"display:flex; flex-direction:column;\">\n            <span style=\"font-weight:600; color:#333;\">${numero}</span>\n            <span style=\"color:#666; font-size:0.85em;\">Vencimento: ${dtVenc}</span>\n          </div>\n        </div>\n        <div style=\"display:flex; align-items:center; gap:8px;\">\n          <div style=\"font-weight:700; color:#333;\">${valorFmt}</div>\n          <button type=\"button\" class=\"btn-visualizar-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #1976D2; background:#e3f2fd; color:#1976D2; cursor:pointer; font-weight:600;\"><i class=\"fas fa-eye\"></i> Visualizar</button>\n          <button type=\"button\" class=\"btn-remover-titulo\" data-id=\"${t.id}\" style=\"padding:6px 10px; border-radius:6px; border:1px solid #e53935; background:#ffebee; color:#e53935; cursor:pointer; font-weight:600;\"><i class=\"fas fa-times\"></i> Remover</button>\n        </div>\n      `;
       listaEl.appendChild(linha2);
     });
 
-    // Rebind dos botões após re-renderização
+    // Rebind dos botões
     const reBotoesVer = listaEl.querySelectorAll('button.btn-visualizar-titulo');
     reBotoesVer.forEach(b => b.onclick = function(ev2) {
       const id2 = ev2.currentTarget.getAttribute('data-id');
@@ -1614,6 +1622,16 @@ function abrirModalBloqueioAglutinacaoColab(titulos) {
 
 function fecharModalBloqueioAglutinacaoColab() {
   const modal = document.getElementById('modalBloqueioAglutinacaoColab');
+  if (modal) modal.style.display = 'none';
+}
+
+// NOVO: Funções do modal de bloqueio mínimo
+function abrirModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
+  if (modal) modal.style.display = 'flex';
+}
+function fecharModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
   if (modal) modal.style.display = 'none';
 }
 </script> 
