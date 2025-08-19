@@ -1391,8 +1391,29 @@ async function confirmarAglutinacao() {
     // Atualizar UI local
     if (resp && resp.novo) {
       console.log('[FRONTEND] Novo título criado:', resp.novo);
-      // Remover originais da lista global e adicionar o novo
+      
+      // Recarregar dados da API para obter status atualizados
       try {
+        if (typeof carregarComissoes === 'function') {
+          console.log('[FRONTEND] Recarregando dados da API...');
+          await carregarComissoes();
+        } else {
+          // Fallback: atualizar UI local se carregarComissoes não estiver disponível
+          if (Array.isArray(todosTitulos)) {
+            const idSet = new Set(ids.map(String));
+            todosTitulos = todosTitulos.filter(t => !idSet.has(String(t.id)));
+            todosTitulos.push(resp.novo);
+            if (Array.isArray(titulosFiltrados)) {
+              titulosFiltrados = titulosFiltrados.filter(t => !idSet.has(String(t.id)));
+              titulosFiltrados.push(resp.novo);
+            }
+            if (typeof atualizarTabelaComFiltros === 'function') atualizarTabelaComFiltros();
+            if (typeof atualizarCardsTotalizadores === 'function') atualizarCardsTotalizadores();
+          }
+        }
+      } catch (error) {
+        console.error('[FRONTEND] Erro ao atualizar UI:', error);
+        // Fallback em caso de erro
         if (Array.isArray(todosTitulos)) {
           const idSet = new Set(ids.map(String));
           todosTitulos = todosTitulos.filter(t => !idSet.has(String(t.id)));
@@ -1404,8 +1425,6 @@ async function confirmarAglutinacao() {
           if (typeof atualizarTabelaComFiltros === 'function') atualizarTabelaComFiltros();
           if (typeof atualizarCardsTotalizadores === 'function') atualizarCardsTotalizadores();
         }
-      } catch (error) {
-        console.error('[FRONTEND] Erro ao atualizar UI local:', error);
       }
 
       // Fechar modal
