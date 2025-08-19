@@ -281,6 +281,8 @@ const aglutinarTitulos = async (req, res) => {
 		// Resolver usuário de lançamento a partir do body, header ou fallback
 		const usuarioLancamento = (req.body && req.body.usuario_lancamento) || req.headers['x-usuario'] || 'AGLUTINACAO';
 		console.log('[AGL] usuario_lancamento resolvido como:', usuarioLancamento);
+		console.log('[AGL] req.body.usuario_lancamento:', req.body?.usuario_lancamento);
+		console.log('[AGL] req.headers[x-usuario]:', req.headers['x-usuario']);
 		
 		// Criar novo título (com colunas de aglutinação)
 		const novo = {
@@ -298,7 +300,7 @@ const aglutinarTitulos = async (req, res) => {
 			usuario_lancamento: usuarioLancamento,
 			ids_aglutinados: ids.join(',')
 		};
-		console.log('[AGL] Novo título a inserir (com colunas):', novo);
+		console.log('[AGL] Novo título a inserir (com colunas):', JSON.stringify(novo, null, 2));
 		let criado;
 		try {
 			const { data: criadoArr, error: errCreate } = await supabase
