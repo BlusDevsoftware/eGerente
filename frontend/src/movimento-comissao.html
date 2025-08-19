@@ -2517,6 +2517,16 @@
                 alert('Selecione pelo menos dois títulos para aglutinar!');
                 return;
             }
+            // Regra: não permitir aglutinação de títulos pagos
+            const pagos = selecionados.filter(t => (t.status || '').toUpperCase() === 'PAGO');
+            if (pagos.length > 0) {
+                if (typeof abrirModalBloqueioAglutinacao === 'function') {
+                    abrirModalBloqueioAglutinacao(pagos);
+                } else {
+                    alert(`Não é possível aglutinar títulos com status PAGO.\nRemova ${pagos.length} título(s) pago(s) da seleção e tente novamente.`);
+                }
+                return;
+            }
             // Abrir modal de aglutinação com os títulos selecionados
             if (typeof abrirModalAglutinacao === 'function') {
                 abrirModalAglutinacao(selecionados);

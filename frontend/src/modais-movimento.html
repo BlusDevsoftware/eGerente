@@ -321,6 +321,31 @@
   </div>
 </div>
 
+<!-- NOVO: Modal de Bloqueio de Aglutinação (Títulos Pagos) -->
+<div id="modalBloqueioAglutinacaoPago" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(229,57,53,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #e53935; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-ban"></i> Aglutinação não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#ffebee; border:1px solid #ffcdd2; color:#c62828; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível aglutinar títulos com status PAGO.</div>
+          <div id="qtdeTitulosPagosAglutinacao" style="font-size:0.95em; margin-top:4px;">Há títulos pagos na seleção.</div>
+        </div>
+      </div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-list"></i> Títulos pagos selecionados</div>
+      <div id="listaTitulosPagosAglutinacao" style="max-height:220px; overflow:auto; border:1px solid #e9ecef; border-radius:8px; padding:8px; background:#fff;"></div>
+      <div style="margin-top:12px; font-size:0.92em; color:#666;">Remova os títulos pagos da seleção e tente novamente.</div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioAglutinacao()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================================
      JAVASCRIPT DOS MODAIS
      ======================================== -->
@@ -341,7 +366,6 @@ function parseValorBr(valor) {
   if (valor == null) return 0;
   if (typeof valor === 'number') return isNaN(valor) ? 0 : valor;
   if (typeof valor === 'string') {
-    // remover separador de milhar e trocar vírgula decimal por ponto
     const limpo = valor.replace(/\./g, '').replace(',', '.').trim();
     const num = parseFloat(limpo);
     return isNaN(num) ? 0 : num;
@@ -1476,5 +1500,49 @@ function handleRemoverTituloClick(ev) {
 
   // Atualizar simulação
   atualizarSimulacaoAglutinacaoUI();
+}
+
+// NOVO: Funções do modal de bloqueio de aglutinação
+function abrirModalBloqueioAglutinacao(titulosPagos) {
+  try {
+    const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+    const lista = document.getElementById('listaTitulosPagosAglutinacao');
+    const qtde = document.getElementById('qtdeTitulosPagosAglutinacao');
+
+    if (qtde) qtde.textContent = `Você selecionou ${titulosPagos.length} título(s) com status PAGO.`;
+
+    if (lista) {
+      lista.innerHTML = '';
+      titulosPagos.forEach((t, i) => {
+        const num = t.numero_titulo || t.id || '-';
+        const colab = (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && t.colaborador_id) ? (mapaColaboradores[t.colaborador_id] || t.colaborador_id) : (t.colaborador_id || '-');
+        const venc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px; border:1px solid #e9ecef; border-radius:8px; margin-bottom:8px; background:#fff;';
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="background:#ffcdd2; color:#c62828; padding:2px 8px; border-radius:12px; font-weight:700;">${i+1}</span>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-weight:600; color:#333;">${num}</span>
+              <span style="color:#666; font-size:0.85em;">Vencimento: ${venc}</span>
+              <span style="color:#666; font-size:0.85em;">Colaborador: ${colab}</span>
+            </div>
+          </div>
+          <div style="color:#c62828; font-weight:700;">PAGO</div>
+        `;
+        lista.appendChild(row);
+      });
+    }
+
+    if (modal) modal.style.display = 'flex';
+  } catch (e) {
+    console.warn('Erro ao abrir modal de bloqueio de aglutinação:', e);
+    alert('Não é possível aglutinar títulos pagos.');
+  }
+}
+
+function fecharModalBloqueioAglutinacao() {
+  const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+  if (modal) modal.style.display = 'none';
 }
 </script> 
