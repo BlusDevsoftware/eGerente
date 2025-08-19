@@ -2527,6 +2527,16 @@
                 }
                 return;
             }
+            // Regra: não permitir colaboradores diferentes
+            const colabs = Array.from(new Set(selecionados.map(t => t.colaborador_id)));
+            if (colabs.length > 1) {
+                if (typeof abrirModalBloqueioAglutinacaoColab === 'function') {
+                    abrirModalBloqueioAglutinacaoColab(selecionados);
+                } else {
+                    alert('Não é possível aglutinar títulos de colaboradores diferentes.');
+                }
+                return;
+            }
             // Abrir modal de aglutinação com os títulos selecionados
             if (typeof abrirModalAglutinacao === 'function') {
                 abrirModalAglutinacao(selecionados);
