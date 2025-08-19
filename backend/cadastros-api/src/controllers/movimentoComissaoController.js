@@ -283,6 +283,7 @@ const aglutinarTitulos = async (req, res) => {
 			colaborador_id: colaboradorId,
 			numero_titulo: numeroTituloNovo,
 			valor: total,
+			valor_venda: total,
 			valor_pago: 0,
 			status: 'PENDENTE',
 			tipo: 'AGLUTINADO', // Campo obrigatório
