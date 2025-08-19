@@ -167,6 +167,13 @@
             padding: 4px 12px;
             font-weight: 600;
         }
+        .status.aglutinado {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
         /* Modal de pagamento */
         .modal-content {
             border-radius: 12px;
@@ -769,6 +776,7 @@
                     <option value="PAGO">Pago</option>
                     <option value="VENCIDO">Vencido</option>
                     <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                    <option value="AGLUTINADO">Aglutinado</option>
                 </select>
                 <input type="date" id="data-inicial" placeholder="Data inicial">
                 <span style="margin: 0 6px; color: #1976D2; font-weight: bold;">até</span>
@@ -1635,7 +1643,7 @@
                 select.appendChild(optPlaceholder);
 
                 // Opções permitidas: qualquer uma exceto PAGO
-                ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'].forEach(op => {
+                ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'].forEach(op => {
                     const opt = document.createElement('option');
                     opt.value = op; opt.textContent = op;
                     if (statusAtualUpper === op) opt.selected = true;
@@ -1955,7 +1963,7 @@
                     select.style.borderRadius = '6px';
                     select.style.background = '#fff';
                     // Opções permitidas
-                    const opcoes = ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'];
+                    const opcoes = ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
                     // Placeholder
                     const optPh = document.createElement('option');
                     optPh.disabled = true; optPh.value = '';
@@ -3378,6 +3386,7 @@ function statusClass(status) {
     if (s.includes('pendente')) return 'pending';
     if (s.includes('vencido')) return 'vencido';
     if (s.includes('pago')) return 'paid';
+    if (s.includes('aglutinado')) return 'aglutinado';
     return '';
 }
 function aplicarFiltros() {
