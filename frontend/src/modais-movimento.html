@@ -297,6 +297,18 @@
         </div>
       </div>
 
+      <!-- NOVO: Simulação do novo título aglutinado -->
+      <div id="simulacaoAglutinacao" style="margin-top:12px; background:#e3f2fd; border:2px solid #1976D2; border-radius:12px; padding:16px;">
+        <!-- preenchido dinamicamente em abrirModalAglutinacao -->
+      </div>
+
+      <!-- NOVO: Campo de Observação / Motivo da Aglutinação -->
+      <div style="margin-top:12px; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+        <div style="font-weight:500; color:#1976D2; margin-bottom:6px;">Observação / Motivo da Aglutinação</div>
+        <textarea id="observacaoAglutinacaoInput" placeholder="Descreva o motivo da aglutinação..." maxlength="500" style="width:100%; min-height:96px; border:1px solid #e0e0e0; border-radius:8px; padding:10px; font-size:0.95em; resize:vertical;"></textarea>
+        <div id="observacaoAglutinacaoCount" style="text-align:right; color:#888; font-size:0.85em; margin-top:6px;">0/500</div>
+      </div>
+
       <div style="margin-top:16px; background:#fff3e0; border:1px solid #ffcc02; border-radius:8px; padding:12px; color:#e65100;">
         <i class="fas fa-info-circle"></i>
         <span style="margin-left:8px;">Nesta etapa apenas revisamos os dados. A confirmação da aglutinação será implementada em seguida.</span>
@@ -304,7 +316,7 @@
     </div>
     <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px 40px 28px 40px; border-top: 1px solid #eee; flex-shrink: 0;">
       <button class="btn-secondary" onclick="fecharModalAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
-      <button class="btn-warning" onclick="/* placeholder para próxima etapa */ alert('Confirmação de aglutinação será implementada na próxima etapa.');" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-object-group"></i> Confirmar Aglutinação</button>
+      <button class="btn-warning" onclick="confirmarAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-object-group"></i> Confirmar Aglutinação</button>
     </div>
   </div>
 </div>
@@ -321,6 +333,8 @@ let modoExclusaoParcelamento = 'unico';
 let titulosParaExcluirAnimacao = [];
 // NOVO: títulos selecionados para aglutinação
 let titulosParaAglutinar = [];
+// NOVO: observação digitada no modal de aglutinação
+let observacaoAglutinacaoTexto = '';
 
 // ========================================
 // FUNÇÕES DE EXCLUSÃO
@@ -798,11 +812,15 @@ function fecharModalTituloPagoNaoPodeExcluir() {
 function abrirModalAglutinacao(titulos) {
   try {
     titulosParaAglutinar = Array.isArray(titulos) ? titulos : [];
+    observacaoAglutinacaoTexto = '';
     const modal = document.getElementById('modalAglutinacaoTitulos');
     const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
     const listaEl = document.getElementById('listaTitulosAglutinacao');
     const totalEl = document.getElementById('valorTotalAglutinar');
     const colabEl = document.getElementById('colaboradorAglutinacao');
+    const obsInput = document.getElementById('observacaoAglutinacaoInput');
+    const obsCount = document.getElementById('observacaoAglutinacaoCount');
+    const simulacaoEl = document.getElementById('simulacaoAglutinacao');
 
     if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
 
@@ -822,20 +840,84 @@ function abrirModalAglutinacao(titulos) {
     }
 
     const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+    const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(total) : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     if (totalEl) {
-      totalEl.textContent = (typeof formatarValorLocal === 'function')
-        ? formatarValorLocal(total)
-        : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+      totalEl.textContent = totalFmt;
     }
 
+    let colaboradorNome = '-';
     if (colabEl) {
       const primeiro = titulosParaAglutinar[0];
       const colabId = primeiro ? primeiro.colaborador_id : '';
       if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) {
-        colabEl.textContent = mapaColaboradores[colabId] || colabId || '-';
+        colaboradorNome = mapaColaboradores[colabId] || colabId || '-';
+        colabEl.textContent = colaboradorNome;
       } else {
-        colabEl.textContent = colabId || '-';
+        colaboradorNome = colabId || '-';
+        colabEl.textContent = colaboradorNome;
       }
+    }
+
+    // Preencher simulação
+    if (simulacaoEl) {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      const dataHoje = `${ano}-${mes}-${dia}`;
+
+      const exemplos = titulosParaAglutinar.slice(0, 3).map(t => (t.numero_titulo || '')).filter(Boolean);
+      const origemResumo = titulosParaAglutinar.length > 3
+        ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
+        : (exemplos.join(', ') || `${titulosParaAglutinar.length} título(s)`);
+
+      simulacaoEl.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <i class="fas fa-receipt" style="font-size: 1.3em; color: #1976D2;"></i>
+          <h3 style="margin: 0; font-size: 1.1em; color: #1976D2; font-weight: 700;">Novo Título Aglutinado (Simulação)</h3>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Nº Título</div>
+            <div style="color: #333;">Simulado-AGL-1/1</div>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Origem</div>
+            <div style="color: #333;">${origemResumo}</div>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Colaborador</div>
+            <div style="color: #333;">${colaboradorNome}</div>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Valor</div>
+            <div style="color: #333; font-weight: 700;">${totalFmt}</div>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Status</div>
+            <div style="color: #333;">PENDENTE</div>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+            <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
+            <input type="date" id="vencimentoTituloAglutinado" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
+          </div>
+        </div>
+        <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
+          <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Descrição</div>
+          <div style="color: #333;">Aglutinação de ${titulosParaAglutinar.length} título(s)</div>
+        </div>
+      `;
+    }
+
+    if (obsInput && obsCount) {
+      obsInput.value = '';
+      obsCount.textContent = '0/500';
+      obsInput.oninput = function() {
+        const len = this.value.length;
+        if (len > 500) this.value = this.value.substring(0, 500);
+        const atual = Math.min(this.value.length, 500);
+        obsCount.textContent = `${atual}/500`;
+      };
     }
 
     if (modal) modal.style.display = 'flex';
@@ -850,7 +932,24 @@ function fecharModalAglutinacao() {
   if (modal) modal.style.display = 'none';
   const listaEl = document.getElementById('listaTitulosAglutinacao');
   if (listaEl) listaEl.innerHTML = '';
+  const obsInput = document.getElementById('observacaoAglutinacaoInput');
+  const obsCount = document.getElementById('observacaoAglutinacaoCount');
+  const simulacaoEl = document.getElementById('simulacaoAglutinacao');
+  if (obsInput) obsInput.value = '';
+  if (obsCount) obsCount.textContent = '0/500';
+  if (simulacaoEl) simulacaoEl.innerHTML = '';
+  observacaoAglutinacaoTexto = '';
   titulosParaAglutinar = [];
+}
+
+// NOVO: Confirmar aglutinação (ainda sem integração backend)
+function confirmarAglutinacao() {
+  const obsInput = document.getElementById('observacaoAglutinacaoInput');
+  const dtInput = document.getElementById('vencimentoTituloAglutinado');
+  observacaoAglutinacaoTexto = obsInput ? obsInput.value.trim() : '';
+  const dataVencimento = dtInput && dtInput.value ? dtInput.value : new Date().toISOString().split('T')[0];
+  // Placeholder: aqui futuramente chamaremos a API passando titulosParaAglutinar, observacaoAglutinacaoTexto e dataVencimento
+  alert(`Aglutinação preparada com ${titulosParaAglutinar.length} título(s).\nVencimento: ${dataVencimento}\nObservação: ${observacaoAglutinacaoTexto || '—'}`);
 }
 
 // Função para fechar todos os modais relacionados ao cancelamento de baixa
