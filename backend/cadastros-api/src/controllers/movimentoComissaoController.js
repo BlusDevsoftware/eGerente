@@ -278,6 +278,10 @@ const aglutinarTitulos = async (req, res) => {
 		const numeroTituloNovo = `AGL-${numeroBaseStr}-1/1`;
 		console.log('[AGL] Próximo número base:', numeroBaseStr, 'numero_titulo:', numeroTituloNovo);
 		
+		// Resolver usuário de lançamento a partir do body, header ou fallback
+		const usuarioLancamento = (req.body && req.body.usuario_lancamento) || req.headers['x-usuario'] || 'AGLUTINACAO';
+		console.log('[AGL] usuario_lancamento resolvido como:', usuarioLancamento);
+		
 		// Criar novo título (com colunas de aglutinação)
 		const novo = {
 			colaborador_id: colaboradorId,
@@ -291,6 +295,7 @@ const aglutinarTitulos = async (req, res) => {
 			descricao: observacao || null,
 			data_geracao: new Date().toISOString().split('T')[0],
 			data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
+			usuario_lancamento: usuarioLancamento,
 			ids_aglutinados: ids.join(',')
 		};
 		console.log('[AGL] Novo título a inserir (com colunas):', novo);
