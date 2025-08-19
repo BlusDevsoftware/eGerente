@@ -1864,10 +1864,11 @@
                     btnCancelarBaixa.style.display = 'none';
                 }
                 
-                // Mostrar botão "Cancelar Aglutinação" se o título for aglutinado
+                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação
                 const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
                 if (btnCancelarAglutinacao) {
-                    if (titulo.status === 'AGLUTINADO' || titulo.numero_titulo?.includes('AGL-')) {
+                    // Só mostrar para títulos que SÃO resultado de aglutinação (não para os que foram aglutinados)
+                    if (titulo.numero_titulo?.includes('AGL-')) {
                         btnCancelarAglutinacao.style.display = 'inline-flex';
                     } else {
                         btnCancelarAglutinacao.style.display = 'none';
@@ -2021,10 +2022,11 @@
                     btnCancelarBaixa.style.display = 'none';
                 }
                 
-                // Mostrar botão "Cancelar Aglutinação" se o título for aglutinado
+                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação
                 const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
                 if (btnCancelarAglutinacao) {
-                    if (titulo.status === 'AGLUTINADO' || titulo.numero_titulo?.includes('AGL-')) {
+                    // Só mostrar para títulos que SÃO resultado de aglutinação (não para os que foram aglutinados)
+                    if (titulo.numero_titulo?.includes('AGL-')) {
                         btnCancelarAglutinacao.style.display = 'inline-flex';
                     } else {
                         btnCancelarAglutinacao.style.display = 'none';
