@@ -2063,4 +2063,27 @@ async function executarCancelarAglutinacao() {
     tituloParaCancelarAglutinacao = null;
   }
 }
+
+// Função para fechar modal de sucesso de baixa múltipla
+function fecharModalSucessoBaixaMultipla() {
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Função para mostrar modal de sucesso de baixa múltipla
+function mostrarModalSucessoBaixaMultipla(dados) {
+  // Preencher informações no modal
+  document.getElementById('quantidadeTitulosSucesso').textContent = dados.quantidade;
+  document.getElementById('dataPagamentoSucesso').textContent = dados.dataPagamento;
+  document.getElementById('statusAplicadoSucesso').textContent = dados.status;
+  document.getElementById('comprovanteSucesso').textContent = dados.comprovante ? 'Sim' : 'Não';
+  
+  // Mostrar o modal
+  const modal = document.getElementById('modalSucessoBaixaMultipla');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
 </script> 

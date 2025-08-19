@@ -1780,9 +1780,14 @@
             });
         });
 
+        // Variável global para armazenar o título atual sendo visualizado/editado
+        let tituloAtual = null;
+        
         // Funções para o Modal Visualizar/Editar Título
         function abrirModalTitulo(titulo, modo) {
             console.log('abrirModalTitulo - titulo:', titulo);
+            // Armazenar o título atual na variável global
+            tituloAtual = titulo;
             const modal = document.getElementById('modalTitulo');
             const form = document.getElementById('formModalTitulo');
             const tituloEl = document.getElementById('modalTituloTitulo');
