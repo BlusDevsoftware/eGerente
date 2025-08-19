@@ -219,8 +219,10 @@ const uploadComprovante = async (req, res) => {
 // NOVO: Aglutinar títulos
 const aglutinarTitulos = async (req, res) => {
     try {
+        console.log('[AGL] Request recebido em /movimento_comissoes/aglutinar:', JSON.stringify(req.body));
         const { ids, observacao, data_vencimento } = req.body || {};
         if (!Array.isArray(ids) || ids.length < 2) {
+            console.warn('[AGL] Validação falhou: ids inválidos ou menos de 2 itens:', ids);
             return res.status(400).json({ error: 'Informe pelo menos 2 IDs para aglutinar' });
         }
         // Buscar títulos
@@ -228,26 +230,36 @@ const aglutinarTitulos = async (req, res) => {
             .from('movimento_comissoes')
             .select('*')
             .in('id', ids);
-        if (errFetch) throw errFetch;
+        if (errFetch) {
+            console.error('[AGL] Erro ao buscar títulos:', errFetch);
+            throw errFetch;
+        }
+        console.log('[AGL] Títulos encontrados:', titulos);
         if (!titulos || titulos.length !== ids.length) {
+            console.warn('[AGL] Nem todos os títulos foram encontrados. Esperado:', ids.length, 'Recebido:', titulos?.length);
             return res.status(400).json({ error: 'Nem todos os títulos foram encontrados' });
         }
         // Regras: não permitir PAGO e colaboradores diferentes
         const temPago = titulos.some(t => (t.status || '').toUpperCase() === 'PAGO');
-        if (temPago) return res.status(400).json({ error: 'Não é permitido aglutinar títulos pagos' });
         const colabs = Array.from(new Set(titulos.map(t => t.colaborador_id)));
+        console.log('[AGL] Validações -> temPago:', temPago, 'colabs:', colabs);
+        if (temPago) return res.status(400).json({ error: 'Não é permitido aglutinar títulos pagos' });
         if (colabs.length > 1) return res.status(400).json({ error: 'Selecione títulos do mesmo colaborador' });
         const colaboradorId = colabs[0];
         
         // Somar valores
         const total = titulos.reduce((acc, t) => acc + (parseFloat(t.valor) || 0), 0);
+        console.log('[AGL] Soma dos valores:', total);
         
         // Gerar número base
         let ultimoNumero = 0;
         const { data: todos, error: errorTodos } = await supabase
             .from('movimento_comissoes')
             .select('numero_titulo');
-        if (errorTodos) throw errorTodos;
+        if (errorTodos) {
+            console.error('[AGL] Erro ao buscar todos os títulos para base:', errorTodos);
+            throw errorTodos;
+        }
         if (todos && todos.length > 0) {
             const bases = todos
                 .map(t => {
@@ -264,6 +276,7 @@ const aglutinarTitulos = async (req, res) => {
         }
         const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
         const numeroTituloNovo = `AGL-${numeroBaseStr}-1/1`;
+        console.log('[AGL] Próximo número base:', numeroBaseStr, 'numero_titulo:', numeroTituloNovo);
         
         // Criar novo título
         const novo = {
@@ -278,23 +291,32 @@ const aglutinarTitulos = async (req, res) => {
             data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
             ids_aglutinados: ids.join(',')
         };
+        console.log('[AGL] Novo título a inserir:', novo);
         const { data: criadoArr, error: errCreate } = await supabase
             .from('movimento_comissoes')
             .insert([novo])
             .select();
-        if (errCreate) throw errCreate;
+        if (errCreate) {
+            console.error('[AGL] Erro ao criar novo título aglutinado:', errCreate);
+            throw errCreate;
+        }
         const criado = Array.isArray(criadoArr) ? criadoArr[0] : criadoArr;
+        console.log('[AGL] Título aglutinado criado:', criado);
         
         // Atualizar originais como aglutinados
         const { error: errUpdateOrig } = await supabase
             .from('movimento_comissoes')
             .update({ status: 'AGLUTINADO', id_titulo_aglutinado: criado.id })
             .in('id', ids);
-        if (errUpdateOrig) throw errUpdateOrig;
+        if (errUpdateOrig) {
+            console.error('[AGL] Erro ao atualizar originais como AGLUTINADO:', errUpdateOrig);
+            throw errUpdateOrig;
+        }
+        console.log('[AGL] Originais atualizados com sucesso:', ids);
         
         return res.status(201).json({ novo: criado });
     } catch (error) {
-        console.error('Erro ao aglutinar títulos:', error);
+        console.error('[AGL] Erro ao aglutinar títulos:', error?.message || error);
         res.status(500).json({ error: 'Erro ao aglutinar títulos', details: error.message || String(error) });
     }
 };
