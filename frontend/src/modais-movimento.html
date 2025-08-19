@@ -266,6 +266,49 @@
   </div>
 </div>
 
+<!-- NOVO: Modal de Aglutinação de Títulos -->
+<div id="modalAglutinacaoTitulos" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4500; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 680px; width: 98%; min-height: auto; max-height: 90vh; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; margin: auto; overflow: hidden; display: flex; flex-direction: column;">
+    <div class="modal-header" style="padding: 28px 40px 0 40px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+      <h2 style="margin: 0; font-size: 1.35em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-object-group"></i> Aglutinar Títulos</h2>
+      <button class="close-modal" onclick="fecharModalAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 24px 40px 0 40px; text-align: left; flex: 1; overflow-y: auto; min-height: 0;">
+      <div style="font-size: 1.05em; color: #555; margin-bottom: 12px;">Foram selecionados <strong id="quantidadeTitulosAglutinar" style="color:#ff9800;">0</strong> título(s) para aglutinação.</div>
+
+      <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <div style="font-weight: 600; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-list" style="color:#1976D2;"></i>
+          Títulos Selecionados
+        </div>
+        <div id="listaTitulosAglutinacao" style="max-height: 260px; overflow-y: auto; font-size: 0.95em;">
+          <!-- preenchido dinamicamente -->
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+          <div style="font-weight:500; color:#1976D2; margin-bottom:4px;">Total dos Valores</div>
+          <div id="valorTotalAglutinar" style="color:#333; font-weight:700;">R$ 0,00</div>
+        </div>
+        <div style="background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
+          <div style="font-weight:500; color:#1976D2; margin-bottom:4px;">Colaborador</div>
+          <div id="colaboradorAglutinacao" style="color:#333; font-weight:700;">-</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:#fff3e0; border:1px solid #ffcc02; border-radius:8px; padding:12px; color:#e65100;">
+        <i class="fas fa-info-circle"></i>
+        <span style="margin-left:8px;">Nesta etapa apenas revisamos os dados. A confirmação da aglutinação será implementada em seguida.</span>
+      </div>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px 40px 28px 40px; border-top: 1px solid #eee; flex-shrink: 0;">
+      <button class="btn-secondary" onclick="fecharModalAglutinacao()" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Cancelar</button>
+      <button class="btn-warning" onclick="/* placeholder para próxima etapa */ alert('Confirmação de aglutinação será implementada na próxima etapa.');" style="padding: 10px 20px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; background-color: #ff9800; color: white; border: none;"><i class="fas fa-object-group"></i> Confirmar Aglutinação</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================================
      JAVASCRIPT DOS MODAIS
      ======================================== -->
@@ -276,6 +319,8 @@ let tituloParaExcluir = null;
 let tituloParaCancelarBaixa = null;
 let modoExclusaoParcelamento = 'unico';
 let titulosParaExcluirAnimacao = [];
+// NOVO: títulos selecionados para aglutinação
+let titulosParaAglutinar = [];
 
 // ========================================
 // FUNÇÕES DE EXCLUSÃO
@@ -747,6 +792,65 @@ function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
 function fecharModalTituloPagoNaoPodeExcluir() {
   const modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
   if (modal) modal.style.display = 'none';
+}
+
+// NOVO: FUNÇÕES DE AGLUTINAÇÃO (abrir/fechar)
+function abrirModalAglutinacao(titulos) {
+  try {
+    titulosParaAglutinar = Array.isArray(titulos) ? titulos : [];
+    const modal = document.getElementById('modalAglutinacaoTitulos');
+    const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
+    const listaEl = document.getElementById('listaTitulosAglutinacao');
+    const totalEl = document.getElementById('valorTotalAglutinar');
+    const colabEl = document.getElementById('colaboradorAglutinacao');
+
+    if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
+
+    if (listaEl) {
+      listaEl.innerHTML = '';
+      titulosParaAglutinar.forEach((t, idx) => {
+        const numero = (t.numero_titulo || '').toString();
+        const valorNum = parseFloat(t.valor || t.valor_total || 0) || 0;
+        const valorFmt = (typeof formatarValorLocal === 'function')
+          ? formatarValorLocal(valorNum)
+          : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        const linha = document.createElement('div');
+        linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:10px 12px; margin-bottom:8px;';
+        linha.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><span style="background:#e3f2fd; color:#1976D2; padding:2px 8px; border-radius:12px; font-weight:600;">${idx+1}</span><span style="font-weight:600; color:#333;">${numero}</span></div><div style="font-weight:700; color:#333;">${valorFmt}</div>`;
+        listaEl.appendChild(linha);
+      });
+    }
+
+    const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
+    if (totalEl) {
+      totalEl.textContent = (typeof formatarValorLocal === 'function')
+        ? formatarValorLocal(total)
+        : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    }
+
+    if (colabEl) {
+      const primeiro = titulosParaAglutinar[0];
+      const colabId = primeiro ? primeiro.colaborador_id : '';
+      if (typeof mapaColaboradores !== 'undefined' && mapaColaboradores && colabId) {
+        colabEl.textContent = mapaColaboradores[colabId] || colabId || '-';
+      } else {
+        colabEl.textContent = colabId || '-';
+      }
+    }
+
+    if (modal) modal.style.display = 'flex';
+  } catch (e) {
+    console.warn('Erro ao abrir modal de aglutinação:', e);
+    alert('Não foi possível abrir o modal de aglutinação.');
+  }
+}
+
+function fecharModalAglutinacao() {
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  if (modal) modal.style.display = 'none';
+  const listaEl = document.getElementById('listaTitulosAglutinacao');
+  if (listaEl) listaEl.innerHTML = '';
+  titulosParaAglutinar = [];
 }
 
 // Função para fechar todos os modais relacionados ao cancelamento de baixa

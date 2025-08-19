@@ -2517,9 +2517,12 @@
                 alert('Selecione pelo menos dois títulos para aglutinar!');
                 return;
             }
-            // Implemente aqui a lógica de aglutinação
-            alert('Aglutinar ' + selecionados.length + ' títulos!');
-            // Exemplo: abrir modal de confirmação/aglutinação
+            // Abrir modal de aglutinação com os títulos selecionados
+            if (typeof abrirModalAglutinacao === 'function') {
+                abrirModalAglutinacao(selecionados);
+            } else {
+                alert('Modal de aglutinação não está disponível no momento.');
+            }
         });
 
         // Funções para manipular upload de arquivos
