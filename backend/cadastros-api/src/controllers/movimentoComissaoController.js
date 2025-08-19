@@ -48,14 +48,14 @@ const criarMovimento = async (req, res) => {
         if (todos && todos.length > 0) {
             const bases = todos
                 .map(t => {
-                    // Para títulos parciais, extrair o número após PAR-
-                    if (t.numero_titulo && t.numero_titulo.startsWith('PAR-')) {
-                        const match = t.numero_titulo.match(/^PAR-(\d{5,})/);
+                    // Extrair número base considerando prefixos PAR- e AGL-
+                    if (t.numero_titulo) {
+                        const pref = t.numero_titulo.match(/^(PAR|AGL)-(\d{5,})/);
+                        if (pref) return parseInt(pref[2], 10);
+                        const match = t.numero_titulo.match(/^(\d{5,})/);
                         return match ? parseInt(match[1], 10) : null;
                     }
-                    // Para títulos normais, extrair o número base
-                    const match = (t.numero_titulo || '').match(/^(\d{5,})/);
-                    return match ? parseInt(match[1], 10) : null;
+                    return null;
                 })
                 .filter(n => n !== null && n > 0);
             if (bases.length > 0) {
@@ -251,12 +251,13 @@ const aglutinarTitulos = async (req, res) => {
         if (todos && todos.length > 0) {
             const bases = todos
                 .map(t => {
-                    if (t.numero_titulo && t.numero_titulo.startsWith('PAR-')) {
-                        const match = t.numero_titulo.match(/^PAR-(\d{5,})/);
+                    if (t.numero_titulo) {
+                        const pref = t.numero_titulo.match(/^(PAR|AGL)-(\d{5,})/);
+                        if (pref) return parseInt(pref[2], 10);
+                        const match = t.numero_titulo.match(/^(\d{5,})/);
                         return match ? parseInt(match[1], 10) : null;
                     }
-                    const match = (t.numero_titulo || '').match(/^(\d{5,})/);
-                    return match ? parseInt(match[1], 10) : null;
+                    return null;
                 })
                 .filter(n => n !== null && n > 0);
             if (bases.length > 0) ultimoNumero = Math.max(...bases);
