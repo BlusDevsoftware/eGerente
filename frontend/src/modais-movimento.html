@@ -336,6 +336,20 @@ let titulosParaAglutinar = [];
 // NOVO: observação digitada no modal de aglutinação
 let observacaoAglutinacaoTexto = '';
 
+// NOVO: helper para normalizar valores numéricos em pt-BR
+function parseValorBr(valor) {
+  if (valor == null) return 0;
+  if (typeof valor === 'number') return isNaN(valor) ? 0 : valor;
+  if (typeof valor === 'string') {
+    // remover separador de milhar e trocar vírgula decimal por ponto
+    const limpo = valor.replace(/\./g, '').replace(',', '.').trim();
+    const num = parseFloat(limpo);
+    return isNaN(num) ? 0 : num;
+  }
+  const n = Number(valor);
+  return isNaN(n) ? 0 : n;
+}
+
 // ========================================
 // FUNÇÕES DE EXCLUSÃO
 // ========================================
@@ -828,7 +842,7 @@ function abrirModalAglutinacao(titulos) {
       listaEl.innerHTML = '';
       titulosParaAglutinar.forEach((t, idx) => {
         const numero = (t.numero_titulo || '').toString();
-        const valorNum = parseFloat(t.valor || t.valor_total || 0) || 0;
+        const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
         const valorFmt = (typeof formatarValorLocal === 'function')
           ? formatarValorLocal(valorNum)
           : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
@@ -906,7 +920,7 @@ function abrirModalAglutinacao(titulos) {
           listaEl.innerHTML = '';
           titulosParaAglutinar.forEach((t, idx2) => {
             const numero = (t.numero_titulo || '').toString();
-            const valorNum = parseFloat(t.valor || t.valor_total || 0) || 0;
+            const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
             const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
             const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
             const linha2 = document.createElement('div');
@@ -948,7 +962,8 @@ function abrirModalAglutinacao(titulos) {
           
           // Totais e colaborador
           const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
-          const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(total) : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+          const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+          const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
           if (totalEl) totalEl.textContent = totalFmt;
           if (colabEl) {
             const primeiro = titulosParaAglutinar[0];
@@ -1061,7 +1076,8 @@ function atualizarSimulacaoAglutinacaoUI() {
     }
 
     const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
-    const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(total) : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+    const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     const hoje = new Date();
     const ano = hoje.getFullYear();
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
@@ -1253,7 +1269,7 @@ function handleRemoverTituloClick(ev) {
     listaEl.innerHTML = '';
     titulosParaAglutinar.forEach((t, idx2) => {
       const numero = (t.numero_titulo || '').toString();
-      const valorNum = parseFloat(t.valor || t.valor_total || 0) || 0;
+      const valorNum = parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0);
       const valorFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(valorNum) : `R$ ${valorNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
       const dtVenc = t.data_vencimento ? (typeof formatarData === 'function' ? formatarData(t.data_vencimento) : t.data_vencimento) : '-';
       const linha2 = document.createElement('div');
@@ -1296,7 +1312,8 @@ function handleRemoverTituloClick(ev) {
 
   // Totais e colaborador
   const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
-  const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(total) : `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+  const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
+  const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
   if (totalEl) totalEl.textContent = totalFmt;
   if (colabEl) {
     const primeiro = titulosParaAglutinar[0];
