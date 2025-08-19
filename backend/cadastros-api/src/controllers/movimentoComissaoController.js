@@ -298,6 +298,7 @@ const aglutinarTitulos = async (req, res) => {
 			data_geracao: new Date().toISOString().split('T')[0],
 			data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
 			usuario_lancamento: usuarioLancamento,
+			percentual_comissao: 0, // Campo obrigatório com valor padrão
 			ids_aglutinados: ids.join(',')
 		};
 		console.log('[AGL] Novo título a inserir (com colunas):', JSON.stringify(novo, null, 2));
