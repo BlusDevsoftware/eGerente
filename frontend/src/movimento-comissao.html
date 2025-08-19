@@ -1643,7 +1643,7 @@
                 select.appendChild(optPlaceholder);
 
                 // Opções permitidas: qualquer uma exceto PAGO
-                ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'].forEach(op => {
+                ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'].forEach(op => {
                     const opt = document.createElement('option');
                     opt.value = op; opt.textContent = op;
                     if (statusAtualUpper === op) opt.selected = true;
@@ -1963,7 +1963,7 @@
                     select.style.borderRadius = '6px';
                     select.style.background = '#fff';
                     // Opções permitidas
-                    const opcoes = ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
+                    const opcoes = ['PENDENTE','VENCIDO','CLIENTE NÃO PAGOU'];
                     // Placeholder
                     const optPh = document.createElement('option');
                     optPh.disabled = true; optPh.value = '';
