@@ -285,6 +285,7 @@ const aglutinarTitulos = async (req, res) => {
 			valor: total,
 			valor_pago: 0,
 			status: 'PENDENTE',
+			tipo: 'AGLUTINADO', // Campo obrigatório
 			observacoes: observacao || null,
 			descricao: observacao || null,
 			data_geracao: new Date().toISOString().split('T')[0],
