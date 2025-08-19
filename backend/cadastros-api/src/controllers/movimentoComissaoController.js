@@ -193,10 +193,6 @@ const uploadComprovante = async (req, res) => {
         if (errorTitulo) throw errorTitulo;
         if (!titulo) return res.status(404).json({ error: 'Título não encontrado' });
         
-        // Aqui você pode implementar a lógica para salvar o arquivo
-        // Por exemplo, salvar no Supabase Storage ou em um diretório local
-        // Por enquanto, vamos apenas retornar sucesso
-        
         // Atualizar o título com a informação do comprovante
         const { data, error } = await supabase
             .from('movimento_comissoes')
@@ -220,6 +216,88 @@ const uploadComprovante = async (req, res) => {
     }
 };
 
+// NOVO: Aglutinar títulos
+const aglutinarTitulos = async (req, res) => {
+    try {
+        const { ids, observacao, data_vencimento } = req.body || {};
+        if (!Array.isArray(ids) || ids.length < 2) {
+            return res.status(400).json({ error: 'Informe pelo menos 2 IDs para aglutinar' });
+        }
+        // Buscar títulos
+        const { data: titulos, error: errFetch } = await supabase
+            .from('movimento_comissoes')
+            .select('*')
+            .in('id', ids);
+        if (errFetch) throw errFetch;
+        if (!titulos || titulos.length !== ids.length) {
+            return res.status(400).json({ error: 'Nem todos os títulos foram encontrados' });
+        }
+        // Regras: não permitir PAGO e colaboradores diferentes
+        const temPago = titulos.some(t => (t.status || '').toUpperCase() === 'PAGO');
+        if (temPago) return res.status(400).json({ error: 'Não é permitido aglutinar títulos pagos' });
+        const colabs = Array.from(new Set(titulos.map(t => t.colaborador_id)));
+        if (colabs.length > 1) return res.status(400).json({ error: 'Selecione títulos do mesmo colaborador' });
+        const colaboradorId = colabs[0];
+        
+        // Somar valores
+        const total = titulos.reduce((acc, t) => acc + (parseFloat(t.valor) || 0), 0);
+        
+        // Gerar número base
+        let ultimoNumero = 0;
+        const { data: todos, error: errorTodos } = await supabase
+            .from('movimento_comissoes')
+            .select('numero_titulo');
+        if (errorTodos) throw errorTodos;
+        if (todos && todos.length > 0) {
+            const bases = todos
+                .map(t => {
+                    if (t.numero_titulo && t.numero_titulo.startsWith('PAR-')) {
+                        const match = t.numero_titulo.match(/^PAR-(\d{5,})/);
+                        return match ? parseInt(match[1], 10) : null;
+                    }
+                    const match = (t.numero_titulo || '').match(/^(\d{5,})/);
+                    return match ? parseInt(match[1], 10) : null;
+                })
+                .filter(n => n !== null && n > 0);
+            if (bases.length > 0) ultimoNumero = Math.max(...bases);
+        }
+        const numeroBaseStr = (ultimoNumero + 1).toString().padStart(5, '0');
+        const numeroTituloNovo = `AGL-${numeroBaseStr}-1/1`;
+        
+        // Criar novo título
+        const novo = {
+            colaborador_id: colaboradorId,
+            numero_titulo: numeroTituloNovo,
+            valor: total,
+            valor_pago: 0,
+            status: 'PENDENTE',
+            observacoes: observacao || null,
+            descricao: observacao || null,
+            data_geracao: new Date().toISOString().split('T')[0],
+            data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
+            ids_aglutinados: ids.join(',')
+        };
+        const { data: criadoArr, error: errCreate } = await supabase
+            .from('movimento_comissoes')
+            .insert([novo])
+            .select();
+        if (errCreate) throw errCreate;
+        const criado = Array.isArray(criadoArr) ? criadoArr[0] : criadoArr;
+        
+        // Atualizar originais como aglutinados
+        const { error: errUpdateOrig } = await supabase
+            .from('movimento_comissoes')
+            .update({ status: 'AGLUTINADO', id_titulo_aglutinado: criado.id })
+            .in('id', ids);
+        if (errUpdateOrig) throw errUpdateOrig;
+        
+        return res.status(201).json({ novo: criado });
+    } catch (error) {
+        console.error('Erro ao aglutinar títulos:', error);
+        res.status(500).json({ error: 'Erro ao aglutinar títulos', details: error.message || String(error) });
+    }
+};
+
 module.exports = {
     listarMovimentos,
     buscarMovimento,
@@ -227,5 +305,6 @@ module.exports = {
     atualizarMovimento,
     excluirMovimento,
     buscarProdutosTitulo,
-    uploadComprovante
+    uploadComprovante,
+    aglutinarTitulos
 }; 
