@@ -327,8 +327,8 @@ const aglutinarTitulos = async (req, res) => {
 			console.log('[AGL] Título aglutinado criado no fallback:', criado);
 		}
 		
-		// Atualizar originais como aglutinados (usando window.api.put() igual ao cancelamento)
-		console.log('[AGL] Atualizando títulos originais usando window.api.put()...');
+		// Atualizar originais como aglutinados (usando supabase.update() simples)
+		console.log('[AGL] Atualizando títulos originais usando supabase.update()...');
 		
 		let sucessos = 0;
 		let erros = 0;
@@ -345,21 +345,15 @@ const aglutinarTitulos = async (req, res) => {
 						id_titulo_aglutinado: criado.id
 					};
 					
-					// Usar window.api.put() igual ao cancelamento
-					// Como estamos no backend, vamos usar uma chamada HTTP para a própria API
-					const response = await fetch(`${req.protocol}://${req.get('host')}/movimento_comissoes/${id}`, {
-						method: 'PUT',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(dadosAtualizacao)
-					});
+					// Usar supabase.update() simples
+					const { data: updateResult, error: errUpdate } = await supabase
+						.from('movimento_comissoes')
+						.update(dadosAtualizacao)
+						.eq('id', id)
+						.select('id, status');
 					
-					if (!response.ok) {
-						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-					}
+					if (errUpdate) throw errUpdate;
 					
-					const updateResult = await response.json();
 					console.log(`[AGL] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, updateResult);
 					sucessos++;
 					
@@ -371,19 +365,17 @@ const aglutinarTitulos = async (req, res) => {
 						status: 'AGLUTINADO'
 					};
 					
-					const response2 = await fetch(`${req.protocol}://${req.get('host')}/movimento_comissoes/${id}`, {
-						method: 'PUT',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(dadosAtualizacaoFallback)
-					});
+					const { data: updateResult2, error: errUpdate2 } = await supabase
+						.from('movimento_comissoes')
+						.update(dadosAtualizacaoFallback)
+						.eq('id', id)
+						.select('id, status');
 					
-					if (!response2.ok) {
-						throw new Error(`HTTP ${response2.status}: ${response2.statusText}`);
+					if (errUpdate2) {
+						console.error(`[AGL] Falha também no fallback para título ${id}:`, errUpdate2);
+						throw errUpdate2;
 					}
 					
-					const updateResult2 = await response2.json();
 					console.log(`[AGL] Título ${id} atualizado com sucesso (fallback):`, updateResult2);
 					sucessos++;
 				}
