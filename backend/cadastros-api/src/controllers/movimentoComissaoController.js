@@ -346,14 +346,20 @@ const aglutinarTitulos = async (req, res) => {
 					};
 					
 					// Usar window.api.put() igual ao cancelamento
-					const { data: updateResult, error: errUpdate } = await supabase
-						.from('movimento_comissoes')
-						.update(dadosAtualizacao)
-						.eq('id', id)
-						.select('id, status');
+					// Como estamos no backend, vamos usar uma chamada HTTP para a própria API
+					const response = await fetch(`${req.protocol}://${req.get('host')}/movimento_comissoes/${id}`, {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(dadosAtualizacao)
+					});
 					
-					if (errUpdate) throw errUpdate;
+					if (!response.ok) {
+						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+					}
 					
+					const updateResult = await response.json();
 					console.log(`[AGL] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, updateResult);
 					sucessos++;
 					
@@ -365,17 +371,19 @@ const aglutinarTitulos = async (req, res) => {
 						status: 'AGLUTINADO'
 					};
 					
-					const { data: updateResult2, error: errUpdate2 } = await supabase
-						.from('movimento_comissoes')
-						.update(dadosAtualizacaoFallback)
-						.eq('id', id)
-						.select('id, status');
+					const response2 = await fetch(`${req.protocol}://${req.get('host')}/movimento_comissoes/${id}`, {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(dadosAtualizacaoFallback)
+					});
 					
-					if (errUpdate2) {
-						console.error(`[AGL] Falha também no fallback para título ${id}:`, errUpdate2);
-						throw errUpdate2;
+					if (!response2.ok) {
+						throw new Error(`HTTP ${response2.status}: ${response2.statusText}`);
 					}
 					
+					const updateResult2 = await response2.json();
 					console.log(`[AGL] Título ${id} atualizado com sucesso (fallback):`, updateResult2);
 					sucessos++;
 				}
