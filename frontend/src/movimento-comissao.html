@@ -1782,7 +1782,7 @@
 
         // Variável global para armazenar o título atual sendo visualizado/editado
         let tituloAtual = null;
-        
+
         // Funções para o Modal Visualizar/Editar Título
         function abrirModalTitulo(titulo, modo) {
             console.log('abrirModalTitulo - titulo:', titulo);
@@ -1869,11 +1869,12 @@
                     btnCancelarBaixa.style.display = 'none';
                 }
                 
-                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação
+                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação e que NÃO estejam pagos
                 const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
                 if (btnCancelarAglutinacao) {
-                    // Só mostrar para títulos que SÃO resultado de aglutinação (não para os que foram aglutinados)
-                    if (titulo.numero_titulo?.includes('AGL-')) {
+                    const isAglutinado = (titulo.numero_titulo?.includes('AGL-'));
+                    const tituloPagoVis = titulo.status === 'PAGO' || titulo.valor_pago > 0;
+                    if (isAglutinado && !tituloPagoVis) {
                         btnCancelarAglutinacao.style.display = 'inline-flex';
                     } else {
                         btnCancelarAglutinacao.style.display = 'none';
@@ -2027,11 +2028,12 @@
                     btnCancelarBaixa.style.display = 'none';
                 }
                 
-                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação
+                // Mostrar botão "Cancelar Aglutinação" apenas para títulos RESULTADO de aglutinação e que NÃO estejam pagos
                 const btnCancelarAglutinacao = document.getElementById('btnCancelarAglutinacao');
                 if (btnCancelarAglutinacao) {
-                    // Só mostrar para títulos que SÃO resultado de aglutinação (não para os que foram aglutinados)
-                    if (titulo.numero_titulo?.includes('AGL-')) {
+                    const isAglutinado = (titulo.numero_titulo?.includes('AGL-'));
+                    const tituloPagoEdit = titulo.status === 'PAGO' || titulo.valor_pago > 0;
+                    if (isAglutinado && !tituloPagoEdit) {
                         btnCancelarAglutinacao.style.display = 'inline-flex';
                     } else {
                         btnCancelarAglutinacao.style.display = 'none';
