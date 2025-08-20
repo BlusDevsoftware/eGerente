@@ -327,8 +327,8 @@ const aglutinarTitulos = async (req, res) => {
 			console.log('[AGL] Título aglutinado criado no fallback:', criado);
 		}
 		
-		// Atualizar originais como aglutinados (usando chamadas individuais como o cancelamento)
-		console.log('[AGL] Atualizando títulos originais usando chamadas individuais...');
+		// Atualizar originais como aglutinados (usando window.api.put() igual ao cancelamento)
+		console.log('[AGL] Atualizando títulos originais usando window.api.put()...');
 		
 		let sucessos = 0;
 		let erros = 0;
@@ -340,9 +340,15 @@ const aglutinarTitulos = async (req, res) => {
 				
 				// Tentar primeiro com id_titulo_aglutinado
 				try {
+					const dadosAtualizacao = {
+						status: 'AGLUTINADO',
+						id_titulo_aglutinado: criado.id
+					};
+					
+					// Usar window.api.put() igual ao cancelamento
 					const { data: updateResult, error: errUpdate } = await supabase
 						.from('movimento_comissoes')
-						.update({ status: 'AGLUTINADO', id_titulo_aglutinado: criado.id })
+						.update(dadosAtualizacao)
 						.eq('id', id)
 						.select('id, status');
 					
@@ -355,9 +361,13 @@ const aglutinarTitulos = async (req, res) => {
 					console.warn(`[AGL] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
 					
 					// Fallback: apenas com status
+					const dadosAtualizacaoFallback = {
+						status: 'AGLUTINADO'
+					};
+					
 					const { data: updateResult2, error: errUpdate2 } = await supabase
 						.from('movimento_comissoes')
-						.update({ status: 'AGLUTINADO' })
+						.update(dadosAtualizacaoFallback)
 						.eq('id', id)
 						.select('id, status');
 					
