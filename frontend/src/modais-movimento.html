@@ -1704,32 +1704,35 @@ async function confirmarAglutinacao() {
           const id = resp.ids_para_atualizar[i];
           try {
             console.log(`[FRONTEND] Atualizando título ID ${id} (${i + 1}/${resp.ids_para_atualizar.length})...`);
-            
+
             // Tentar primeiro com id_titulo_aglutinado
             try {
               const dadosAtualizacao = {
                 status: 'AGLUTINADO',
                 id_titulo_aglutinado: resp.novo.id
               };
-              
+
+              console.log(`[FRONTEND] Dados de atualização para título ${id}:`, dadosAtualizacao);
+
               // Usar window.api.put() igual ao cancelamento
-              await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacao);
-              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (com id_titulo_aglutinado)`);
+              const resultado = await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacao);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, resultado);
               sucessos++;
-              
+
             } catch (errUpd) {
               console.warn(`[FRONTEND] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
-              
+
               // Fallback: apenas com status
               const dadosAtualizacaoFallback = {
                 status: 'AGLUTINADO'
               };
-              
-              await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacaoFallback);
-              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (fallback)`);
+
+              console.log(`[FRONTEND] Tentando fallback para título ${id}:`, dadosAtualizacaoFallback);
+              const resultadoFallback = await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacaoFallback);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (fallback):`, resultadoFallback);
               sucessos++;
             }
-            
+
           } catch (error) {
             console.error(`[FRONTEND] Erro ao atualizar título ${id}:`, error);
             erros++;
@@ -1740,6 +1743,20 @@ async function confirmarAglutinacao() {
         
         if (erros > 0) {
           console.warn(`[FRONTEND] Atenção: ${erros} título(s) não foram atualizados com sucesso`);
+        }
+
+        // VERIFICAR SE OS TÍTULOS FORAM REALMENTE ATUALIZADOS NO BANCO
+        console.log('[FRONTEND] Verificando se os títulos foram realmente atualizados no banco...');
+        for (let i = 0; i < resp.ids_para_atualizar.length; i++) {
+          const id = resp.ids_para_atualizar[i];
+          try {
+            const tituloAtualizado = await window.api.get(`/movimento_comissoes/${id}`);
+            console.log(`[FRONTEND] Título ${id} após atualização:`, tituloAtualizado);
+            console.log(`[FRONTEND] Status do título ${id}: ${tituloAtualizado.status}`);
+            console.log(`[FRONTEND] id_titulo_aglutinado do título ${id}: ${tituloAtualizado.id_titulo_aglutinado}`);
+          } catch (error) {
+            console.error(`[FRONTEND] Erro ao verificar título ${id} após atualização:`, error);
+          }
         }
       }
       
