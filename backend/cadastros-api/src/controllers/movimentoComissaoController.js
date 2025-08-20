@@ -110,15 +110,64 @@ const atualizarMovimento = async (req, res) => {
 	try {
 		const { id } = req.params;
 		const atualizacao = req.body;
-		const { data, error } = await supabase
-			.from('movimento_comissoes')
-			.update(atualizacao)
-			.eq('id', id)
-			.select()
-			.single();
-		if (error) throw error;
-		if (!data) return res.status(404).json({ error: 'Movimento não encontrado' });
-		res.json(data);
+		
+		console.log(`[BACKEND] Atualizando movimento ID ${id}:`, atualizacao);
+		console.log(`[BACKEND] Dados recebidos:`, JSON.stringify(atualizacao, null, 2));
+		
+		// USAR A PRÓPRIA API EM VEZ DE SUPABASE DIRETAMENTE
+		// Isso garante consistência, validações e logs da API
+		try {
+			// Fazer chamada para a própria API usando fetch
+			const response = await fetch(`${req.protocol}://${req.get('host')}/api/movimento_comissoes/${id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-usuario': req.headers['x-usuario'] || 'API_INTERNA'
+				},
+				body: JSON.stringify(atualizacao)
+			});
+			
+			if (!response.ok) {
+				const errorData = await response.json();
+				console.error(`[BACKEND] Erro na API interna:`, errorData);
+				throw new Error(`API interna retornou erro: ${response.status} - ${errorData.error || 'Erro desconhecido'}`);
+			}
+			
+			const data = await response.json();
+			console.log(`[BACKEND] Movimento ${id} atualizado com sucesso via API:`, data);
+			console.log(`[BACKEND] Status após atualização: ${data.status}`);
+			console.log(`[BACKEND] id_titulo_aglutinado após atualização: ${data.id_titulo_aglutinado}`);
+			
+			res.json(data);
+			
+		} catch (apiError) {
+			console.error(`[BACKEND] Erro na API interna, tentando fallback com Supabase:`, apiError);
+			
+			// FALLBACK: usar Supabase diretamente se a API falhar
+			const { data, error } = await supabase
+				.from('movimento_comissoes')
+				.update(atualizacao)
+				.eq('id', id)
+				.select()
+				.single();
+				
+			if (error) {
+				console.error(`[BACKEND] Erro no fallback Supabase:`, error);
+				throw error;
+			}
+			
+			if (!data) {
+				console.error(`[BACKEND] Movimento ${id} não encontrado após atualização`);
+				return res.status(404).json({ error: 'Movimento não encontrado' });
+			}
+			
+			console.log(`[BACKEND] Movimento ${id} atualizado com sucesso via fallback Supabase:`, data);
+			console.log(`[BACKEND] Status após atualização: ${data.status}`);
+			console.log(`[BACKEND] id_titulo_aglutinado após atualização: ${data.id_titulo_aglutinado}`);
+			
+			res.json(data);
+		}
+		
 	} catch (error) {
 		console.error('Erro ao atualizar movimento:', error);
 		res.status(500).json({ error: 'Erro ao atualizar movimento' });
@@ -348,14 +397,90 @@ const diagnosticarSchemaAglutinacao = async (req, res) => {
 		// tenta selecionar explicitamente as colunas novas
 		const { data, error } = await supabase
 			.from('movimento_comissoes')
-			.select('id, ids_aglutinados, id_titulo_aglutinado')
+			.select('id, status, id_titulo_aglutinado, ids_aglutinados')
 			.limit(1);
+		
 		if (error) {
-			return res.status(200).json({ ok: false, message: 'Seleção falhou', error: String(error) });
+			console.error('[DIAGNÓSTICO] Erro ao verificar schema:', error);
+			return res.status(500).json({ 
+				error: 'Erro ao verificar schema', 
+				details: error.message 
+			});
 		}
-		return res.status(200).json({ ok: true, sample: data });
-	} catch (e) {
-		return res.status(200).json({ ok: false, error: String(e) });
+		
+		// verificar se as colunas existem
+		const colunasExistentes = data && data.length > 0 ? Object.keys(data[0]) : [];
+		const colunasEsperadas = ['id', 'status', 'id_titulo_aglutinado', 'ids_aglutinados'];
+		const colunasFaltando = colunasEsperadas.filter(col => !colunasExistentes.includes(col));
+		
+		console.log('[DIAGNÓSTICO] Colunas existentes:', colunasExistentes);
+		console.log('[DIAGNÓSTICO] Colunas esperadas:', colunasEsperadas);
+		console.log('[DIAGNÓSTICO] Colunas faltando:', colunasFaltando);
+		
+		// tentar inserir um registro de teste para ver se as colunas funcionam
+		if (colunasFaltando.length === 0) {
+			try {
+				const { data: teste, error: erroTeste } = await supabase
+					.from('movimento_comissoes')
+					.update({ 
+						status: 'TESTE_SCHEMA',
+						id_titulo_aglutinado: 999999
+					})
+					.eq('id', 1)
+					.select('id, status, id_titulo_aglutinado');
+				
+				if (erroTeste) {
+					console.error('[DIAGNÓSTICO] Erro ao testar atualização:', erroTeste);
+					return res.json({
+						colunas_existentes: colunasExistentes,
+						colunas_faltando: colunasFaltando,
+						teste_atualizacao: 'FALHOU',
+						erro_teste: erroTeste.message
+					});
+				}
+				
+				console.log('[DIAGNÓSTICO] Teste de atualização bem-sucedido:', teste);
+				
+				// reverter o teste
+				await supabase
+					.from('movimento_comissoes')
+					.update({ 
+						status: 'PENDENTE',
+						id_titulo_aglutinado: null
+					})
+					.eq('id', 1);
+				
+				return res.json({
+					colunas_existentes: colunasExistentes,
+					colunas_faltando: colunasFaltando,
+					teste_atualizacao: 'SUCESSO',
+					mensagem: 'Schema está funcionando corretamente'
+				});
+				
+			} catch (erroTeste) {
+				console.error('[DIAGNÓSTICO] Erro no teste de atualização:', erroTeste);
+				return res.json({
+					colunas_existentes: colunasExistentes,
+					colunas_faltando: colunasFaltando,
+					teste_atualizacao: 'FALHOU',
+					erro_teste: erroTeste.message
+				});
+			}
+		}
+		
+		return res.json({
+			colunas_existentes: colunasExistentes,
+			colunas_faltando: colunasFaltando,
+			teste_atualizacao: 'NÃO_EXECUTADO',
+			mensagem: 'Colunas necessárias não existem'
+		});
+		
+	} catch (error) {
+		console.error('[DIAGNÓSTICO] Erro geral:', error);
+		res.status(500).json({ 
+			error: 'Erro no diagnóstico', 
+			details: error.message 
+		});
 	}
 };
 
