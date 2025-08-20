@@ -538,6 +538,26 @@ function mostrarAnimacaoAglutinacao() {
     } catch (_) {
       modal.appendChild(node);
     }
+  } else {
+    // fallback: construir dinamicamente (padrão igual baixa)
+    const animacaoDiv = document.createElement('div');
+    animacaoDiv.id = 'animacaoAglutinacaoDiv';
+    animacaoDiv.style.cssText = 'margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;';
+    animacaoDiv.innerHTML = `
+      <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+        <span id="textoProgressoAglutinacao">Iniciando aglutinação...</span>
+      </div>
+      <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+        <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25,118,210,0.3);"></div>
+      </div>
+      <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando aglutinação...</div>
+    `;
+    try {
+      modalBody.appendChild(animacaoDiv);
+    } catch (_) {
+      modal.appendChild(animacaoDiv);
+    }
   }
 }
 
