@@ -2768,7 +2768,8 @@
                     return;
                 }
                 
-                // Se não é baixa parcial, executar cancelamento normal
+                // Se não é baixa parcial, executar cancelamento normal com animação inline no modal do título
+                mostrarAnimacaoCancelamentoInline();
                 await executarCancelamentoBaixa(tituloParaCancelarBaixa, []);
                 
                 // Fechar modais e abrir modal de sucesso (fluxo sem parciais)
@@ -2781,6 +2782,7 @@
                 if (modalSucesso) {
                     modalSucesso.style.display = 'flex';
                 }
+                finalizarAnimacaoCancelamentoInline();
                 if (typeof resetarVariaveisCancelamento === 'function') {
                     resetarVariaveisCancelamento();
                 }
@@ -2788,6 +2790,7 @@
             } catch (error) {
                 console.error('Erro ao cancelar baixa:', error);
                 alert(`Erro ao cancelar baixa: ${error.message}`);
+                finalizarAnimacaoCancelamentoInline();
                 fecharModalConfirmCancelarBaixa();
             }
         }
@@ -3178,6 +3181,65 @@
                 
                 console.log(`Progresso: ${percentual}% - ${texto}`);
             }
+        }
+
+        // Animação inline para cancelamento de baixa dentro do modal do título (padrão igual baixa)
+        function mostrarAnimacaoCancelamentoInline() {
+            const modal = document.getElementById('modalTitulo');
+            if (!modal) return;
+            const form = document.getElementById('formModalTitulo');
+
+            // Remover animação anterior se existir
+            const anterior = document.getElementById('animacaoExclusaoDiv');
+            if (anterior) anterior.remove();
+
+            // Ocultar botões de ação do modal título enquanto processa
+            try {
+                const btnSalvar = document.getElementById('btnSalvarModalTitulo');
+                if (btnSalvar) btnSalvar.style.display = 'none';
+                const btnCancelarBaixa = document.getElementById('btnCancelarBaixa');
+                if (btnCancelarBaixa) btnCancelarBaixa.style.display = 'none';
+            } catch (_) {}
+
+            // Criar bloco de animação reutilizando os mesmos IDs da animação de exclusão
+            const animacaoDiv = document.createElement('div');
+            animacaoDiv.id = 'animacaoExclusaoDiv';
+            animacaoDiv.style.cssText = `
+                margin: 20px 0; 
+                text-align: center;
+                background: #f8f9fa;
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid #e9ecef;
+            `;
+            animacaoDiv.innerHTML = `
+                <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+                    <span id="textoProgressoExclusao">Iniciando cancelamento...</span>
+                </div>
+                <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="barraProgressoExclusao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
+                </div>
+                <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando cancelamento de baixa...</div>
+            `;
+
+            // Inserir a animação no final do formulário do modal título
+            if (form && form.parentElement) {
+                form.parentElement.appendChild(animacaoDiv);
+            } else {
+                modal.appendChild(animacaoDiv);
+            }
+        }
+
+        function finalizarAnimacaoCancelamentoInline() {
+            const anim = document.getElementById('animacaoExclusaoDiv');
+            if (anim && anim.parentElement) anim.parentElement.removeChild(anim);
+            try {
+                const btnSalvar = document.getElementById('btnSalvarModalTitulo');
+                if (btnSalvar) btnSalvar.style.display = 'inline-flex';
+                const btnCancelarBaixa = document.getElementById('btnCancelarBaixa');
+                if (btnCancelarBaixa) btnCancelarBaixa.style.display = 'inline-flex';
+            } catch (_) {}
         }
 
         // function fecharModalConfirmExclusao() {
