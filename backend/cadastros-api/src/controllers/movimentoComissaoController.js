@@ -327,25 +327,59 @@ const aglutinarTitulos = async (req, res) => {
 			console.log('[AGL] Título aglutinado criado no fallback:', criado);
 		}
 		
-		// Atualizar originais como aglutinados (tentativa com id_titulo_aglutinado; fallback sem)
-		try {
-			const { error: errUpdateOrig } = await supabase
-				.from('movimento_comissoes')
-				.update({ status: 'AGLUTINADO', id_titulo_aglutinado: criado.id })
-				.in('id', ids);
-			if (errUpdateOrig) throw errUpdateOrig;
-			console.log('[AGL] Originais atualizados com sucesso (com id_titulo_aglutinado):', ids);
-		} catch (errUpd) {
-			console.warn('[AGL] Falha ao atualizar com id_titulo_aglutinado. Aplicando fallback apenas com status:', errUpd);
-			const { error: errUpdateOrig2 } = await supabase
-				.from('movimento_comissoes')
-				.update({ status: 'AGLUTINADO' })
-				.in('id', ids);
-			if (errUpdateOrig2) {
-				console.error('[AGL] Falha também no fallback de atualização de originais:', errUpdateOrig2);
-				throw errUpdateOrig2;
+		// Atualizar originais como aglutinados (usando loop individual como na baixa múltipla)
+		console.log('[AGL] Atualizando títulos originais usando loop individual...');
+		
+		let sucessos = 0;
+		let erros = 0;
+		
+		for (let i = 0; i < ids.length; i++) {
+			const id = ids[i];
+			try {
+				console.log(`[AGL] Atualizando título ID ${id} (${i + 1}/${ids.length})...`);
+				
+				// Tentar primeiro com id_titulo_aglutinado
+				try {
+					const { data: updateResult, error: errUpdate } = await supabase
+						.from('movimento_comissoes')
+						.update({ status: 'AGLUTINADO', id_titulo_aglutinado: criado.id })
+						.eq('id', id)
+						.select('id, status');
+					
+					if (errUpdate) throw errUpdate;
+					
+					console.log(`[AGL] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, updateResult);
+					sucessos++;
+					
+				} catch (errUpd) {
+					console.warn(`[AGL] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
+					
+					// Fallback: apenas com status
+					const { data: updateResult2, error: errUpdate2 } = await supabase
+						.from('movimento_comissoes')
+						.update({ status: 'AGLUTINADO' })
+						.eq('id', id)
+						.select('id, status');
+					
+					if (errUpdate2) {
+						console.error(`[AGL] Falha também no fallback para título ${id}:`, errUpdate2);
+						throw errUpdate2;
+					}
+					
+					console.log(`[AGL] Título ${id} atualizado com sucesso (fallback):`, updateResult2);
+					sucessos++;
+				}
+				
+			} catch (error) {
+				console.error(`[AGL] Erro ao atualizar título ${id}:`, error);
+				erros++;
 			}
-			console.log('[AGL] Originais atualizados com sucesso (fallback):', ids);
+		}
+		
+		console.log(`[AGL] Resumo da atualização: ${sucessos} sucessos, ${erros} erros`);
+		
+		if (erros > 0) {
+			console.warn(`[AGL] Atenção: ${erros} título(s) não foram atualizados com sucesso`);
 		}
 		
 		return res.status(201).json({ novo: criado });
