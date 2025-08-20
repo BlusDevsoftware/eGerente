@@ -402,6 +402,33 @@
 </div>
 
 <!-- NOVO: Modal de Bloqueio de Aglutinação (Títulos Pagos) -->
+<!-- NOVO: Modal de Progresso de Aglutinação -->
+<div id="modalProgressoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; padding: 24px; box-shadow: 0 8px 32px rgba(255,152,0,0.2);">
+    <h2 style="margin: 0 0 12px 0; font-size: 1.2em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-object-group"></i> Aglutinando títulos...</h2>
+    <div style="margin: 10px 0 14px 0;">
+      <span id="textoProgressoAglutinacao" style="color:#555">Iniciando aglutinação...</span>
+    </div>
+    <div style="height: 12px; background: #ffe0b2; border-radius: 8px; overflow: hidden;">
+      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff9800, #ffb74d); border-radius: 8px; transition: width 0.4s ease;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO: Modal de Sucesso de Aglutinação -->
+<div id="modalSucessoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5600; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 420px; width: 96%; padding: 24px; box-shadow: 0 8px 32px rgba(76,175,80,0.18);">
+    <div class="modal-header" style="padding: 0 0 8px 0; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.2em; color: #43a047; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Sucesso!</h2>
+      <button class="close-modal" onclick="fecharModalSucessoAglutinacao()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding-top: 8px; text-align: center;">
+      <div style="font-size: 1.05em; color: #555; margin-bottom: 12px;">Aglutinação realizada com sucesso!</div>
+      <button id="btnOkSucessoAglutinacao" class="btn-success" onclick="fecharModalSucessoAglutinacao()" style="background-color: #43a047; color: white; border: none; padding: 10px 32px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-check"></i> OK</button>
+    </div>
+  </div>
+</div>
+
 <div id="modalBloqueioAglutinacaoPago" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(229,57,53,0.18); padding: 0;">
     <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
@@ -478,6 +505,25 @@
      ======================================== -->
 
 <script>
+// Animação de Aglutinação
+function atualizarProgressoAglutinacao(percentual, texto) {
+  const barra = document.getElementById('barraProgressoAglutinacao');
+  const textoEl = document.getElementById('textoProgressoAglutinacao');
+  if (barra) barra.style.width = `${percentual}%`;
+  if (textoEl && typeof texto === 'string') textoEl.textContent = texto;
+}
+
+function mostrarModalProgressoAglutinacao(textoInicial) {
+  const modal = document.getElementById('modalProgressoAglutinacao');
+  if (modal) modal.style.display = 'flex';
+  atualizarProgressoAglutinacao(10, textoInicial || 'Iniciando aglutinação...');
+}
+
+function fecharModalSucessoAglutinacao() {
+  const modal = document.getElementById('modalSucessoAglutinacao');
+  if (modal) modal.style.display = 'none';
+}
+
 // Variáveis globais para os modais
 let tituloParaExcluir = null;
 let tituloParaCancelarBaixa = null;
@@ -1581,19 +1627,32 @@ async function confirmarAglutinacao() {
     console.log('[FRONTEND] window.api disponível:', !!window.api);
     console.log('[FRONTEND] window.api.post disponível:', !!window.api?.post);
 
-    // Mostrar progresso simples (poderia integrar com animação)
+    // Animação de progresso de aglutinação
     const btns = document.querySelectorAll('#modalAglutinacaoTitulos .modal-footer button');
     btns.forEach(b => b.disabled = true);
+    // Mostrar modal de progresso
+    const modalProg = document.getElementById('modalProgressoAglutinacao');
+    const barraProg = document.getElementById('barraProgressoAglutinacao');
+    const textoProg = document.getElementById('textoProgressoAglutinacao');
+    if (modalProg) modalProg.style.display = 'flex';
+    if (barraProg) barraProg.style.width = '10%';
+    if (textoProg) textoProg.textContent = 'Preparando dados para aglutinação...';
 
     console.log('[FRONTEND] Fazendo requisição POST para /movimento_comissoes/aglutinar...');
+    if (barraProg) barraProg.style.width = '35%';
+    if (textoProg) textoProg.textContent = 'Enviando dados ao servidor...';
     const resp = await window.api.post('/movimento_comissoes/aglutinar', payload);
     console.log('[FRONTEND] Resposta recebida:', resp);
+    if (barraProg) barraProg.style.width = '65%';
+    if (textoProg) textoProg.textContent = 'Processando resposta...';
 
     // Atualizar UI local
     if (resp && resp.novo) {
       console.log('[FRONTEND] Novo título criado:', resp.novo);
       
       // Recarregar dados da API para obter status atualizados
+      if (barraProg) barraProg.style.width = '80%';
+      if (textoProg) textoProg.textContent = 'Atualizando listagem...';
       try {
         if (typeof carregarComissoes === 'function') {
           console.log('[FRONTEND] Recarregando dados da API...');
@@ -1628,11 +1687,18 @@ async function confirmarAglutinacao() {
         }
       }
 
-      // Fechar modal
+      // Finalizar animação e mostrar sucesso
+      if (barraProg) barraProg.style.width = '100%';
+      if (textoProg) textoProg.textContent = 'Aglutinação concluída com sucesso!';
+      // Pequeno delay para percepção do usuário
+      await new Promise(r => setTimeout(r, 500));
+      if (modalProg) modalProg.style.display = 'none';
       fecharModalAglutinacao();
-      alert('Aglutinação realizada com sucesso!');
+      const modalSucesso = document.getElementById('modalSucessoAglutinacao');
+      if (modalSucesso) modalSucesso.style.display = 'flex';
     } else {
       console.warn('[FRONTEND] Resposta sem novo título:', resp);
+      if (modalProg) modalProg.style.display = 'none';
       alert('Aglutinação finalizada, mas sem retorno de novo título.');
     }
   } catch (error) {
@@ -1642,6 +1708,8 @@ async function confirmarAglutinacao() {
       status: error?.status,
       data: error?.data
     });
+    const modalProg = document.getElementById('modalProgressoAglutinacao');
+    if (modalProg) modalProg.style.display = 'none';
     const msg = error?.data?.error || error?.message || 'Erro ao aglutinar títulos';
     alert(msg);
   } finally {
