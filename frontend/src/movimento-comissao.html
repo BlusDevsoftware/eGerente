@@ -2371,7 +2371,9 @@
                     const statusAtual = (t.status || '').toUpperCase();
                     const venc = t.data_vencimento;
                     const naoPago = statusAtual !== 'PAGO';
-                    if (naoPago && venc && typeof venc === 'string' && venc < todayStr && statusAtual !== 'VENCIDO') {
+                    // NÃO sobrescrever títulos com status AGLUTINADO
+                    const naoAglutinado = statusAtual !== 'AGLUTINADO';
+                    if (naoPago && naoAglutinado && venc && typeof venc === 'string' && venc < todayStr && statusAtual !== 'VENCIDO') {
                         t.status = 'VENCIDO';
                         // persistir no backend sem bloquear a UI
                         atualizacoes.push(
