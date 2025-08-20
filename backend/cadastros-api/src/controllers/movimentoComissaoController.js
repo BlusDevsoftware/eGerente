@@ -327,8 +327,8 @@ const aglutinarTitulos = async (req, res) => {
 			console.log('[AGL] Título aglutinado criado no fallback:', criado);
 		}
 		
-		// Atualizar originais como aglutinados (usando loop individual como na baixa múltipla)
-		console.log('[AGL] Atualizando títulos originais usando loop individual...');
+		// Atualizar originais como aglutinados (usando chamadas individuais como o cancelamento)
+		console.log('[AGL] Atualizando títulos originais usando chamadas individuais...');
 		
 		let sucessos = 0;
 		let erros = 0;
