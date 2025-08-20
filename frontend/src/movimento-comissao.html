@@ -2769,6 +2769,8 @@
                 }
                 
                 // Se não é baixa parcial, executar cancelamento normal com animação inline no modal do título
+                // Fechar o modal de confirmação para que a animação fique visível no modal do título
+                try { if (typeof fecharModalConfirmCancelarBaixa === 'function') fecharModalConfirmCancelarBaixa(); } catch(_) {}
                 mostrarAnimacaoCancelamentoInline();
                 await executarCancelamentoBaixa(tituloParaCancelarBaixa, []);
                 
@@ -3223,11 +3225,17 @@
                 <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando cancelamento de baixa...</div>
             `;
 
-            // Inserir a animação no final do formulário do modal título
-            if (form && form.parentElement) {
-                form.parentElement.appendChild(animacaoDiv);
-            } else {
-                modal.appendChild(animacaoDiv);
+            // Inserir a animação antes do rodapé/botões do modal título, se possível
+            const footer = modal.querySelector('.modal-footer');
+            const container = form && form.parentElement ? form.parentElement : modal;
+            try {
+                if (footer && footer.parentElement === container) {
+                    container.insertBefore(animacaoDiv, footer);
+                } else {
+                    container.appendChild(animacaoDiv);
+                }
+            } catch(_) {
+                container.appendChild(animacaoDiv);
             }
         }
 
