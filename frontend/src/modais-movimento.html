@@ -402,18 +402,23 @@
 </div>
 
 <!-- NOVO: Modal de Bloqueio de Aglutinação (Títulos Pagos) -->
-<!-- NOVO: Modal de Progresso de Aglutinação -->
-<div id="modalProgressoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5500; align-items: center; justify-content: center;">
-  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 520px; width: 96%; padding: 24px; box-shadow: 0 8px 32px rgba(255,152,0,0.2);">
-    <h2 style="margin: 0 0 12px 0; font-size: 1.2em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-object-group"></i> Aglutinando títulos...</h2>
-    <div style="margin: 10px 0 14px 0;">
-      <span id="textoProgressoAglutinacao" style="color:#555">Iniciando aglutinação...</span>
+<!-- NOVO: Animação inline de Aglutinação (padrão igual baixa) -->
+<template id="templateAnimacaoAglutinacao">
+  <div id="animacaoAglutinacaoDiv" style="margin: 20px 0; text-align: center; background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #e9ecef;">
+    <div style="font-weight: 600; color: #1976D2; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 1.2em;"></i>
+      <span id="textoProgressoAglutinacao">Iniciando aglutinação...</span>
     </div>
-    <div style="height: 12px; background: #ffe0b2; border-radius: 8px; overflow: hidden;">
-      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #ff9800, #ffb74d); border-radius: 8px; transition: width 0.4s ease;"></div>
+    <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
+      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25,118,210,0.3);"></div>
     </div>
+    <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando aglutinação...</div>
   </div>
-</div>
+  
+  <style>
+    /* Nenhum estilo global adicional para evitar conflitos */
+  </style>
+</template>
 
 <!-- NOVO: Modal de Sucesso de Aglutinação -->
 <div id="modalSucessoAglutinacao" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 5600; align-items: center; justify-content: center;">
@@ -513,10 +518,35 @@ function atualizarProgressoAglutinacao(percentual, texto) {
   if (textoEl && typeof texto === 'string') textoEl.textContent = texto;
 }
 
-function mostrarModalProgressoAglutinacao(textoInicial) {
-  const modal = document.getElementById('modalProgressoAglutinacao');
-  if (modal) modal.style.display = 'flex';
-  atualizarProgressoAglutinacao(10, textoInicial || 'Iniciando aglutinação...');
+function mostrarAnimacaoAglutinacao() {
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  const modalBody = modal ? modal.querySelector('.modal-body') : null;
+  const footerBtns = modal ? modal.querySelector('.modal-footer') : null;
+  if (!modalBody) return;
+  // remover anterior
+  const anterior = document.getElementById('animacaoAglutinacaoDiv');
+  if (anterior) anterior.remove();
+  // esconder botoes
+  if (footerBtns) footerBtns.style.display = 'none';
+  // clonar template
+  const tpl = document.getElementById('templateAnimacaoAglutinacao');
+  if (tpl && tpl.content) {
+    const node = tpl.content.cloneNode(true);
+    // inserir antes do footer
+    try {
+      modalBody.appendChild(node);
+    } catch (_) {
+      modal.appendChild(node);
+    }
+  }
+}
+
+function finalizarAnimacaoAglutinacao() {
+  const anim = document.getElementById('animacaoAglutinacaoDiv');
+  if (anim && anim.parentElement) anim.parentElement.removeChild(anim);
+  const modal = document.getElementById('modalAglutinacaoTitulos');
+  const footerBtns = modal ? modal.querySelector('.modal-footer') : null;
+  if (footerBtns) footerBtns.style.display = 'flex';
 }
 
 function fecharModalSucessoAglutinacao() {
@@ -1627,32 +1657,24 @@ async function confirmarAglutinacao() {
     console.log('[FRONTEND] window.api disponível:', !!window.api);
     console.log('[FRONTEND] window.api.post disponível:', !!window.api?.post);
 
-    // Animação de progresso de aglutinação
+    // Iniciar animação inline (padrão do sistema)
     const btns = document.querySelectorAll('#modalAglutinacaoTitulos .modal-footer button');
     btns.forEach(b => b.disabled = true);
-    // Mostrar modal de progresso
-    const modalProg = document.getElementById('modalProgressoAglutinacao');
-    const barraProg = document.getElementById('barraProgressoAglutinacao');
-    const textoProg = document.getElementById('textoProgressoAglutinacao');
-    if (modalProg) modalProg.style.display = 'flex';
-    if (barraProg) barraProg.style.width = '10%';
-    if (textoProg) textoProg.textContent = 'Preparando dados para aglutinação...';
+    mostrarAnimacaoAglutinacao();
+    atualizarProgressoAglutinacao(10, 'Preparando dados para aglutinação...');
 
     console.log('[FRONTEND] Fazendo requisição POST para /movimento_comissoes/aglutinar...');
-    if (barraProg) barraProg.style.width = '35%';
-    if (textoProg) textoProg.textContent = 'Enviando dados ao servidor...';
+    atualizarProgressoAglutinacao(35, 'Enviando dados ao servidor...');
     const resp = await window.api.post('/movimento_comissoes/aglutinar', payload);
     console.log('[FRONTEND] Resposta recebida:', resp);
-    if (barraProg) barraProg.style.width = '65%';
-    if (textoProg) textoProg.textContent = 'Processando resposta...';
+    atualizarProgressoAglutinacao(65, 'Processando resposta...');
 
     // Atualizar UI local
     if (resp && resp.novo) {
       console.log('[FRONTEND] Novo título criado:', resp.novo);
       
       // Recarregar dados da API para obter status atualizados
-      if (barraProg) barraProg.style.width = '80%';
-      if (textoProg) textoProg.textContent = 'Atualizando listagem...';
+      atualizarProgressoAglutinacao(80, 'Atualizando listagem...');
       try {
         if (typeof carregarComissoes === 'function') {
           console.log('[FRONTEND] Recarregando dados da API...');
@@ -1688,17 +1710,15 @@ async function confirmarAglutinacao() {
       }
 
       // Finalizar animação e mostrar sucesso
-      if (barraProg) barraProg.style.width = '100%';
-      if (textoProg) textoProg.textContent = 'Aglutinação concluída com sucesso!';
-      // Pequeno delay para percepção do usuário
+      atualizarProgressoAglutinacao(100, 'Aglutinação concluída com sucesso!');
       await new Promise(r => setTimeout(r, 500));
-      if (modalProg) modalProg.style.display = 'none';
+      finalizarAnimacaoAglutinacao();
       fecharModalAglutinacao();
       const modalSucesso = document.getElementById('modalSucessoAglutinacao');
       if (modalSucesso) modalSucesso.style.display = 'flex';
     } else {
       console.warn('[FRONTEND] Resposta sem novo título:', resp);
-      if (modalProg) modalProg.style.display = 'none';
+      finalizarAnimacaoAglutinacao();
       alert('Aglutinação finalizada, mas sem retorno de novo título.');
     }
   } catch (error) {
@@ -1708,8 +1728,7 @@ async function confirmarAglutinacao() {
       status: error?.status,
       data: error?.data
     });
-    const modalProg = document.getElementById('modalProgressoAglutinacao');
-    if (modalProg) modalProg.style.display = 'none';
+    finalizarAnimacaoAglutinacao();
     const msg = error?.data?.error || error?.message || 'Erro ao aglutinar títulos';
     alert(msg);
   } finally {
