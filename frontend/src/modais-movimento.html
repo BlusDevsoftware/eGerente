@@ -1630,7 +1630,7 @@ function atualizarSimulacaoAglutinacaoUI() {
         </div>
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloAglutinado" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;">
+          <input type="date" id="vencimentoTituloAglutinado" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
         </div>
       </div>
       <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
@@ -1745,6 +1745,11 @@ async function confirmarAglutinacao() {
       
       // Recarregar dados da API para obter status atualizados
       atualizarProgressoAglutinacao(80, 'Atualizando listagem...');
+      
+      // AGUARDAR um pouco para garantir que as atualizações terminem
+      console.log('[FRONTEND] Aguardando finalização das atualizações...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       try {
         if (typeof carregarComissoes === 'function') {
           console.log('[FRONTEND] Recarregando dados da API...');
