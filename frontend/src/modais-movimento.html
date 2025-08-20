@@ -410,7 +410,7 @@
       <span id="textoProgressoAglutinacao">Iniciando aglutinação...</span>
     </div>
     <div style="width: 100%; background-color: #e3f2fd; border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 12px;">
-      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25,118,210,0.3);"></div>
+      <div id="barraProgressoAglutinacao" style="width: 0%; height: 100%; background: linear-gradient(90deg, #1976D2, #42a5f5); border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);"></div>
     </div>
     <div style="font-size: 0.9em; color: #666; font-style: italic;">Processando aglutinação...</div>
   </div>
@@ -1692,6 +1692,56 @@ async function confirmarAglutinacao() {
     // Atualizar UI local
     if (resp && resp.novo) {
       console.log('[FRONTEND] Novo título criado:', resp.novo);
+      
+      // ATUALIZAR TÍTULOS ORIGINAIS USANDO A API (igual ao cancelamento)
+      if (resp.ids_para_atualizar && Array.isArray(resp.ids_para_atualizar)) {
+        atualizarProgressoAglutinacao(70, 'Atualizando status dos títulos originais...');
+        
+        let sucessos = 0;
+        let erros = 0;
+        
+        for (let i = 0; i < resp.ids_para_atualizar.length; i++) {
+          const id = resp.ids_para_atualizar[i];
+          try {
+            console.log(`[FRONTEND] Atualizando título ID ${id} (${i + 1}/${resp.ids_para_atualizar.length})...`);
+            
+            // Tentar primeiro com id_titulo_aglutinado
+            try {
+              const dadosAtualizacao = {
+                status: 'AGLUTINADO',
+                id_titulo_aglutinado: resp.novo.id
+              };
+              
+              // Usar window.api.put() igual ao cancelamento
+              await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacao);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (com id_titulo_aglutinado)`);
+              sucessos++;
+              
+            } catch (errUpd) {
+              console.warn(`[FRONTEND] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
+              
+              // Fallback: apenas com status
+              const dadosAtualizacaoFallback = {
+                status: 'AGLUTINADO'
+              };
+              
+              await window.api.put(`/movimento_comissoes/${id}`, dadosAtualizacaoFallback);
+              console.log(`[FRONTEND] Título ${id} atualizado com sucesso (fallback)`);
+              sucessos++;
+            }
+            
+          } catch (error) {
+            console.error(`[FRONTEND] Erro ao atualizar título ${id}:`, error);
+            erros++;
+          }
+        }
+        
+        console.log(`[FRONTEND] Resumo da atualização: ${sucessos} sucessos, ${erros} erros`);
+        
+        if (erros > 0) {
+          console.warn(`[FRONTEND] Atenção: ${erros} título(s) não foram atualizados com sucesso`);
+        }
+      }
       
       // Recarregar dados da API para obter status atualizados
       atualizarProgressoAglutinacao(80, 'Atualizando listagem...');

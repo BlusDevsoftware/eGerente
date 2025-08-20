@@ -327,72 +327,15 @@ const aglutinarTitulos = async (req, res) => {
 			console.log('[AGL] Título aglutinado criado no fallback:', criado);
 		}
 		
-		// Atualizar originais como aglutinados (usando supabase.update() simples)
-		console.log('[AGL] Atualizando títulos originais usando supabase.update()...');
+		// NÃO atualizar originais aqui - será feito no frontend usando a API
+		console.log('[AGL] Novo título criado. Títulos originais serão atualizados no frontend usando a API.');
+		console.log('[AGL] IDs dos títulos originais para atualizar:', ids);
 		
-		let sucessos = 0;
-		let erros = 0;
-		
-		for (let i = 0; i < ids.length; i++) {
-			const id = ids[i];
-			try {
-				console.log(`[AGL] Atualizando título ID ${id} (${i + 1}/${ids.length})...`);
-				
-				// Tentar primeiro com id_titulo_aglutinado
-				try {
-					const dadosAtualizacao = {
-						status: 'AGLUTINADO',
-						id_titulo_aglutinado: criado.id
-					};
-					
-					// Usar supabase.update() simples
-					const { data: updateResult, error: errUpdate } = await supabase
-						.from('movimento_comissoes')
-						.update(dadosAtualizacao)
-						.eq('id', id)
-						.select('id, status');
-					
-					if (errUpdate) throw errUpdate;
-					
-					console.log(`[AGL] Título ${id} atualizado com sucesso (com id_titulo_aglutinado):`, updateResult);
-					sucessos++;
-					
-				} catch (errUpd) {
-					console.warn(`[AGL] Falha ao atualizar título ${id} com id_titulo_aglutinado. Tentando fallback:`, errUpd);
-					
-					// Fallback: apenas com status
-					const dadosAtualizacaoFallback = {
-						status: 'AGLUTINADO'
-					};
-					
-					const { data: updateResult2, error: errUpdate2 } = await supabase
-						.from('movimento_comissoes')
-						.update(dadosAtualizacaoFallback)
-						.eq('id', id)
-						.select('id, status');
-					
-					if (errUpdate2) {
-						console.error(`[AGL] Falha também no fallback para título ${id}:`, errUpdate2);
-						throw errUpdate2;
-					}
-					
-					console.log(`[AGL] Título ${id} atualizado com sucesso (fallback):`, updateResult2);
-					sucessos++;
-				}
-				
-			} catch (error) {
-				console.error(`[AGL] Erro ao atualizar título ${id}:`, error);
-				erros++;
-			}
-		}
-		
-		console.log(`[AGL] Resumo da atualização: ${sucessos} sucessos, ${erros} erros`);
-		
-		if (erros > 0) {
-			console.warn(`[AGL] Atenção: ${erros} título(s) não foram atualizados com sucesso`);
-		}
-		
-		return res.status(201).json({ novo: criado });
+		return res.status(201).json({ 
+			novo: criado,
+			ids_para_atualizar: ids,
+			mensagem: 'Títulos originais devem ser atualizados no frontend usando a API'
+		});
 	} catch (error) {
 		console.error('[AGL] Erro ao aglutinar títulos:', error?.message || error);
 		res.status(500).json({ error: 'Erro ao aglutinar títulos', details: error.message || String(error) });
