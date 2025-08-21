@@ -1763,10 +1763,6 @@ async function confirmarAglutinacao() {
       // Recarregar dados da API para obter status atualizados
       atualizarProgressoAglutinacao(80, 'Atualizando listagem...');
       
-      // AGUARDAR um pouco para garantir que as atualizações terminem
-      console.log('[FRONTEND] Aguardando finalização das atualizações...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       try {
         if (typeof carregarComissoes === 'function') {
           console.log('[FRONTEND] Recarregando dados da API...');
