@@ -1348,11 +1348,20 @@ function abrirModalAglutinacao(titulos) {
           if (titulosParaAglutinar.length === 0) {
             simulacaoEl.innerHTML = '';
           } else {
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            const dataHoje = `${ano}-${mes}-${dia}`;
+            // PRESERVAR a data escolhida pelo usuário em vez de sempre usar a data atual
+            let dataVencimento = '';
+            const campoVencimentoExistente = document.getElementById('vencimentoTituloAglutinado');
+            if (campoVencimentoExistente && campoVencimentoExistente.value) {
+              dataVencimento = campoVencimentoExistente.value;
+            } else {
+              // Fallback: usar data atual apenas se não houver data escolhida
+              const hoje = new Date();
+              const ano = hoje.getFullYear();
+              const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+              const dia = String(hoje.getDate()).padStart(2, '0');
+              dataVencimento = `${ano}-${mes}-${dia}`;
+            }
+            
             const exemplos = titulosParaAglutinar.slice(0, 3).map(t => (t.numero_titulo || '')).filter(Boolean);
             const origemResumo = titulosParaAglutinar.length > 3
               ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
@@ -1385,7 +1394,7 @@ function abrirModalAglutinacao(titulos) {
                 </div>
                 <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
                   <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Vencimento</div>
-                  <input type=\"date\" id=\"vencimentoTituloAglutinado\" value=\"${dataHoje}\" style=\"padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
+                  <input type=\"date\" id=\"vencimentoTituloAglutinado\" value=\"${dataVencimento}\" style=\"padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
                 </div>
               </div>
               <div style=\"margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
@@ -1592,11 +1601,21 @@ function atualizarSimulacaoAglutinacaoUI() {
     const total = titulosParaAglutinar.reduce((acc, t) => acc + (parseFloat(t.valor || t.valor_total || 0) || 0), 0);
     const totalNum = titulosParaAglutinar.reduce((acc, t) => acc + parseValorBr(t.valor ?? t.valor_total ?? t.valor_titulo ?? 0), 0);
     const totalFmt = (typeof formatarValorLocal === 'function') ? formatarValorLocal(totalNum) : `R$ ${totalNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoje.getDate()).padStart(2, '0');
-    const dataHoje = `${ano}-${mes}-${dia}`;
+    
+    // PRESERVAR a data escolhida pelo usuário em vez de sempre usar a data atual
+    let dataVencimento = '';
+    const campoVencimentoExistente = document.getElementById('vencimentoTituloAglutinado');
+    if (campoVencimentoExistente && campoVencimentoExistente.value) {
+      dataVencimento = campoVencimentoExistente.value;
+    } else {
+      // Fallback: usar data atual apenas se não houver data escolhida
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      dataVencimento = `${ano}-${mes}-${dia}`;
+    }
+    
     const exemplos = titulosParaAglutinar.slice(0, 3).map(t => (t.numero_titulo || '')).filter(Boolean);
     const origemResumo = titulosParaAglutinar.length > 3
       ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
@@ -1630,7 +1649,7 @@ function atualizarSimulacaoAglutinacaoUI() {
         </div>
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloAglutinado" value="${dataHoje}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
+          <input type="date" id="vencimentoTituloAglutinado" value="${dataVencimento}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
         </div>
       </div>
       <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
