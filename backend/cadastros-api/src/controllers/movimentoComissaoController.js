@@ -270,6 +270,16 @@ const aglutinarTitulos = async (req, res) => {
 	try {
 		console.log('[AGL] Request recebido em /movimento_comissoes/aglutinar:', JSON.stringify(req.body));
 		const { ids, observacao, data_vencimento } = req.body || {};
+		
+		console.log('[AGL] DEBUG - Dados extraídos do body:');
+		console.log('[AGL] DEBUG - ids:', ids);
+		console.log('[AGL] DEBUG - observacao:', observacao);
+		console.log('[AGL] DEBUG - data_vencimento:', data_vencimento);
+		console.log('[AGL] DEBUG - Tipo de data_vencimento:', typeof data_vencimento);
+		console.log('[AGL] DEBUG - data_vencimento é vazio?', !data_vencimento);
+		console.log('[AGL] DEBUG - data_vencimento é undefined?', data_vencimento === undefined);
+		console.log('[AGL] DEBUG - data_vencimento é null?', data_vencimento === null);
+		
 		if (!Array.isArray(ids) || ids.length < 2) {
 			console.warn('[AGL] Validação falhou: ids inválidos ou menos de 2 itens:', ids);
 			return res.status(400).json({ error: 'Informe pelo menos 2 IDs para aglutinar' });
@@ -350,6 +360,10 @@ const aglutinarTitulos = async (req, res) => {
 			percentual_comissao: 0, // Campo obrigatório com valor padrão
 			ids_aglutinados: ids.join(',')
 		};
+		
+		console.log('[AGL] DEBUG - data_vencimento recebida:', data_vencimento);
+		console.log('[AGL] DEBUG - data_vencimento final no objeto:', novo.data_vencimento);
+		console.log('[AGL] DEBUG - data_geracao:', novo.data_geracao);
 		console.log('[AGL] Novo título a inserir (com colunas):', JSON.stringify(novo, null, 2));
 		let criado;
 		try {

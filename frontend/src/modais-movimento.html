@@ -1668,8 +1668,38 @@ async function confirmarAglutinacao() {
     console.log('[FRONTEND] Iniciando confirmarAglutinacao...');
     const obsInput = document.getElementById('observacaoAglutinacaoInput');
     const dtInput = document.getElementById('vencimentoTituloAglutinado');
+    
+    console.log('[FRONTEND] DEBUG - Campo observação encontrado:', !!obsInput);
+    console.log('[FRONTEND] DEBUG - Campo vencimento encontrado:', !!dtInput);
+    
+    if (dtInput) {
+      console.log('[FRONTEND] DEBUG - Campo vencimento value:', dtInput.value);
+      console.log('[FRONTEND] DEBUG - Campo vencimento getAttribute value:', dtInput.getAttribute('value'));
+      console.log('[FRONTEND] DEBUG - Campo vencimento type:', dtInput.type);
+      console.log('[FRONTEND] DEBUG - Campo vencimento id:', dtInput.id);
+    }
+    
     observacaoAglutinacaoTexto = obsInput ? obsInput.value.trim() : '';
-    const dataVencimento = dtInput && dtInput.value ? dtInput.value : new Date().toISOString().split('T')[0];
+    
+    // TENTAR DIFERENTES FORMAS DE CAPTURAR A DATA
+    let dataVencimento = '';
+    
+    if (dtInput) {
+      if (dtInput.value) {
+        dataVencimento = dtInput.value;
+        console.log('[FRONTEND] DEBUG - Data capturada via .value:', dataVencimento);
+      } else if (dtInput.getAttribute('value')) {
+        dataVencimento = dtInput.getAttribute('value');
+        console.log('[FRONTEND] DEBUG - Data capturada via getAttribute:', dataVencimento);
+      } else {
+        // Fallback: usar data atual
+        dataVencimento = new Date().toISOString().split('T')[0];
+        console.log('[FRONTEND] DEBUG - Usando fallback data atual:', dataVencimento);
+      }
+    } else {
+      dataVencimento = new Date().toISOString().split('T')[0];
+      console.log('[FRONTEND] DEBUG - Campo não encontrado, usando data atual:', dataVencimento);
+    }
 
     console.log('[FRONTEND] Dados coletados:', {
       observacao: observacaoAglutinacaoTexto,
