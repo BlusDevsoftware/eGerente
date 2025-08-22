@@ -1394,7 +1394,7 @@ function abrirModalAglutinacao(titulos) {
                 </div>
                 <div style=\"background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
                   <div style=\"font-weight: 600; color: #1976D2; margin-bottom: 4px;\">Vencimento</div>
-                  <input type=\"date\" id=\"vencimentoTituloAglutinado\" value=\"${dataVencimento}\" style=\"padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
+                  <input type=\"date\" id=\"vencimentoTituloAglutinado\" value=\"${dataVencimento}\" style=\"padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\" onchange=\"console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);\">
                 </div>
               </div>
               <div style=\"margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;\">
@@ -1649,7 +1649,7 @@ function atualizarSimulacaoAglutinacaoUI() {
         </div>
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloAglutinado" value="${dataVencimento}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;\">
+          <input type="date" id="vencimentoTituloAglutinado" value="${dataVencimento}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;" onchange="console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);">
         </div>
       </div>
       <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
@@ -1685,12 +1685,16 @@ async function confirmarAglutinacao() {
     let dataVencimento = '';
     
     if (dtInput) {
+      // AGUARDAR um pouco para o campo ser inicializado pelo navegador
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Tentar novamente após o delay
       if (dtInput.value) {
         dataVencimento = dtInput.value;
-        console.log('[FRONTEND] DEBUG - Data capturada via .value:', dataVencimento);
+        console.log('[FRONTEND] DEBUG - Data capturada via .value (após delay):', dataVencimento);
       } else if (dtInput.getAttribute('value')) {
         dataVencimento = dtInput.getAttribute('value');
-        console.log('[FRONTEND] DEBUG - Data capturada via getAttribute:', dataVencimento);
+        console.log('[FRONTEND] DEBUG - Data capturada via getAttribute (após delay):', dataVencimento);
       } else {
         // Fallback: usar data atual
         dataVencimento = new Date().toISOString().split('T')[0];
