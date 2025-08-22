@@ -1873,7 +1873,10 @@
             if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
                 console.log('[MODAL] Título aglutinado detectado, carregando títulos originais...');
                 secaoTitulosOriginais.style.display = 'block';
-                carregarTitulosOriginaisAglutinados(titulo.ids_aglutinados);
+                // Pequeno delay para garantir que o DOM esteja pronto
+                setTimeout(() => {
+                    carregarTitulosOriginaisAglutinados(titulo.ids_aglutinados);
+                }, 100);
             } else {
                 secaoTitulosOriginais.style.display = 'none';
             }
@@ -2258,6 +2261,17 @@
                 
                 const listaContainer = document.getElementById('titulos-originais-lista');
                 const carregandoEl = document.getElementById('carregando-titulos-originais');
+                
+                // Verificar se os elementos existem
+                if (!listaContainer) {
+                    console.error('[MODAL] Elemento titulos-originais-lista não encontrado');
+                    return;
+                }
+                
+                if (!carregandoEl) {
+                    console.error('[MODAL] Elemento carregando-titulos-originais não encontrado');
+                    return;
+                }
                 
                 // Mostrar loading
                 carregandoEl.style.display = 'block';
