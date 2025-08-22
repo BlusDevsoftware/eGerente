@@ -2305,13 +2305,16 @@
                 const colaboradorNome = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-id', titulo.id);
+                // Verificar se é título aglutinado para exibir tipo especial
+                const tipoExibicao = titulo.tipo_aglutinacao === 'AGL-PS' ? 'AGL-PS' : (titulo.tipo || '');
+                
                 tr.innerHTML = `
                     <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
                     <td>${titulo.numero_titulo || ''}</td>
                     <td>${formatarData(titulo.data_geracao)}</td>
                     <td>${formatarData(titulo.data_vencimento)}</td>
                     <td>${colaboradorNome}</td>
-                    <td>${titulo.tipo || ''}</td>
+                    <td>${tipoExibicao}</td>
                     <td>${titulo.descricao || ''}</td>
                     <td>${formatarValor(titulo.valor)}</td>
                     <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
