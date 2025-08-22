@@ -1689,7 +1689,7 @@ async function confirmarAglutinacao() {
   try {
     console.log('[FRONTEND] Iniciando confirmarAglutinacao...');
     const obsInput = document.getElementById('observacaoAglutinacaoInput');
-    const dtInput = document.getElementById('vencimentoTituloAglutinado');
+    let dtInput = document.getElementById('vencimentoTituloAglutinado');
     
     console.log('[FRONTEND] DEBUG - Campo observação encontrado:', !!obsInput);
     console.log('[FRONTEND] DEBUG - Campo vencimento encontrado:', !!dtInput);
@@ -1707,6 +1707,19 @@ async function confirmarAglutinacao() {
     let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
     
     console.log('[FRONTEND] === INVESTIGAÇÃO DA DATA DE VENCIMENTO ===');
+    
+    // BUSCAR O INPUT CORRETAMENTE (dentro do container)
+    if (dtInput && dtInput.tagName === 'SPAN') {
+      // Se encontrou o container, buscar o input dentro dele
+      dtInput = dtInput.querySelector('input[type="date"]');
+      console.log('[FRONTEND] Input encontrado dentro do container:', dtInput);
+    }
+    if (dtInput && dtInput.tagName === 'SPAN') {
+      // Se encontrou o container, buscar o input dentro dele
+      dtInput = dtInput.querySelector('input[type="date"]');
+      console.log('[FRONTEND] Input encontrado dentro do container:', dtInput);
+    }
+    
     console.log('[FRONTEND] Input encontrado:', dtInput);
     
     if (dtInput && dtInput.value) {
