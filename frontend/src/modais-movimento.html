@@ -583,6 +583,8 @@ let titulosParaExcluirAnimacao = [];
 let titulosParaAglutinar = [];
 // NOVO: observação digitada no modal de aglutinação
 let observacaoAglutinacaoTexto = '';
+// NOVO: data de vencimento escolhida pelo usuário no modal de aglutinação
+let dataVencimentoAglutinacao = '';
 
 // NOVO: helper para normalizar valores numéricos em pt-BR
 function parseValorBr(valor) {
@@ -1669,6 +1671,9 @@ function atualizarSimulacaoAglutinacaoUI() {
       inputData.style.cssText = 'padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;';
       inputData.addEventListener('change', function() {
         console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);
+        // ARMAZENAR a data escolhida pelo usuário na variável global
+        dataVencimentoAglutinacao = this.value;
+        console.log('[FRONTEND] DEBUG - Variável global atualizada para:', dataVencimentoAglutinacao);
       });
       
       containerVencimento.appendChild(inputData);
@@ -1703,30 +1708,15 @@ async function confirmarAglutinacao() {
     
     observacaoAglutinacaoTexto = obsInput ? obsInput.value.trim() : '';
     
-    // CAPTURAR DATA DE VENCIMENTO IGUAL À BAIXA PARCIAL
+    // CAPTURAR DATA DE VENCIMENTO USANDO VARIÁVEL GLOBAL
     let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
     
     console.log('[FRONTEND] === INVESTIGAÇÃO DA DATA DE VENCIMENTO ===');
+    console.log('[FRONTEND] Variável global dataVencimentoAglutinacao:', dataVencimentoAglutinacao);
     
-    // BUSCAR O INPUT CORRETAMENTE (dentro do container)
-    if (dtInput && dtInput.tagName === 'SPAN') {
-      // Se encontrou o container, buscar o input dentro dele
-      dtInput = dtInput.querySelector('input[type="date"]');
-      console.log('[FRONTEND] Input encontrado dentro do container:', dtInput);
-    }
-    if (dtInput && dtInput.tagName === 'SPAN') {
-      // Se encontrou o container, buscar o input dentro dele
-      dtInput = dtInput.querySelector('input[type="date"]');
-      console.log('[FRONTEND] Input encontrado dentro do container:', dtInput);
-    }
-    
-    console.log('[FRONTEND] Input encontrado:', dtInput);
-    
-    if (dtInput && dtInput.value) {
-      // Pegar a data exata informada pelo usuário
-      const dataOriginal = dtInput.value;
-      console.log('[FRONTEND] Data original do input:', dataOriginal);
-      console.log('[FRONTEND] Tipo da data original:', typeof dataOriginal);
+    // PRIORIDADE 1: Usar a variável global (data escolhida pelo usuário)
+    if (dataVencimentoAglutinacao) {
+      console.log('[FRONTEND] Usando data da variável global:', dataVencimentoAglutinacao);
       
       // Função para tratar data como local (igual à baixa parcial)
       function tratarDataComoLocal(dataString) {
@@ -1750,10 +1740,10 @@ async function confirmarAglutinacao() {
       }
       
       // Usar a função para tratar a data
-      dataVencimento = tratarDataComoLocal(dataOriginal);
+      dataVencimento = tratarDataComoLocal(dataVencimentoAglutinacao);
       console.log('[FRONTEND] Data final que será usada:', dataVencimento);
     } else {
-      console.log('[FRONTEND] Input não encontrado ou sem valor');
+      console.log('[FRONTEND] Variável global vazia, usando fallback');
     }
     
     console.log('[FRONTEND] === FIM INVESTIGAÇÃO ===');
