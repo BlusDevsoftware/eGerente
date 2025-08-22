@@ -1621,6 +1621,7 @@ function atualizarSimulacaoAglutinacaoUI() {
       ? `${titulosParaAglutinar.length} títulos (ex.: ${exemplos.join(', ')}...)`
       : (exemplos.join(', ') || `${titulosParaAglutinar.length} título(s)`);
 
+    // CRIAR HTML SEM O CAMPO DE DATA (será criado programaticamente)
     simulacaoEl.innerHTML = `
       <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
         <i class="fas fa-receipt" style="font-size: 1.3em; color: #1976D2;"></i>
@@ -1649,7 +1650,7 @@ function atualizarSimulacaoAglutinacaoUI() {
         </div>
         <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
           <div style="font-weight: 600; color: #1976D2; margin-bottom: 4px;">Vencimento</div>
-          <input type="date" id="vencimentoTituloAglutinado" value="${dataVencimento}" style="padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;" onchange="console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);">
+          <div id="containerVencimentoAglutinado"></div>
         </div>
       </div>
       <div style="margin-top: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e3f2fd;">
@@ -1657,6 +1658,27 @@ function atualizarSimulacaoAglutinacaoUI() {
         <div style="color: #333;">Aglutinação de ${titulosParaAglutinar.length} título(s)</div>
       </div>
     `;
+
+    // CRIAR O CAMPO DE DATA PROGRAMATICAMENTE (garante inicialização correta)
+    const containerVencimento = document.getElementById('containerVencimentoAglutinado');
+    if (containerVencimento) {
+      const inputData = document.createElement('input');
+      inputData.type = 'date';
+      inputData.id = 'vencimentoTituloAglutinado';
+      inputData.value = dataVencimento;
+      inputData.style.cssText = 'padding: 6px; border-radius: 4px; border: 1px solid #1976D2; background: #fff; color: #1976D2; font-size: 0.9em; width: 100%;';
+      inputData.addEventListener('change', function() {
+        console.log('[FRONTEND] DEBUG - Data alterada para:', this.value);
+      });
+      
+      containerVencimento.appendChild(inputData);
+      
+      console.log('[FRONTEND] DEBUG - Campo de data criado programaticamente com valor:', dataVencimento);
+      console.log('[FRONTEND] DEBUG - Campo criado:', inputData);
+      console.log('[FRONTEND] DEBUG - Campo value:', inputData.value);
+      console.log('[FRONTEND] DEBUG - Campo type:', inputData.type);
+    }
+
   } catch (e) {
     console.warn('Falha ao atualizar simulação de aglutinação:', e);
   }
