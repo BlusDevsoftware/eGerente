@@ -351,7 +351,7 @@ const aglutinarTitulos = async (req, res) => {
 			valor_venda: total,
 			valor_pago: 0,
 			status: 'PENDENTE',
-			tipo: 'servico', // Campo obrigatório - usando tipo válido existente
+			tipo: 'AGL-PS', // Tipo especial para títulos aglutinados (não aparece na seleção)
 			observacoes: observacao || null,
 			descricao: observacao || null,
 			data_geracao: new Date().toISOString().split('T')[0],
