@@ -2274,6 +2274,9 @@
                 const listaContainer = document.getElementById('titulos-originais-lista');
                 const carregandoEl = document.getElementById('carregando-titulos-originais');
                 
+                console.log('[MODAL] DEBUG - listaContainer encontrado:', !!listaContainer);
+                console.log('[MODAL] DEBUG - carregandoEl encontrado:', !!carregandoEl);
+                
                 // Verificar se os elementos existem
                 if (!listaContainer) {
                     console.error('[MODAL] Elemento titulos-originais-lista não encontrado');
@@ -2285,10 +2288,14 @@
                     return;
                 }
                 
+                console.log('[MODAL] DEBUG - Elementos encontrados, iniciando carregamento...');
+                
                 // Mostrar loading
                 carregandoEl.style.display = 'block';
                 listaContainer.innerHTML = '';
                 listaContainer.appendChild(carregandoEl);
+                
+                console.log('[MODAL] DEBUG - Loading exibido');
                 
                 // Converter string de IDs em array
                 const ids = idsAglutinados.split(',').map(id => id.trim());
@@ -2296,17 +2303,26 @@
                 
                 // Buscar cada título original
                 const titulosOriginais = [];
+                console.log('[MODAL] DEBUG - Iniciando busca dos títulos originais...');
+                
                 for (const id of ids) {
                     try {
+                        console.log('[MODAL] DEBUG - Buscando título ID:', id);
                         const response = await window.api.get(`/movimento_comissoes/${id}`);
+                        console.log('[MODAL] DEBUG - Resposta para ID', id, ':', response);
+                        
                         if (response && response.data) {
                             titulosOriginais.push(response.data);
                             console.log('[MODAL] Título original carregado:', response.data.numero_titulo);
+                        } else {
+                            console.log('[MODAL] DEBUG - Resposta vazia para ID:', id);
                         }
                     } catch (error) {
                         console.error('[MODAL] Erro ao carregar título original ID', id, ':', error);
                     }
                 }
+                
+                console.log('[MODAL] DEBUG - Total de títulos encontrados:', titulosOriginais.length);
                 
                 // Esconder loading
                 carregandoEl.style.display = 'none';
