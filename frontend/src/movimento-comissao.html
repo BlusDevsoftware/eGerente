@@ -1870,15 +1870,27 @@
             
             // VERIFICAR SE É TÍTULO AGLUTINADO E CARREGAR TÍTULOS ORIGINAIS
             const secaoTitulosOriginais = document.getElementById('secao-titulos-originais');
+            console.log('[MODAL] DEBUG - Elemento secao-titulos-originais encontrado:', !!secaoTitulosOriginais);
+            console.log('[MODAL] DEBUG - tipo_aglutinacao:', titulo.tipo_aglutinacao);
+            console.log('[MODAL] DEBUG - ids_aglutinados:', titulo.ids_aglutinados);
+            
             if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
                 console.log('[MODAL] Título aglutinado detectado, carregando títulos originais...');
-                secaoTitulosOriginais.style.display = 'block';
-                // Pequeno delay para garantir que o DOM esteja pronto
-                setTimeout(() => {
-                    carregarTitulosOriginaisAglutinados(titulo.ids_aglutinados);
-                }, 100);
+                if (secaoTitulosOriginais) {
+                    secaoTitulosOriginais.style.display = 'block';
+                    console.log('[MODAL] DEBUG - Seção de títulos originais exibida');
+                    // Pequeno delay para garantir que o DOM esteja pronto
+                    setTimeout(() => {
+                        carregarTitulosOriginaisAglutinados(titulo.ids_aglutinados);
+                    }, 100);
+                } else {
+                    console.error('[MODAL] ERRO - Elemento secao-titulos-originais não encontrado!');
+                }
             } else {
-                secaoTitulosOriginais.style.display = 'none';
+                if (secaoTitulosOriginais) {
+                    secaoTitulosOriginais.style.display = 'none';
+                    console.log('[MODAL] DEBUG - Seção de títulos originais ocultada');
+                }
             }
             
             // Título e ícone
