@@ -1703,29 +1703,47 @@ async function confirmarAglutinacao() {
     
     observacaoAglutinacaoTexto = obsInput ? obsInput.value.trim() : '';
     
-    // TENTAR DIFERENTES FORMAS DE CAPTURAR A DATA
-    let dataVencimento = '';
+    // CAPTURAR DATA DE VENCIMENTO IGUAL À BAIXA PARCIAL
+    let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
     
-    if (dtInput) {
-      // AGUARDAR um pouco para o campo ser inicializado pelo navegador
-      await new Promise(resolve => setTimeout(resolve, 100));
+    console.log('[FRONTEND] === INVESTIGAÇÃO DA DATA DE VENCIMENTO ===');
+    console.log('[FRONTEND] Input encontrado:', dtInput);
+    
+    if (dtInput && dtInput.value) {
+      // Pegar a data exata informada pelo usuário
+      const dataOriginal = dtInput.value;
+      console.log('[FRONTEND] Data original do input:', dataOriginal);
+      console.log('[FRONTEND] Tipo da data original:', typeof dataOriginal);
       
-      // Tentar novamente após o delay
-      if (dtInput.value) {
-        dataVencimento = dtInput.value;
-        console.log('[FRONTEND] DEBUG - Data capturada via .value (após delay):', dataVencimento);
-      } else if (dtInput.getAttribute('value')) {
-        dataVencimento = dtInput.getAttribute('value');
-        console.log('[FRONTEND] DEBUG - Data capturada via getAttribute (após delay):', dataVencimento);
-      } else {
-        // Fallback: usar data atual
-        dataVencimento = new Date().toISOString().split('T')[0];
-        console.log('[FRONTEND] DEBUG - Usando fallback data atual:', dataVencimento);
+      // Função para tratar data como local (igual à baixa parcial)
+      function tratarDataComoLocal(dataString) {
+        const partes = dataString.split('-');
+        const ano = parseInt(partes[0]);
+        const mes = parseInt(partes[1]) - 1; // Mês começa em 0
+        const dia = parseInt(partes[2]);
+        
+        // Criar data como local (não UTC)
+        const dataLocal = new Date(ano, mes, dia);
+        console.log('[FRONTEND] Data criada como local:', dataLocal);
+        
+        // Retornar no formato YYYY-MM-DD
+        const anoLocal = dataLocal.getFullYear();
+        const mesLocal = String(dataLocal.getMonth() + 1).padStart(2, '0');
+        const diaLocal = String(dataLocal.getDate()).padStart(2, '0');
+        const dataFormatada = `${anoLocal}-${mesLocal}-${diaLocal}`;
+        
+        console.log('[FRONTEND] Data formatada:', dataFormatada);
+        return dataFormatada;
       }
+      
+      // Usar a função para tratar a data
+      dataVencimento = tratarDataComoLocal(dataOriginal);
+      console.log('[FRONTEND] Data final que será usada:', dataVencimento);
     } else {
-      dataVencimento = new Date().toISOString().split('T')[0];
-      console.log('[FRONTEND] DEBUG - Campo não encontrado, usando data atual:', dataVencimento);
+      console.log('[FRONTEND] Input não encontrado ou sem valor');
     }
+    
+    console.log('[FRONTEND] === FIM INVESTIGAÇÃO ===');
 
     console.log('[FRONTEND] Dados coletados:', {
       observacao: observacaoAglutinacaoTexto,

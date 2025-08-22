@@ -144,12 +144,12 @@ const atualizarMovimento = async (req, res) => {
 			console.error(`[BACKEND] Erro na API interna, tentando fallback com Supabase:`, apiError);
 			
 			// FALLBACK: usar Supabase diretamente se a API falhar
-			const { data, error } = await supabase
-				.from('movimento_comissoes')
-				.update(atualizacao)
-				.eq('id', id)
-				.select()
-				.single();
+		const { data, error } = await supabase
+			.from('movimento_comissoes')
+			.update(atualizacao)
+			.eq('id', id)
+			.select()
+			.single();
 				
 			if (error) {
 				console.error(`[BACKEND] Erro no fallback Supabase:`, error);
@@ -165,7 +165,7 @@ const atualizarMovimento = async (req, res) => {
 			console.log(`[BACKEND] Status após atualização: ${data.status}`);
 			console.log(`[BACKEND] id_titulo_aglutinado após atualização: ${data.id_titulo_aglutinado}`);
 			
-			res.json(data);
+		res.json(data);
 		}
 		
 	} catch (error) {
