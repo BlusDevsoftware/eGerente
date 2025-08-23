@@ -2748,9 +2748,20 @@ function gerarEventosTimeline(titulo) {
       }
     }
     
-    // 5. Pagamento (baixa) - usar updated_at se disponível para ter horário real
+    // 5. Pagamento (baixa) - usar data_pagamento com horário atual se não tiver updated_at
     if (titulo.status === 'PAGO' && titulo.data_pagamento) {
-      const dataPagamento = titulo.updated_at || titulo.data_pagamento;
+      // Se updated_at é igual a created_at, significa que não foi atualizado pelo trigger
+      // Nesse caso, vamos simular um horário baseado na data de pagamento
+      let dataPagamento;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataPagamento = titulo.updated_at;
+      } else {
+        // Simular horário de pagamento (meio-dia) se não tiver timestamp real
+        const dataPag = new Date(titulo.data_pagamento);
+        dataPag.setHours(12, 0, 0, 0); // 12:00
+        dataPagamento = dataPag.toISOString();
+      }
+      
       eventos.push({
         titulo: 'Título Pago',
         data: formatarDataCompleta(dataPagamento),
@@ -2764,7 +2775,14 @@ function gerarEventosTimeline(titulo) {
     
     // 6. Cancelamento de baixa (se houver histórico)
     if (titulo.status === 'PENDENTE' && titulo.data_pagamento) {
-      const dataCancelamento = titulo.updated_at || new Date();
+      // Se updated_at é igual a created_at, usar horário atual
+      let dataCancelamento;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataCancelamento = titulo.updated_at;
+      } else {
+        dataCancelamento = new Date().toISOString();
+      }
+      
       eventos.push({
         titulo: 'Baixa Cancelada',
         data: formatarDataCompleta(dataCancelamento),
@@ -2778,7 +2796,14 @@ function gerarEventosTimeline(titulo) {
     
     // 7. Cancelamento de aglutinação (se aplicável)
     if (titulo.status === 'PENDENTE' && titulo.id_titulo_aglutinado) {
-      const dataCancelamentoAglutinacao = titulo.updated_at || new Date();
+      // Se updated_at é igual a created_at, usar horário atual
+      let dataCancelamentoAglutinacao;
+      if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+        dataCancelamentoAglutinacao = titulo.updated_at;
+      } else {
+        dataCancelamentoAglutinacao = new Date().toISOString();
+      }
+      
       eventos.push({
         titulo: 'Aglutinação Cancelada',
         data: formatarDataCompleta(dataCancelamentoAglutinacao),
