@@ -2689,11 +2689,12 @@ function gerarEventosTimeline(titulo) {
   const eventos = [];
   
   try {
-    // 1. Criação do título
-    if (titulo.data_geracao) {
+    // 1. Criação do título (usar created_at se disponível, senão data_geracao)
+    const dataCriacao = titulo.created_at || titulo.data_geracao;
+    if (dataCriacao) {
       eventos.push({
         titulo: 'Título Criado',
-        data: formatarDataCompleta(titulo.data_geracao),
+        data: formatarDataCompleta(dataCriacao),
         descricao: `Título ${titulo.numero_titulo} criado com valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}`,
         icone: 'fa-plus-circle',
         corFundo: '#e8f5e8',
@@ -2718,9 +2719,10 @@ function gerarEventosTimeline(titulo) {
     // 3. Aglutinação (se for título aglutinado)
     if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
       const ids = titulo.ids_aglutinados.split(',').map(id => id.trim());
+      const dataAglutinacao = titulo.created_at || titulo.data_geracao;
       eventos.push({
         titulo: 'Títulos Aglutinados',
-        data: formatarDataCompleta(titulo.data_geracao),
+        data: formatarDataCompleta(dataAglutinacao),
         descricao: `Aglutinação criada a partir de ${ids.length} título(s) original(is).${titulo.motivo_aglutinacao ? ` Motivo: ${titulo.motivo_aglutinacao}` : ''}`,
         icone: 'fa-link',
         corFundo: '#e3f2fd',
@@ -2733,9 +2735,10 @@ function gerarEventosTimeline(titulo) {
     if (titulo.id_titulo_origem) {
       const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
       if (tituloOrigem) {
+        const dataBaixaParcial = titulo.created_at || titulo.data_geracao;
         eventos.push({
           titulo: 'Baixa Parcial Realizada',
-          data: formatarDataCompleta(titulo.data_geracao),
+          data: formatarDataCompleta(dataBaixaParcial),
           descricao: `Baixa parcial de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} do título original ${tituloOrigem.numero_titulo}`,
           icone: 'fa-money-bill-wave',
           corFundo: '#f3e5f5',
@@ -2745,11 +2748,12 @@ function gerarEventosTimeline(titulo) {
       }
     }
     
-    // 5. Pagamento (baixa)
+    // 5. Pagamento (baixa) - usar updated_at se disponível para ter horário real
     if (titulo.status === 'PAGO' && titulo.data_pagamento) {
+      const dataPagamento = titulo.updated_at || titulo.data_pagamento;
       eventos.push({
         titulo: 'Título Pago',
-        data: formatarDataCompleta(titulo.data_pagamento),
+        data: formatarDataCompleta(dataPagamento),
         descricao: `Pagamento realizado no valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor_pago || titulo.valor) : `R$ ${(titulo.valor_pago || titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}${titulo.observacoes ? `. Observação: ${titulo.observacoes}` : ''}`,
         icone: 'fa-check-circle',
         corFundo: '#e8f5e8',
@@ -2760,9 +2764,10 @@ function gerarEventosTimeline(titulo) {
     
     // 6. Cancelamento de baixa (se houver histórico)
     if (titulo.status === 'PENDENTE' && titulo.data_pagamento) {
+      const dataCancelamento = titulo.updated_at || new Date();
       eventos.push({
         titulo: 'Baixa Cancelada',
-        data: formatarDataCompleta(titulo.updated_at || new Date()),
+        data: formatarDataCompleta(dataCancelamento),
         descricao: 'Pagamento do título foi cancelado',
         icone: 'fa-undo',
         corFundo: '#ffebee',
@@ -2773,9 +2778,10 @@ function gerarEventosTimeline(titulo) {
     
     // 7. Cancelamento de aglutinação (se aplicável)
     if (titulo.status === 'PENDENTE' && titulo.id_titulo_aglutinado) {
+      const dataCancelamentoAglutinacao = titulo.updated_at || new Date();
       eventos.push({
         titulo: 'Aglutinação Cancelada',
-        data: formatarDataCompleta(titulo.updated_at || new Date()),
+        data: formatarDataCompleta(dataCancelamentoAglutinacao),
         descricao: 'Aglutinação foi cancelada, título voltou ao status original',
         icone: 'fa-unlink',
         corFundo: '#fff3e0',
@@ -2814,13 +2820,26 @@ function formatarDataCompleta(data) {
     const d = new Date(data);
     if (isNaN(d)) return data;
     
-    return d.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    // Verificar se a data tem informações de hora (timestamp completo)
+    const temHora = d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0 || d.getMilliseconds() !== 0;
+    
+    if (temHora) {
+      // Se tem hora, mostrar data e hora
+      return d.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } else {
+      // Se não tem hora, mostrar apenas data
+      return d.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
   } catch (e) {
     return data;
   }
