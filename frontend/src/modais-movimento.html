@@ -2605,4 +2605,246 @@ function mostrarModalBloqueioAglutinacaoColab(titulos) {
   const modal = document.getElementById('modalBloqueioAglutinacaoColab');
   if (modal) modal.style.display = 'flex';
 }
-</script> 
+
+// NOVO: Modal de Linha do Tempo do Título
+function abrirModalTimeline(titulo) {
+  console.log('[TIMELINE] Abrindo modal para título:', titulo);
+  
+  try {
+    const modal = document.getElementById('modalTimeline');
+    const ul = document.getElementById('timelineEventos');
+    const tituloInfo = document.getElementById('timelineTituloInfo');
+    
+    if (!modal || !ul || !tituloInfo) {
+      console.error('[TIMELINE] Elementos do modal não encontrados');
+      return;
+    }
+    
+    // Limpar conteúdo anterior
+    ul.innerHTML = '';
+    
+    // Exibir informações do título no cabeçalho
+    const colaboradorNome = mapaColaboradores && mapaColaboradores[titulo.colaborador_id] 
+      ? mapaColaboradores[titulo.colaborador_id] 
+      : titulo.colaborador_id || 'N/A';
+    
+    tituloInfo.innerHTML = `
+      <div style="background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+        <div style="font-weight: 600; color: #e65100; margin-bottom: 4px;">Título ${titulo.numero_titulo}</div>
+        <div style="font-size: 0.9em; color: #666;">
+          <span><strong>Colaborador:</strong> ${colaboradorNome}</span> | 
+          <span><strong>Valor:</strong> ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</span> | 
+          <span><strong>Status:</strong> <span style="background: #9c27b0; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.8em;">${titulo.status || 'N/A'}</span></span>
+        </div>
+      </div>
+    `;
+    
+    // Gerar eventos da linha do tempo
+    const eventos = gerarEventosTimeline(titulo);
+    
+    if (eventos && eventos.length > 0) {
+      eventos.forEach(ev => {
+        const li = document.createElement('li');
+        li.style.cssText = 'margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px; position: relative;';
+        
+        // Adicionar linha conectora (exceto para o último item)
+        if (ev !== eventos[eventos.length - 1]) {
+          li.style.cssText += 'padding-bottom: 8px;';
+          li.innerHTML = `
+            <div style="position: absolute; left: 15px; top: 40px; width: 2px; height: 18px; background: #e0e0e0;"></div>
+          `;
+        }
+        
+        li.innerHTML += `
+          <div style="width: 32px; height: 32px; background: ${ev.corFundo}; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid ${ev.corBorda}; margin-top: 2px; flex-shrink: 0;">
+            <i class="fas ${ev.icone}" style="color: ${ev.corIcone}; font-size: 1.1em;"></i>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 600; color: #333; font-size: 1.05em; margin-bottom: 2px;">${ev.titulo}</div>
+            <div style="color: #888; font-size: 0.95em; margin-bottom: 4px;">${ev.data}</div>
+            ${ev.descricao ? `<div style="color: #555; font-size: 0.95em; line-height: 1.4; background: #f8f9fa; padding: 8px; border-radius: 6px; border-left: 3px solid ${ev.corBorda};">${ev.descricao}</div>` : ''}
+          </div>
+        `;
+        
+        ul.appendChild(li);
+      });
+    } else {
+      ul.innerHTML = '<li style="color:#888; text-align:center; margin: 32px 0; font-style: italic;">Nenhum evento encontrado para este título.</li>';
+    }
+    
+    modal.style.display = 'flex';
+    
+  } catch (e) {
+    console.error('[TIMELINE] Erro ao abrir modal:', e);
+    alert('Erro ao carregar linha do tempo do título.');
+  }
+}
+
+function fecharModalTimeline() {
+  const modal = document.getElementById('modalTimeline');
+  if (modal) modal.style.display = 'none';
+}
+
+function gerarEventosTimeline(titulo) {
+  const eventos = [];
+  
+  try {
+    // 1. Criação do título
+    if (titulo.data_geracao) {
+      eventos.push({
+        titulo: 'Título Criado',
+        data: formatarDataCompleta(titulo.data_geracao),
+        descricao: `Título ${titulo.numero_titulo} criado com valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}`,
+        icone: 'fa-plus-circle',
+        corFundo: '#e8f5e8',
+        corBorda: '#4caf50',
+        corIcone: '#4caf50'
+      });
+    }
+    
+    // 2. Edição do título (se houver updated_at diferente de created_at)
+    if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+      eventos.push({
+        titulo: 'Título Editado',
+        data: formatarDataCompleta(titulo.updated_at),
+        descricao: 'Informações do título foram modificadas',
+        icone: 'fa-edit',
+        corFundo: '#fff3e0',
+        corBorda: '#ff9800',
+        corIcone: '#ff9800'
+      });
+    }
+    
+    // 3. Aglutinação (se for título aglutinado)
+    if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
+      const ids = titulo.ids_aglutinados.split(',').map(id => id.trim());
+      eventos.push({
+        titulo: 'Títulos Aglutinados',
+        data: formatarDataCompleta(titulo.data_geracao),
+        descricao: `Aglutinação criada a partir de ${ids.length} título(s) original(is).${titulo.motivo_aglutinacao ? ` Motivo: ${titulo.motivo_aglutinacao}` : ''}`,
+        icone: 'fa-link',
+        corFundo: '#e3f2fd',
+        corBorda: '#2196f3',
+        corIcone: '#2196f3'
+      });
+    }
+    
+    // 4. Baixa parcial (se for título parcial)
+    if (titulo.id_titulo_origem) {
+      const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
+      if (tituloOrigem) {
+        eventos.push({
+          titulo: 'Baixa Parcial Realizada',
+          data: formatarDataCompleta(titulo.data_geracao),
+          descricao: `Baixa parcial de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} do título original ${tituloOrigem.numero_titulo}`,
+          icone: 'fa-money-bill-wave',
+          corFundo: '#f3e5f5',
+        corBorda: '#9c27b0',
+        corIcone: '#9c27b0'
+        });
+      }
+    }
+    
+    // 5. Pagamento (baixa)
+    if (titulo.status === 'PAGO' && titulo.data_pagamento) {
+      eventos.push({
+        titulo: 'Título Pago',
+        data: formatarDataCompleta(titulo.data_pagamento),
+        descricao: `Pagamento realizado no valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor_pago || titulo.valor) : `R$ ${(titulo.valor_pago || titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}${titulo.observacoes ? `. Observação: ${titulo.observacoes}` : ''}`,
+        icone: 'fa-check-circle',
+        corFundo: '#e8f5e8',
+        corBorda: '#4caf50',
+        corIcone: '#4caf50'
+      });
+    }
+    
+    // 6. Cancelamento de baixa (se houver histórico)
+    if (titulo.status === 'PENDENTE' && titulo.data_pagamento) {
+      eventos.push({
+        titulo: 'Baixa Cancelada',
+        data: formatarDataCompleta(titulo.updated_at || new Date()),
+        descricao: 'Pagamento do título foi cancelado',
+        icone: 'fa-undo',
+        corFundo: '#ffebee',
+        corBorda: '#f44336',
+        corIcone: '#f44336'
+      });
+    }
+    
+    // 7. Cancelamento de aglutinação (se aplicável)
+    if (titulo.status === 'PENDENTE' && titulo.id_titulo_aglutinado) {
+      eventos.push({
+        titulo: 'Aglutinação Cancelada',
+        data: formatarDataCompleta(titulo.updated_at || new Date()),
+        descricao: 'Aglutinação foi cancelada, título voltou ao status original',
+        icone: 'fa-unlink',
+        corFundo: '#fff3e0',
+        corBorda: '#ff9800',
+        corIcone: '#ff9800'
+      });
+    }
+    
+    // 8. Vencimento (se aplicável)
+    if (titulo.status === 'VENCIDO' && titulo.data_vencimento) {
+      eventos.push({
+        titulo: 'Título Vencido',
+        data: formatarDataCompleta(titulo.data_vencimento),
+        descricao: 'Título atingiu a data de vencimento sem pagamento',
+        icone: 'fa-exclamation-triangle',
+        corFundo: '#ffebee',
+        corBorda: '#f44336',
+        corIcone: '#f44336'
+      });
+    }
+    
+    // Ordenar eventos por data (mais recente primeiro)
+    eventos.sort((a, b) => new Date(b.data) - new Date(a.data));
+    
+  } catch (e) {
+    console.error('[TIMELINE] Erro ao gerar eventos:', e);
+  }
+  
+  return eventos;
+}
+
+function formatarDataCompleta(data) {
+  if (!data) return 'Data não informada';
+  
+  try {
+    const d = new Date(data);
+    if (isNaN(d)) return data;
+    
+    return d.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return data;
+  }
+}
+</script>
+
+<!-- NOVO: Modal de Linha do Tempo do Título -->
+<div id="modalTimeline" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 700px; width: 96%; box-shadow: 0 8px 32px rgba(255,152,0,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-clock"></i> Linha do Tempo do Título</h2>
+      <button class="close-modal" onclick="fecharModalTimeline()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px; min-height: 200px; max-height: 500px; overflow-y: auto;">
+      <!-- Informações do título -->
+      <div id="timelineTituloInfo"></div>
+      
+      <!-- Lista de eventos da linha do tempo -->
+      <ul id="timelineEventos" style="list-style: none; padding: 0; margin: 0;">
+        <!-- Eventos dinâmicos aqui -->
+      </ul>
+    </div>
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalTimeline()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display: flex; align-items: center; gap: 8px;"><i class="fas fa-times"></i> Fechar</button>
+    </div>
+  </div>
+</div> 

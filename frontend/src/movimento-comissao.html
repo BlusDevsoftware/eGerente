@@ -1164,23 +1164,7 @@
     <!-- Inclusão dos Modais de Exclusão e Cancelamento de Baixa -->
     <div id="modais-container"></div>
 
-    <!-- Modal de linah do tempo de titulo-->
-    <div id="modalTimeline" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
-      <div class="modal-content" style="background: #fff; border-radius: 12px; max-width: 420px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
-        <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
-          <h2 style="margin: 0; font-size: 1.3em; color: #ff9800; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-clock"></i> Linha do Tempo do Título</h2>
-          <button class="close-modal" onclick="fecharModalTimeline()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
-        </div>
-        <div class="modal-body" style="padding: 24px 32px 0 32px; min-height: 180px; max-height: 400px; overflow-y: auto;">
-          <ul id="timelineEventos" style="list-style: none; padding: 0; margin: 0;">
-            <!-- Eventos dinâmicos aqui -->
-          </ul>
-        </div>
-        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 18px 32px 24px 32px; border-top: 1px solid #eee;">
-          <button class="btn-secondary" onclick="fecharModalTimeline()" style="padding: 10px 24px; border-radius: 4px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #fff; color: #333; border: 1px solid #ddd;"><i class="fas fa-times"></i> Fechar</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Loader de carregamento -->
     <div id="loader-movimento" style="display: none; justify-content: center; align-items: center; height: 200px;">
@@ -2519,6 +2503,14 @@
         }
         // Integrar aos botões da tabela
         function bindAcoesTabela() {
+            document.querySelectorAll('.timeline-btn').forEach(function(btn, idx) {
+                btn.onclick = function() {
+                    const row = btn.closest('tr');
+                    const index = Array.from(row.parentNode.children).indexOf(row);
+                    const titulo = titulosFiltrados[index];
+                    abrirModalTimeline(titulo);
+                };
+            });
             document.querySelectorAll('.view-btn').forEach(function(btn, idx) {
                 btn.onclick = function() {
                     const row = btn.closest('tr');
@@ -2710,31 +2702,7 @@
         // Funções dos modais foram movidas para modais-movimento.html
         // As funções abrirModalConfirmExclusao, fecharModalConfirmExclusao, etc. estão no arquivo separado
 
-        function abrirModalTimeline(eventos) {
-          const modal = document.getElementById('modalTimeline');
-          const ul = document.getElementById('timelineEventos');
-          ul.innerHTML = '';
-          if (Array.isArray(eventos) && eventos.length) {
-            eventos.forEach(ev => {
-              ul.innerHTML += `<li style="margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px;">
-                <div style="width: 32px; height: 32px; background: #fff3e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffb74d; margin-top: 2px;">
-                  <i class="fas fa-clock" style="color: #ff9800; font-size: 1.2em;"></i>
-                </div>
-                <div style="flex:1;">
-                  <div style="font-weight: 600; color: #333; font-size: 1.05em;">${ev.titulo}</div>
-                  <div style="color: #888; font-size: 0.97em;">${ev.data}</div>
-                  <div style="color: #555; font-size: 0.98em; margin-top: 2px;">${ev.descricao || ''}</div>
-                </div>
-              </li>`;
-            });
-          } else {
-            ul.innerHTML = '<li style="color:#888; text-align:center; margin: 32px 0;">Nenhum evento encontrado para este título.</li>';
-          }
-          modal.style.display = 'flex';
-        }
-        function fecharModalTimeline() {
-          document.getElementById('modalTimeline').style.display = 'none';
-        }
+
 
         let linhasSelecionadas = [];
         let ultimaLinhaSelecionada = null;
@@ -3707,7 +3675,7 @@
         // Fecha todos os modais ao clicar em qualquer link do menu lateral
         document.querySelectorAll('.nav-menu a').forEach(function(link) {
             link.addEventListener('click', function() {
-                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado', 'modalTituloPagoNaoPodeExcluir'];
+                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'modalTituloJaBaixado', 'modalTituloPagoNaoPodeExcluir', 'modalTimeline'];
                 modais.forEach(function(id) {
                     var modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
