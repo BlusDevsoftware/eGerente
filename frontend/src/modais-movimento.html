@@ -2734,6 +2734,19 @@ function gerarEventosTimeline(titulo) {
         created_at_parseado: new Date(titulo.created_at).toISOString()
       });
       
+      // Debug adicional para entender o problema de timezone
+      const updatedAtDate = new Date(titulo.updated_at);
+      console.log('[TIMELINE] Debug - Análise detalhada do updated_at:', {
+        original: titulo.updated_at,
+        tipo: typeof titulo.updated_at,
+        parseado_iso: updatedAtDate.toISOString(),
+        parseado_local: updatedAtDate.toString(),
+        parseado_utc: updatedAtDate.toUTCString(),
+        horas_utc: updatedAtDate.getUTCHours(),
+        horas_local: updatedAtDate.getHours(),
+        timezone_offset: updatedAtDate.getTimezoneOffset()
+      });
+      
       eventos.push({
         titulo: 'Título Editado',
         data: formatarDataCompleta(titulo.updated_at),
@@ -2890,17 +2903,33 @@ function formatarDataCompleta(data) {
     
     if (temHoraNaString) {
       // Se tem timestamp na string original, sempre mostrar data e hora
-      // Agora que o banco está correto, usar sempre timezone de Brasília
-      const resultado = d.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Sao_Paulo'
-      });
-      console.log('[TIMELINE] Resultado formatado:', resultado);
-      return resultado;
+      // Se o banco já retorna com timezone (+00:00), não aplicar conversão adicional
+      const isUTC = data.includes('+00:00') || data.includes('Z');
+      
+      if (isUTC) {
+        // Se já está em UTC, usar diretamente sem conversão de timezone
+        const resultado = d.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        console.log('[TIMELINE] Resultado sem conversão (já UTC):', resultado);
+        return resultado;
+      } else {
+        // Se não está em UTC, aplicar conversão para Brasília
+        const resultado = d.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Sao_Paulo'
+        });
+        console.log('[TIMELINE] Resultado com conversão para Brasília:', resultado);
+        return resultado;
+      }
     } else {
       // Se não tem timestamp, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
