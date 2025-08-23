@@ -1840,7 +1840,12 @@
                 if (oldSelectReset && oldSelectReset.parentElement) oldSelectReset.parentElement.removeChild(oldSelectReset);
             })();
             document.getElementById('modal-colaborador').value = mapaColaboradores[titulo.colaborador_id] || titulo.colaborador_id || '';
-            document.getElementById('modal-tipo').value = titulo.tipo || '';
+            // Definir tipo para títulos aglutinados
+            let tipoExibicao = titulo.tipo || '';
+            if (titulo.tipo_aglutinacao === 'AGL-PS') {
+                tipoExibicao = 'AGL - PS';
+            }
+            document.getElementById('modal-tipo').value = tipoExibicao;
             
             // Preencher valor na seção de Informações Principais
             const valorPrincipalFormatado = titulo.valor ? titulo.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00';
