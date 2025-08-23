@@ -2849,20 +2849,22 @@ function formatarDataCompleta(data) {
     const temHora = d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0 || d.getMilliseconds() !== 0;
     
     if (temHora) {
-      // Se tem hora, mostrar data e hora
+      // Se tem hora, mostrar data e hora no fuso horário de Brasília
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        timeZone: 'America/Sao_Paulo'
       });
     } else {
       // Se não tem hora, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: 'America/Sao_Paulo'
       });
     }
   } catch (e) {
