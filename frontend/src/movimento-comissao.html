@@ -1437,6 +1437,13 @@
                 return;
             }
             
+            // NOVO: Verificar se o título está aglutinado
+            if (titulo.status === 'AGLUTINADO') {
+                // Mostrar modal de aviso informando que não é possível baixar título aglutinado
+                mostrarModalBloqueioBaixaTituloAglutinado(titulo);
+                return;
+            }
+            
             // Resetar estado visual do modal antes de abrir (caso tenha sido usado antes)
             const paymentModalEl = document.getElementById('paymentModal');
             if (paymentModalEl) {
