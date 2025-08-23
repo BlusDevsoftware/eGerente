@@ -2703,6 +2703,12 @@ function gerarEventosTimeline(titulo) {
   try {
     // 1. Criação do título (usar created_at para mostrar data e hora, senão data_geracao)
     const dataCriacao = titulo.created_at || titulo.data_geracao;
+    console.log('[TIMELINE] Debug - Data de criação:', {
+      created_at: titulo.created_at,
+      data_geracao: titulo.data_geracao,
+      dataCriacao_usada: dataCriacao
+    });
+    
     if (dataCriacao) {
       eventos.push({
         titulo: 'Título Criado',
@@ -2857,7 +2863,9 @@ function formatarDataCompleta(data) {
   if (!data) return 'Data não informada';
   
   try {
+    console.log('[TIMELINE] Formatando data:', data);
     const d = new Date(data);
+    console.log('[TIMELINE] Data parseada:', d.toISOString());
     if (isNaN(d)) return data;
     
     // Verificar se a string original contém informações de hora (timestamp)
