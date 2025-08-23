@@ -2611,14 +2611,22 @@ function abrirModalTimeline(titulo) {
   console.log('[TIMELINE] Abrindo modal para título:', titulo);
   
   // Debug: mostrar informações de data do título
-  console.log('[TIMELINE] Debug - Datas do título:', {
-    created_at: titulo.created_at,
-    updated_at: titulo.updated_at,
-    data_geracao: titulo.data_geracao,
-    data_pagamento: titulo.data_pagamento,
-    data_vencimento: titulo.data_vencimento,
-    status: titulo.status
-  });
+      console.log('[TIMELINE] Debug - Datas do título:', {
+      created_at: titulo.created_at,
+      updated_at: titulo.updated_at,
+      data_geracao: titulo.data_geracao,
+      data_pagamento: titulo.data_pagamento,
+      data_vencimento: titulo.data_vencimento,
+      status: titulo.status
+    });
+    
+    // Verificar se o problema está no banco - comparar com horário atual
+    console.log('[TIMELINE] Debug - Horário atual do navegador:', new Date().toISOString());
+    console.log('[TIMELINE] Debug - Diferença de horas:', {
+      created_at_hora: titulo.created_at ? new Date(titulo.created_at).getHours() : 'N/A',
+      hora_atual: new Date().getHours(),
+      diferenca: titulo.created_at ? Math.abs(new Date(titulo.created_at).getHours() - new Date().getHours()) : 'N/A'
+    });
   
   try {
     const modal = document.getElementById('modalTimeline');
