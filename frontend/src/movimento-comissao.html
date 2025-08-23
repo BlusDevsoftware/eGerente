@@ -2311,9 +2311,11 @@
                         const response = await window.api.get(`/movimento_comissoes/${id}`);
                         console.log('[MODAL] DEBUG - Resposta para ID', id, ':', response);
                         
-                        if (response && response.data) {
-                            titulosOriginais.push(response.data);
-                            console.log('[MODAL] Título original carregado:', response.data.numero_titulo);
+                        // Verificar se a resposta tem dados (pode vir direto ou dentro de .data)
+                        if (response && (response.data || response.id)) {
+                            const tituloData = response.data || response;
+                            titulosOriginais.push(tituloData);
+                            console.log('[MODAL] Título original carregado:', tituloData.numero_titulo);
                         } else {
                             console.log('[MODAL] DEBUG - Resposta vazia para ID:', id);
                         }
