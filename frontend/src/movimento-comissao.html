@@ -1870,11 +1870,12 @@
             document.getElementById('modal-data-pagamento').value = titulo.data_pagamento ? formatarData(titulo.data_pagamento) : 'Não pago';
             const valorPagoFormatado = titulo.valor_pago ? titulo.valor_pago.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00';
             document.getElementById('modal-valor-pago').value = valorPagoFormatado;
-            // Para títulos aglutinados, não mostrar o motivo da aglutinação nas observações
+            // Para títulos aglutinados, mostrar observações de pagamento (não o motivo da aglutinação)
             let observacoesExibicao = 'Nenhuma observação';
             if (titulo.tipo_aglutinacao === 'AGL-PS') {
-                // Se for título aglutinado, mostrar apenas observações específicas de pagamento
-                observacoesExibicao = titulo.observacoes_pagamento || 'Nenhuma observação';
+                // Se for título aglutinado, mostrar observações de pagamento (se existirem)
+                // O campo observacoes para títulos aglutinados contém as observações de pagamento
+                observacoesExibicao = titulo.observacoes || 'Nenhuma observação';
             } else {
                 // Para títulos normais, mostrar as observações originais
                 observacoesExibicao = titulo.observacoes || 'Nenhuma observação';
