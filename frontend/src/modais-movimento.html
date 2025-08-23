@@ -2610,6 +2610,16 @@ function mostrarModalBloqueioAglutinacaoColab(titulos) {
 function abrirModalTimeline(titulo) {
   console.log('[TIMELINE] Abrindo modal para título:', titulo);
   
+  // Debug: mostrar informações de data do título
+  console.log('[TIMELINE] Debug - Datas do título:', {
+    created_at: titulo.created_at,
+    updated_at: titulo.updated_at,
+    data_geracao: titulo.data_geracao,
+    data_pagamento: titulo.data_pagamento,
+    data_vencimento: titulo.data_vencimento,
+    status: titulo.status
+  });
+  
   try {
     const modal = document.getElementById('modalTimeline');
     const ul = document.getElementById('timelineEventos');
@@ -2688,6 +2698,8 @@ function fecharModalTimeline() {
 function gerarEventosTimeline(titulo) {
   const eventos = [];
   
+  console.log('[TIMELINE] Gerando eventos para título:', titulo.numero_titulo);
+  
   try {
     // 1. Criação do título (usar created_at se disponível, senão data_geracao)
     const dataCriacao = titulo.created_at || titulo.data_geracao;
@@ -2748,18 +2760,15 @@ function gerarEventosTimeline(titulo) {
       }
     }
     
-    // 5. Pagamento (baixa) - usar data_pagamento com horário atual se não tiver updated_at
+    // 5. Pagamento (baixa) - usar data_pagamento ou updated_at se disponível
     if (titulo.status === 'PAGO' && titulo.data_pagamento) {
-      // Se updated_at é igual a created_at, significa que não foi atualizado pelo trigger
-      // Nesse caso, vamos simular um horário baseado na data de pagamento
+      // Usar updated_at se disponível e diferente de created_at, senão usar data_pagamento
       let dataPagamento;
       if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
         dataPagamento = titulo.updated_at;
       } else {
-        // Simular horário de pagamento (meio-dia) se não tiver timestamp real
-        const dataPag = new Date(titulo.data_pagamento);
-        dataPag.setHours(12, 0, 0, 0); // 12:00
-        dataPagamento = dataPag.toISOString();
+        // Usar apenas a data de pagamento sem simular horário
+        dataPagamento = titulo.data_pagamento;
       }
       
       eventos.push({
@@ -2775,12 +2784,14 @@ function gerarEventosTimeline(titulo) {
     
     // 6. Cancelamento de baixa (se houver histórico)
     if (titulo.status === 'PENDENTE' && titulo.data_pagamento) {
-      // Se updated_at é igual a created_at, usar horário atual
+      // Usar updated_at se disponível e diferente de created_at
       let dataCancelamento;
       if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
         dataCancelamento = titulo.updated_at;
       } else {
-        dataCancelamento = new Date().toISOString();
+        // Se não há timestamp de cancelamento, não mostrar o evento
+        // pois pode ser um título que nunca foi pago
+        return eventos;
       }
       
       eventos.push({
@@ -2796,12 +2807,14 @@ function gerarEventosTimeline(titulo) {
     
     // 7. Cancelamento de aglutinação (se aplicável)
     if (titulo.status === 'PENDENTE' && titulo.id_titulo_aglutinado) {
-      // Se updated_at é igual a created_at, usar horário atual
+      // Usar updated_at se disponível e diferente de created_at
       let dataCancelamentoAglutinacao;
       if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
         dataCancelamentoAglutinacao = titulo.updated_at;
       } else {
-        dataCancelamentoAglutinacao = new Date().toISOString();
+        // Se não há timestamp de cancelamento, não mostrar o evento
+        // pois pode ser um título que nunca foi aglutinado
+        return eventos;
       }
       
       eventos.push({
@@ -2831,6 +2844,8 @@ function gerarEventosTimeline(titulo) {
     // Ordenar eventos por data (mais recente primeiro)
     eventos.sort((a, b) => new Date(b.data) - new Date(a.data));
     
+    console.log('[TIMELINE] Eventos gerados:', eventos);
+    
   } catch (e) {
     console.error('[TIMELINE] Erro ao gerar eventos:', e);
   }
@@ -2845,11 +2860,19 @@ function formatarDataCompleta(data) {
     const d = new Date(data);
     if (isNaN(d)) return data;
     
-    // Verificar se a data tem informações de hora (timestamp completo)
-    const temHora = d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0 || d.getMilliseconds() !== 0;
+    // Verificar se a string original contém informações de hora
+    const temHoraNaString = typeof data === 'string' && (
+      data.includes('T') || 
+      data.includes(':') || 
+      data.includes('Z') ||
+      data.length > 10
+    );
     
-    if (temHora) {
-      // Se tem hora, mostrar data e hora no fuso horário de Brasília
+    // Verificar se a data tem informações de hora significativas (não apenas 00:00:00)
+    const temHoraSignificativa = d.getHours() !== 0 || d.getMinutes() !== 0 || d.getSeconds() !== 0 || d.getMilliseconds() !== 0;
+    
+    if (temHoraNaString && temHoraSignificativa) {
+      // Se tem hora na string original e é significativa, mostrar data e hora
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -2859,7 +2882,7 @@ function formatarDataCompleta(data) {
         timeZone: 'America/Sao_Paulo'
       });
     } else {
-      // Se não tem hora, mostrar apenas data
+      // Se não tem hora ou é apenas 00:00:00, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -2868,6 +2891,7 @@ function formatarDataCompleta(data) {
       });
     }
   } catch (e) {
+    console.error('[TIMELINE] Erro ao formatar data:', data, e);
     return data;
   }
 }
