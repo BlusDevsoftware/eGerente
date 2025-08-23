@@ -298,11 +298,13 @@ const aglutinarTitulos = async (req, res) => {
 			console.warn('[AGL] Nem todos os títulos foram encontrados. Esperado:', ids.length, 'Recebido:', titulos?.length);
 			return res.status(400).json({ error: 'Nem todos os títulos foram encontrados' });
 		}
-		// Regras: não permitir PAGO e colaboradores diferentes
+		// Regras: não permitir PAGO, AGLUTINADO e colaboradores diferentes
 		const temPago = titulos.some(t => (t.status || '').toUpperCase() === 'PAGO');
+		const temAglutinado = titulos.some(t => (t.status || '').toUpperCase() === 'AGLUTINADO');
 		const colabs = Array.from(new Set(titulos.map(t => t.colaborador_id)));
-		console.log('[AGL] Validações -> temPago:', temPago, 'colabs:', colabs);
+		console.log('[AGL] Validações -> temPago:', temPago, 'temAglutinado:', temAglutinado, 'colabs:', colabs);
 		if (temPago) return res.status(400).json({ error: 'Não é permitido aglutinar títulos pagos' });
+		if (temAglutinado) return res.status(400).json({ error: 'Não é permitido aglutinar títulos que já foram aglutinados' });
 		if (colabs.length > 1) return res.status(400).json({ error: 'Selecione títulos do mesmo colaborador' });
 		const colaboradorId = colabs[0];
 		
