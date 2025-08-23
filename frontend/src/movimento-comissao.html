@@ -1082,7 +1082,7 @@
             </div>
           
             <!-- Seção de Produtos/Serviços -->
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+            <div id="secao-produtos" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
               <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
                 <i class="fas fa-cubes" style="color: #1976D2;"></i> Produtos/Serviços do Título
               </h3>
@@ -1888,14 +1888,19 @@
             // Carregar comprovante do título
             carregarComprovanteTitulo(titulo);
             
-            // VERIFICAR SE É TÍTULO AGLUTINADO E CARREGAR TÍTULOS ORIGINAIS
+            // VERIFICAR SE É TÍTULO AGLUTINADO E CONTROLAR SEÇÕES
             const secaoTitulosOriginais = document.getElementById('secao-titulos-originais');
+            const secaoProdutos = document.getElementById('secao-produtos');
+            
             console.log('[MODAL] DEBUG - Elemento secao-titulos-originais encontrado:', !!secaoTitulosOriginais);
+            console.log('[MODAL] DEBUG - Elemento secao-produtos encontrado:', !!secaoProdutos);
             console.log('[MODAL] DEBUG - tipo_aglutinacao:', titulo.tipo_aglutinacao);
             console.log('[MODAL] DEBUG - ids_aglutinados:', titulo.ids_aglutinados);
             
             if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
-                console.log('[MODAL] Título aglutinado detectado, carregando títulos originais...');
+                console.log('[MODAL] Título aglutinado detectado, configurando seções...');
+                
+                // Para títulos aglutinados: mostrar títulos originais e ocultar produtos
                 if (secaoTitulosOriginais) {
                     secaoTitulosOriginais.style.display = 'block';
                     console.log('[MODAL] DEBUG - Seção de títulos originais exibida');
@@ -1906,10 +1911,23 @@
                 } else {
                     console.error('[MODAL] ERRO - Elemento secao-titulos-originais não encontrado!');
                 }
+                
+                if (secaoProdutos) {
+                    secaoProdutos.style.display = 'none';
+                    console.log('[MODAL] DEBUG - Seção de produtos ocultada para título aglutinado');
+                } else {
+                    console.error('[MODAL] ERRO - Elemento secao-produtos não encontrado!');
+                }
             } else {
+                // Para títulos normais: ocultar títulos originais e mostrar produtos
                 if (secaoTitulosOriginais) {
                     secaoTitulosOriginais.style.display = 'none';
                     console.log('[MODAL] DEBUG - Seção de títulos originais ocultada');
+                }
+                
+                if (secaoProdutos) {
+                    secaoProdutos.style.display = 'block';
+                    console.log('[MODAL] DEBUG - Seção de produtos exibida para título normal');
                 }
             }
             
