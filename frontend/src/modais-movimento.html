@@ -505,6 +505,31 @@
   </div>
 </div>
 
+<!-- NOVO: Modal de Bloqueio de Aglutinação por Título já Aglutinado -->
+<div id="modalBloqueioAglutinacaoJaAglutinado" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.22); z-index: 5500; align-items: center; justify-content: center;">
+  <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 560px; width: 96%; box-shadow: 0 8px 32px rgba(156,39,176,0.18); padding: 0;">
+    <div class="modal-header" style="padding: 24px 32px 0 32px; display: flex; align-items: center; justify-content: space-between;">
+      <h2 style="margin: 0; font-size: 1.28em; color: #9c27b0; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-layer-group"></i> Aglutinação não permitida</h2>
+      <button class="close-modal" onclick="fecharModalBloqueioAglutinacaoJaAglutinado()" style="background: none; border: none; font-size: 1.3em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px 32px 0 32px;">
+      <div style="background:#f3e5f5; border:1px solid #e1bee7; color:#7b1fa2; border-radius:8px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+        <div>
+          <div style="font-weight:600;">Não é possível aglutinar títulos que já foram aglutinados anteriormente.</div>
+          <div id="qtdeTitulosJaAglutinados" style="font-size:0.95em; margin-top:4px;">Há títulos com status AGLUTINADO na seleção.</div>
+        </div>
+      </div>
+      <div style="font-weight:600; color:#333; margin-bottom:8px; display:flex; align-items:center; gap:8px;"><i class="fas fa-list"></i> Títulos já aglutinados selecionados</div>
+      <div id="listaTitulosJaAglutinados" style="max-height:220px; overflow:auto; border:1px solid #e9ecef; border-radius:8px; padding:8px; background:#fff;"></div>
+      <div style="margin-top:12px; font-size:0.92em; color:#666;">Remova os títulos já aglutinados da seleção e tente novamente.</div>
+    </div>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; padding: 20px 32px 28px 32px; border-top: 1px solid #eee;">
+      <button class="btn-secondary" onclick="fecharModalBloqueioAglutinacaoJaAglutinado()" style="padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd; display:flex; align-items:center; gap:8px;"><i class="fas fa-check"></i> Entendi</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================================
      JAVASCRIPT DOS MODAIS
      ======================================== -->
@@ -1754,10 +1779,34 @@ async function confirmarAglutinacao() {
       titulosParaAglutinar: titulosParaAglutinar
     });
 
-    // Validações simples
+    // Validações no frontend antes de enviar para o backend
     if (!Array.isArray(titulosParaAglutinar) || titulosParaAglutinar.length < 2) {
       console.warn('[FRONTEND] Validação falhou: menos de 2 títulos');
-      alert('Selecione ao menos 2 títulos para aglutinar.');
+      mostrarModalBloqueioMinimoAglutinacao();
+      return;
+    }
+
+    // Verificar se há títulos pagos
+    const titulosPagos = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'PAGO');
+    if (titulosPagos.length > 0) {
+      console.warn('[FRONTEND] Validação falhou: há títulos pagos');
+      mostrarModalBloqueioAglutinacaoPago(titulosPagos);
+      return;
+    }
+
+    // Verificar se há títulos já aglutinados
+    const titulosJaAglutinados = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'AGLUTINADO');
+    if (titulosJaAglutinados.length > 0) {
+      console.warn('[FRONTEND] Validação falhou: há títulos já aglutinados');
+      mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados);
+      return;
+    }
+
+    // Verificar se há títulos de colaboradores diferentes
+    const colaboradores = Array.from(new Set(titulosParaAglutinar.map(t => t.colaborador_id)));
+    if (colaboradores.length > 1) {
+      console.warn('[FRONTEND] Validação falhou: há colaboradores diferentes');
+      mostrarModalBloqueioAglutinacaoColab(titulosParaAglutinar);
       return;
     }
 
@@ -2183,6 +2232,11 @@ function fecharModalBloqueioMinimoAglutinacao() {
   if (modal) modal.style.display = 'none';
 }
 
+function fecharModalBloqueioAglutinacaoJaAglutinado() {
+  const modal = document.getElementById('modalBloqueioAglutinacaoJaAglutinado');
+  if (modal) modal.style.display = 'none';
+}
+
 // Função para fechar modal de progresso
 function fecharModalProgressoCancelarAglutinacao() {
   const modal = document.getElementById('modalProgressoCancelarAglutinacao');
@@ -2356,5 +2410,94 @@ function mostrarModalSucessoBaixaMultipla(dados) {
   if (modal) {
     modal.style.display = 'flex';
   }
+}
+
+// ========================================
+// FUNÇÕES PARA MOSTRAR MODAIS DE BLOQUEIO
+// ========================================
+
+function mostrarModalBloqueioMinimoAglutinacao() {
+  const modal = document.getElementById('modalBloqueioMinimoAglutinacao');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoPago(titulosPagos) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeTitulosPagosAglutinacao');
+  const listaEl = document.getElementById('listaTitulosPagosAglutinacao');
+  
+  if (qtdeEl) {
+    qtdeEl.textContent = `Há ${titulosPagos.length} título(s) pago(s) na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosPagos.forEach(t => {
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ffcdd2; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#e53935; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">PAGO</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoPago');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeTitulosJaAglutinados');
+  const listaEl = document.getElementById('listaTitulosJaAglutinados');
+  
+  if (qtdeEl) {
+    qtdeEl.textContent = `Há ${titulosJaAglutinados.length} título(s) com status AGLUTINADO na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulosJaAglutinados.forEach(t => {
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #e1bee7; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#9c27b0; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">AGLUTINADO</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoJaAglutinado');
+  if (modal) modal.style.display = 'flex';
+}
+
+function mostrarModalBloqueioAglutinacaoColab(titulos) {
+  // Preencher informações no modal
+  const qtdeEl = document.getElementById('qtdeColabsAglutinacao');
+  const listaEl = document.getElementById('listaTitulosColabAglutinacao');
+  
+  if (qtdeEl) {
+    const colaboradores = Array.from(new Set(titulos.map(t => t.colaborador_id)));
+    qtdeEl.textContent = `Há ${colaboradores.length} colaborador(es) diferente(s) na seleção.`;
+  }
+  
+  if (listaEl) {
+    listaEl.innerHTML = '';
+    titulos.forEach(t => {
+      const colaboradorNome = mapaColaboradores[t.colaborador_id] || t.colaborador_id || '';
+      const linha = document.createElement('div');
+      linha.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ffe0b2; border-radius:6px; padding:8px 10px; margin-bottom:6px;';
+      linha.innerHTML = `
+        <span style="font-weight:500; color:#333;">${t.numero_titulo}</span>
+        <span style="background:#ff9800; color:white; padding:2px 8px; border-radius:12px; font-size:0.85em; font-weight:600;">${colaboradorNome}</span>
+      `;
+      listaEl.appendChild(linha);
+    });
+  }
+  
+  const modal = document.getElementById('modalBloqueioAglutinacaoColab');
+  if (modal) modal.style.display = 'flex';
 }
 </script> 
