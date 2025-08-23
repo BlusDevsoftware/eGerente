@@ -355,7 +355,7 @@ const aglutinarTitulos = async (req, res) => {
 			tipo_aglutinacao: 'AGL-PS', // Tipo especial para identificar títulos aglutinados
 			motivo_aglutinacao: observacao || null, // NOVA COLUNA: motivo específico da aglutinação
 			observacoes: null, // Campo limpo para títulos aglutinados (será usado apenas para pagamento)
-			descricao: null, // Campo limpo para títulos aglutinados (será usado apenas para descrição original)
+			descricao: `Aglutinação de títulos - Título AGL-${numeroBaseStr}-1/1`, // Descrição automática para títulos aglutinados
 			data_geracao: new Date().toISOString().split('T')[0],
 			data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
 			usuario_lancamento: usuarioLancamento,
