@@ -2890,30 +2890,17 @@ function formatarDataCompleta(data) {
     
     if (temHoraNaString) {
       // Se tem timestamp na string original, sempre mostrar data e hora
-      // Tratar o fuso horário corretamente - se não tem Z, é horário local
-      const isUTC = data.includes('Z');
-      console.log('[TIMELINE] É UTC?', isUTC);
-      
-      const options = {
+      // Agora que o banco está correto, usar sempre timezone de Brasília
+      const resultado = d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
-      };
-      
-      // Se não é UTC, não especificar timeZone para usar o horário local original
-      if (!isUTC) {
-        const resultado = d.toLocaleDateString('pt-BR', options);
-        console.log('[TIMELINE] Resultado sem timeZone:', resultado);
-        return resultado;
-    } else {
-        // Se é UTC, converter para fuso de Brasília
-        options.timeZone = 'America/Sao_Paulo';
-        const resultado = d.toLocaleDateString('pt-BR', options);
-        console.log('[TIMELINE] Resultado com timeZone:', resultado);
-        return resultado;
-      }
+        minute: '2-digit',
+        timeZone: 'America/Sao_Paulo'
+      });
+      console.log('[TIMELINE] Resultado formatado:', resultado);
+      return resultado;
     } else {
       // Se não tem timestamp, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
