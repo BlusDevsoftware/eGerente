@@ -2283,9 +2283,13 @@
                     return;
                 }
                 
+                // Se o elemento de loading não existir, recriar
                 if (!carregandoEl) {
-                    console.error('[MODAL] Elemento carregando-titulos-originais não encontrado');
-                    return;
+                    console.log('[MODAL] Elemento carregando não encontrado, recriando...');
+                    carregandoEl = document.createElement('div');
+                    carregandoEl.id = 'carregando-titulos-originais';
+                    carregandoEl.style.cssText = 'text-align: center; color: #666; font-style: italic; padding: 16px;';
+                    carregandoEl.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>Carregando títulos originais...';
                 }
                 
                 console.log('[MODAL] DEBUG - Elementos encontrados, iniciando carregamento...');
