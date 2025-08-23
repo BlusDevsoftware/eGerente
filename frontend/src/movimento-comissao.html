@@ -1081,6 +1081,18 @@
               </div>
             </div>
           
+            <!-- Seção: Motivo da Aglutinação (apenas para títulos aglutinados) -->
+            <div id="secao-motivo-aglutinacao" style="display: none; background: #fff3e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #ffcc02;">
+              <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #e65100; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                <i class="fas fa-info-circle" style="color: #e65100;"></i> Motivo da Aglutinação
+              </h3>
+              <div style="background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #ffcc02;">
+                <div id="motivo-aglutinacao-texto" style="color: #333; font-size: 0.95em; line-height: 1.5;">
+                  <!-- Motivo da aglutinação será carregado dinamicamente aqui -->
+                </div>
+              </div>
+            </div>
+          
             <!-- Seção de Produtos/Serviços -->
             <div id="secao-produtos" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
               <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
@@ -1851,11 +1863,9 @@
             const valorPrincipalFormatado = titulo.valor ? titulo.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0,00';
             document.getElementById('modal-valor-principal').value = valorPrincipalFormatado;
             
-            // Para títulos aglutinados, mostrar o motivo da aglutinação na descrição
+            // Para títulos aglutinados, mostrar a descrição original (não o motivo da aglutinação)
+            // O motivo da aglutinação será mostrado em uma seção específica
             let descricaoExibicao = titulo.descricao || '';
-            if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.observacoes) {
-                descricaoExibicao = titulo.observacoes;
-            }
             document.getElementById('modal-descricao').value = descricaoExibicao;
             
             // Formatar valor para exibição
@@ -1891,16 +1901,18 @@
             // VERIFICAR SE É TÍTULO AGLUTINADO E CONTROLAR SEÇÕES
             const secaoTitulosOriginais = document.getElementById('secao-titulos-originais');
             const secaoProdutos = document.getElementById('secao-produtos');
+            const secaoMotivoAglutinacao = document.getElementById('secao-motivo-aglutinacao');
             
             console.log('[MODAL] DEBUG - Elemento secao-titulos-originais encontrado:', !!secaoTitulosOriginais);
             console.log('[MODAL] DEBUG - Elemento secao-produtos encontrado:', !!secaoProdutos);
+            console.log('[MODAL] DEBUG - Elemento secao-motivo-aglutinacao encontrado:', !!secaoMotivoAglutinacao);
             console.log('[MODAL] DEBUG - tipo_aglutinacao:', titulo.tipo_aglutinacao);
             console.log('[MODAL] DEBUG - ids_aglutinados:', titulo.ids_aglutinados);
             
             if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
                 console.log('[MODAL] Título aglutinado detectado, configurando seções...');
                 
-                // Para títulos aglutinados: mostrar títulos originais e ocultar produtos
+                // Para títulos aglutinados: mostrar títulos originais, motivo da aglutinação e ocultar produtos
                 if (secaoTitulosOriginais) {
                     secaoTitulosOriginais.style.display = 'block';
                     console.log('[MODAL] DEBUG - Seção de títulos originais exibida');
@@ -1912,6 +1924,16 @@
                     console.error('[MODAL] ERRO - Elemento secao-titulos-originais não encontrado!');
                 }
                 
+                if (secaoMotivoAglutinacao) {
+                    secaoMotivoAglutinacao.style.display = 'block';
+                    // Carregar o motivo da aglutinação da NOVA COLUNA motivo_aglutinacao
+                    const motivoTexto = titulo.motivo_aglutinacao || 'Motivo da aglutinação não informado';
+                    document.getElementById('motivo-aglutinacao-texto').textContent = motivoTexto;
+                    console.log('[MODAL] DEBUG - Seção de motivo da aglutinação exibida com motivo_aglutinacao');
+                } else {
+                    console.error('[MODAL] ERRO - Elemento secao-motivo-aglutinacao não encontrado!');
+                }
+                
                 if (secaoProdutos) {
                     secaoProdutos.style.display = 'none';
                     console.log('[MODAL] DEBUG - Seção de produtos ocultada para título aglutinado');
@@ -1919,10 +1941,15 @@
                     console.error('[MODAL] ERRO - Elemento secao-produtos não encontrado!');
                 }
             } else {
-                // Para títulos normais: ocultar títulos originais e mostrar produtos
+                // Para títulos normais: ocultar títulos originais, motivo da aglutinação e mostrar produtos
                 if (secaoTitulosOriginais) {
                     secaoTitulosOriginais.style.display = 'none';
                     console.log('[MODAL] DEBUG - Seção de títulos originais ocultada');
+                }
+                
+                if (secaoMotivoAglutinacao) {
+                    secaoMotivoAglutinacao.style.display = 'none';
+                    console.log('[MODAL] DEBUG - Seção de motivo da aglutinação ocultada');
                 }
                 
                 if (secaoProdutos) {
@@ -4724,26 +4751,32 @@ document.addEventListener('DOMContentLoaded', function() {
           atualizarProgressoBaixa(30, 'Processando dados de pagamento...');
         }
         
-        // Preparar dados para envio
+        // Preparar dados para envio - APENAS campos relacionados ao pagamento
         const dadosPagamento = {
           valor_pago: valorPago,
           data_pagamento: dataPagamento,
           status: status,
-          observacoes: observacoes,
+          observacoes: observacoes, // Apenas observações de pagamento
           comprovante_url: comprovanteUrl
         };
+        
+        // IMPORTANTE: NÃO enviar campo descricao para evitar sobrescrever a descrição original
+        console.log('[BAIXA] Dados de pagamento enviados:', dadosPagamento);
         
         // Enviar dados para o backend
         atualizarProgressoBaixa(50, 'Registrando baixa no sistema...');
         await window.api.put(`/movimento_comissoes/${titulo.id}`, dadosPagamento);
         atualizarProgressoBaixa(70, 'Baixa registrada com sucesso!');
         
-        // Atualizar array local
+        // Atualizar array local - APENAS campos de pagamento
         titulo.valor_pago = valorPago;
         titulo.data_pagamento = dataPagamento;
         titulo.status = status;
-        titulo.observacoes = observacoes;
+        titulo.observacoes = observacoes; // Apenas observações de pagamento
         titulo.comprovante_url = comprovanteUrl;
+        
+        // IMPORTANTE: NÃO alterar titulo.descricao para manter a descrição original
+        console.log('[BAIXA] Array local atualizado - descrição preservada:', titulo.descricao);
         
         // Se for baixa parcial, criar novo título
         if (baixaParcial) {

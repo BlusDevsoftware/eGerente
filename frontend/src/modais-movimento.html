@@ -382,11 +382,11 @@
         <!-- preenchido dinamicamente em abrirModalAglutinacao -->
       </div>
 
-      <!-- NOVO: Campo de Observação / Motivo da Aglutinação -->
+      <!-- NOVO: Campo de Motivo da Aglutinação -->
       <div style="margin-top:12px; background:#fff; border:1px solid #e3f2fd; border-radius:8px; padding:12px;">
-        <div style="font-weight:500; color:#1976D2; margin-bottom:6px;">Observação / Motivo da Aglutinação</div>
-        <textarea id="observacaoAglutinacaoInput" placeholder="Descreva o motivo da aglutinação..." maxlength="500" style="width:100%; min-height:96px; border:1px solid #e0e0e0; border-radius:8px; padding:10px; font-size:0.95em; resize:vertical;"></textarea>
-        <div id="observacaoAglutinacaoCount" style="text-align:right; color:#888; font-size:0.85em; margin-top:6px;">0/500</div>
+        <div style="font-weight:500; color:#1976D2; margin-bottom:6px;">Motivo da Aglutinação</div>
+        <textarea id="motivoAglutinacaoInput" placeholder="Descreva o motivo da aglutinação..." maxlength="500" style="width:100%; min-height:96px; border:1px solid #e0e0e0; border-radius:8px; padding:10px; font-size:0.95em; resize:vertical;"></textarea>
+        <div id="motivoAglutinacaoCount" style="text-align:right; color:#888; font-size:0.85em; margin-top:6px;">0/500</div>
       </div>
 
       <div style="margin-top:16px; background:#fff3e0; border:1px solid #ffcc02; border-radius:8px; padding:12px; color:#e65100;">
@@ -582,7 +582,7 @@ let titulosParaExcluirAnimacao = [];
 // NOVO: títulos selecionados para aglutinação
 let titulosParaAglutinar = [];
 // NOVO: observação digitada no modal de aglutinação
-let observacaoAglutinacaoTexto = '';
+let motivoAglutinacaoTexto = '';
 // NOVO: data de vencimento escolhida pelo usuário no modal de aglutinação
 let dataVencimentoAglutinacao = '';
 
@@ -1199,15 +1199,15 @@ function abrirModalAglutinacao(titulos) {
   console.log('[MODAL] window.api.post disponível:', !!window.api?.post);
   
   titulosParaAglutinar = Array.isArray(titulos) ? titulos : [];
-  observacaoAglutinacaoTexto = '';
+  motivoAglutinacaoTexto = '';
   
   const modal = document.getElementById('modalAglutinacaoTitulos');
   const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
   const listaEl = document.getElementById('listaTitulosAglutinacao');
   const totalEl = document.getElementById('valorTotalAglutinar');
   const colabEl = document.getElementById('colaboradorAglutinacao');
-  const obsInput = document.getElementById('observacaoAglutinacaoInput');
-  const obsCount = document.getElementById('observacaoAglutinacaoCount');
+  const motivoInput = document.getElementById('motivoAglutinacaoInput');
+  const motivoCount = document.getElementById('motivoAglutinacaoCount');
   const simulacaoEl = document.getElementById('simulacaoAglutinacao');
 
   if (qtdEl) qtdEl.textContent = titulosParaAglutinar.length;
@@ -1410,14 +1410,14 @@ function abrirModalAglutinacao(titulos) {
     });
   }
 
-  if (obsInput && obsCount) {
-    obsInput.value = '';
-    obsCount.textContent = '0/500';
-    obsInput.oninput = function() {
+  if (motivoInput && motivoCount) {
+    motivoInput.value = '';
+    motivoCount.textContent = '0/500';
+    motivoInput.oninput = function() {
       const len = this.value.length;
       if (len > 500) this.value = this.value.substring(0, 500);
       const atual = Math.min(this.value.length, 500);
-      obsCount.textContent = `${atual}/500`;
+      motivoCount.textContent = `${atual}/500`;
     };
   }
 
@@ -1432,13 +1432,13 @@ function fecharModalAglutinacao() {
   if (modal) modal.style.display = 'none';
   const listaEl = document.getElementById('listaTitulosAglutinacao');
   if (listaEl) listaEl.innerHTML = '';
-  const obsInput = document.getElementById('observacaoAglutinacaoInput');
-  const obsCount = document.getElementById('observacaoAglutinacaoCount');
+  const motivoInput = document.getElementById('motivoAglutinacaoInput');
+  const motivoCount = document.getElementById('motivoAglutinacaoCount');
   const simulacaoEl = document.getElementById('simulacaoAglutinacao');
-  if (obsInput) obsInput.value = '';
-  if (obsCount) obsCount.textContent = '0/500';
+  if (motivoInput) motivoInput.value = '';
+  if (motivoCount) motivoCount.textContent = '0/500';
   if (simulacaoEl) simulacaoEl.innerHTML = '';
-  observacaoAglutinacaoTexto = '';
+  motivoAglutinacaoTexto = '';
   titulosParaAglutinar = [];
 }
 
@@ -1693,7 +1693,7 @@ function atualizarSimulacaoAglutinacaoUI() {
 async function confirmarAglutinacao() {
   try {
     console.log('[FRONTEND] Iniciando confirmarAglutinacao...');
-    const obsInput = document.getElementById('observacaoAglutinacaoInput');
+    const motivoInput = document.getElementById('motivoAglutinacaoInput');
     let dtInput = document.getElementById('vencimentoTituloAglutinado');
     
     console.log('[FRONTEND] DEBUG - Campo observação encontrado:', !!obsInput);
@@ -1706,7 +1706,7 @@ async function confirmarAglutinacao() {
       console.log('[FRONTEND] DEBUG - Campo vencimento id:', dtInput.id);
     }
     
-    observacaoAglutinacaoTexto = obsInput ? obsInput.value.trim() : '';
+    motivoAglutinacaoTexto = motivoInput ? motivoInput.value.trim() : '';
     
     // CAPTURAR DATA DE VENCIMENTO USANDO VARIÁVEL GLOBAL
     let dataVencimento = new Date().toISOString().split('T')[0]; // Fallback para data atual
@@ -1749,7 +1749,7 @@ async function confirmarAglutinacao() {
     console.log('[FRONTEND] === FIM INVESTIGAÇÃO ===');
 
     console.log('[FRONTEND] Dados coletados:', {
-      observacao: observacaoAglutinacaoTexto,
+      observacao: motivoAglutinacaoTexto,
       dataVencimento: dataVencimento,
       titulosParaAglutinar: titulosParaAglutinar
     });
@@ -1765,7 +1765,7 @@ async function confirmarAglutinacao() {
     const ids = titulosParaAglutinar.map(t => t.id);
     const payload = {
       ids,
-      observacao: observacaoAglutinacaoTexto,
+      observacao: motivoAglutinacaoTexto,
       data_vencimento: dataVencimento
     };
 

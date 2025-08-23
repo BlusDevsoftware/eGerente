@@ -353,8 +353,9 @@ const aglutinarTitulos = async (req, res) => {
 			status: 'PENDENTE',
 			tipo: 'servico', // Usar tipo válido existente (não viola foreign key)
 			tipo_aglutinacao: 'AGL-PS', // Tipo especial para identificar títulos aglutinados
-			observacoes: observacao || null,
-			descricao: observacao || null,
+			motivo_aglutinacao: observacao || null, // NOVA COLUNA: motivo específico da aglutinação
+			observacoes: null, // Campo limpo para títulos aglutinados (será usado apenas para pagamento)
+			descricao: null, // Campo limpo para títulos aglutinados (será usado apenas para descrição original)
 			data_geracao: new Date().toISOString().split('T')[0],
 			data_vencimento: data_vencimento || new Date().toISOString().split('T')[0],
 			usuario_lancamento: usuarioLancamento,
