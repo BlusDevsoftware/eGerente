@@ -2726,6 +2726,14 @@ function gerarEventosTimeline(titulo) {
     
     // 2. Edição do título (se houver updated_at diferente de created_at)
     if (titulo.updated_at && titulo.created_at && titulo.updated_at !== titulo.created_at) {
+      console.log('[TIMELINE] Debug - Evento de edição:', {
+        created_at: titulo.created_at,
+        updated_at: titulo.updated_at,
+        sao_diferentes: titulo.updated_at !== titulo.created_at,
+        updated_at_parseado: new Date(titulo.updated_at).toISOString(),
+        created_at_parseado: new Date(titulo.created_at).toISOString()
+      });
+      
       eventos.push({
         titulo: 'Título Editado',
         data: formatarDataCompleta(titulo.updated_at),
@@ -2899,7 +2907,7 @@ function formatarDataCompleta(data) {
         const resultado = d.toLocaleDateString('pt-BR', options);
         console.log('[TIMELINE] Resultado sem timeZone:', resultado);
         return resultado;
-      } else {
+    } else {
         // Se é UTC, converter para fuso de Brasília
         options.timeZone = 'America/Sao_Paulo';
         const resultado = d.toLocaleDateString('pt-BR', options);
