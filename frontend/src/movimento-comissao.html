@@ -2555,6 +2555,12 @@
                 // Verificar se é título aglutinado para exibir tipo especial
                 const tipoExibicao = titulo.tipo_aglutinacao === 'AGL-PS' ? 'AGL-PS' : (titulo.tipo || '');
                 
+                // Gerar descrição automática para títulos aglutinados
+                let descricaoExibicao = titulo.descricao || '';
+                if (titulo.tipo_aglutinacao === 'AGL-PS') {
+                    descricaoExibicao = `Aglutinação de títulos - Título ${titulo.numero_titulo}`;
+                }
+                
                 tr.innerHTML = `
                     <td><button class="action-btn timeline-btn" title="Linha do Tempo"><i class="fas fa-clock"></i></button></td>
                     <td>${titulo.numero_titulo || ''}</td>
@@ -2562,7 +2568,7 @@
                     <td>${formatarData(titulo.data_vencimento)}</td>
                     <td>${colaboradorNome}</td>
                     <td>${tipoExibicao}</td>
-                    <td>${titulo.descricao || ''}</td>
+                    <td>${descricaoExibicao}</td>
                     <td>${formatarValor(titulo.valor)}</td>
                     <td><span class="status ${statusClass(titulo.status)}">${titulo.status || ''}</span></td>
                     <td class="actions">
