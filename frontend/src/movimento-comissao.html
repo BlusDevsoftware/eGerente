@@ -1071,7 +1071,7 @@
             </div>
 
             <!-- Seção: Descrição -->
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+            <div id="secao-descricao" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e9ecef;">
               <h3 style="margin: 0 0 16px 0; font-size: 1.1em; color: #1976D2; display: flex; align-items: center; gap: 8px; font-weight: 600;">
                 <i class="fas fa-align-left" style="color: #1976D2;"></i> Descrição
               </h3>
@@ -1902,10 +1902,12 @@
             const secaoTitulosOriginais = document.getElementById('secao-titulos-originais');
             const secaoProdutos = document.getElementById('secao-produtos');
             const secaoMotivoAglutinacao = document.getElementById('secao-motivo-aglutinacao');
+            const secaoDescricao = document.getElementById('secao-descricao');
             
             console.log('[MODAL] DEBUG - Elemento secao-titulos-originais encontrado:', !!secaoTitulosOriginais);
             console.log('[MODAL] DEBUG - Elemento secao-produtos encontrado:', !!secaoProdutos);
             console.log('[MODAL] DEBUG - Elemento secao-motivo-aglutinacao encontrado:', !!secaoMotivoAglutinacao);
+            console.log('[MODAL] DEBUG - Elemento secao-descricao encontrado:', !!secaoDescricao);
             console.log('[MODAL] DEBUG - tipo_aglutinacao:', titulo.tipo_aglutinacao);
             console.log('[MODAL] DEBUG - ids_aglutinados:', titulo.ids_aglutinados);
             
@@ -1940,6 +1942,13 @@
                 } else {
                     console.error('[MODAL] ERRO - Elemento secao-produtos não encontrado!');
                 }
+                
+                if (secaoDescricao) {
+                    secaoDescricao.style.display = 'none';
+                    console.log('[MODAL] DEBUG - Seção de descrição ocultada para título aglutinado');
+                } else {
+                    console.error('[MODAL] ERRO - Elemento secao-descricao não encontrado!');
+                }
             } else {
                 // Para títulos normais: ocultar títulos originais, motivo da aglutinação e mostrar produtos
                 if (secaoTitulosOriginais) {
@@ -1955,6 +1964,11 @@
                 if (secaoProdutos) {
                     secaoProdutos.style.display = 'block';
                     console.log('[MODAL] DEBUG - Seção de produtos exibida para título normal');
+                }
+                
+                if (secaoDescricao) {
+                    secaoDescricao.style.display = 'block';
+                    console.log('[MODAL] DEBUG - Seção de descrição exibida para título normal');
                 }
             }
             
