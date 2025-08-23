@@ -2703,11 +2703,6 @@ function gerarEventosTimeline(titulo) {
   try {
     // 1. Criação do título (usar created_at para mostrar data e hora, senão data_geracao)
     const dataCriacao = titulo.created_at || titulo.data_geracao;
-    console.log('[TIMELINE] Debug - Data de criação:', {
-      created_at: titulo.created_at,
-      data_geracao: titulo.data_geracao,
-      dataCriacao_usada: dataCriacao
-    });
     
     if (dataCriacao) {
       eventos.push({
@@ -2863,9 +2858,7 @@ function formatarDataCompleta(data) {
   if (!data) return 'Data não informada';
   
   try {
-    console.log('[TIMELINE] Formatando data:', data);
     const d = new Date(data);
-    console.log('[TIMELINE] Data parseada:', d.toISOString());
     if (isNaN(d)) return data;
     
     // Verificar se a string original contém informações de hora (timestamp)
@@ -2878,14 +2871,24 @@ function formatarDataCompleta(data) {
     
     if (temHoraNaString) {
       // Se tem timestamp na string original, sempre mostrar data e hora
-      return d.toLocaleDateString('pt-BR', {
+      // Tratar o fuso horário corretamente - se não tem Z, é horário local
+      const isUTC = data.includes('Z');
+      const options = {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Sao_Paulo'
-      });
+        minute: '2-digit'
+      };
+      
+      // Se não é UTC, não especificar timeZone para usar o horário local original
+      if (!isUTC) {
+        return d.toLocaleDateString('pt-BR', options);
+      } else {
+        // Se é UTC, converter para fuso de Brasília
+        options.timeZone = 'America/Sao_Paulo';
+        return d.toLocaleDateString('pt-BR', options);
+      }
     } else {
       // Se não tem timestamp, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
