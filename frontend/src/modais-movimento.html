@@ -1225,6 +1225,42 @@ function abrirModalAglutinacao(titulos) {
   
   titulosParaAglutinar = Array.isArray(titulos) ? titulos : [];
   motivoAglutinacaoTexto = '';
+
+  // VALIDAÇÕES ANTES DE ABRIR O MODAL
+  console.log('[MODAL] Executando validações antes de abrir modal...');
+  
+  // Verificar se há títulos selecionados
+  if (!Array.isArray(titulosParaAglutinar) || titulosParaAglutinar.length < 2) {
+    console.warn('[MODAL] Validação falhou: menos de 2 títulos');
+    mostrarModalBloqueioMinimoAglutinacao();
+    return;
+  }
+
+  // Verificar se há títulos pagos
+  const titulosPagos = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'PAGO');
+  if (titulosPagos.length > 0) {
+    console.warn('[MODAL] Validação falhou: há títulos pagos');
+    mostrarModalBloqueioAglutinacaoPago(titulosPagos);
+    return;
+  }
+
+  // Verificar se há títulos já aglutinados
+  const titulosJaAglutinados = titulosParaAglutinar.filter(t => (t.status || '').toUpperCase() === 'AGLUTINADO');
+  if (titulosJaAglutinados.length > 0) {
+    console.warn('[MODAL] Validação falhou: há títulos já aglutinados');
+    mostrarModalBloqueioAglutinacaoJaAglutinado(titulosJaAglutinados);
+    return;
+  }
+
+  // Verificar se há títulos de colaboradores diferentes
+  const colaboradores = Array.from(new Set(titulosParaAglutinar.map(t => t.colaborador_id)));
+  if (colaboradores.length > 1) {
+    console.warn('[MODAL] Validação falhou: há colaboradores diferentes');
+    mostrarModalBloqueioAglutinacaoColab(titulosParaAglutinar);
+    return;
+  }
+
+  console.log('[MODAL] Todas as validações passaram, abrindo modal...');
   
   const modal = document.getElementById('modalAglutinacaoTitulos');
   const qtdEl = document.getElementById('quantidadeTitulosAglutinar');
