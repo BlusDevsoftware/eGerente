@@ -2701,12 +2701,11 @@ function gerarEventosTimeline(titulo) {
   console.log('[TIMELINE] Gerando eventos para título:', titulo.numero_titulo);
   
   try {
-    // 1. Criação do título (usar created_at se disponível, senão data_geracao)
-    const dataCriacao = titulo.created_at || titulo.data_geracao;
-    if (dataCriacao) {
+    // 1. Criação do título (usar data_geracao para mostrar apenas a data, sem hora)
+    if (titulo.data_geracao) {
       eventos.push({
         titulo: 'Título Criado',
-        data: formatarDataCompleta(dataCriacao),
+        data: formatarDataCompleta(titulo.data_geracao),
         descricao: `Título ${titulo.numero_titulo} criado com valor de ${formatarValorLocal ? formatarValorLocal(titulo.valor) : `R$ ${(titulo.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}`,
         icone: 'fa-plus-circle',
         corFundo: '#e8f5e8',
@@ -2731,7 +2730,7 @@ function gerarEventosTimeline(titulo) {
     // 3. Aglutinação (se for título aglutinado)
     if (titulo.tipo_aglutinacao === 'AGL-PS' && titulo.ids_aglutinados) {
       const ids = titulo.ids_aglutinados.split(',').map(id => id.trim());
-      const dataAglutinacao = titulo.created_at || titulo.data_geracao;
+      const dataAglutinacao = titulo.data_geracao;
       eventos.push({
         titulo: 'Títulos Aglutinados',
         data: formatarDataCompleta(dataAglutinacao),
@@ -2747,7 +2746,7 @@ function gerarEventosTimeline(titulo) {
     if (titulo.id_titulo_origem) {
       const tituloOrigem = todosTitulos.find(t => t.id === titulo.id_titulo_origem);
       if (tituloOrigem) {
-        const dataBaixaParcial = titulo.created_at || titulo.data_geracao;
+        const dataBaixaParcial = titulo.data_geracao;
         eventos.push({
           titulo: 'Baixa Parcial Realizada',
           data: formatarDataCompleta(dataBaixaParcial),
