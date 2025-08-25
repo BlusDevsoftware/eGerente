@@ -2898,44 +2898,28 @@ function formatarDataCompleta(data) {
     );
     
     if (temHoraNaString) {
-      // Para datas com timestamp, tratar como UTC e converter para local
-      // Se a string termina com +00:00, é UTC
-      let dataParaProcessar = data;
-      if (data.endsWith('+00:00')) {
-        // Remover o +00:00 e adicionar Z para indicar UTC
-        dataParaProcessar = data.replace('+00:00', 'Z');
+      // Para datas com timestamp, exibir exatamente como está no banco
+      // Extrair apenas a parte da data e hora, removendo timezone
+      const match = data.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/);
+      if (match) {
+        const [, dataPart, horaPart] = match;
+        const [ano, mes, dia] = dataPart.split('-');
+        const [hora, minuto] = horaPart.split(':');
+        const resultado = `${dia}/${mes}/${ano}, ${hora}:${minuto}`;
+        console.log('[TIMELINE] Resultado exato do banco:', resultado);
+        return resultado;
       }
       
-      const d = new Date(dataParaProcessar);
-      console.log('[TIMELINE] Data parseada pelo JS:', d.toISOString());
-      console.log('[TIMELINE] Data local:', d.toString());
-      
-      if (isNaN(d)) return data;
-      
-      // Usar timezone local do navegador (sem forçar Brasília)
-      const resultado = d.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      console.log('[TIMELINE] Resultado sem timezone forçado:', resultado);
-      return resultado;
+      // Fallback: se não conseguir extrair, retornar como está
+      return data;
     } else {
-      // Para datas sem timestamp, tratar como data local
+      // Para datas sem timestamp, converter apenas o formato
       const d = new Date(data);
-      console.log('[TIMELINE] Data parseada pelo JS (sem timestamp):', d.toISOString());
-      console.log('[TIMELINE] Data local (sem timestamp):', d.toString());
-      
       if (isNaN(d)) return data;
       
-      // Se não tem timestamp, mostrar apenas data
-      return d.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
+      // Converter apenas o formato da data (DD/MM/AAAA)
+      const [ano, mes, dia] = data.split('-');
+      return `${dia}/${mes}/${ano}`;
     }
   } catch (e) {
     console.error('[TIMELINE] Erro ao formatar data:', data, e);
