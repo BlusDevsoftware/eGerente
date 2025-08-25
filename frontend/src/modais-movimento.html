@@ -2902,24 +2902,22 @@ function formatarDataCompleta(data) {
     );
     
     if (temHoraNaString) {
-      // Sempre usar timezone de Brasília para exibição consistente
+      // Usar timezone local do navegador (sem forçar Brasília)
       const resultado = d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Sao_Paulo'
+        minute: '2-digit'
       });
-      console.log('[TIMELINE] Resultado com timezone Brasília:', resultado);
+      console.log('[TIMELINE] Resultado sem timezone forçado:', resultado);
       return resultado;
     } else {
       // Se não tem timestamp, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric',
-        timeZone: 'America/Sao_Paulo'
+        year: 'numeric'
       });
     }
   } catch (e) {
