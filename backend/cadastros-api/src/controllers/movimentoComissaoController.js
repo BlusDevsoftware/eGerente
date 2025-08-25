@@ -84,9 +84,18 @@ const criarMovimento = async (req, res) => {
 					numeroTitulo = `PAR-${numeroTitulo}`;
 				}
 				
+				// Criar data e hora local de Brasília
+				const agora = new Date();
+				const dataHoraLocal = new Date(agora.getTime() - (agora.getTimezoneOffset() * 60000))
+					.toISOString()
+					.slice(0, 19)
+					.replace('T', ' ');
+				
 				registros.push({
 					...mov,
-					numero_titulo: numeroTitulo
+					numero_titulo: numeroTitulo,
+					created_at: dataHoraLocal,
+					updated_at: dataHoraLocal
 				});
 			}
 			ultimoNumero++;
