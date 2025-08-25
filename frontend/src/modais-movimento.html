@@ -2888,10 +2888,6 @@ function formatarDataCompleta(data) {
   
   try {
     console.log('[TIMELINE] Formatando data original:', data);
-    const d = new Date(data);
-    console.log('[TIMELINE] Data parseada pelo JS:', d.toISOString());
-    console.log('[TIMELINE] Data local:', d.toString());
-    if (isNaN(d)) return data;
     
     // Verificar se a string original contém informações de hora (timestamp)
     const temHoraNaString = typeof data === 'string' && (
@@ -2902,6 +2898,20 @@ function formatarDataCompleta(data) {
     );
     
     if (temHoraNaString) {
+      // Para datas com timestamp, tratar como UTC e converter para local
+      // Se a string termina com +00:00, é UTC
+      let dataParaProcessar = data;
+      if (data.endsWith('+00:00')) {
+        // Remover o +00:00 e adicionar Z para indicar UTC
+        dataParaProcessar = data.replace('+00:00', 'Z');
+      }
+      
+      const d = new Date(dataParaProcessar);
+      console.log('[TIMELINE] Data parseada pelo JS:', d.toISOString());
+      console.log('[TIMELINE] Data local:', d.toString());
+      
+      if (isNaN(d)) return data;
+      
       // Usar timezone local do navegador (sem forçar Brasília)
       const resultado = d.toLocaleDateString('pt-BR', {
         day: '2-digit',
@@ -2913,6 +2923,13 @@ function formatarDataCompleta(data) {
       console.log('[TIMELINE] Resultado sem timezone forçado:', resultado);
       return resultado;
     } else {
+      // Para datas sem timestamp, tratar como data local
+      const d = new Date(data);
+      console.log('[TIMELINE] Data parseada pelo JS (sem timestamp):', d.toISOString());
+      console.log('[TIMELINE] Data local (sem timestamp):', d.toString());
+      
+      if (isNaN(d)) return data;
+      
       // Se não tem timestamp, mostrar apenas data
       return d.toLocaleDateString('pt-BR', {
         day: '2-digit',
