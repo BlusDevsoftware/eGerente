@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* Estilos seguindo o padrão do sistema */
         .main-content {
@@ -155,51 +155,183 @@
             background: #f4faff;
         }
 
-        .charts-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
+        .titulos-grid-section {
             margin-bottom: 24px;
         }
 
-        .chart-container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
-            padding: 20px;
-            border: 1px solid #e3f2fd;
-        }
-
-        .chart-header {
+        .section-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
+            padding: 0 4px;
         }
 
-        .chart-title {
-            font-size: 1.1em;
+        .section-header h3 {
+            font-size: 1.2em;
             font-weight: 600;
             color: #1565c0;
             margin: 0;
         }
 
-        .chart-legend {
+        .grid-controls {
             display: flex;
-            gap: 15px;
-            font-size: 0.8em;
+            gap: 12px;
         }
 
-        .legend-item {
+        .titulos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .titulo-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            border: 1px solid #e3f2fd;
+            padding: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .titulo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(33,150,243,0.15);
+        }
+
+        .titulo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #90caf9;
+        }
+
+        .titulo-card.pendente::before { background: #FF9800; }
+        .titulo-card.atrasado::before { background: #f44336; }
+        .titulo-card.recebido::before { background: #4CAF50; }
+
+        .titulo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .titulo-cliente {
+            font-weight: 600;
+            color: #1565c0;
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .titulo-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .titulo-status.pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .titulo-status.atrasado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .titulo-status.recebido {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .titulo-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .titulo-valor {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1976D2;
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f4faff;
+            border-radius: 8px;
+            border: 1px solid #e3f2fd;
+        }
+
+        .titulo-observacoes {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .titulo-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-acao {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
+        .btn-visualizar {
+            background: #e3f2fd;
+            color: #1976D2;
+        }
+
+        .btn-visualizar:hover {
+            background: #bbdefb;
+        }
+
+        .btn-editar {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .btn-editar:hover {
+            background: #ffe0b2;
         }
 
         .table-scroll {
@@ -485,44 +617,22 @@
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3 class="chart-title">Evolução Mensal</h3>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #4CAF50;"></div>
-                            <span>Recebido</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #FF9800;"></div>
-                            <span>Pendente</span>
-                        </div>
-                    </div>
-                </div>
-                <canvas id="evolucaoMensal" width="400" height="200"></canvas>
-            </div>
 
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3 class="chart-title">Distribuição por Status</h3>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #4CAF50;"></div>
-                            <span>Recebido</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #FF9800;"></div>
-                            <span>Pendente</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #f44336;"></div>
-                            <span>Atrasado</span>
-                        </div>
-                    </div>
+
+        <!-- Grid de Títulos a Receber -->
+        <div class="titulos-grid-section">
+            <div class="section-header">
+                <h3>Títulos a Receber</h3>
+                <div class="grid-controls">
+                    <button class="btn-filter btn-secondary" onclick="alternarVisualizacao()">
+                        <i class="fas fa-th-large"></i>
+                        Alternar Visualização
+                    </button>
                 </div>
-                <canvas id="distribuicaoStatus" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="titulos-grid" id="titulosGrid">
+                <!-- Cards de títulos serão inseridos dinamicamente -->
             </div>
         </div>
 
@@ -623,70 +733,54 @@
             ]
         };
 
-        // Inicializar gráficos
-        function inicializarGraficos() {
-            // Gráfico de Evolução Mensal
-            const ctxEvolucao = document.getElementById('evolucaoMensal').getContext('2d');
-            new Chart(ctxEvolucao, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [{
-                        label: 'Recebido',
-                        data: [18000, 22000, 19500, 25000, 23000, 25750],
-                        borderColor: '#4CAF50',
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                        tension: 0.4
-                    }, {
-                        label: 'Pendente',
-                        data: [5000, 8000, 6500, 7500, 9000, 8250],
-                        borderColor: '#FF9800',
-                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+        // Carregar grid de títulos
+        function carregarGridTitulos() {
+            const grid = document.getElementById('titulosGrid');
+            grid.innerHTML = '';
 
-            // Gráfico de Distribuição por Status
-            const ctxDistribuicao = document.getElementById('distribuicaoStatus').getContext('2d');
-            new Chart(ctxDistribuicao, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Recebido', 'Pendente', 'Atrasado'],
-                    datasets: [{
-                        data: [25750, 8250, 3500],
-                        backgroundColor: ['#4CAF50', '#FF9800', '#f44336'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
+            dadosMock.titulos.forEach(titulo => {
+                const card = document.createElement('div');
+                card.className = `titulo-card ${titulo.status}`;
+                card.onclick = () => visualizarTitulo(titulo.cliente);
+                
+                card.innerHTML = `
+                    <div class="titulo-header">
+                        <h4 class="titulo-cliente">${titulo.cliente}</h4>
+                        <span class="titulo-status ${titulo.status}">${getStatusText(titulo.status)}</span>
+                    </div>
+                    
+                    <div class="titulo-info">
+                        <div class="info-item">
+                            <span class="info-label">Data</span>
+                            <span class="info-value">${formatarData(titulo.data)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vencimento</span>
+                            <span class="info-value">${formatarData(titulo.vencimento)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="titulo-valor">
+                        R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </div>
+                    
+                    <div class="titulo-observacoes">
+                        ${titulo.observacoes}
+                    </div>
+                    
+                    <div class="titulo-acoes">
+                        <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.cliente}')">
+                            <i class="fas fa-eye"></i>
+                            Visualizar
+                        </button>
+                        <button class="btn-acao btn-editar" onclick="event.stopPropagation(); editarTitulo('${titulo.cliente}')">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
             });
         }
 
@@ -769,9 +863,27 @@
             // Implementar modal de edição
         }
 
+        function alternarVisualizacao() {
+            const gridSection = document.querySelector('.titulos-grid-section');
+            const tableSection = document.querySelector('.table-scroll');
+            const paginationSection = document.querySelector('.filters-container:last-of-type');
+            
+            if (gridSection.style.display === 'none') {
+                // Mostrar grid, esconder tabela
+                gridSection.style.display = 'block';
+                tableSection.style.display = 'none';
+                paginationSection.style.display = 'flex';
+            } else {
+                // Mostrar tabela, esconder grid
+                gridSection.style.display = 'none';
+                tableSection.style.display = 'block';
+                paginationSection.style.display = 'flex';
+            }
+        }
+
         // Inicializar quando a página carregar
         window.addEventListener('DOMContentLoaded', function() {
-            inicializarGraficos();
+            carregarGridTitulos();
             carregarTabela();
         });
 
