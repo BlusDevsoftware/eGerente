@@ -1731,11 +1731,12 @@
             if (novoStatus) payload.status = novoStatus;
 
             // Enviar para o backend
-            window.api.put(`/movimento_comissoes/${titulo.id}`, payload).then(() => {
-                // Atualizar o array local
-                titulo.valor = parseFloat(valor);
-                titulo.descricao = descricao;
-                if (novoStatus) titulo.status = novoStatus;
+            window.api.put(`/movimento_comissoes/${titulo.id}`, payload).then((tituloAtualizado) => {
+                // Atualizar array local com dados completos do banco (incluindo updated_at)
+                const index = todosTitulos.findIndex(t => t.id === titulo.id);
+                if (index !== -1) {
+                    todosTitulos[index] = { ...todosTitulos[index], ...tituloAtualizado };
+                }
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
                 closeViewModal();
@@ -3877,12 +3878,13 @@ if (btnSalvarModalTitulo) {
                 if (statusSelect && statusSelect.value) {
                     payload.status = statusSelect.value;
                 }
-                await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
+                const tituloAtualizado = await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
                 
-                // Atualizar array local
-                titulo.valor = parseFloat(valor);
-                titulo.descricao = descricao;
-                if (payload.status) titulo.status = payload.status;
+                // Atualizar array local com dados completos do banco (incluindo updated_at)
+                const index = todosTitulos.findIndex(t => t.id === titulo.id);
+                if (index !== -1) {
+                    todosTitulos[index] = { ...todosTitulos[index], ...tituloAtualizado };
+                }
             }
             
             // Atualizar interface
@@ -3955,12 +3957,13 @@ if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
                     payload.status = statusSelect.value;
                 }
                 
-                await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
+                const tituloAtualizado = await window.api.put(`/movimento_comissoes/${titulo.id}`, payload);
                 
-                // Atualizar o array local
-                titulo.valor = parseFloat(valor);
-                titulo.descricao = descricao;
-                if (payload.status) titulo.status = payload.status;
+                // Atualizar array local com dados completos do banco (incluindo updated_at)
+                const index = todosTitulos.findIndex(t => t.id === titulo.id);
+                if (index !== -1) {
+                    todosTitulos[index] = { ...todosTitulos[index], ...tituloAtualizado };
+                }
                 
                 atualizarTabelaComFiltros();
                 atualizarCardsTotalizadores();
