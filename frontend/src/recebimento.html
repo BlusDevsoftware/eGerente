@@ -3,11 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Comissões - Recebimento</title>
+    <title>Dashboard Pessoal - Colaborador</title>
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos específicos para o dashboard */
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+
+        .dashboard-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-card.recebido::before { background: linear-gradient(90deg, #4CAF50, #45a049); }
+        .stat-card.pendente::before { background: linear-gradient(90deg, #FF9800, #f57c00); }
+        .stat-card.atrasado::before { background: linear-gradient(90deg, #f44336, #d32f2f); }
+        .stat-card.media::before { background: linear-gradient(90deg, #2196F3, #1976D2); }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-card.recebido .stat-card-icon { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .stat-card.pendente .stat-card-icon { background: linear-gradient(135deg, #FF9800, #f57c00); }
+        .stat-card.atrasado .stat-card-icon { background: linear-gradient(135deg, #f44336, #d32f2f); }
+        .stat-card.media .stat-card-icon { background: linear-gradient(135deg, #2196F3, #1976D2); }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .stat-card-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .stat-card-change {
+            font-size: 0.8rem;
+            color: #27ae60;
+            margin-top: 0.5rem;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .btn-filter {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .table-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-container th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table-container td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f3f4;
+            color: #2c3e50;
+        }
+
+        .table-container tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-recebido {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-atrasado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -58,129 +416,207 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="welcome-text">
-                <h1>Relatório de Recebimento</h1>
-                <p>Analise o recebimento de comissões</p>
-            </div>
-            <div class="user-info">
-                <div class="notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">3</span>
-                </div>
-                <div class="user-avatar">A</div>
-            </div>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Meu Dashboard Financeiro</h1>
+            <p>Bem-vindo, João Silva! Acompanhe sua situação financeira em tempo real</p>
         </div>
 
-        <!-- Filters -->
-        <div class="filters-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar...">
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card recebido" onclick="showCardDetails('recebido')">
+                <div class="stat-card-header">
+                    <div>
+                        <h3 class="stat-card-value" id="totalRecebido">R$ 25.750,00</h3>
+                        <p class="stat-card-label">Total Recebido</p>
+                        <p class="stat-card-change">+12% este mês</p>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
             </div>
-            <div class="filter-options">
-                <select>
-                    <option value="">Período</option>
-                    <option value="hoje">Hoje</option>
-                    <option value="semana">Esta Semana</option>
-                    <option value="mes">Este Mês</option>
-                    <option value="personalizado">Personalizado</option>
-                </select>
-                <select>
-                    <option value="">Status</option>
-                    <option value="recebido">Recebido</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="atrasado">Atrasado</option>
-                </select>
-            </div>
-            <button class="btn-primary">
-                <i class="fas fa-file-export"></i>
-                Exportar
-            </button>
-        </div>
 
-        <!-- Summary Cards -->
-        <div class="dashboard-cards">
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-money-bill-wave"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Total Recebido</h3>
-                    <p>R$ 25.750,00</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Pendentes</h3>
-                    <p>R$ 8.250,00</p>
+            <div class="stat-card pendente" onclick="showCardDetails('pendente')">
+                <div class="stat-card-header">
+                    <div>
+                        <h3 class="stat-card-value" id="totalPendente">R$ 8.250,00</h3>
+                        <p class="stat-card-label">Pendentes</p>
+                        <p class="stat-card-change">5 títulos aguardando</p>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Atrasados</h3>
-                    <p>R$ 3.500,00</p>
+
+            <div class="stat-card atrasado" onclick="showCardDetails('atrasado')">
+                <div class="stat-card-header">
+                    <div>
+                        <h3 class="stat-card-value" id="totalAtrasado">R$ 3.500,00</h3>
+                        <p class="stat-card-label">Cliente Não Pagou</p>
+                        <p class="stat-card-change">3 títulos em atraso</p>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Média Mensal</h3>
-                    <p>R$ 22.500,00</p>
+
+            <div class="stat-card media" onclick="showCardDetails('media')">
+                <div class="stat-card-header">
+                    <div>
+                        <h3 class="stat-card-value" id="mediaMensal">R$ 22.500,00</h3>
+                        <p class="stat-card-label">Média Mensal</p>
+                        <p class="stat-card-change">Últimos 6 meses</p>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Colaborador</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Forma de Pagamento</th>
-                        <th>Observações</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2024-02-20</td>
-                        <td>João Silva</td>
-                        <td>R$ 1.500,00</td>
-                        <td><span class="status paid">Recebido</span></td>
-                        <td>Transferência</td>
-                        <td>Pagamento referente a venda #123</td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2024-02-19</td>
-                        <td>Maria Santos</td>
-                        <td>R$ 2.000,00</td>
-                        <td><span class="status pending">Pendente</span></td>
-                        <td>Dinheiro</td>
-                        <td>Aguardando confirmação</td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="periodo">Período</label>
+                    <select id="periodo">
+                        <option value="mes_atual">Mês Atual</option>
+                        <option value="ultimos_3_meses">Últimos 3 Meses</option>
+                        <option value="ultimos_6_meses">Últimos 6 Meses</option>
+                        <option value="ano_atual">Ano Atual</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="">Todos os Status</option>
+                        <option value="recebido">Recebido</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="atrasado">Cliente Não Pagou</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="cliente">Cliente</label>
+                    <select id="cliente">
+                        <option value="">Todos os Clientes</option>
+                        <option value="cliente1">Cliente A</option>
+                        <option value="cliente2">Cliente B</option>
+                        <option value="cliente3">Cliente C</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="valor_min">Valor Mínimo</label>
+                    <input type="number" id="valor_min" placeholder="R$ 0,00" step="0.01">
+                </div>
+
+                <div class="filter-group">
+                    <label for="valor_max">Valor Máximo</label>
+                    <input type="number" id="valor_max" placeholder="R$ 10.000,00" step="0.01">
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-filter btn-primary" onclick="aplicarFiltros()">
+                        <i class="fas fa-filter"></i>
+                        Aplicar Filtros
+                    </button>
+                    <button class="btn-filter btn-secondary" onclick="limparFiltros()">
+                        <i class="fas fa-times"></i>
+                        Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Evolução Mensal</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <span>Recebido</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #FF9800;"></div>
+                            <span>Pendente</span>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="evolucaoMensal" width="400" height="200"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Distribuição por Status</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4CAF50;"></div>
+                            <span>Recebido</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #FF9800;"></div>
+                            <span>Pendente</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f44336;"></div>
+                            <span>Atrasado</span>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="distribuicaoStatus" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                <h3 class="table-title">Meus Títulos</h3>
+                <div class="table-actions">
+                    <button class="btn-filter btn-secondary" onclick="exportarDados()">
+                        <i class="fas fa-file-export"></i>
+                        Exportar
+                    </button>
+                    <button class="btn-filter btn-primary" onclick="atualizarDados()">
+                        <i class="fas fa-sync-alt"></i>
+                        Atualizar
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Vencimento</th>
+                            <th>Observações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaTitulos">
+                        <!-- Dados serão carregados dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button onclick="mudarPagina('anterior')" id="btnAnterior">Anterior</button>
+                <button class="active">1</button>
+                <button onclick="mudarPagina('2')">2</button>
+                <button onclick="mudarPagina('3')">3</button>
+                <button onclick="mudarPagina('proximo')" id="btnProximo">Próximo</button>
+            </div>
         </div>
     </div>
 
@@ -192,6 +628,215 @@
                 this.parentElement.classList.toggle('active');
             });
         });
+
+        // Dados mockados para demonstração
+        const dadosMock = {
+            titulos: [
+                {
+                    data: '2024-02-20',
+                    cliente: 'Empresa ABC Ltda',
+                    valor: 1500.00,
+                    status: 'recebido',
+                    vencimento: '2024-02-15',
+                    observacoes: 'Pagamento referente a venda #123'
+                },
+                {
+                    data: '2024-02-19',
+                    cliente: 'Comércio XYZ',
+                    valor: 2000.00,
+                    status: 'pendente',
+                    vencimento: '2024-02-25',
+                    observacoes: 'Aguardando confirmação'
+                },
+                {
+                    data: '2024-02-18',
+                    cliente: 'Indústria DEF',
+                    valor: 3500.00,
+                    status: 'atrasado',
+                    vencimento: '2024-01-30',
+                    observacoes: 'Cliente não pagou'
+                },
+                {
+                    data: '2024-02-17',
+                    cliente: 'Loja GHI',
+                    valor: 1200.00,
+                    status: 'recebido',
+                    vencimento: '2024-02-10',
+                    observacoes: 'Pagamento em dia'
+                },
+                {
+                    data: '2024-02-16',
+                    cliente: 'Empresa JKL',
+                    valor: 2800.00,
+                    status: 'pendente',
+                    vencimento: '2024-02-28',
+                    observacoes: 'Aguardando pagamento'
+                }
+            ]
+        };
+
+        // Inicializar gráficos
+        function inicializarGraficos() {
+            // Gráfico de Evolução Mensal
+            const ctxEvolucao = document.getElementById('evolucaoMensal').getContext('2d');
+            new Chart(ctxEvolucao, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Recebido',
+                        data: [18000, 22000, 19500, 25000, 23000, 25750],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Pendente',
+                        data: [5000, 8000, 6500, 7500, 9000, 8250],
+                        borderColor: '#FF9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Distribuição por Status
+            const ctxDistribuicao = document.getElementById('distribuicaoStatus').getContext('2d');
+            new Chart(ctxDistribuicao, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Recebido', 'Pendente', 'Atrasado'],
+                    datasets: [{
+                        data: [25750, 8250, 3500],
+                        backgroundColor: ['#4CAF50', '#FF9800', '#f44336'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Carregar tabela com dados
+        function carregarTabela() {
+            const tbody = document.getElementById('tabelaTitulos');
+            tbody.innerHTML = '';
+
+            dadosMock.titulos.forEach(titulo => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatarData(titulo.data)}</td>
+                    <td>${titulo.cliente}</td>
+                    <td>R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                    <td><span class="status-badge status-${titulo.status}">${getStatusText(titulo.status)}</span></td>
+                    <td>${formatarData(titulo.vencimento)}</td>
+                    <td>${titulo.observacoes}</td>
+                    <td>
+                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.cliente}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" title="Editar" onclick="editarTitulo('${titulo.cliente}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Funções auxiliares
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'recebido': 'Recebido',
+                'pendente': 'Pendente',
+                'atrasado': 'Cliente Não Pagou'
+            };
+            return statusMap[status] || status;
+        }
+
+        function showCardDetails(tipo) {
+            alert(`Detalhes do card: ${tipo}`);
+            // Aqui você pode implementar um modal com detalhes
+        }
+
+        function aplicarFiltros() {
+            alert('Filtros aplicados!');
+            // Implementar lógica de filtros
+        }
+
+        function limparFiltros() {
+            document.getElementById('periodo').value = 'mes_atual';
+            document.getElementById('status').value = '';
+            document.getElementById('cliente').value = '';
+            document.getElementById('valor_min').value = '';
+            document.getElementById('valor_max').value = '';
+        }
+
+        function exportarDados() {
+            alert('Exportando dados...');
+            // Implementar exportação para Excel/PDF
+        }
+
+        function atualizarDados() {
+            alert('Atualizando dados...');
+            // Implementar atualização em tempo real
+        }
+
+        function mudarPagina(pagina) {
+            alert(`Mudando para página: ${pagina}`);
+            // Implementar paginação
+        }
+
+        function visualizarTitulo(cliente) {
+            alert(`Visualizando título do cliente: ${cliente}`);
+            // Implementar modal de visualização
+        }
+
+        function editarTitulo(cliente) {
+            alert(`Editando título do cliente: ${cliente}`);
+            // Implementar modal de edição
+        }
+
+        // Inicializar quando a página carregar
+        window.addEventListener('DOMContentLoaded', function() {
+            inicializarGraficos();
+            carregarTabela();
+        });
+
+        // Atualizar dados a cada 5 minutos
+        setInterval(function() {
+            // Aqui você pode implementar atualização automática
+            console.log('Verificando atualizações...');
+        }, 300000);
     </script>
     <script src="scripts/navigation.js"></script>
     <script>
