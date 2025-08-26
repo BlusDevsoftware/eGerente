@@ -1083,10 +1083,6 @@
                     const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
                     ordem.forEach(chave => {
                         if (grupos[chave]) {
-                            const header = document.createElement('div');
-                            header.className = 'group-header';
-                            header.innerHTML = `<i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})`;
-                            grid.appendChild(header);
                             limitarListaParaExibicao(grupos[chave]).forEach(renderCard);
                         }
                     });
@@ -1094,10 +1090,6 @@
                 } else if (statusAgruparSelecionado && grupos[statusAgruparSelecionado]) {
                     // Agrupar apenas pelo status selecionado
                     const chave = statusAgruparSelecionado;
-                    const header = document.createElement('div');
-                    header.className = 'group-header';
-                    header.innerHTML = `<i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})`;
-                    grid.appendChild(header);
                     limitarListaParaExibicao(grupos[chave]).forEach(renderCard);
                     return;
                 }
@@ -1144,9 +1136,6 @@
                     const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
                     ordem.forEach(chave => {
                         if (grupos[chave]) {
-                            const trHeader = document.createElement('tr');
-                            trHeader.innerHTML = `<td colspan="10" style="text-align:left; background:#e3f2fd; color:#1565c0; font-weight:700; border:1px solid #e3f2fd;"><i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})</td>`;
-                            tbody.appendChild(trHeader);
                             limitarListaParaExibicao(grupos[chave]).forEach(t => tbody.appendChild(renderRow(t)));
                         }
                     });
@@ -1154,9 +1143,6 @@
                 } else if (statusAgruparSelecionado && grupos[statusAgruparSelecionado]) {
                     // Agrupar apenas pelo status selecionado na tabela
                     const chave = statusAgruparSelecionado;
-                    const trHeader = document.createElement('tr');
-                    trHeader.innerHTML = `<td colspan="10" style="text-align:left; background:#e3f2fd; color:#1565c0; font-weight:700; border:1px solid #e3f2fd;"><i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})</td>`;
-                    tbody.appendChild(trHeader);
                     limitarListaParaExibicao(grupos[chave]).forEach(t => tbody.appendChild(renderRow(t)));
                     return;
                 }
