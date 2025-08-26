@@ -558,6 +558,20 @@
             cursor: not-allowed;
         }
 
+        /* Agrupamento */
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1976D2;
+            font-weight: 700;
+            background: #e3f2fd;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 12px 20px 4px 20px;
+        }
+
         @media (max-width: 768px) {
             .charts-section {
                 grid-template-columns: 1fr;
@@ -757,10 +771,14 @@
 
         <!-- Paginação e Ações -->
         <div class="filters-container" id="barraInferior" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd;">
-            <div>
+            <div style="display:flex; gap:8px; align-items:center;">
                 <button class="btn-filter btn-secondary" onclick="alternarVisualizacao(this)" style="padding: 6px 12px; font-size: 0.85em;">
                     <i class="fas fa-list"></i>
                     Ver Tabela
+                </button>
+                <button class="btn-filter" onclick="alternarAgrupamento()" style="padding: 6px 12px; font-size: 0.85em; background:#0d6efd;">
+                    <i class="fas fa-layer-group"></i>
+                    Agrupar
                 </button>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
@@ -791,6 +809,8 @@
         let titulosFiltrados = [];
         let mapaColaboradores = {};
         let limiteExibicao = 20; // padrão
+        let agrupamentoAtivo = false;
+        let criterioAgrupamento = 'status';
 
         // Função para carregar colaboradores
         async function carregarColaboradores() {
@@ -1000,25 +1020,19 @@
             const grid = document.getElementById('titulosGrid');
             grid.innerHTML = '';
 
-            const lista = limitarListaParaExibicao(titulosFiltrados);
-            lista.forEach(titulo => {
+            const renderCard = (titulo) => {
                 const card = document.createElement('div');
                 card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
                 card.onclick = () => visualizarTitulo(titulo.numero_titulo);
-                
-                // Sanitização básica e ajuste de nome (primeiro e segundo)
                 const esc = (s) => String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
                 const nomeColabRaw = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
                 const nomeColab = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.slice(0,2).join(' '); })(nomeColabRaw);
-
                 const hasComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante);
-                
                 card.innerHTML = `
                     <div class="titulo-header">
                         <h4 class="titulo-cliente">${esc(titulo.numero_titulo)}</h4>
                         <span class="titulo-status ${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span>
                     </div>
-                    
                     <div class="titulo-info">
                         <div class="info-item">
                             <span class="info-label">Colaborador</span>
@@ -1029,7 +1043,6 @@
                             <span class="info-value">${esc(titulo.tipo)}</span>
                         </div>
                     </div>
-                    
                     <div class="titulo-info">
                         <div class="info-item">
                             <span class="info-label">Geração</span>
@@ -1040,32 +1053,36 @@
                             <span class="info-value">${formatarData(titulo.data_vencimento)}</span>
                         </div>
                     </div>
-                    
-                    <div class="titulo-valor">
-                        R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                    </div>
-                    
-                    <div class="titulo-observacoes">
-                        ${esc(titulo.descricao)}
-                    </div>
-                    
-                                <div class="titulo-acoes">
-                <button class="timeline-btn" onclick="event.stopPropagation(); abrirTimeline('${titulo.numero_titulo}')" title="Linha do Tempo">
-                    <i class="fas fa-clock"></i>
-                </button>
-                <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.numero_titulo}')">
-                    <i class="fas fa-eye"></i>
-                    Visualizar
-                </button>
-                <button class="btn-acao ${hasComprovante ? 'btn-comprovante' : 'btn-comprovante-missing'}" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
-                    <i class="fas fa-file-invoice"></i>
-                    Comprovante
-                </button>
-            </div>
-                `;
-                
+                    <div class="titulo-valor">R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <div class="titulo-observacoes">${esc(titulo.descricao)}</div>
+                    <div class="titulo-acoes">
+                        <button class="timeline-btn" onclick="event.stopPropagation(); abrirTimeline('${titulo.numero_titulo}')" title="Linha do Tempo">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.numero_titulo}')">
+                            <i class="fas fa-eye"></i> Visualizar
+                        </button>
+                        <button class="btn-acao ${hasComprovante ? 'btn-comprovante' : 'btn-comprovante-missing'}" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
+                            <i class="fas fa-file-invoice"></i> Comprovante
+                        </button>
+                    </div>`;
                 grid.appendChild(card);
-            });
+            };
+
+            if (agrupamentoAtivo && criterioAgrupamento === 'status') {
+                const grupos = titulosFiltrados.reduce((acc, t)=>{ const k = String(t.status||'Sem status'); (acc[k]=acc[k]||[]).push(t); return acc; },{});
+                const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
+                Object.keys(grupos).sort((a,b)=> ordem.indexOf(a)-ordem.indexOf(b)).forEach(chave => {
+                    const header = document.createElement('div');
+                    header.className = 'group-header';
+                    header.innerHTML = `<i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})`;
+                    grid.appendChild(header);
+                    limitarListaParaExibicao(grupos[chave]).forEach(renderCard);
+                });
+                return;
+            }
+
+            limitarListaParaExibicao(titulosFiltrados).forEach(renderCard);
         }
 
         // Carregar tabela com dados
@@ -1073,8 +1090,7 @@
             const tbody = document.getElementById('recebimentoTableBody');
             tbody.innerHTML = '';
 
-            const lista = limitarListaParaExibicao(titulosFiltrados);
-            lista.forEach((titulo, index) => {
+            const renderRow = (titulo) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><button class="timeline-btn" title="Linha do Tempo" onclick="abrirTimeline('${titulo.numero_titulo}')">
@@ -1095,10 +1111,23 @@
                         <button class="action-btn ${ (titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante) ? 'comprovante-btn' : 'comprovante-missing' }" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
                             <i class="fas fa-file-invoice"></i>
                         </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+                    </td>`;
+                return row;
+            };
+
+            if (agrupamentoAtivo && criterioAgrupamento === 'status') {
+                const grupos = titulosFiltrados.reduce((acc, t)=>{ const k = String(t.status||'Sem status'); (acc[k]=acc[k]||[]).push(t); return acc; },{});
+                const ordem = ['PAGO','PENDENTE','VENCIDO','CLIENTE NÃO PAGOU','AGLUTINADO'];
+                Object.keys(grupos).sort((a,b)=> ordem.indexOf(a)-ordem.indexOf(b)).forEach(chave => {
+                    const trHeader = document.createElement('tr');
+                    trHeader.innerHTML = `<td colspan="10" style="text-align:left; background:#e3f2fd; color:#1565c0; font-weight:700; border:1px solid #e3f2fd;"><i class=\"fas fa-tag\"></i> ${getStatusText(chave)} (${grupos[chave].length})</td>`;
+                    tbody.appendChild(trHeader);
+                    limitarListaParaExibicao(grupos[chave]).forEach(t => tbody.appendChild(renderRow(t)));
+                });
+                return;
+            }
+
+            limitarListaParaExibicao(titulosFiltrados).forEach(t => tbody.appendChild(renderRow(t)));
         }
 
         function limitarListaParaExibicao(lista) {
@@ -1116,6 +1145,13 @@
             const sel = document.getElementById('exibirQtd');
             if (!sel) return;
             limiteExibicao = sel.value;
+            carregarGridTitulos();
+            carregarTabela();
+            requestAnimationFrame(sincronizarAlturaConteudo);
+        }
+
+        function alternarAgrupamento(){
+            agrupamentoAtivo = !agrupamentoAtivo;
             carregarGridTitulos();
             carregarTabela();
             requestAnimationFrame(sincronizarAlturaConteudo);
@@ -1351,27 +1387,6 @@
                             ${String(titulo.descricao||titulo.observacoes||'Sem observações.').replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}
                         </div>
                     </div>
-                    <div class="form-section" style="margin-top:22px; padding-top:16px; border-top:1px solid #eee;">
-                        <h3 style="margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-paperclip"></i> Comprovante de Pagamento</h3>
-                        <div id="comprovante-container-r" style="background:#fff; border-radius:8px; padding:16px; border:1px solid #e3f2fd;">
-                            <div id="comprovante-info-r" style="display:none;">
-                                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                                    <i class="fas fa-file-alt" style="font-size:1.3em; color:#4CAF50;"></i>
-                                    <div>
-                                        <div style="font-weight:500; color:#333; font-size:0.9em;">Comprovante anexado</div>
-                                        <div style="font-size:0.8em; color:#666;">Clique no botão abaixo para visualizar</div>
-                    </div>
-                                </div>
-                                <button type="button" id="btnVisualizarComprovanteR" style="background:#1976D2; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; display:flex; align-items:center; gap:6px; font-weight:500;">
-                                    <i class="fas fa-eye"></i> Visualizar Comprovante
-                                </button>
-                            </div>
-                            <div id="sem-comprovante-r" style="text-align:center; color:#6c757d; font-style:italic; padding:16px;">
-                                <i class="fas fa-info-circle" style="margin-right:8px;"></i>
-                                Nenhum comprovante anexado a este título
-                            </div>
-                        </div>
-                    </div>
                     ${produtosArr.length ? `
                     <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
                         <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-list\"></i> Produtos do Título</h3>
@@ -1389,11 +1404,32 @@
                                     ${produtosHTML}
                                 </tbody>
                             </table>
-                        </div>
+                    </div>
                     </div>` : ''}
                     ${secaoBaixa}
                     ${secaoParciais}
                     ${secaoAgl}
+                    <div class="form-section" style="margin-top:22px; padding-top:16px; border-top:1px solid #eee;">
+                        <h3 style="margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-paperclip"></i> Comprovante de Pagamento</h3>
+                        <div id="comprovante-container-r" style="background:#fff; border-radius:8px; padding:16px; border:1px solid #e3f2fd;">
+                            <div id="comprovante-info-r" style="display:none;">
+                                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                                    <i class="fas fa-file-alt" style="font-size:1.3em; color:#4CAF50;"></i>
+                                    <div>
+                                        <div style="font-weight:500; color:#333; font-size:0.9em;">Comprovante anexado</div>
+                                        <div style="font-size:0.8em; color:#666;">Clique no botão abaixo para visualizar</div>
+                                    </div>
+                                </div>
+                                <button type="button" id="btnVisualizarComprovanteR" style="background:#1976D2; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; display:flex; align-items:center; gap:6px; font-weight:500;">
+                                    <i class="fas fa-eye"></i> Visualizar Comprovante
+                                </button>
+                            </div>
+                            <div id="sem-comprovante-r" style="text-align:center; color:#6c757d; font-style:italic; padding:16px;">
+                                <i class="fas fa-info-circle" style="margin-right:8px;"></i>
+                                Nenhum comprovante anexado a este título
+                            </div>
+                        </div>
+                    </div>
                 </form>
             `;
 
