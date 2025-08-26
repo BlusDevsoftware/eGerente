@@ -1218,115 +1218,71 @@
             // Implementar modal de edição
         }
 
-        function visualizarComprovante(numeroTitulo) {
-            console.log('Visualizar comprovante do título:', numeroTitulo);
-            // Buscar o título nos dados reais
-            const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
-            if (titulo) {
-                // Simular modal de comprovante
-                const modal = document.createElement('div');
-                modal.className = 'modal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100vw;
-                    height: 100vh;
-                    background: rgba(0,0,0,0.5);
-                    z-index: 4000;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                `;
+        async function visualizarComprovante(numeroTitulo) {
+            try {
+                const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo) || {};
+                // Prioriza exatamente como no Movimento: usar comprovante_url
+                let url = titulo.comprovante_url || null;
 
-                const modalContent = document.createElement('div');
-                modalContent.style.cssText = `
-                    background: white;
-                    border-radius: 12px;
-                    padding: 24px;
-                    max-width: 500px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    position: relative;
-                `;
+                // Fallbacks caso não exista a URL direta
+                if (!url && Array.isArray(titulo.anexos) && titulo.anexos.length) {
+                    const anexo = titulo.anexos.find(a => a.url) || titulo.anexos[0];
+                    if (anexo && anexo.url) url = anexo.url;
+                }
+                if (!url && titulo.comprovante) {
+                    const b64 = String(titulo.comprovante);
+                    url = b64.startsWith('data:') ? b64 : `data:application/octet-stream;base64,${b64}`;
+                }
+                if (!url && (titulo.id || numeroTitulo)) {
+                    try {
+                        const resp = await window.api.get(`/movimento_comissoes/${titulo.id || numeroTitulo}/comprovante`);
+                        if (resp && (resp.url || resp.base64)) {
+                            url = resp.url || (resp.base64.startsWith('data:') ? resp.base64 : `data:application/octet-stream;base64,${resp.base64}`);
+                        }
+                    } catch (_) {}
+                }
 
-                modalContent.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-file-invoice" style="color: #2e7d32;"></i>
-                            Comprovante - ${titulo.numero_titulo}
-                        </h2>
-                        <button onclick="this.closest('.modal').remove()" style="
-                            background: none;
-                            border: none;
-                            font-size: 1.5em;
-                            color: #666;
-                            cursor: pointer;
-                            padding: 5px;
-                        ">&times;</button>
-                    </div>
-                    <div style="border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #fafafa;">
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            <h3 style="color: #2e7d32; margin: 0;">COMPROVANTE DE PAGAMENTO</h3>
-                            <p style="color: #666; margin: 5px 0;">Título: ${titulo.numero_titulo}</p>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                            <div>
-                                <strong>Colaborador:</strong><br>
-                                ${titulo.colaborador}
-                            </div>
-                            <div>
-                                <strong>Tipo:</strong><br>
-                                ${titulo.tipo}
-                            </div>
-                            <div>
-                                <strong>Data de Geração:</strong><br>
-                                ${formatarData(titulo.data_geracao)}
-                            </div>
-                            <div>
-                                <strong>Data de Vencimento:</strong><br>
-                                ${formatarData(titulo.data_vencimento)}
-                            </div>
-                        </div>
-                        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #e8f5e8; border-radius: 8px;">
-                            <div style="font-size: 0.9em; color: #666;">Valor Total</div>
-                            <div style="font-size: 1.8em; font-weight: bold; color: #2e7d32;">
-                                R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                            </div>
-                        </div>
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                            <div style="font-size: 0.9em; color: #666;">
-                                <strong>Status:</strong> ${getStatusText(titulo.status)}
-                            </div>
-                            <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
-                                <strong>Observações:</strong> ${titulo.observacoes}
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="window.print()" style="
-                            background: #2e7d32;
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-weight: 500;
-                        ">Imprimir Comprovante</button>
-                    </div>
-                `;
-
-                modal.appendChild(modalContent);
-                document.body.appendChild(modal);
-
-                // Fechar modal ao clicar fora
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.remove();
-                    }
-                });
+                if (url) {
+                    window.open(url, '_blank');
+                } else {
+                    mostrarModalInfo('Nenhum comprovante anexado a este título.');
+                }
+            } catch (e) {
+                console.error('Erro ao abrir comprovante:', e);
+                mostrarModalInfo('Não foi possível abrir o comprovante.');
             }
+        }
+
+        function mostrarModalInfo(mensagem) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5000;
+                display: flex; align-items: center; justify-content: center;`;
+
+            const box = document.createElement('div');
+            box.style.cssText = `
+                background: #fff; border-radius: 12px; padding: 20px 24px; max-width: 420px; width: 92%;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;`;
+            box.innerHTML = `
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px;">
+                    <h3 style="margin:0; color:#1f2937; font-size: 1.05em; font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-info-circle" style="color:#0d6efd;"></i> Aviso
+                    </h3>
+                    <button style="background:none;border:none;font-size:1.4em;color:#6b7280;cursor:pointer;" title="Fechar">&times;</button>
+                </div>
+                <div style="color:#4b5563; font-size:0.95em;">${mensagem}</div>
+                <div style="margin-top: 16px;">
+                    <button style="background:#0d6efd;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">OK</button>
+                </div>`;
+
+            const close = () => modal.remove();
+            box.querySelector('button[title="Fechar"]').onclick = close;
+            box.querySelector('button:not([title])').onclick = close;
+            modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+
+            modal.appendChild(box);
+            document.body.appendChild(modal);
         }
 
         function abrirTimeline(numeroTitulo) {
