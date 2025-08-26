@@ -1261,8 +1261,6 @@
                         <div style=\"display:flex; gap:16px; flex-wrap:wrap;\">
                             <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Data Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.data_pagamento?formatarData(titulo.data_pagamento):'-'}</div></div>
                             <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Valor Pago</div><div style=\"font-weight:600; color:#1f2937;\">R$ ${(Number(titulo.valor_pago||titulo.valor||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
-                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Forma de Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.forma_pagamento||'-'}</div></div>
-                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Usuário Baixa</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.usuario_baixa||'-'}</div></div>
                         </div>
                     </div>` : '';
 
