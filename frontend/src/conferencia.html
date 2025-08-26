@@ -74,114 +74,23 @@
             </div>
         </div>
 
-        <!-- Filters -->
-        <div class="filters-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar...">
-            </div>
-            <div class="filter-options">
-                <select>
-                    <option value="">Período</option>
-                    <option value="hoje">Hoje</option>
-                    <option value="semana">Esta Semana</option>
-                    <option value="mes">Este Mês</option>
-                    <option value="personalizado">Personalizado</option>
-                </select>
-                <select>
-                    <option value="">Status</option>
-                    <option value="conferido">Conferido</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="divergencia">Divergência</option>
-                </select>
-            </div>
-            <button class="btn-primary">
-                <i class="fas fa-check-double"></i>
-                Conferir
-            </button>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="dashboard-cards">
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-check-circle"></i>
+        <!-- Mensagem de Desenvolvimento -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 40px 20px;">
+            <div style="background: linear-gradient(135deg, #1976D2, #42A5F5); border-radius: 20px; padding: 60px 40px; box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3); max-width: 500px; width: 100%;">
+                <div style="font-size: 4rem; color: white; margin-bottom: 20px;">
+                    <i class="fas fa-tools"></i>
                 </div>
-                <div class="card-info">
-                    <h3>Conferidos</h3>
-                    <p>R$ 18.750,00</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
+                <h2 style="color: white; font-size: 2rem; margin-bottom: 15px; font-weight: 600;">
+                    Em Desenvolvimento
+                </h2>
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+                    A funcionalidade de <strong>Conferência de Comissões</strong> está sendo desenvolvida e estará disponível em breve.
+                </p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: rgba(255, 255, 255, 0.8); font-size: 0.95rem;">
                     <i class="fas fa-clock"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Pendentes</h3>
-                    <p>R$ 5.250,00</p>
+                    <span>Aguarde as próximas atualizações</span>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Divergências</h3>
-                    <p>R$ 1.500,00</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-percentage"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Taxa de Acerto</h3>
-                    <p>98.5%</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Colaborador</th>
-                        <th>Valor Calculado</th>
-                        <th>Valor Pago</th>
-                        <th>Diferença</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2024-02-20</td>
-                        <td>João Silva</td>
-                        <td>R$ 1.500,00</td>
-                        <td>R$ 1.500,00</td>
-                        <td>R$ 0,00</td>
-                        <td><span class="status paid">Conferido</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2024-02-19</td>
-                        <td>Maria Santos</td>
-                        <td>R$ 2.000,00</td>
-                        <td>R$ 1.800,00</td>
-                        <td>R$ 200,00</td>
-                        <td><span class="status pending">Divergência</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
