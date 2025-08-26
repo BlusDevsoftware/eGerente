@@ -860,7 +860,7 @@
                 
                 // Atualizar cards totalizadores com animação após pequeno delay para garantir zeros iniciais
                 setTimeout(() => {
-                    atualizarCardsTotalizadores();
+                atualizarCardsTotalizadores();
                     atualizarCardsComAnimacao();
                 }, 50);
                 
@@ -1012,7 +1012,7 @@
                 const nomeColab = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.slice(0,2).join(' '); })(nomeColabRaw);
 
                 const hasComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante);
-
+                
                 card.innerHTML = `
                     <div class="titulo-header">
                         <h4 class="titulo-cliente">${esc(titulo.numero_titulo)}</h4>
@@ -1243,9 +1243,23 @@
             const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
 
             // Produtos do título (tenta vários formatos de campo)
-            const produtosArr = Array.isArray(titulo.produtos) ? titulo.produtos
+            let produtosArr = Array.isArray(titulo.produtos) ? titulo.produtos
                 : (Array.isArray(titulo.itens) ? titulo.itens
                 : (Array.isArray(titulo.items) ? titulo.items : []));
+
+            // Compatibilidade com Movimento: item_id no formato "codigo-nome,codigo-nome"
+            if ((!produtosArr || produtosArr.length === 0) && typeof titulo.item_id === 'string' && titulo.item_id.trim()) {
+                const itensStr = titulo.item_id.split(',').map(s => s.trim()).filter(Boolean);
+                produtosArr = itensStr.map((item, idx) => {
+                    const match = item.match(/^(\d{5})-(.+)$/);
+                    if (match) {
+                        const nome = match[2].trim();
+                        const unit = Number(titulo.valor_venda || titulo.valor || 0);
+                        return { nome, quantidade: 1, valor_unitario: unit, valor_total: unit };
+                    }
+                    return { nome: item, quantidade: 1, valor_unitario: Number(titulo.valor_venda||0), valor_total: Number(titulo.valor_venda||0) };
+                });
+            }
             const produtosHTML = produtosArr.map((p, idx) => {
                 const nome = p.nome || p.descricao || p.nome_produto || `Produto ${idx+1}`;
                 const qtd = Number(p.quantidade ?? p.qtd ?? 1);
@@ -1259,8 +1273,8 @@
                 </tr>`;
             }).join('');
 
-            const modal = document.createElement('div');
-            modal.className = 'modal';
+                const modal = document.createElement('div');
+                modal.className = 'modal';
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; display: flex; align-items: center; justify-content: center;';
 
             const content = document.createElement('div');
@@ -1278,7 +1292,7 @@
                         <div style=\"display:flex; gap:16px; flex-wrap:wrap;\">
                             <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Data Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.data_pagamento?formatarData(titulo.data_pagamento):'-'}</div></div>
                             <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Valor Pago</div><div style=\"font-weight:600; color:#1f2937;\">R$ ${(Number(titulo.valor_pago||titulo.valor||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
-                        </div>
+                    </div>
                     </div>` : '';
 
             const listaHTML = (arr) => arr.map(t=>`<li style=\"padding:8px 0; display:flex; justify-content:space-between; border-bottom:1px dashed #eee;\"><span>${t.numero_titulo}</span><span style=\"color:#6b7280;\">${getStatusText(t.status)} • R$ ${Number(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></li>`).join('');
@@ -1305,22 +1319,22 @@
                         <div class="form-group" style="flex:1; min-width:220px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Colaborador</label>
                             <input type="text" value="${nomeExibicao}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
-                        </div>
-                    </div>
+                            </div>
+                            </div>
                     <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
                         <div class="form-group" style="flex:1; min-width:200px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Data de Geração</label>
                             <input type="text" value="${formatarData(titulo.data_geracao)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
-                        </div>
+                            </div>
                         <div class="form-group" style="flex:1; min-width:200px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Data de Vencimento</label>
                             <input type="text" value="${formatarData(titulo.data_vencimento)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
-                        </div>
+                            </div>
                         <div class="form-group" style="flex:1; min-width:160px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Status</label>
                             <input type="text" value="${getStatusText(titulo.status)}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
                         </div>
-                    </div>
+                            </div>
                     <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
                         <div class="form-group" style="flex:1; min-width:200px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Tipo</label>
@@ -1329,8 +1343,8 @@
                         <div class="form-group" style="flex:1; min-width:200px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Valor</label>
                             <input type="text" value="R$ ${Number(titulo.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
-                        </div>
-                    </div>
+                            </div>
+                            </div>
                     <div class="form-section" style="margin-top:22px; padding-top:16px; border-top:1px solid #eee;">
                         <h3 style="margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;"><i class="fas fa-align-left"></i> Observações</h3>
                         <div style="background:#fff; border-radius:8px; border:1px solid #e3f2fd; padding:12px; color:#555;">
@@ -1346,7 +1360,7 @@
                                     <div>
                                         <div style="font-weight:500; color:#333; font-size:0.9em;">Comprovante anexado</div>
                                         <div style="font-size:0.8em; color:#666;">Clique no botão abaixo para visualizar</div>
-                                    </div>
+                    </div>
                                 </div>
                                 <button type="button" id="btnVisualizarComprovanteR" style="background:#1976D2; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:0.9em; display:flex; align-items:center; gap:6px; font-weight:500;">
                                     <i class="fas fa-eye"></i> Visualizar Comprovante
@@ -1391,7 +1405,7 @@
             content.appendChild(body);
             content.appendChild(footer);
             modal.appendChild(content);
-            document.body.appendChild(modal);
+                document.body.appendChild(modal);
 
             header.querySelector('button').onclick = () => modal.remove();
             modal.addEventListener('click', (e)=>{ if (e.target === modal) modal.remove(); });
