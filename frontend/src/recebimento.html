@@ -1310,7 +1310,7 @@
             // Implementar paginação
         }
 
-        function visualizarTitulo(numeroTitulo) {
+        async function visualizarTitulo(numeroTitulo) {
             const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
             if (!titulo) { mostrarModalInfo('Título não encontrado.'); return; }
 
@@ -1321,8 +1321,36 @@
             const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === titulo.id);
             const isParcial = titulosParciais.length > 0;
             const idsAgl = Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : [];
-            const titulosAglutinados = idsAgl.length ? todosTitulos.filter(t => idsAgl.includes(t.id)) : [];
+            let titulosAglutinados = [];
             const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
+            
+            // Se for aglutinado, buscar os títulos originais da API
+            if (isAglutinado && idsAgl.length > 0) {
+                try {
+                    console.log('Título aglutinado detectado, IDs:', idsAgl);
+                    // Converter string de IDs em array se for string
+                    const ids = typeof idsAgl === 'string' ? idsAgl.split(',').map(id => id.trim()) : idsAgl;
+                    console.log('IDs processados:', ids);
+                    
+                    // Buscar cada título original da API
+                    for (const id of ids) {
+                        try {
+                            console.log('Buscando título ID:', id);
+                            const response = await window.api.get(`/movimento_comissoes/${id}`);
+                            if (response && (response.data || response.id)) {
+                                const tituloData = response.data || response;
+                                titulosAglutinados.push(tituloData);
+                                console.log('Título encontrado:', tituloData.numero_titulo);
+                            }
+                        } catch (error) {
+                            console.error('Erro ao carregar título original ID', id, ':', error);
+                        }
+                    }
+                    console.log('Total de títulos aglutinados carregados:', titulosAglutinados.length);
+                } catch (error) {
+                    console.error('Erro ao carregar títulos aglutinados:', error);
+                }
+            }
 
             // Produtos do título (tenta vários formatos de campo)
             let produtosArr = Array.isArray(titulo.produtos) ? titulo.produtos
