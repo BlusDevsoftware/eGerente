@@ -389,10 +389,16 @@
         .btn-comprovante { background-color: #198754 !important; color: #fff !important; }
         .btn-comprovante i { color: #fff !important; }
         .btn-comprovante:hover { opacity: 0.9; }
+        .btn-comprovante-missing { background-color: #dc3545 !important; color: #fff !important; }
+        .btn-comprovante-missing i { color: #fff !important; }
+        .btn-comprovante-missing:hover { opacity: 0.9; }
 
         .comprovante-btn { background-color: #198754 !important; color: #fff !important; }
         .comprovante-btn i { color: #fff !important; }
         .comprovante-btn:hover { opacity: 0.9; }
+        .comprovante-missing { background-color: #dc3545 !important; color: #fff !important; }
+        .comprovante-missing i { color: #fff !important; }
+        .comprovante-missing:hover { opacity: 0.9; }
 
         .timeline-btn {
             min-width: 28px;
@@ -1004,6 +1010,8 @@
                 const esc = (s) => String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
                 const nomeColab = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
 
+                const hasComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante);
+
                 card.innerHTML = `
                     <div class="titulo-header">
                         <h4 class="titulo-cliente">${esc(titulo.numero_titulo)}</h4>
@@ -1048,7 +1056,7 @@
                     <i class="fas fa-eye"></i>
                     Visualizar
                 </button>
-                <button class="btn-acao btn-comprovante" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
+                <button class="btn-acao ${hasComprovante ? 'btn-comprovante' : 'btn-comprovante-missing'}" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
                     <i class="fas fa-file-invoice"></i>
                     Comprovante
                 </button>
@@ -1083,7 +1091,7 @@
                         <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.numero_titulo}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="action-btn comprovante-btn" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
+                        <button class="action-btn ${ (titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante) ? 'comprovante-btn' : 'comprovante-missing' }" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
                             <i class="fas fa-file-invoice"></i>
                         </button>
                     </td>
