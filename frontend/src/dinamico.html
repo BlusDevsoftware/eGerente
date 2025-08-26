@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -113,6 +123,14 @@
             </button>
         </div>
 
+        <!-- Spinner de Carregamento -->
+        <div id="loader-dinamico" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center;">
+            <div style="text-align: center;">
+                <div class="spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1976D2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <p style="color: #1976D2; font-weight: 600;">Carregando dados...</p>
+            </div>
+        </div>
+
         <!-- Charts Container -->
         <div class="charts-container">
             <div class="chart-card">
@@ -134,11 +152,11 @@
             <div class="table-header">
                 <h2>Resultados</h2>
                 <div class="table-actions">
-                    <button class="btn-secondary">
+                    <button class="btn-secondary" onclick="exportarRelatorio()">
                         <i class="fas fa-download"></i>
                         Exportar
                     </button>
-                    <button class="btn-secondary">
+                    <button class="btn-secondary" onclick="imprimirRelatorio()">
                         <i class="fas fa-print"></i>
                         Imprimir
                     </button>
@@ -157,36 +175,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2024-02-20</td>
-                        <td>João Silva</td>
-                        <td>Produto</td>
-                        <td>R$ 3.000,00</td>
-                        <td>R$ 300,00</td>
-                        <td><span class="status paid">Pago</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2024-02-19</td>
-                        <td>Maria Santos</td>
-                        <td>Serviço</td>
-                        <td>R$ 2.500,00</td>
-                        <td>R$ 250,00</td>
-                        <td><span class="status pending">Pendente</span></td>
-                        <td>
-                            <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
+                    <!-- Dados serão carregados dinamicamente -->
                 </tbody>
             </table>
         </div>
     </div>
 
+    <script src="scripts/config/api.js"></script>
     <script>
+        // Variáveis globais
+        let mapaColaboradores = {};
+        let mapaClientes = {};
+        let dadosRelatorio = [];
+        let charts = {};
+
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
             trigger.addEventListener('click', function(e) {
@@ -195,59 +197,484 @@
             });
         });
 
-        // Status Chart
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        new Chart(statusCtx, {
+        // Carregar colaboradores
+        async function carregarColaboradores() {
+            try {
+                const colaboradores = await window.api.get('/colaboradores');
+                mapaColaboradores = {};
+                const selectColaborador = document.querySelector('.advanced-filters select:nth-of-type(1)');
+                
+                // Limpar opções existentes (exceto a primeira)
+                selectColaborador.innerHTML = '<option value="">Colaborador</option><option value="todos">Todos</option>';
+                
+                colaboradores.forEach(colaborador => {
+                    mapaColaboradores[colaborador.id] = colaborador.nome;
+                    const option = document.createElement('option');
+                    option.value = colaborador.id;
+                    option.textContent = colaborador.nome;
+                    selectColaborador.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar colaboradores:', error);
+            }
+        }
+
+        // Carregar clientes
+        async function carregarClientes() {
+            try {
+                const clientes = await window.api.get('/clientes');
+                mapaClientes = {};
+                clientes.forEach(cliente => {
+                    mapaClientes[cliente.id] = cliente.nome;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+            }
+        }
+
+        // Carregar dados do relatório
+        async function carregarDadosRelatorio() {
+            try {
+                mostrarSpinner();
+                const movimentoComissoes = await window.api.get('/movimento_comissoes');
+                dadosRelatorio = movimentoComissoes;
+                console.log('Dados carregados:', dadosRelatorio.length, 'registros');
+                ocultarSpinner();
+            } catch (error) {
+                console.error('Erro ao carregar dados do relatório:', error);
+                ocultarSpinner();
+            }
+        }
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            const dataInicial = document.querySelector('.date-range input[type="date"]:first-of-type').value;
+            const dataFinal = document.querySelector('.date-range input[type="date"]:last-of-type').value;
+            const colaboradorId = document.querySelector('.advanced-filters select:nth-of-type(1)').value;
+            const tipo = document.querySelector('.advanced-filters select:nth-of-type(2)').value;
+            const status = document.querySelector('.advanced-filters select:nth-of-type(3)').value;
+            const valorMinimo = document.querySelector('.value-range input:first-of-type').value;
+            const valorMaximo = document.querySelector('.value-range input:last-of-type').value;
+
+            let dadosFiltrados = [...dadosRelatorio];
+
+            // Filtro por data
+            if (dataInicial) {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    new Date(item.data_geracao) >= new Date(dataInicial)
+                );
+            }
+            if (dataFinal) {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    new Date(item.data_geracao) <= new Date(dataFinal)
+                );
+            }
+
+            // Filtro por colaborador
+            if (colaboradorId && colaboradorId !== 'todos') {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    item.colaborador_id === colaboradorId
+                );
+            }
+
+            // Filtro por tipo
+            if (tipo) {
+                if (tipo === 'produtos') {
+                    dadosFiltrados = dadosFiltrados.filter(item => 
+                        item.tipo === 'PRODUTO'
+                    );
+                } else if (tipo === 'servicos') {
+                    dadosFiltrados = dadosFiltrados.filter(item => 
+                        item.tipo === 'SERVICO'
+                    );
+                }
+            }
+
+            // Filtro por status
+            if (status) {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    item.status === status.toUpperCase()
+                );
+            }
+
+            // Filtro por valor
+            if (valorMinimo) {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    Number(item.valor) >= Number(valorMinimo)
+                );
+            }
+            if (valorMaximo) {
+                dadosFiltrados = dadosFiltrados.filter(item => 
+                    Number(item.valor) <= Number(valorMaximo)
+                );
+            }
+
+            console.log('Dados filtrados:', dadosFiltrados.length, 'registros');
+            return dadosFiltrados;
+        }
+
+        // Gerar relatório
+        async function gerarRelatorio() {
+            try {
+                mostrarSpinner();
+                const dadosFiltrados = aplicarFiltros();
+                atualizarGraficos(dadosFiltrados);
+                atualizarTabela(dadosFiltrados);
+                ocultarSpinner();
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                ocultarSpinner();
+            }
+        }
+
+        // Mostrar spinner
+        function mostrarSpinner() {
+            const spinner = document.getElementById('loader-dinamico');
+            if (spinner) {
+                spinner.style.display = 'flex';
+            }
+        }
+
+        // Ocultar spinner
+        function ocultarSpinner() {
+            const spinner = document.getElementById('loader-dinamico');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Inicializar página
+        async function inicializarPagina() {
+            await carregarColaboradores();
+            await carregarClientes();
+            await carregarDadosRelatorio();
+            
+            // Gerar relatório inicial
+            gerarRelatorio();
+        }
+
+        // Atualizar gráficos com dados reais
+        function atualizarGraficos(dados) {
+            atualizarGraficoStatus(dados);
+            atualizarGraficoColaboradores(dados);
+            atualizarGraficoEvolucao(dados);
+        }
+
+        // Atualizar gráfico de status
+        function atualizarGraficoStatus(dados) {
+            const statusCount = {};
+            dados.forEach(item => {
+                const status = item.status || 'PENDENTE';
+                statusCount[status] = (statusCount[status] || 0) + 1;
+            });
+
+            const labels = Object.keys(statusCount);
+            const values = Object.values(statusCount);
+            const colors = {
+                'PAGO': '#28a745',
+                'PENDENTE': '#ffc107',
+                'VENCIDO': '#dc3545',
+                'CLIENTE NÃO PAGOU': '#6c757d',
+                'AGLUTINADO': '#17a2b8'
+            };
+
+            const backgroundColors = labels.map(label => colors[label] || '#6c757d');
+
+            if (charts.statusChart) {
+                charts.statusChart.destroy();
+            }
+
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            charts.statusChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ['Pago', 'Pendente', 'Cancelado'],
+                    labels: labels,
                 datasets: [{
-                    data: [65, 25, 10],
-                    backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                        data: values,
+                        backgroundColor: backgroundColors
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
-            }
-        });
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
 
-        // Colaboradores Chart
-        const colaboradoresCtx = document.getElementById('colaboradoresChart').getContext('2d');
-        new Chart(colaboradoresCtx, {
+        // Atualizar gráfico de colaboradores
+        function atualizarGraficoColaboradores(dados) {
+            const colaboradorTotais = {};
+            dados.forEach(item => {
+                const colaboradorId = item.colaborador_id;
+                const colaboradorNome = mapaColaboradores[colaboradorId] || `ID: ${colaboradorId}`;
+                const valor = Number(item.valor) || 0;
+                colaboradorTotais[colaboradorNome] = (colaboradorTotais[colaboradorNome] || 0) + valor;
+            });
+
+            // Ordenar e pegar top 5
+            const sortedColaboradores = Object.entries(colaboradorTotais)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5);
+
+            const labels = sortedColaboradores.map(([nome]) => nome);
+            const values = sortedColaboradores.map(([, valor]) => valor);
+
+            if (charts.colaboradoresChart) {
+                charts.colaboradoresChart.destroy();
+            }
+
+            const ctx = document.getElementById('colaboradoresChart').getContext('2d');
+            charts.colaboradoresChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['João Silva', 'Maria Santos', 'Pedro Oliveira', 'Ana Costa', 'Carlos Lima'],
+                    labels: labels,
                 datasets: [{
-                    label: 'Comissões',
-                    data: [12000, 9500, 8000, 7500, 7000],
+                        label: 'Valor Total (R$)',
+                        data: values,
                     backgroundColor: '#007bff'
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
-            }
-        });
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-        // Evolução Chart
-        const evolucaoCtx = document.getElementById('evolucaoChart').getContext('2d');
-        new Chart(evolucaoCtx, {
+        // Atualizar gráfico de evolução
+        function atualizarGraficoEvolucao(dados) {
+            const evolucaoMensal = {};
+            dados.forEach(item => {
+                const data = new Date(item.data_geracao);
+                const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+                const valor = Number(item.valor) || 0;
+                evolucaoMensal[mesAno] = (evolucaoMensal[mesAno] || 0) + valor;
+            });
+
+            // Ordenar por data
+            const sortedEvolucao = Object.entries(evolucaoMensal)
+                .sort(([a], [b]) => a.localeCompare(b));
+
+            const labels = sortedEvolucao.map(([mesAno]) => {
+                const [ano, mes] = mesAno.split('-');
+                const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+                return `${meses[parseInt(mes) - 1]}/${ano}`;
+            });
+            const values = sortedEvolucao.map(([, valor]) => valor);
+
+            if (charts.evolucaoChart) {
+                charts.evolucaoChart.destroy();
+            }
+
+            const ctx = document.getElementById('evolucaoChart').getContext('2d');
+            charts.evolucaoChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    labels: labels,
                 datasets: [{
-                    label: 'Comissões',
-                    data: [15000, 18000, 22000, 20000, 25000, 28000],
+                        label: 'Valor Total (R$)',
+                        data: values,
                     borderColor: '#007bff',
-                    tension: 0.1
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.1,
+                        fill: true
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Atualizar tabela de resultados
+        function atualizarTabela(dados) {
+            const tbody = document.querySelector('.table-container tbody');
+            tbody.innerHTML = '';
+
+            if (dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
+                return;
             }
+
+            dados.forEach(item => {
+                const row = document.createElement('tr');
+                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                
+                // Status com cor
+                let statusClass = 'pending';
+                let statusText = item.status || 'PENDENTE';
+                if (item.status === 'PAGO') statusClass = 'paid';
+                if (item.status === 'VENCIDO') statusClass = 'overdue';
+
+                row.innerHTML = `
+                    <td>${dataFormatada}</td>
+                    <td>${colaboradorNome}</td>
+                    <td>${item.tipo || ''}</td>
+                    <td>${valorFormatado}</td>
+                    <td>${comissaoFormatada}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarItem('${item.id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Visualizar item (placeholder)
+        function visualizarItem(id) {
+            console.log('Visualizar item:', id);
+            // Implementar modal de visualização se necessário
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarPagina();
+            
+            // Botão gerar relatório
+            document.querySelector('.btn-primary').addEventListener('click', gerarRelatorio);
         });
+
+        // Exportar relatório
+        function exportarRelatorio() {
+            const dadosFiltrados = aplicarFiltros();
+            if (dadosFiltrados.length === 0) {
+                alert('Nenhum dado para exportar. Aplique filtros e gere o relatório primeiro.');
+                return;
+            }
+
+            // Criar CSV
+            let csv = 'Data,Colaborador,Tipo,Valor,Comissão,Status\n';
+            dadosFiltrados.forEach(item => {
+                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                
+                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${comissaoFormatada}","${item.status || 'PENDENTE}"\n`;
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `relatorio_dinamico_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Imprimir relatório
+        function imprimirRelatorio() {
+            const dadosFiltrados = aplicarFiltros();
+            if (dadosFiltrados.length === 0) {
+                alert('Nenhum dado para imprimir. Aplique filtros e gere o relatório primeiro.');
+                return;
+            }
+
+            // Criar conteúdo para impressão
+            let conteudo = `
+                <html>
+                <head>
+                    <title>Relatório Dinâmico - ${new Date().toLocaleDateString('pt-BR')}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #1976D2; text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .status { padding: 4px 8px; border-radius: 4px; color: white; }
+                        .paid { background-color: #28a745; }
+                        .pending { background-color: #ffc107; color: black; }
+                        .overdue { background-color: #dc3545; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Relatório Dinâmico de Comissões</h1>
+                    <p><strong>Data de geração:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+                    <p><strong>Total de registros:</strong> ${dadosFiltrados.length}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Colaborador</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Comissão</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            dadosFiltrados.forEach(item => {
+                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                
+                let statusClass = 'pending';
+                if (item.status === 'PAGO') statusClass = 'paid';
+                if (item.status === 'VENCIDO') statusClass = 'overdue';
+
+                conteudo += `
+                    <tr>
+                        <td>${dataFormatada}</td>
+                        <td>${colaboradorNome}</td>
+                        <td>${item.tipo || ''}</td>
+                        <td>${valorFormatado}</td>
+                        <td>${comissaoFormatada}</td>
+                        <td><span class="status ${statusClass}">${item.status || 'PENDENTE'}</span></td>
+                    </tr>
+                `;
+            });
+
+            conteudo += `
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+
+            // Abrir janela de impressão
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(conteudo);
+            janelaImpressao.document.close();
+            janelaImpressao.print();
+        }
     </script>
     <script src="scripts/navigation.js"></script>
     <script>
