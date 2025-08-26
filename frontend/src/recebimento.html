@@ -219,7 +219,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
             border: 1px solid #e3f2fd;
-            padding: 12px;
+            padding: 10px;
             transition: all 0.2s ease;
             cursor: pointer;
             position: relative;
@@ -229,8 +229,8 @@
             height: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            min-height: 220px;
+            gap: 6px;
+            min-height: 160px;
         }
 
         .titulo-card:hover {
@@ -258,7 +258,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         .titulo-cliente {
@@ -295,8 +295,8 @@
         .titulo-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 6px;
         }
 
         .info-item {
@@ -318,26 +318,26 @@
         }
 
         .titulo-valor {
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 700;
             color: #1976D2;
             text-align: center;
-            margin: 12px 0;
-            padding: 8px;
+            margin: 6px 0;
+            padding: 6px;
             background: #f4faff;
             border-radius: 6px;
             border: 1px solid #e3f2fd;
         }
 
         .titulo-observacoes {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #666;
-            margin-bottom: 12px;
-            line-height: 1.3;
+            margin-bottom: 8px;
+            line-height: 1.25;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            line-clamp: 3;
+            line-clamp: 2;
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -637,32 +637,32 @@
                     <h3>Total Recebido</h3>
                     <i class="fas fa-money-bill-wave"></i>
                 </div>
-                <div class="card-value" id="totalRecebido">R$ 25.750,00</div>
-                <div class="card-change" id="totalRecebidoChange">+12% este mês</div>
+                <div class="card-value" id="totalRecebido">R$ 0,00</div>
+                <div class="card-change" id="totalRecebidoChange">&nbsp;</div>
             </div>
             <div class="card clickable" id="cardPendente" onclick="filtrarPorCard('PENDENTE')">
                 <div class="card-header">
                     <h3>Pendentes</h3>
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="card-value" id="totalPendente">R$ 8.250,00</div>
-                <div class="card-change" id="totalPendenteChange">5 títulos aguardando</div>
+                <div class="card-value" id="totalPendente">R$ 0,00</div>
+                <div class="card-change" id="totalPendenteChange">&nbsp;</div>
             </div>
             <div class="card clickable" id="cardClienteNaoPagou" onclick="filtrarPorCard('CLIENTE NÃO PAGOU')">
                 <div class="card-header">
                     <h3>Cliente Não Pagou</h3>
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
-                <div class="card-value" id="totalAtrasado">R$ 3.500,00</div>
-                <div class="card-change" id="totalAtrasadoChange">3 títulos em atraso</div>
+                <div class="card-value" id="totalAtrasado">R$ 0,00</div>
+                <div class="card-change" id="totalAtrasadoChange">&nbsp;</div>
             </div>
             <div class="card">
                 <div class="card-header">
                     <h3>Média Mensal</h3>
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="card-value" id="mediaMensal">R$ 22.500,00</div>
-                <div class="card-change" id="mediaMensalChange">Últimos 6 meses</div>
+                <div class="card-value" id="mediaMensal">R$ 0,00</div>
+                <div class="card-change" id="mediaMensalChange">&nbsp;</div>
             </div>
         </div>
 
@@ -750,12 +750,16 @@
                     Ver Tabela
                 </button>
             </div>
-            <div class="pagination">
-                <button onclick="mudarPagina('anterior')" id="btnAnterior">Anterior</button>
-                <button class="active">1</button>
-                <button onclick="mudarPagina('2')">2</button>
-                <button onclick="mudarPagina('3')">3</button>
-                <button onclick="mudarPagina('proximo')" id="btnProximo">Próximo</button>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label for="exibirQtd" style="color:#1565c0; font-weight:600;">Exibir</label>
+                <select id="exibirQtd" onchange="aplicarPaginacaoQuantidade()" style="border: 1.5px solid #90caf9; border-radius: 8px; background: #f4faff; color: #1565c0; padding: 5px 10px;">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="todos">Todos</option>
+                </select>
+                <span id="contadorTitulos" style="color:#1565c0; font-weight:600;">Títulos: 0</span>
             </div>
         </div>
     </div>
@@ -773,6 +777,7 @@
         let todosTitulos = [];
         let titulosFiltrados = [];
         let mapaColaboradores = {};
+        let limiteExibicao = 20; // padrão
 
         // Função para carregar colaboradores
         async function carregarColaboradores() {
@@ -799,6 +804,8 @@
         // Função para carregar títulos da API
         async function carregarTitulos() {
             try {
+                // Garante estado zerado antes de iniciar fetch
+                zerarCards();
                 await carregarColaboradores();
                 const data = await window.api.get('/movimento_comissoes');
 
@@ -829,9 +836,11 @@
                 todosTitulos = titulos;
                 titulosFiltrados = [...todosTitulos];
                 
-                // Atualizar cards totalizadores
-                atualizarCardsTotalizadores();
-                atualizarCardsComAnimacao();
+                // Atualizar cards totalizadores com animação após pequeno delay para garantir zeros iniciais
+                setTimeout(() => {
+                    atualizarCardsTotalizadores();
+                    atualizarCardsComAnimacao();
+                }, 50);
                 
                 // Carregar visualizações
                 carregarGridTitulos();
@@ -859,8 +868,10 @@
                 titulosFiltrados = [...todosTitulos];
                 carregarGridTitulos();
                 carregarTabela();
-                atualizarCardsTotalizadores();
-                atualizarCardsComAnimacao();
+                setTimeout(() => {
+                    atualizarCardsTotalizadores();
+                    atualizarCardsComAnimacao();
+                }, 50);
                 requestAnimationFrame(sincronizarAlturaConteudo);
             }
         }
@@ -891,8 +902,9 @@
         function animarNumero(elemento, valorFinal) {
             const el = typeof elemento === 'string' ? document.getElementById(elemento) : elemento;
             if (!el) return;
-            const texto = String(el.textContent || '');
-            const prefixo = texto.includes('R$') ? 'R$ ' : '';
+            // Garante que começamos do zero e com prefixo consistente
+            const prefixo = 'R$ ';
+            el.textContent = `${prefixo}0,00`;
             const duracao = 600;
             const inicio = performance.now();
             const startVal = 0;
@@ -904,6 +916,19 @@
                 if (p < 1) requestAnimationFrame(frame);
             }
             requestAnimationFrame(frame);
+        }
+
+        function zerarCards() {
+            const ids = ['totalRecebido', 'totalPendente', 'totalAtrasado', 'mediaMensal'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = 'R$ 0,00';
+            });
+            const changes = ['totalRecebidoChange','totalPendenteChange','totalAtrasadoChange','mediaMensalChange'];
+            changes.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '&nbsp;';
+            });
         }
 
         function atualizarCardsComAnimacao() {
@@ -934,7 +959,8 @@
             const grid = document.getElementById('titulosGrid');
             grid.innerHTML = '';
 
-            titulosFiltrados.forEach(titulo => {
+            const lista = limitarListaParaExibicao(titulosFiltrados);
+            lista.forEach(titulo => {
                 const card = document.createElement('div');
                 card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
                 card.onclick = () => visualizarTitulo(titulo.numero_titulo);
@@ -1002,7 +1028,8 @@
             const tbody = document.getElementById('recebimentoTableBody');
             tbody.innerHTML = '';
 
-            titulosFiltrados.forEach((titulo, index) => {
+            const lista = limitarListaParaExibicao(titulosFiltrados);
+            lista.forEach((titulo, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><button class="timeline-btn" title="Linha do Tempo" onclick="abrirTimeline('${titulo.numero_titulo}')">
@@ -1027,6 +1054,26 @@
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        function limitarListaParaExibicao(lista) {
+            const contador = document.getElementById('contadorTitulos');
+            if (contador) {
+                contador.textContent = `Títulos: ${lista.length}`;
+            }
+            if (String(limiteExibicao) === 'todos') return lista;
+            const limite = parseInt(limiteExibicao, 10);
+            if (!isNaN(limite)) return lista.slice(0, limite);
+            return lista;
+        }
+
+        function aplicarPaginacaoQuantidade() {
+            const sel = document.getElementById('exibirQtd');
+            if (!sel) return;
+            limiteExibicao = sel.value;
+            carregarGridTitulos();
+            carregarTabela();
+            requestAnimationFrame(sincronizarAlturaConteudo);
         }
 
         // Funções auxiliares
@@ -1090,6 +1137,7 @@
             // Atualizar visualizações
             carregarGridTitulos();
             carregarTabela();
+            aplicarPaginacaoQuantidade();
         }
 
         function limparFiltros() {
@@ -1106,6 +1154,7 @@
             titulosFiltrados = [...todosTitulos];
             carregarGridTitulos();
             carregarTabela();
+            aplicarPaginacaoQuantidade();
         }
 
         function exportarDados() {
@@ -1432,6 +1481,7 @@
 
             // Sincronizar altura após alternar
             requestAnimationFrame(sincronizarAlturaConteudo);
+            setTimeout(sincronizarAlturaConteudo, 60);
         }
 
         // Calcula e aplica a mesma altura máxima para grid e tabela (evita sobrepor a barra inferior)
@@ -1459,6 +1509,8 @@
 
         // Inicializar quando a página carregar
         window.addEventListener('DOMContentLoaded', function() {
+            // Zerar cards antes de qualquer carregamento para evitar flash
+            zerarCards();
             // Carregar dados da API
             carregarTitulos();
             
