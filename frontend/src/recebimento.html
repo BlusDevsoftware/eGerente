@@ -15,6 +15,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            padding-bottom: 80px; /* Espaço para a barra fixa + margem inferior */
         }
 
         .dashboard-cards {
@@ -159,30 +160,39 @@
             margin-bottom: 24px;
         }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 0 4px;
-        }
 
-        .section-header h3 {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #1565c0;
-            margin: 0;
-        }
 
-        .grid-controls {
-            display: flex;
-            gap: 12px;
-        }
+
 
         .titulos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        .titulos-grid-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .titulos-grid-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
 
         .titulo-card {
@@ -190,11 +200,12 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
             border: 1px solid #e3f2fd;
-            padding: 20px;
+            padding: 16px;
             transition: all 0.2s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            min-width: 0;
         }
 
         .titulo-card:hover {
@@ -212,9 +223,11 @@
             background: #90caf9;
         }
 
-        .titulo-card.pendente::before { background: #FF9800; }
-        .titulo-card.atrasado::before { background: #f44336; }
-        .titulo-card.recebido::before { background: #4CAF50; }
+        .titulo-card.PENDENTE::before { background: #FF9800; }
+        .titulo-card.VENCIDO::before { background: #f44336; }
+        .titulo-card.PAGO::before { background: #4CAF50; }
+        .titulo-card.CLIENTE-NÃO-PAGOU::before { background: #f57c00; }
+        .titulo-card.AGLUTINADO::before { background: #7b1fa2; }
 
         .titulo-header {
             display: flex;
@@ -226,8 +239,9 @@
         .titulo-cliente {
             font-weight: 600;
             color: #1565c0;
-            font-size: 1.1em;
+            font-size: 1em;
             margin: 0;
+            line-height: 1.2;
         }
 
         .titulo-status {
@@ -256,8 +270,8 @@
         .titulo-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .info-item {
@@ -279,22 +293,22 @@
         }
 
         .titulo-valor {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 700;
             color: #1976D2;
             text-align: center;
-            margin: 15px 0;
-            padding: 10px;
+            margin: 12px 0;
+            padding: 8px;
             background: #f4faff;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px solid #e3f2fd;
         }
 
         .titulo-observacoes {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #666;
-            margin-bottom: 15px;
-            line-height: 1.4;
+            margin-bottom: 12px;
+            line-height: 1.3;
         }
 
         .titulo-acoes {
@@ -304,16 +318,16 @@
         }
 
         .btn-acao {
-            padding: 6px 12px;
+            padding: 4px 8px;
             border: none;
-            border-radius: 6px;
-            font-size: 0.8em;
+            border-radius: 4px;
+            font-size: 0.75em;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .btn-visualizar {
@@ -332,6 +346,37 @@
 
         .btn-editar:hover {
             background: #ffe0b2;
+        }
+
+        .btn-comprovante { background-color: #198754 !important; color: #fff !important; }
+        .btn-comprovante i { color: #fff !important; }
+        .btn-comprovante:hover { opacity: 0.9; }
+
+        .comprovante-btn { background-color: #198754 !important; color: #fff !important; }
+        .comprovante-btn i { color: #fff !important; }
+        .comprovante-btn:hover { opacity: 0.9; }
+
+        .timeline-btn {
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,152,0,0.15);
+            color: #ff9800;
+            border: 1.5px solid #ffcc80;
+            font-weight: 500;
+            margin: 0 auto;
+            transition: background 0.18s, border 0.18s, color 0.18s;
+            border-radius: 4px;
+        }
+        .timeline-btn i { font-size: 1em; color: #ff9800; }
+        .timeline-btn:hover {
+            background: rgba(255,152,0,0.28);
+            border-color: #ff9800;
+            color: #e65100;
         }
 
         .table-scroll {
@@ -384,57 +429,65 @@
             text-transform: uppercase;
         }
 
-        .status-recebido {
+        .status-PAGO {
             background: #d4edda;
             color: #155724;
         }
 
-        .status-pendente {
+        .status-PENDENTE {
             background: #fff3cd;
             color: #856404;
         }
 
-        .status-atrasado {
+        .status-VENCIDO {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        .status-CLIENTE-NÃO-PAGOU {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-AGLUTINADO {
+            background: #f3e5f5;
+            color: #7b1fa2;
         }
 
         .action-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 5px;
+            padding: 6px;
             margin: 0 2px;
-            border-radius: 4px;
-            transition: background 0.2s;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .action-btn:hover {
-            background: #f4faff;
-        }
+        .action-btn:hover { opacity: 0.8; }
+        .action-btn i { font-size: 14px; }
 
-        .view-btn {
-            color: #1976D2;
-        }
-
-        .edit-btn {
-            color: #ff9800;
-        }
+        .view-btn { background-color: #0d6efd; color: white; }
 
         .pagination {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
-            margin-top: 16px;
+            gap: 6px;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            margin-top: 0;
         }
 
         .pagination button {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #90caf9;
             background: #fff;
             border-radius: 6px;
@@ -442,6 +495,7 @@
             transition: all 0.2s;
             color: #1565c0;
             font-weight: 500;
+            font-size: 0.9em;
         }
 
         .pagination button:hover {
@@ -474,6 +528,10 @@
             .filter-options input[type='date'] {
                 width: 100%;
             }
+            
+            #barraInferior {
+                left: 0; /* Em mobile, a sidebar pode estar oculta */
+            }
         }
     </style>
 </head>
@@ -481,7 +539,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo" style="display: flex; align-items: center; justify-content: center; padding: 15px 0;">
-            <img src="../Imagens/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;"><h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height: 2.5em; margin-right: 10px;"><h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
         </div>
         <ul class="nav-menu">
             <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
@@ -593,9 +651,11 @@
                 </select>
                 <select id="status">
                     <option value="">Todos os Status</option>
-                    <option value="recebido">Recebido</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="atrasado">Cliente Não Pagou</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="PAGO">Pago</option>
+                    <option value="VENCIDO">Vencido</option>
+                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                    <option value="AGLUTINADO">Aglutinado</option>
                 </select>
                 <select id="cliente">
                     <option value="">Todos os Clientes</option>
@@ -621,18 +681,10 @@
 
         <!-- Grid de Títulos a Receber -->
         <div class="titulos-grid-section">
-            <div class="section-header">
-                <h3>Títulos a Receber</h3>
-                <div class="grid-controls">
-                    <button class="btn-filter btn-secondary" onclick="alternarVisualizacao()">
-                        <i class="fas fa-th-large"></i>
-                        Alternar Visualização
-                    </button>
+            <div class="titulos-grid-container">
+                <div class="titulos-grid" id="titulosGrid">
+                    <!-- Cards de títulos serão inseridos dinamicamente -->
                 </div>
-            </div>
-            
-            <div class="titulos-grid" id="titulosGrid">
-                <!-- Cards de títulos serão inseridos dinamicamente -->
             </div>
         </div>
 
@@ -641,12 +693,15 @@
             <table id="recebimentoTable">
                 <thead>
                     <tr>
-                        <th>Data</th>
-                        <th>Cliente</th>
+                        <th style="width:40px;"></th>
+                        <th>Nº Título</th>
+                        <th>Data da Geração</th>
+                        <th>Data de Vencimento</th>
+                        <th>Colaborador</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
                         <th>Valor</th>
                         <th>Status</th>
-                        <th>Vencimento</th>
-                        <th>Observações</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -657,15 +712,11 @@
         </div>
 
         <!-- Paginação e Ações -->
-        <div class="filters-container" style="flex-shrink: 0; margin-bottom: 0; border-top: 1.5px solid #e3f2fd; border-radius: 10px 10px 0 0; justify-content: space-between;">
+        <div class="filters-container" id="barraInferior" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd;">
             <div>
-                <button class="btn-filter" onclick="exportarDados()">
-                    <i class="fas fa-file-export"></i>
-                    Exportar
-                </button>
-                <button class="btn-filter btn-secondary" onclick="atualizarDados()">
-                    <i class="fas fa-sync-alt"></i>
-                    Atualizar
+                <button class="btn-filter btn-secondary" onclick="alternarVisualizacao()" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-list"></i>
+                    Ver Tabela
                 </button>
             </div>
             <div class="pagination">
@@ -687,76 +738,153 @@
             });
         });
 
-        // Dados mockados para demonstração
-        const dadosMock = {
-            titulos: [
-                {
-                    data: '2024-02-20',
-                    cliente: 'Empresa ABC Ltda',
-                    valor: 1500.00,
-                    status: 'recebido',
-                    vencimento: '2024-02-15',
-                    observacoes: 'Pagamento referente a venda #123'
-                },
-                {
-                    data: '2024-02-19',
-                    cliente: 'Comércio XYZ',
-                    valor: 2000.00,
-                    status: 'pendente',
-                    vencimento: '2024-02-25',
-                    observacoes: 'Aguardando confirmação'
-                },
-                {
-                    data: '2024-02-18',
-                    cliente: 'Indústria DEF',
-                    valor: 3500.00,
-                    status: 'atrasado',
-                    vencimento: '2024-01-30',
-                    observacoes: 'Cliente não pagou'
-                },
-                {
-                    data: '2024-02-17',
-                    cliente: 'Loja GHI',
-                    valor: 1200.00,
-                    status: 'recebido',
-                    vencimento: '2024-02-10',
-                    observacoes: 'Pagamento em dia'
-                },
-                {
-                    data: '2024-02-16',
-                    cliente: 'Empresa JKL',
-                    valor: 2800.00,
-                    status: 'pendente',
-                    vencimento: '2024-02-28',
-                    observacoes: 'Aguardando pagamento'
+        // Variáveis globais para dados
+        let todosTitulos = [];
+        let titulosFiltrados = [];
+        let mapaColaboradores = {};
+
+        // Função para carregar colaboradores
+        async function carregarColaboradores() {
+            try {
+                const colaboradores = await window.api.get('/colaboradores');
+                if (Array.isArray(colaboradores)) {
+                    colaboradores.forEach(colab => {
+                        mapaColaboradores[colab.codigo] = colab.nome;
+                    });
+                    // Preencher filtro de colaborador
+                    const selectColab = document.getElementById('cliente');
+                    if (selectColab) {
+                        selectColab.innerHTML = '<option value="">Todos os Clientes</option>';
+                        colaboradores.forEach(colab => {
+                            selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
+                        });
+                    }
                 }
-            ]
-        };
+            } catch (e) {
+                console.error('Erro ao carregar colaboradores:', e);
+            }
+        }
+
+        // Função para carregar títulos da API
+        async function carregarTitulos() {
+            try {
+                await carregarColaboradores();
+                const data = await window.api.get('/movimento_comissoes');
+
+                // Atualizar status para VENCIDO quando vencimento < hoje e não pago
+                const todayStr = new Date().toISOString().split('T')[0];
+                const atualizacoes = [];
+                const titulos = Array.isArray(data) ? data : [];
+                
+                titulos.forEach(t => {
+                    const statusAtual = (t.status || '').toUpperCase();
+                    const venc = t.data_vencimento;
+                    const naoPago = statusAtual !== 'PAGO';
+                    const naoAglutinado = statusAtual !== 'AGLUTINADO';
+                    
+                    if (naoPago && naoAglutinado && venc && typeof venc === 'string' && venc < todayStr && statusAtual !== 'VENCIDO') {
+                        t.status = 'VENCIDO';
+                        atualizacoes.push(
+                            window.api.put(`/movimento_comissoes/${t.id}`, { status: 'VENCIDO' }).catch(() => {})
+                        );
+                    }
+                });
+
+                // Disparar atualizações em background
+                if (atualizacoes.length) {
+                    Promise.allSettled(atualizacoes).catch(() => {});
+                }
+
+                todosTitulos = titulos;
+                titulosFiltrados = [...todosTitulos];
+                
+                // Atualizar cards totalizadores
+                atualizarCardsTotalizadores();
+                
+                // Carregar visualizações
+                carregarGridTitulos();
+                carregarTabela();
+                
+            } catch (e) {
+                console.error('Erro ao carregar títulos:', e);
+                // Fallback para dados mockados em caso de erro
+                todosTitulos = [
+                    {
+                        id: 1,
+                        numero_titulo: 'TIT-001',
+                        data_geracao: '2024-02-20',
+                        data_vencimento: '2024-03-20',
+                        colaborador: 'João Silva',
+                        tipo: 'Comissão',
+                        descricao: 'Comissão referente a venda #123',
+                        valor: 1500.00,
+                        status: 'PAGO',
+                        observacoes: 'Pagamento referente a venda #123'
+                    }
+                ];
+                titulosFiltrados = [...todosTitulos];
+                carregarGridTitulos();
+                carregarTabela();
+            }
+        }
+
+        // Função para atualizar cards totalizadores
+        function atualizarCardsTotalizadores() {
+            const totalRecebido = todosTitulos
+                .filter(t => t.status === 'PAGO')
+                .reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const totalPendente = todosTitulos
+                .filter(t => t.status === 'PENDENTE')
+                .reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const totalAtrasado = todosTitulos
+                .filter(t => t.status === 'CLIENTE NÃO PAGOU')
+                .reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
+            
+            const mediaMensal = totalRecebido / 6; // Simplificado para demonstração
+
+            document.getElementById('totalRecebido').textContent = `R$ ${totalRecebido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalPendente').textContent = `R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalAtrasado').textContent = `R$ ${totalAtrasado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('mediaMensal').textContent = `R$ ${mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
 
         // Carregar grid de títulos
         function carregarGridTitulos() {
             const grid = document.getElementById('titulosGrid');
             grid.innerHTML = '';
 
-            dadosMock.titulos.forEach(titulo => {
+            titulosFiltrados.forEach(titulo => {
                 const card = document.createElement('div');
-                card.className = `titulo-card ${titulo.status}`;
-                card.onclick = () => visualizarTitulo(titulo.cliente);
+                card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
+                card.onclick = () => visualizarTitulo(titulo.numero_titulo);
                 
                 card.innerHTML = `
                     <div class="titulo-header">
-                        <h4 class="titulo-cliente">${titulo.cliente}</h4>
-                        <span class="titulo-status ${titulo.status}">${getStatusText(titulo.status)}</span>
+                        <h4 class="titulo-cliente">${titulo.numero_titulo}</h4>
+                        <span class="titulo-status ${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span>
                     </div>
                     
                     <div class="titulo-info">
                         <div class="info-item">
-                            <span class="info-label">Data</span>
-                            <span class="info-value">${formatarData(titulo.data)}</span>
+                            <span class="info-label">Colaborador</span>
+                            <span class="info-value">${titulo.colaborador}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo</span>
+                            <span class="info-value">${titulo.tipo}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="titulo-info">
+                        <div class="info-item">
+                            <span class="info-label">Geração</span>
+                            <span class="info-value">${formatarData(titulo.data_geracao)}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Vencimento</span>
-                            <span class="info-value">${formatarData(titulo.vencimento)}</span>
+                            <span class="info-value">${formatarData(titulo.data_vencimento)}</span>
                         </div>
                     </div>
                     
@@ -765,19 +893,22 @@
                     </div>
                     
                     <div class="titulo-observacoes">
-                        ${titulo.observacoes}
+                        ${titulo.descricao}
                     </div>
                     
-                    <div class="titulo-acoes">
-                        <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.cliente}')">
-                            <i class="fas fa-eye"></i>
-                            Visualizar
-                        </button>
-                        <button class="btn-acao btn-editar" onclick="event.stopPropagation(); editarTitulo('${titulo.cliente}')">
-                            <i class="fas fa-edit"></i>
-                            Editar
-                        </button>
-                    </div>
+                                <div class="titulo-acoes">
+                <button class="timeline-btn" onclick="event.stopPropagation(); abrirTimeline('${titulo.numero_titulo}')" title="Linha do Tempo">
+                    <i class="fas fa-clock"></i>
+                </button>
+                <button class="btn-acao btn-visualizar" onclick="event.stopPropagation(); visualizarTitulo('${titulo.numero_titulo}')">
+                    <i class="fas fa-eye"></i>
+                    Visualizar
+                </button>
+                <button class="btn-acao btn-comprovante" onclick="event.stopPropagation(); visualizarComprovante('${titulo.numero_titulo}')">
+                    <i class="fas fa-file-invoice"></i>
+                    Comprovante
+                </button>
+            </div>
                 `;
                 
                 grid.appendChild(card);
@@ -789,21 +920,26 @@
             const tbody = document.getElementById('recebimentoTableBody');
             tbody.innerHTML = '';
 
-            dadosMock.titulos.forEach(titulo => {
+            titulosFiltrados.forEach((titulo, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${formatarData(titulo.data)}</td>
-                    <td>${titulo.cliente}</td>
+                    <td><button class="timeline-btn" title="Linha do Tempo" onclick="abrirTimeline('${titulo.numero_titulo}')">
+                        <i class="fas fa-clock"></i>
+                    </button></td>
+                    <td>${titulo.numero_titulo}</td>
+                    <td>${formatarData(titulo.data_geracao)}</td>
+                    <td>${formatarData(titulo.data_vencimento)}</td>
+                    <td>${titulo.colaborador}</td>
+                    <td>${titulo.tipo}</td>
+                    <td>${titulo.descricao}</td>
                     <td>R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                    <td><span class="status-badge status-${titulo.status}">${getStatusText(titulo.status)}</span></td>
-                    <td>${formatarData(titulo.vencimento)}</td>
-                    <td>${titulo.observacoes}</td>
+                    <td><span class="status-badge status-${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span></td>
                     <td>
-                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.cliente}')">
+                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.numero_titulo}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="action-btn edit-btn" title="Editar" onclick="editarTitulo('${titulo.cliente}')">
-                            <i class="fas fa-edit"></i>
+                        <button class="action-btn comprovante-btn" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
+                            <i class="fas fa-file-invoice"></i>
                         </button>
                     </td>
                 `;
@@ -818,16 +954,51 @@
 
         function getStatusText(status) {
             const statusMap = {
-                'recebido': 'Recebido',
-                'pendente': 'Pendente',
-                'atrasado': 'Cliente Não Pagou'
+                'PAGO': 'Pago',
+                'PENDENTE': 'Pendente',
+                'VENCIDO': 'Vencido',
+                'CLIENTE NÃO PAGOU': 'Cliente não pagou',
+                'AGLUTINADO': 'Aglutinado'
             };
             return statusMap[status] || status;
         }
 
         function aplicarFiltros() {
-            alert('Filtros aplicados!');
-            // Implementar lógica de filtros
+            const status = document.getElementById('status').value;
+            const colaborador = document.getElementById('cliente').value;
+            const dataInicial = document.getElementById('data_inicial').value;
+            const dataFinal = document.getElementById('data_final').value;
+            const periodo = document.getElementById('periodo').value;
+
+            // Aplicar filtros
+            titulosFiltrados = todosTitulos.filter(titulo => {
+                let passa = true;
+
+                // Filtro por status
+                if (status && titulo.status !== status) {
+                    passa = false;
+                }
+
+                // Filtro por colaborador
+                if (colaborador && titulo.colaborador !== colaborador) {
+                    passa = false;
+                }
+
+                // Filtro por período
+                if (dataInicial && titulo.data_geracao < dataInicial) {
+                    passa = false;
+                }
+
+                if (dataFinal && titulo.data_geracao > dataFinal) {
+                    passa = false;
+                }
+
+                return passa;
+            });
+
+            // Atualizar visualizações
+            carregarGridTitulos();
+            carregarTabela();
         }
 
         function limparFiltros() {
@@ -836,6 +1007,11 @@
             document.getElementById('cliente').value = '';
             document.getElementById('data_inicial').value = '';
             document.getElementById('data_final').value = '';
+            
+            // Resetar filtros
+            titulosFiltrados = [...todosTitulos];
+            carregarGridTitulos();
+            carregarTabela();
         }
 
         function exportarDados() {
@@ -863,6 +1039,276 @@
             // Implementar modal de edição
         }
 
+        function visualizarComprovante(numeroTitulo) {
+            console.log('Visualizar comprovante do título:', numeroTitulo);
+            // Buscar o título nos dados reais
+            const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
+            if (titulo) {
+                // Simular modal de comprovante
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0,0,0,0.5);
+                    z-index: 4000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 24px;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    position: relative;
+                `;
+
+                modalContent.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-file-invoice" style="color: #2e7d32;"></i>
+                            Comprovante - ${titulo.numero_titulo}
+                        </h2>
+                        <button onclick="this.closest('.modal').remove()" style="
+                            background: none;
+                            border: none;
+                            font-size: 1.5em;
+                            color: #666;
+                            cursor: pointer;
+                            padding: 5px;
+                        ">&times;</button>
+                    </div>
+                    <div style="border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; background: #fafafa;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h3 style="color: #2e7d32; margin: 0;">COMPROVANTE DE PAGAMENTO</h3>
+                            <p style="color: #666; margin: 5px 0;">Título: ${titulo.numero_titulo}</p>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <strong>Colaborador:</strong><br>
+                                ${titulo.colaborador}
+                            </div>
+                            <div>
+                                <strong>Tipo:</strong><br>
+                                ${titulo.tipo}
+                            </div>
+                            <div>
+                                <strong>Data de Geração:</strong><br>
+                                ${formatarData(titulo.data_geracao)}
+                            </div>
+                            <div>
+                                <strong>Data de Vencimento:</strong><br>
+                                ${formatarData(titulo.data_vencimento)}
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #e8f5e8; border-radius: 8px;">
+                            <div style="font-size: 0.9em; color: #666;">Valor Total</div>
+                            <div style="font-size: 1.8em; font-weight: bold; color: #2e7d32;">
+                                R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <div style="font-size: 0.9em; color: #666;">
+                                <strong>Status:</strong> ${getStatusText(titulo.status)}
+                            </div>
+                            <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                                <strong>Observações:</strong> ${titulo.observacoes}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.print()" style="
+                            background: #2e7d32;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: 500;
+                        ">Imprimir Comprovante</button>
+                    </div>
+                `;
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                // Fechar modal ao clicar fora
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+        }
+
+        function abrirTimeline(numeroTitulo) {
+            console.log('Abrir timeline do título:', numeroTitulo);
+            // Buscar o título nos dados reais
+            const titulo = todosTitulos.find(t => t.numero_titulo === numeroTitulo);
+            if (titulo) {
+                // Simular dados de timeline para demonstração
+                const eventosTimeline = [
+                    {
+                        data: titulo.data_geracao,
+                        evento: 'Título Gerado',
+                        descricao: `Título ${numeroTitulo} foi criado com valor de R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+                    },
+                    {
+                        data: titulo.data_vencimento,
+                        evento: 'Data de Vencimento',
+                        descricao: `Vencimento previsto para ${formatarData(titulo.data_vencimento)}`
+                    }
+                ];
+
+                // Se o título for PAGO, adicionar evento de pagamento
+                if (titulo.status === 'PAGO') {
+                    eventosTimeline.push({
+                        data: titulo.data_vencimento,
+                        evento: 'Título Pago',
+                        descricao: `Pagamento realizado no valor de R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+                    });
+                }
+
+                // Se o título for VENCIDO, adicionar evento de vencimento
+                if (titulo.status === 'VENCIDO') {
+                    eventosTimeline.push({
+                        data: titulo.data_vencimento,
+                        evento: 'Título Vencido',
+                        descricao: `Título vencido em ${formatarData(titulo.data_vencimento)}`
+                    });
+                }
+
+                // Mostrar modal com timeline
+                mostrarModalTimeline(titulo, eventosTimeline);
+            }
+        }
+
+        function mostrarModalTimeline(titulo, eventos) {
+            // Criar modal de timeline
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: 4000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+            `;
+
+            let eventosHTML = '';
+            eventos.forEach((evento, index) => {
+                eventosHTML += `
+                    <div style="display: flex; margin-bottom: 20px; position: relative;">
+                        <div style="
+                            width: 12px;
+                            height: 12px;
+                            background: #ff9800;
+                            border-radius: 50%;
+                            margin-right: 16px;
+                            margin-top: 4px;
+                            flex-shrink: 0;
+                        "></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
+                                ${evento.evento}
+                            </div>
+                            <div style="color: #666; font-size: 0.9em; margin-bottom: 4px;">
+                                ${formatarData(evento.data)}
+                            </div>
+                            <div style="color: #555; font-size: 0.95em;">
+                                ${evento.descricao}
+                            </div>
+                        </div>
+                        ${index < eventos.length - 1 ? `
+                            <div style="
+                                position: absolute;
+                                left: 5px;
+                                top: 16px;
+                                width: 2px;
+                                height: 20px;
+                                background: #e0e0e0;
+                            "></div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            modalContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #333; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-clock" style="color: #ff9800;"></i>
+                        Linha do Tempo - ${titulo.numero_titulo}
+                    </h2>
+                    <button onclick="this.closest('.modal').remove()" style="
+                        background: none;
+                        border: none;
+                        font-size: 1.5em;
+                        color: #666;
+                        cursor: pointer;
+                        padding: 5px;
+                    ">&times;</button>
+                </div>
+                <div style="margin-bottom: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 4px;">
+                        ${titulo.numero_titulo} - ${titulo.colaborador}
+                    </div>
+                    <div style="color: #666; font-size: 0.9em;">
+                        Valor: R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})} | Status: ${getStatusText(titulo.status)}
+                    </div>
+                </div>
+                <div style="padding-left: 8px;">
+                    ${eventosHTML}
+                </div>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Fechar modal ao clicar fora
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        function mostrarApenasGrid() {
+            const gridSection = document.querySelector('.titulos-grid-section');
+            const tableSection = document.querySelector('.table-scroll');
+            const paginationSection = document.querySelector('.filters-container:last-of-type');
+            
+            // Mostrar apenas a grid
+            gridSection.style.display = 'block';
+            tableSection.style.display = 'none';
+            paginationSection.style.display = 'flex';
+        }
+
         function alternarVisualizacao() {
             const gridSection = document.querySelector('.titulos-grid-section');
             const tableSection = document.querySelector('.table-scroll');
@@ -873,18 +1319,33 @@
                 gridSection.style.display = 'block';
                 tableSection.style.display = 'none';
                 paginationSection.style.display = 'flex';
+                
+                // Atualizar texto do botão
+                const btn = event.target.closest('button');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-list"></i> Ver Tabela';
+                }
             } else {
                 // Mostrar tabela, esconder grid
                 gridSection.style.display = 'none';
                 tableSection.style.display = 'block';
                 paginationSection.style.display = 'flex';
+                
+                // Atualizar texto do botão
+                const btn = event.target.closest('button');
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-th-large"></i> Ver Cards';
+                }
             }
         }
 
         // Inicializar quando a página carregar
         window.addEventListener('DOMContentLoaded', function() {
-            carregarGridTitulos();
-            carregarTabela();
+            // Carregar dados da API
+            carregarTitulos();
+            
+            // Iniciar mostrando apenas os cards (grid)
+            mostrarApenasGrid();
         });
 
         // Atualizar dados a cada 5 minutos
@@ -892,7 +1353,29 @@
             // Aqui você pode implementar atualização automática
             console.log('Verificando atualizações...');
         }, 300000);
+
+        // Ajustar posição da barra inferior quando necessário
+        function ajustarBarraInferior() {
+            const barra = document.getElementById('barraInferior');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (barra && sidebar) {
+                const sidebarWidth = sidebar.offsetWidth;
+                const margin = 48; // 24px de cada lado
+                barra.style.left = sidebarWidth + 'px';
+                barra.style.width = `calc(100vw - ${sidebarWidth}px - ${margin}px)`;
+            }
+        }
+
+        // Ajustar quando a janela for redimensionada
+        window.addEventListener('resize', ajustarBarraInferior);
+        
+        // Ajustar quando a sidebar for expandida/recolhida
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(ajustarBarraInferior, 100);
+        });
     </script>
+    <script src="scripts/config/api.js"></script>
     <script src="scripts/navigation.js"></script>
     <script>
     window.addEventListener('DOMContentLoaded', function() {
