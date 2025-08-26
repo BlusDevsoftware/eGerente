@@ -900,6 +900,14 @@
                 todosTitulos = titulos;
                 titulosFiltrados = [...todosTitulos];
                 
+                // Debug: verificar se há títulos aglutinados
+                const titulosAgl = titulos.filter(t => String(t.status||'').toUpperCase() === 'AGLUTINADO');
+                console.log('Títulos AGLUTINADO encontrados:', titulosAgl.length);
+                if (titulosAgl.length > 0) {
+                    console.log('Primeiro título AGLUTINADO:', titulosAgl[0]);
+                    console.log('Campos:', Object.keys(titulosAgl[0]));
+                }
+                
                 // Atualizar cards totalizadores com animação após pequeno delay para garantir zeros iniciais
                 setTimeout(() => {
                 atualizarCardsTotalizadores();
@@ -1134,7 +1142,7 @@
                     <td>R$ ${titulo.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
                     <td><span class="status-badge status-${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span></td>
                     <td>
-                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarTitulo('${titulo.numero_titulo}')">
+                        <button class="action-btn view-btn"me title="Visualizar" onclick="visualizarTitulo('${titulo.numero_titulo}')">
                             <i class="fas fa-eye"></i>
                         </button>
                         <button class="action-btn ${ (titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante) ? 'comprovante-btn' : 'comprovante-missing' }" title="Visualizar Comprovante" onclick="visualizarComprovante('${titulo.numero_titulo}')">
@@ -1320,9 +1328,19 @@
             const isPago = String(titulo.status||'').toUpperCase() === 'PAGO';
             const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === titulo.id);
             const isParcial = titulosParciais.length > 0;
+            
+            // Debug: verificar campos do título
+            console.log('Título completo:', titulo);
+            console.log('Status:', titulo.status);
+            console.log('tipo_aglutinacao:', titulo.tipo_aglutinacao);
+            console.log('ids_aglutinados:', titulo.ids_aglutinados);
+            
             const idsAgl = Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : [];
             let titulosAglutinados = [];
             const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
+            
+            console.log('isAglutinado:', isAglutinado);
+            console.log('idsAgl:', idsAgl);
             
             // Se for aglutinado, buscar os títulos originais da API
             if (isAglutinado && idsAgl.length > 0) {
