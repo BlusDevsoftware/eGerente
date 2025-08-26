@@ -33,6 +33,9 @@
             border: 1px solid #e3f2fd;
         }
 
+        .card.clickable { cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card.clickable:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(33,150,243,0.15); }
+
         .card-header {
             display: flex;
             align-items: center;
@@ -180,14 +183,14 @@
         .titulos-grid-container {
             max-height: 85vh;
             width: 100%;
-            height: 100%;
+            height: 96.5%;
             overflow-y: auto;
             position: relative;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
             background: #fff;
             margin-bottom: 16px;
-            padding: 0;
+            padding-bottom: 24px;
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
@@ -216,7 +219,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(33,150,243,0.07);
             border: 1px solid #e3f2fd;
-            padding: 2px;
+            padding: 12px;
             transition: all 0.2s ease;
             cursor: pointer;
             position: relative;
@@ -224,6 +227,10 @@
             min-width: 0;
             width: auto;
             height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 220px;
         }
 
         .titulo-card:hover {
@@ -327,6 +334,12 @@
             color: #666;
             margin-bottom: 12px;
             line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .titulo-acoes {
@@ -619,7 +632,7 @@
 
         <!-- Summary Cards -->
         <div class="dashboard-cards">
-            <div class="card">
+            <div class="card clickable" id="cardTotalRecebido" onclick="filtrarPorCard('PAGO')">
                 <div class="card-header">
                     <h3>Total Recebido</h3>
                     <i class="fas fa-money-bill-wave"></i>
@@ -627,7 +640,7 @@
                 <div class="card-value" id="totalRecebido">R$ 25.750,00</div>
                 <div class="card-change" id="totalRecebidoChange">+12% este mês</div>
             </div>
-            <div class="card">
+            <div class="card clickable" id="cardPendente" onclick="filtrarPorCard('PENDENTE')">
                 <div class="card-header">
                     <h3>Pendentes</h3>
                     <i class="fas fa-clock"></i>
@@ -635,7 +648,7 @@
                 <div class="card-value" id="totalPendente">R$ 8.250,00</div>
                 <div class="card-change" id="totalPendenteChange">5 títulos aguardando</div>
             </div>
-            <div class="card">
+            <div class="card clickable" id="cardClienteNaoPagou" onclick="filtrarPorCard('CLIENTE NÃO PAGOU')">
                 <div class="card-header">
                     <h3>Cliente Não Pagou</h3>
                     <i class="fas fa-exclamation-circle"></i>
@@ -657,7 +670,7 @@
         <div class="filters-container">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar títulos...">
+                <input id="busca" type="text" placeholder="Buscar títulos...">
             </div>
             <div class="filter-options">
                 <select id="periodo">
@@ -675,8 +688,8 @@
                     <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
                     <option value="AGLUTINADO">Aglutinado</option>
                 </select>
-                <select id="cliente">
-                    <option value="">Todos os Clientes</option>
+                <select id="colaborador">
+                    <option value="">Todos os Colaboradores</option>
                     <option value="cliente1">Cliente A</option>
                     <option value="cliente2">Cliente B</option>
                     <option value="cliente3">Cliente C</option>
@@ -732,7 +745,7 @@
         <!-- Paginação e Ações -->
         <div class="filters-container" id="barraInferior" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd;">
             <div>
-                <button class="btn-filter btn-secondary" onclick="alternarVisualizacao()" style="padding: 6px 12px; font-size: 0.85em;">
+                <button class="btn-filter btn-secondary" onclick="alternarVisualizacao(this)" style="padding: 6px 12px; font-size: 0.85em;">
                     <i class="fas fa-list"></i>
                     Ver Tabela
                 </button>
@@ -770,11 +783,11 @@
                         mapaColaboradores[colab.codigo] = colab.nome;
                     });
                     // Preencher filtro de colaborador
-                    const selectColab = document.getElementById('cliente');
+                    const selectColab = document.getElementById('colaborador');
                     if (selectColab) {
-                        selectColab.innerHTML = '<option value="">Todos os Clientes</option>';
+                        selectColab.innerHTML = '<option value="">Todos os Colaboradores</option>';
                         colaboradores.forEach(colab => {
-                            selectColab.innerHTML += `<option value="${colab.codigo}">${colab.nome}</option>`;
+                            selectColab.innerHTML += `<option value="${colab.nome}">${colab.nome}</option>`;
                         });
                     }
                 }
@@ -818,10 +831,13 @@
                 
                 // Atualizar cards totalizadores
                 atualizarCardsTotalizadores();
+                atualizarCardsComAnimacao();
                 
                 // Carregar visualizações
                 carregarGridTitulos();
                 carregarTabela();
+                // Sincronizar após conteúdo dinâmico ser inserido
+                requestAnimationFrame(sincronizarAlturaConteudo);
                 
             } catch (e) {
                 console.error('Erro ao carregar títulos:', e);
@@ -843,6 +859,9 @@
                 titulosFiltrados = [...todosTitulos];
                 carregarGridTitulos();
                 carregarTabela();
+                atualizarCardsTotalizadores();
+                atualizarCardsComAnimacao();
+                requestAnimationFrame(sincronizarAlturaConteudo);
             }
         }
 
@@ -856,7 +875,7 @@
                 .filter(t => t.status === 'PENDENTE')
                 .reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
             
-            const totalAtrasado = todosTitulos
+            const totalClienteNaoPagou = todosTitulos
                 .filter(t => t.status === 'CLIENTE NÃO PAGOU')
                 .reduce((sum, t) => sum + parseFloat(t.valor || 0), 0);
             
@@ -864,8 +883,50 @@
 
             document.getElementById('totalRecebido').textContent = `R$ ${totalRecebido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('totalPendente').textContent = `R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('totalAtrasado').textContent = `R$ ${totalAtrasado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalAtrasado').textContent = `R$ ${totalClienteNaoPagou.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('mediaMensal').textContent = `R$ ${mediaMensal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        // Anima a contagem de valores nos cards
+        function animarNumero(elemento, valorFinal) {
+            const el = typeof elemento === 'string' ? document.getElementById(elemento) : elemento;
+            if (!el) return;
+            const texto = String(el.textContent || '');
+            const prefixo = texto.includes('R$') ? 'R$ ' : '';
+            const duracao = 600;
+            const inicio = performance.now();
+            const startVal = 0;
+            function frame(now) {
+                const p = Math.min(1, (now - inicio) / duracao);
+                const eased = p < 0.5 ? 2*p*p : -1 + (4 - 2*p)*p; // easeInOutQuad
+                const atual = Math.round(eased * valorFinal);
+                el.textContent = `${prefixo}${atual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                if (p < 1) requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function atualizarCardsComAnimacao() {
+            const totalRecebido = todosTitulos.filter(t => t.status === 'PAGO').reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const totalPendente = todosTitulos.filter(t => t.status === 'PENDENTE').reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const totalClienteNaoPagou = todosTitulos.filter(t => t.status === 'CLIENTE NÃO PAGOU').reduce((s, t) => s + parseFloat(t.valor || 0), 0);
+            const mediaMensal = totalRecebido / 6;
+            animarNumero('totalRecebido', Math.floor(totalRecebido));
+            animarNumero('totalPendente', Math.floor(totalPendente));
+            animarNumero('totalAtrasado', Math.floor(totalClienteNaoPagou));
+            animarNumero('mediaMensal', Math.floor(mediaMensal));
+        }
+
+        function filtrarPorCard(status) {
+            // Aplica o status e recarrega
+            const sel = document.getElementById('status');
+            if (sel) sel.value = status === 'PAGO' ? 'PAGO' : status;
+            aplicarFiltros();
+            // Garante que cards fiquem visíveis após filtro
+            const btnToggle = document.querySelector('#barraInferior button');
+            if (btnToggle && document.querySelector('.titulos-grid-section').style.display === 'none') {
+                btnToggle.click();
+            }
         }
 
         // Carregar grid de títulos
@@ -878,20 +939,23 @@
                 card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
                 card.onclick = () => visualizarTitulo(titulo.numero_titulo);
                 
+                // Sanitização básica para evitar HTML indesejado em strings
+                const esc = (s) => String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
                 card.innerHTML = `
                     <div class="titulo-header">
-                        <h4 class="titulo-cliente">${titulo.numero_titulo}</h4>
+                        <h4 class="titulo-cliente">${esc(titulo.numero_titulo)}</h4>
                         <span class="titulo-status ${titulo.status.replace(/\s+/g, '-')}">${getStatusText(titulo.status)}</span>
                     </div>
                     
                     <div class="titulo-info">
                         <div class="info-item">
                             <span class="info-label">Colaborador</span>
-                            <span class="info-value">${titulo.colaborador}</span>
+                            <span class="info-value">${esc(titulo.colaborador)}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Tipo</span>
-                            <span class="info-value">${titulo.tipo}</span>
+                            <span class="info-value">${esc(titulo.tipo)}</span>
                         </div>
                     </div>
                     
@@ -911,7 +975,7 @@
                     </div>
                     
                     <div class="titulo-observacoes">
-                        ${titulo.descricao}
+                        ${esc(titulo.descricao)}
                     </div>
                     
                                 <div class="titulo-acoes">
@@ -983,10 +1047,11 @@
 
         function aplicarFiltros() {
             const status = document.getElementById('status').value;
-            const colaborador = document.getElementById('cliente').value;
+            const colaborador = document.getElementById('colaborador').value;
             const dataInicial = document.getElementById('data_inicial').value;
             const dataFinal = document.getElementById('data_final').value;
             const periodo = document.getElementById('periodo').value;
+            const busca = (document.getElementById('busca')?.value || '').trim().toLowerCase();
 
             // Aplicar filtros
             titulosFiltrados = todosTitulos.filter(titulo => {
@@ -1011,6 +1076,14 @@
                     passa = false;
                 }
 
+                // Filtro por busca livre (nº título, colaborador, descrição)
+                if (busca) {
+                    const texto = `${String(titulo.numero_titulo || '')} ${String(titulo.colaborador || '')} ${String(titulo.descricao || '')}`.toLowerCase();
+                    if (!texto.includes(busca)) {
+                        passa = false;
+                    }
+                }
+
                 return passa;
             });
 
@@ -1022,9 +1095,12 @@
         function limparFiltros() {
             document.getElementById('periodo').value = 'mes_atual';
             document.getElementById('status').value = '';
-            document.getElementById('cliente').value = '';
+            const colabSel = document.getElementById('colaborador');
+            if (colabSel) colabSel.value = '';
             document.getElementById('data_inicial').value = '';
             document.getElementById('data_final').value = '';
+            const buscaInput = document.getElementById('busca');
+            if (buscaInput) buscaInput.value = '';
             
             // Resetar filtros
             titulosFiltrados = [...todosTitulos];
@@ -1327,7 +1403,7 @@
             paginationSection.style.display = 'flex';
         }
 
-        function alternarVisualizacao() {
+        function alternarVisualizacao(btn) {
             const gridSection = document.querySelector('.titulos-grid-section');
             const tableSection = document.querySelector('.table-scroll');
             const paginationSection = document.querySelector('.filters-container:last-of-type');
@@ -1339,7 +1415,6 @@
                 paginationSection.style.display = 'flex';
                 
                 // Atualizar texto do botão
-                const btn = event.target.closest('button');
                 if (btn) {
                     btn.innerHTML = '<i class="fas fa-list"></i> Ver Tabela';
                 }
@@ -1350,11 +1425,36 @@
                 paginationSection.style.display = 'flex';
                 
                 // Atualizar texto do botão
-                const btn = event.target.closest('button');
                 if (btn) {
                     btn.innerHTML = '<i class="fas fa-th-large"></i> Ver Cards';
                 }
             }
+
+            // Sincronizar altura após alternar
+            requestAnimationFrame(sincronizarAlturaConteudo);
+        }
+
+        // Calcula e aplica a mesma altura máxima para grid e tabela (evita sobrepor a barra inferior)
+        function sincronizarAlturaConteudo() {
+            try {
+                const barra = document.getElementById('barraInferior');
+                const gridContainer = document.querySelector('.titulos-grid-container');
+                const tableContainer = document.querySelector('.table-scroll');
+                if (!gridContainer || !tableContainer) return;
+
+                const topGrid = gridContainer.getBoundingClientRect().top;
+                const topTable = tableContainer.getBoundingClientRect().top;
+                const limiteInferior = barra ? barra.getBoundingClientRect().top : window.innerHeight;
+                const folga = 16;
+
+                const disponivelGrid = Math.max(200, Math.floor(limiteInferior - topGrid - folga));
+                const disponivelTable = Math.max(200, Math.floor(limiteInferior - topTable - folga));
+
+                gridContainer.style.maxHeight = disponivelGrid + 'px';
+                gridContainer.style.height = disponivelGrid + 'px';
+                tableContainer.style.maxHeight = disponivelTable + 'px';
+                tableContainer.style.height = disponivelTable + 'px';
+            } catch (_) {}
         }
 
         // Inicializar quando a página carregar
@@ -1364,6 +1464,12 @@
             
             // Iniciar mostrando apenas os cards (grid)
             mostrarApenasGrid();
+
+            // Sincronizar altura após montar layout inicial
+            setTimeout(() => {
+                ajustarBarraInferior();
+                sincronizarAlturaConteudo();
+            }, 50);
         });
 
         // Atualizar dados a cada 5 minutos
@@ -1386,7 +1492,10 @@
         }
 
         // Ajustar quando a janela for redimensionada
-        window.addEventListener('resize', ajustarBarraInferior);
+        window.addEventListener('resize', function() {
+            ajustarBarraInferior();
+            sincronizarAlturaConteudo();
+        });
         
         // Ajustar quando a sidebar for expandida/recolhida
         document.addEventListener('DOMContentLoaded', function() {
