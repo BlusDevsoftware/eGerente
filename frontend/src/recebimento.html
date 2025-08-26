@@ -1335,7 +1335,7 @@
             console.log('tipo_aglutinacao:', titulo.tipo_aglutinacao);
             console.log('ids_aglutinados:', titulo.ids_aglutinados);
             
-            const idsAgl = titulo.ids_aglutinados ? (Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : [titulo.ids_aglutinados]) : [];
+            const idsAgl = titulo.ids_aglutinados ? (Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : titulo.ids_aglutinados.toString().split(',').map(id => id.trim())) : [];
             let titulosAglutinados = [];
             const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
             
