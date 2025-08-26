@@ -1235,6 +1235,13 @@
             const nomeColab = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
             const nomeExibicao = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.join(' '); })(nomeColab);
 
+            const isPago = String(titulo.status||'').toUpperCase() === 'PAGO';
+            const titulosParciais = todosTitulos.filter(t => t.id_titulo_origem === titulo.id);
+            const isParcial = titulosParciais.length > 0;
+            const idsAgl = Array.isArray(titulo.ids_aglutinados) ? titulo.ids_aglutinados : [];
+            const titulosAglutinados = idsAgl.length ? todosTitulos.filter(t => idsAgl.includes(t.id)) : [];
+            const isAglutinado = String(titulo.status||'').toUpperCase()==='AGLUTINADO' || (idsAgl.length>0) || Boolean(titulo.tipo_aglutinacao);
+
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; display: flex; align-items: center; justify-content: center;';
@@ -1248,6 +1255,31 @@
 
             const body = document.createElement('div');
             body.style.cssText = 'padding:24px 36px 0 36px; flex:1 1 auto; min-height:180px; text-align:left; background:#fff; overflow-y:auto;';
+            const secaoBaixa = isPago ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-receipt\"></i> Dados da Baixa</h3>
+                        <div style=\"display:flex; gap:16px; flex-wrap:wrap;\">
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Data Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.data_pagamento?formatarData(titulo.data_pagamento):'-'}</div></div>
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Valor Pago</div><div style=\"font-weight:600; color:#1f2937;\">R$ ${(Number(titulo.valor_pago||titulo.valor||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Forma de Pagamento</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.forma_pagamento||'-'}</div></div>
+                            <div style=\"flex:1; min-width:180px;\"><div style=\"color:#6b7280; font-size:0.9em;\">Usuário Baixa</div><div style=\"font-weight:600; color:#1f2937;\">${titulo.usuario_baixa||'-'}</div></div>
+                        </div>
+                    </div>` : '';
+
+            const listaHTML = (arr) => arr.map(t=>`<li style=\"padding:8px 0; display:flex; justify-content:space-between; border-bottom:1px dashed #eee;\"><span>${t.numero_titulo}</span><span style=\"color:#6b7280;\">${getStatusText(t.status)} • R$ ${Number(t.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></li>`).join('');
+
+            const secaoParciais = isParcial ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-stream\"></i> Títulos Parciais Gerados</h3>
+                        <ul style=\"list-style:none; margin:0; padding:0;\">${listaHTML(titulosParciais)}</ul>
+                    </div>`: '';
+
+            const secaoAgl = isAglutinado ? `
+                    <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
+                        <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-layer-group\"></i> Títulos Aglutinados</h3>
+                        ${titulosAglutinados.length ? `<ul style=\"list-style:none; margin:0; padding:0;\">${listaHTML(titulosAglutinados)}</ul>` : '<div style=\"color:#6b7280;\">Sem lista de títulos aglutinados.</div>'}
+                    </div>` : '';
+
             body.innerHTML = `
                 <form style="margin:0;">
                     <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
@@ -1296,6 +1328,9 @@
                             <i class="fas fa-file-invoice"></i> Visualizar Comprovante
                         </button>
                     </div>
+                    ${secaoBaixa}
+                    ${secaoParciais}
+                    ${secaoAgl}
                 </form>
             `;
 
