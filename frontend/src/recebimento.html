@@ -1278,14 +1278,14 @@
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; display: flex; align-items: center; justify-content: center;';
 
             const content = document.createElement('div');
-            content.style.cssText = 'background:#fff; border-radius:16px; max-width: 1000px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding:0; display:flex; flex-direction:column;';
+            content.style.cssText = 'background:#fff; border-radius:16px; max-width: 800px; width: 95vw; min-width: 320px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding:0; display:flex; flex-direction:column; max-height: 90vh;';
 
             const header = document.createElement('div');
             header.style.cssText = 'padding:24px 36px 0 36px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:16px 16px 0 0;';
             header.innerHTML = `<h2 style="margin:0; font-size:1.3em; color:#1976D2; display:flex; align-items:center; gap:10px; font-weight:700;"><i class="fas fa-eye"></i> Visualizar Título</h2><button style="background:none; border:none; font-size:1.5em; color:#666; cursor:pointer; padding:5px; transition:color 0.3s; border-radius:50%;"><i class="fas fa-times"></i></button>`;
 
             const body = document.createElement('div');
-            body.style.cssText = 'padding:24px 36px 0 36px; flex:1 1 auto; min-height:180px; text-align:left; background:#fff; overflow-y:auto;';
+            body.style.cssText = 'padding:20px 28px 0 28px; flex:1 1 auto; min-height:140px; text-align:left; background:#fff; overflow-y:auto; max-height: 68vh;';
             const secaoBaixa = isPago ? `
                     <div class=\"form-section\" style=\"margin-top:22px; padding-top:16px; border-top:1px solid #eee;\">
                         <h3 style=\"margin-bottom:14px; font-size:1.05em; color:#1976D2; display:flex; align-items:center; gap:8px; font-weight:600;\"><i class=\"fas fa-receipt\"></i> Dados da Baixa</h3>
