@@ -572,6 +572,19 @@
             margin: 12px 20px 4px 20px;
         }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        
         @media (max-width: 768px) {
             .charts-section {
                 grid-template-columns: 1fr;
@@ -739,7 +752,10 @@
 
         <!-- Grid de Títulos a Receber -->
         <div class="titulos-grid-section">
-            <div class="titulos-grid-container">
+            <div class="titulos-grid-container" style="position: relative;">
+                <div id="loader-recebimento" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 2; display: flex; justify-content: center; align-items: center;">
+                    <div class="spinner"></div>
+                </div>
                 <div class="titulos-grid" id="titulosGrid">
                     <!-- Cards de títulos serão inseridos dinamicamente -->
                 </div>
@@ -747,7 +763,10 @@
         </div>
 
         <!-- Commissions Table -->
-        <div class="table-scroll">
+        <div class="table-scroll" style="position: relative;">
+            <div id="loader-tabela-recebimento" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 2; display: flex; justify-content: center; align-items: center;">
+                <div class="spinner"></div>
+            </div>
             <table id="recebimentoTable">
                 <thead>
                     <tr>
@@ -855,9 +874,23 @@
             }
         }
 
+        // Funções para controlar o spinner
+        function mostrarSpinner() {
+            document.getElementById('loader-recebimento').style.display = 'flex';
+            document.getElementById('loader-tabela-recebimento').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-recebimento').style.display = 'none';
+            document.getElementById('loader-tabela-recebimento').style.display = 'none';
+        }
+
         // Função para carregar títulos da API
         async function carregarTitulos() {
             try {
+                // Mostrar spinner
+                mostrarSpinner();
+                
                 // Garante estado zerado antes de iniciar fetch
                 zerarCards();
                 await carregarColaboradores();
@@ -920,8 +953,14 @@
                 // Sincronizar após conteúdo dinâmico ser inserido
                 requestAnimationFrame(sincronizarAlturaConteudo);
                 
+                // Ocultar spinner
+                ocultarSpinner();
+                
             } catch (e) {
                 console.error('Erro ao carregar títulos:', e);
+                // Ocultar spinner em caso de erro
+                ocultarSpinner();
+                
                 // Fallback para dados mockados em caso de erro
                 todosTitulos = [
                     {
@@ -945,6 +984,9 @@
                     atualizarCardsComAnimacao();
                 }, 50);
                 requestAnimationFrame(sincronizarAlturaConteudo);
+                
+                // Ocultar spinner no fallback
+                ocultarSpinner();
             }
         }
 
