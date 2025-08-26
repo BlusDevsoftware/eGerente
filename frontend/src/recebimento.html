@@ -1006,9 +1006,10 @@
                 card.className = `titulo-card ${titulo.status.replace(/\s+/g, '-')}`;
                 card.onclick = () => visualizarTitulo(titulo.numero_titulo);
                 
-                // Sanitização básica para evitar HTML indesejado em strings
+                // Sanitização básica e ajuste de nome (primeiro e segundo)
                 const esc = (s) => String(s || '').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-                const nomeColab = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
+                const nomeColabRaw = mapaColaboradores[titulo.colaborador] || mapaColaboradores[titulo.colaborador_codigo] || titulo.colaborador || '';
+                const nomeColab = (function(n){ const p = String(n).trim().split(/\s+/).filter(Boolean); return p.slice(0,2).join(' '); })(nomeColabRaw);
 
                 const hasComprovante = Boolean(titulo.comprovante_url || (Array.isArray(titulo.anexos) && titulo.anexos.length) || titulo.comprovante);
 
@@ -1134,6 +1135,17 @@
                 'AGLUTINADO': 'Aglutinado'
             };
             return statusMap[status] || status;
+        }
+
+        // Utilidades globais
+        function escapeHTML(s) {
+            return String(s || '').replace(/[&<>\"]/g, function(m) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]); });
+        }
+
+        function formatColaboradorNome(nome) {
+            const partes = String(nome || '').trim().split(/\s+/).filter(Boolean);
+            if (partes.length === 0) return '';
+            return partes.slice(0, 2).join(' ');
         }
 
         function aplicarFiltros() {
