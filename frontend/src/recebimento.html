@@ -813,6 +813,7 @@
         let todosTitulos = [];
         let titulosFiltrados = [];
         let mapaColaboradores = {};
+        let mapaClientes = {};
         let limiteExibicao = 20; // padrão
         let agrupamentoAtivo = false;
         let criterioAgrupamento = 'status';
@@ -840,12 +841,27 @@
             }
         }
 
+        // Função para carregar clientes
+        async function carregarClientes() {
+            try {
+                const clientes = await window.api.get('/clientes');
+                if (Array.isArray(clientes)) {
+                    clientes.forEach(cli => {
+                        mapaClientes[cli.id || cli.codigo] = cli.nome;
+                    });
+                }
+            } catch (e) {
+                console.error('Erro ao carregar clientes:', e);
+            }
+        }
+
         // Função para carregar títulos da API
         async function carregarTitulos() {
             try {
                 // Garante estado zerado antes de iniciar fetch
                 zerarCards();
                 await carregarColaboradores();
+                await carregarClientes();
                 const data = await window.api.get('/movimento_comissoes');
 
                 // Atualizar status para VENCIDO quando vencimento < hoje e não pago
@@ -1384,7 +1400,7 @@
                         </div>
                         <div class="form-group" style="flex:1; min-width:220px;">
                             <label style="margin-bottom:6px; display:block; color:#1976D2; font-weight:600;">Cliente</label>
-                            <input type="text" value="${titulo.cliente || titulo.cliente_nome || titulo.nome_cliente || 'Não informado'}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
+                            <input type="text" value="${mapaClientes[titulo.cliente_id] || titulo.cliente || titulo.cliente_nome || titulo.nome_cliente || 'Não informado'}" readonly style="width:100%; padding:10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0;">
                         </div>
                     </div>
                     <div class="form-row" style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
