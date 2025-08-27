@@ -253,15 +253,23 @@
         }
 
         function obterNomeColaboradorPorItem(item) {
-            const id = item.colaborador_id;
-            const viaMapa = resolverNomeColaboradorPorId(id);
-            return (
-                viaMapa ||
-                item.colaborador ||
-                item.colaborador_nome ||
-                item.nome_colaborador ||
-                (id ? `ID: ${id}` : 'Não informado')
-            );
+            const candidatosCodigo = [
+                item.colaborador_id,
+                item.colaborador_codigo,
+                item.colaborador_codigo_id,
+                item.codigo_colaborador,
+                item.colaborador
+            ];
+            for (const cod of candidatosCodigo) {
+                const nome = resolverNomeColaboradorPorId(cod);
+                if (nome) return nome;
+            }
+            const candidatosNome = [item.colaborador_nome, item.nome_colaborador, item.colaborador];
+            for (const n of candidatosNome) {
+                if (n && String(n).trim() !== '') return String(n).trim();
+            }
+            const id = item.colaborador_id || item.colaborador || item.colaborador_codigo;
+            return id ? `ID: ${id}` : 'Não informado';
         }
 
         // Toggle submenu
@@ -284,10 +292,26 @@
                 selectColaborador.innerHTML = '<option value="">Selecionar</option><option value="todos">Todos</option>';
 
                 colaboradores.forEach(colaborador => {
-                    mapaColaboradores[colaborador.id] = colaborador.nome;
+                    const nome = colaborador.nome || colaborador.nome_colaborador || colaborador.descricao || '';
+                    const possiveisChaves = [
+                        colaborador.id,
+                        colaborador.codigo,
+                        colaborador.codigo_colaborador,
+                        colaborador.colaborador_id,
+                        colaborador.colaborador_codigo
+                    ].filter(v => v !== undefined && v !== null && String(v).trim() !== '');
+
+                    possiveisChaves.forEach(ch => {
+                        mapaColaboradores[String(ch).trim()] = nome;
+                        const asNumber = !Number.isNaN(Number(ch)) ? String(Number(ch)) : '';
+                        if (asNumber) {
+                            mapaColaboradores[asNumber] = nome;
+                        }
+                    });
+
                     const option = document.createElement('option');
-                    option.value = colaborador.nome; // filtrar por nome
-                    option.textContent = colaborador.nome;
+                    option.value = nome; // filtrar por nome
+                    option.textContent = nome;
                     option.setAttribute('data-id', colaborador.id);
                     selectColaborador.appendChild(option);
                 });
@@ -349,9 +373,8 @@
             if (colaboradorNomeSelecionado && colaboradorNomeSelecionado !== 'todos') {
                 const alvo = colaboradorNomeSelecionado.toString().trim().toLowerCase();
                 dadosFiltrados = dadosFiltrados.filter(item => {
-                    const nomeMap = (mapaColaboradores[item.colaborador_id] || '').toString().trim().toLowerCase();
-                    const nomeDireto = (item.colaborador || item.colaborador_nome || item.nome_colaborador || '').toString().trim().toLowerCase();
-                    return nomeMap === alvo || nomeDireto === alvo;
+                    const nome = obterNomeColaboradorPorItem(item).toString().trim().toLowerCase();
+                    return nome === alvo;
                 });
             }
 
