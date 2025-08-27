@@ -147,7 +147,7 @@
         <!-- KPI Cards -->
         <div class="dashboard-cards" style="margin-top: 10px; margin-bottom: 20px;">
             <div class="card">
-                <div class="card-icon" style="background:#1976D21a; color:#1976D2;">
+                <div class="card-icon" style="background:transparent; color:#1976D2;">
                     <i class="fas fa-coins"></i>
                 </div>
                 <div class="card-info">
@@ -156,7 +156,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-icon" style="background:#28a7451a; color:#28a745;">
+                <div class="card-icon" style="background:transparent; color:#28a745;">
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="card-info">
@@ -165,7 +165,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-icon" style="background:#ffc1071a; color:#ff9800;">
+                <div class="card-icon" style="background:transparent; color:#ff9800;">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="card-info">
@@ -174,7 +174,7 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-icon" style="background:#dc35451a; color:#dc3545;">
+                <div class="card-icon" style="background:transparent; color:#dc3545;">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div class="card-info">
@@ -242,6 +242,17 @@
         let dadosRelatorio = [];
         let charts = {};
 
+        function obterNomeColaboradorPorItem(item) {
+            const id = item.colaborador_id;
+            return (
+                mapaColaboradores[id] ||
+                item.colaborador ||
+                item.colaborador_nome ||
+                item.nome_colaborador ||
+                (id ? `ID: ${id}` : 'Não informado')
+            );
+        }
+
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
             trigger.addEventListener('click', function(e) {
@@ -255,16 +266,18 @@
             try {
                 const colaboradores = await window.api.get('/colaboradores');
                 mapaColaboradores = {};
-                const selectColaborador = document.querySelector('.advanced-filters select:nth-of-type(1)');
-                
-                // Limpar opções existentes (exceto a primeira)
-                selectColaborador.innerHTML = '<option value="">Colaborador</option><option value="todos">Todos</option>';
-                
+                const selectColaborador = document.getElementById('filtroColaborador');
+                if (!selectColaborador) return;
+
+                // Limpar opções existentes
+                selectColaborador.innerHTML = '<option value="">Selecionar</option><option value="todos">Todos</option>';
+
                 colaboradores.forEach(colaborador => {
                     mapaColaboradores[colaborador.id] = colaborador.nome;
                     const option = document.createElement('option');
-                    option.value = colaborador.id;
+                    option.value = colaborador.nome; // filtrar por nome
                     option.textContent = colaborador.nome;
+                    option.setAttribute('data-id', colaborador.id);
                     selectColaborador.appendChild(option);
                 });
             } catch (error) {
@@ -303,7 +316,7 @@
         function aplicarFiltros() {
             const dataInicial = (document.getElementById('dataInicial')||{}).value || '';
             const dataFinal = (document.getElementById('dataFinal')||{}).value || '';
-            const colaboradorId = (document.getElementById('filtroColaborador')||{}).value || '';
+            const colaboradorNomeSelecionado = (document.getElementById('filtroColaborador')||{}).value || '';
             const tipo = (document.getElementById('filtroTipo')||{}).value || '';
             const status = (document.getElementById('filtroStatus')||{}).value || '';
 
@@ -321,11 +334,12 @@
                 );
             }
 
-            // Filtro por colaborador
-            if (colaboradorId && colaboradorId !== 'todos') {
-                dadosFiltrados = dadosFiltrados.filter(item => 
-                    item.colaborador_id === colaboradorId
-                );
+            // Filtro por colaborador (por nome)
+            if (colaboradorNomeSelecionado && colaboradorNomeSelecionado !== 'todos') {
+                dadosFiltrados = dadosFiltrados.filter(item => {
+                    const nome = mapaColaboradores[item.colaborador_id] || '';
+                    return nome === colaboradorNomeSelecionado;
+                });
             }
 
             // Filtro por tipo
@@ -470,8 +484,7 @@
         function atualizarGraficoColaboradores(dados) {
             const colaboradorTotais = {};
             dados.forEach(item => {
-                const colaboradorId = item.colaborador_id;
-                const colaboradorNome = mapaColaboradores[colaboradorId] || `ID: ${colaboradorId}`;
+                const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valor = Number(item.valor) || 0;
                 colaboradorTotais[colaboradorNome] = (colaboradorTotais[colaboradorNome] || 0) + valor;
             });
@@ -587,7 +600,7 @@
             dados.forEach(item => {
                 const row = document.createElement('tr');
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
-                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
@@ -657,7 +670,7 @@
             let csv = 'Data,Colaborador,Tipo,Valor,Comissão,Status\n';
             dadosFiltrados.forEach(item => {
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
-                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
@@ -721,7 +734,7 @@
 
             dadosFiltrados.forEach(item => {
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
-                const colaboradorNome = mapaColaboradores[item.colaborador_id] || `ID: ${item.colaborador_id}`;
+                const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
