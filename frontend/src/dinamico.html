@@ -89,42 +89,51 @@
         </div>
 
         <!-- Advanced Filters -->
-        <div class="advanced-filters">
-            <div class="filter-group">
-                <div class="date-range">
-                    <label>Período</label>
-                    <input type="date" placeholder="Data Inicial">
-                    <input type="date" placeholder="Data Final">
+        <div class="advanced-filters" style="grid-template-columns: 1fr auto; align-items: end; gap: 12px;">
+            <div class="filter-group" style="display:grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 10px; align-items: end;">
+                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#1976D2; font-weight:600;">Colaborador</label>
+                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <option value="">Selecionar</option>
+                        <option value="todos">Todos</option>
+                    </select>
                 </div>
-                <select>
-                    <option value="">Colaborador</option>
-                    <option value="todos">Todos</option>
-                </select>
-                <select>
-                    <option value="">Tipo</option>
-                    <option value="produtos">Produtos</option>
-                    <option value="servicos">Serviços</option>
-                    <option value="ambos">Ambos</option>
-                </select>
-                <select>
-                    <option value="">Status</option>
-                    <option value="PAGO">Pago</option>
-                    <option value="PENDENTE">Pendente</option>
-                    <option value="VENCIDO">Vencido</option>
-                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
-                    <option value="AGLUTINADO">Aglutinado</option>
-                    <option value="CANCELADO">Cancelado</option>
-                </select>
-                <div class="value-range">
-                    <label>Faixa de Valor</label>
-                    <input type="number" placeholder="Mínimo">
-                    <input type="number" placeholder="Máximo">
+                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#1976D2; font-weight:600;">Tipo</label>
+                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <option value="">Selecionar</option>
+                        <option value="produtos">Produtos</option>
+                        <option value="servicos">Serviços</option>
+                        <option value="ambos">Ambos</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#1976D2; font-weight:600;">Status</label>
+                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <option value="">Selecionar</option>
+                        <option value="PAGO">Pago</option>
+                        <option value="PENDENTE">Pendente</option>
+                        <option value="VENCIDO">Vencido</option>
+                        <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                        <option value="AGLUTINADO">Aglutinado</option>
+                        <option value="CANCELADO">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#1976D2; font-weight:600;">Período</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="date" placeholder="Data Inicial" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <input type="date" placeholder="Data Final" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                    </div>
                 </div>
             </div>
-            <button class="btn-primary">
-                <i class="fas fa-search"></i>
-                Gerar Relatório
-            </button>
+            <div class="form-group" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                <label style="visibility:hidden; height:16px;">Ação</label>
+                <button class="btn-primary" style="width: auto; min-width: 120px; height: 32px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9em;">
+                    <i class="fas fa-search" style="margin-right: 6px;"></i>
+                    Gerar Relatório
+                </button>
+            </div>
         </div>
 
         <!-- Spinner de Carregamento -->
@@ -687,7 +696,7 @@
                 return;
             }
 
-            // Criar conteúdo para impressão
+            // Criar conteúdo para impressão de relatorio
             let conteudo = `
                 <html>
                 <head>
