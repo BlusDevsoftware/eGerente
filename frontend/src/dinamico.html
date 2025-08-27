@@ -39,6 +39,42 @@
             background: #f7f9fc;
             z-index: 1;
         }
+        /* Status - idêntico à aba movimento de comissão */
+        .status.paid {
+            background: #e3f9e5;
+            color: #388e3c;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        .status.pending {
+            background: #fffbe6;
+            color: #b8860b;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        .status.vencido {
+            background: #ffeaea;
+            color: #d32f2f;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        .status.nao-pago {
+            background: #fff3e0 !important;
+            color: #f57c00 !important;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
+        .status.aglutinado {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -734,14 +770,9 @@
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                // Status com cor
-                let statusClass = 'pending';
-                let statusText = item.status || 'PENDENTE';
-                if (statusText === 'PAGO') statusClass = 'paid';
-                else if (statusText === 'VENCIDO') statusClass = 'overdue';
-                else if (statusText === 'CLIENTE NÃO PAGOU') statusClass = 'notpaid';
-                else if (statusText === 'AGLUTINADO') statusClass = 'aglutinado';
-                else if (statusText === 'CANCELADO') statusClass = 'cancelled';
+                        // Status com cor - idêntico à aba movimento de comissão
+        let statusClass = statusClass(item.status);
+        let statusText = item.status || 'PENDENTE';
 
                 row.innerHTML = `
                     <td>${geracao}</td>
@@ -882,13 +913,12 @@
                         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                         th { background-color: #f2f2f2; }
-                        .status { padding: 4px 8px; border-radius: 4px; color: white; }
-                        .paid { background-color: #28a745; }
-                        .pending { background-color: #ffc107; color: black; }
-                        .overdue { background-color: #dc3545; }
-                        .notpaid { background-color: #6c757d; }
-                        .aglutinado { background-color: #17a2b8; }
-                        .cancelled { background-color: #9e9e9e; }
+                        .status { padding: 4px 12px; border-radius: 8px; font-weight: 600; }
+                        .paid { background-color: #e3f9e5; color: #388e3c; }
+                        .pending { background-color: #fffbe6; color: #b8860b; }
+                        .vencido { background-color: #ffeaea; color: #d32f2f; }
+                        .nao-pago { background-color: #fff3e0; color: #f57c00; }
+                        .aglutinado { background-color: #f3e5f5; color: #7b1fa2; }
                     </style>
                 </head>
                 <body>
@@ -915,12 +945,7 @@
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                let statusClass = 'pending';
-                if (item.status === 'PAGO') statusClass = 'paid';
-                else if (item.status === 'VENCIDO') statusClass = 'overdue';
-                else if (item.status === 'CLIENTE NÃO PAGOU') statusClass = 'notpaid';
-                else if (item.status === 'AGLUTINADO') statusClass = 'aglutinado';
-                else if (item.status === 'CANCELADO') statusClass = 'cancelled';
+                            let statusClass = statusClass(item.status);
 
                 conteudo += `
                     <tr>
@@ -945,6 +970,18 @@
             janelaImpressao.document.write(conteudo);
             janelaImpressao.document.close();
             janelaImpressao.print();
+        }
+        
+        // Função statusClass - idêntica à aba movimento de comissão
+        function statusClass(status) {
+            if (!status) return 'pending';
+            const s = status.toLowerCase();
+            if (s.includes('não pagou') || s.includes('nao pagou')) return 'nao-pago';
+            if (s.includes('pendente')) return 'pending';
+            if (s.includes('vencido')) return 'vencido';
+            if (s.includes('pago')) return 'paid';
+            if (s.includes('aglutinado')) return 'aglutinado';
+            return 'pending';
         }
     </script>
     <script src="scripts/navigation.js"></script>
