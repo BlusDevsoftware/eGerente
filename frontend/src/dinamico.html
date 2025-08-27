@@ -96,8 +96,6 @@
                 <select>
                     <option value="">Colaborador</option>
                     <option value="todos">Todos</option>
-                    <option value="joao">João Silva</option>
-                    <option value="maria">Maria Santos</option>
                 </select>
                 <select>
                     <option value="">Tipo</option>
@@ -107,9 +105,12 @@
                 </select>
                 <select>
                     <option value="">Status</option>
-                    <option value="pago">Pago</option>
-                    <option value="pendente">Pendente</option>
-                    <option value="cancelado">Cancelado</option>
+                    <option value="PAGO">Pago</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="VENCIDO">Vencido</option>
+                    <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
+                    <option value="AGLUTINADO">Aglutinado</option>
+                    <option value="CANCELADO">Cancelado</option>
                 </select>
                 <div class="value-range">
                     <label>Faixa de Valor</label>
@@ -128,6 +129,46 @@
             <div style="text-align: center;">
                 <div class="spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #1976D2; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
                 <p style="color: #1976D2; font-weight: 600;">Carregando dados...</p>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="dashboard-cards" style="margin-top: 10px; margin-bottom: 20px;">
+            <div class="card">
+                <div class="card-icon" style="background:#1976D21a; color:#1976D2;">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Total (R$)</h3>
+                    <p id="kpi-total">-</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:#28a7451a; color:#28a745;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Pago (R$)</h3>
+                    <p id="kpi-pago">-</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:#ffc1071a; color:#ff9800;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Pendente (R$)</h3>
+                    <p id="kpi-pendente">-</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon" style="background:#dc35451a; color:#dc3545;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Vencido (R$)</h3>
+                    <p id="kpi-vencido">-</p>
+                </div>
             </div>
         </div>
 
@@ -313,11 +354,29 @@
             return dadosFiltrados;
         }
 
+        // Atualizar KPIs
+        function atualizarKPIs(dados) {
+            const formatBRL = v => Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            const soma = (arr, pred) => arr.filter(pred).reduce((acc, i) => acc + Number(i.valor||0), 0);
+
+            const total = soma(dados, () => true);
+            const pago = soma(dados, i => i.status === 'PAGO');
+            const pendente = soma(dados, i => i.status === 'PENDENTE');
+            const vencido = soma(dados, i => i.status === 'VENCIDO');
+
+            const el = id => document.getElementById(id);
+            if (el('kpi-total')) el('kpi-total').textContent = formatBRL(total);
+            if (el('kpi-pago')) el('kpi-pago').textContent = formatBRL(pago);
+            if (el('kpi-pendente')) el('kpi-pendente').textContent = formatBRL(pendente);
+            if (el('kpi-vencido')) el('kpi-vencido').textContent = formatBRL(vencido);
+        }
+
         // Gerar relatório
         async function gerarRelatorio() {
             try {
                 mostrarSpinner();
                 const dadosFiltrados = aplicarFiltros();
+                atualizarKPIs(dadosFiltrados);
                 atualizarGraficos(dadosFiltrados);
                 atualizarTabela(dadosFiltrados);
                 ocultarSpinner();
@@ -561,9 +620,26 @@
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             inicializarPagina();
-            
+
             // Botão gerar relatório
             document.querySelector('.btn-primary').addEventListener('click', gerarRelatorio);
+
+            // Autoatualização ao mudar filtros
+            const filtroContainer = document.querySelector('.advanced-filters');
+            filtroContainer.addEventListener('change', function(e) {
+                if (e.target.matches('input, select')) {
+                    gerarRelatorio();
+                }
+            });
+
+            // Atualiza ao digitar valores numéricos (debounce simples)
+            let debounce;
+            filtroContainer.addEventListener('input', function(e) {
+                if (e.target.matches('.value-range input')) {
+                    clearTimeout(debounce);
+                    debounce = setTimeout(() => gerarRelatorio(), 400);
+                }
+            });
         });
 
         // Exportar relatório
@@ -582,7 +658,7 @@
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${comissaoFormatada}","${item.status || 'PENDENTE}"\n`;
+                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${comissaoFormatada}","${item.status || 'PENDENTE'}"\n`;
             });
 
             // Download
