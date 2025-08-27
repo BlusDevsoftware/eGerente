@@ -9,6 +9,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Spinner de carregamento */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 2;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -76,7 +107,10 @@
         </div>
 
         <!-- Dashboard Cards -->
-        <div class="dashboard-cards" id="dashboard-cards">
+        <div class="dashboard-cards" id="dashboard-cards" style="position: relative;">
+            <div id="loader-cards" class="loader-overlay">
+                <div class="spinner"></div>
+            </div>
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Total de Colaboradores</h3>
@@ -112,7 +146,10 @@
         </div>
 
         <!-- Charts Section -->
-        <div class="charts-section">
+        <div class="charts-section" style="position: relative;">
+            <div id="loader-charts" class="loader-overlay">
+                <div class="spinner"></div>
+            </div>
             <div class="chart-container">
                 <h2>Evolução das Comissões</h2>
                 <canvas id="comissoesChart"></canvas>
@@ -124,7 +161,10 @@
         </div>
 
         <!-- Latest Commissions -->
-        <div class="latest-commissions">
+        <div class="latest-commissions" style="position: relative;">
+            <div id="loader-table" class="loader-overlay">
+                <div class="spinner"></div>
+            </div>
             <div class="table-header">
             <h2>Últimas Comissões</h2>
                 <button class="btn-primary" onclick="carregarComissoes()">
@@ -166,9 +206,39 @@
             inicializarDragAndDrop();
         });
 
+        // Funções para controlar os spinners
+        function mostrarSpinnerCards() {
+            document.getElementById('loader-cards').style.display = 'flex';
+        }
+        
+        function ocultarSpinnerCards() {
+            document.getElementById('loader-cards').style.display = 'none';
+        }
+        
+        function mostrarSpinnerCharts() {
+            document.getElementById('loader-charts').style.display = 'flex';
+        }
+        
+        function ocultarSpinnerCharts() {
+            document.getElementById('loader-charts').style.display = 'none';
+        }
+        
+        function mostrarSpinnerTable() {
+            document.getElementById('loader-table').style.display = 'flex';
+        }
+        
+        function ocultarSpinnerTable() {
+            document.getElementById('loader-table').style.display = 'none';
+        }
+
         // Função para inicializar o dashboard
         async function inicializarDashboard() {
             try {
+                // Mostrar spinners ao iniciar
+                mostrarSpinnerCards();
+                mostrarSpinnerCharts();
+                mostrarSpinnerTable();
+                
                 await Promise.all([
                     carregarDadosCards(),
                     carregarComissoes(),
@@ -202,9 +272,14 @@
                 // Aplicar classes de cor baseadas no crescimento
                 aplicarClassesCrescimento();
                 
+                // Ocultar spinner dos cards
+                ocultarSpinnerCards();
+                
             } catch (error) {
                 console.error('Erro ao carregar dados dos cards:', error);
                 mostrarToast('Erro ao carregar dados do dashboard', 'error');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinnerCards();
             }
         }
 
@@ -356,10 +431,15 @@
                     </tr>
                 `).join('');
 
+                // Ocultar spinner da tabela
+                ocultarSpinnerTable();
+
             } catch (error) {
                 console.error('Erro ao carregar comissões:', error);
                 document.getElementById('comissoes-tbody').innerHTML = 
                     '<tr><td colspan="5" class="error">Erro ao carregar comissões</td></tr>';
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinnerTable();
             }
         }
 
@@ -481,10 +561,15 @@
                     }
                 });
 
+                // Ocultar spinner dos gráficos
+                ocultarSpinnerCharts();
+
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
                 // Criar gráficos com dados padrão em caso de erro
                 criarGraficosPadrao();
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinnerCharts();
             }
         }
 
