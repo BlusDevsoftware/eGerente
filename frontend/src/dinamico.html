@@ -240,6 +240,33 @@
         let dadosRelatorio = [];
         let charts = {};
 
+        // Persistência simples dos filtros
+        function salvarEstadoFiltros() {
+            const estado = {
+                colaborador: (document.getElementById('filtroColaborador')||{}).value || '',
+                tipo: (document.getElementById('filtroTipo')||{}).value || '',
+                status: (document.getElementById('filtroStatus')||{}).value || '',
+                dataInicial: (document.getElementById('dataInicial')||{}).value || '',
+                dataFinal: (document.getElementById('dataFinal')||{}).value || ''
+            };
+            try { localStorage.setItem('dinamico_filtros', JSON.stringify(estado)); } catch (_) {}
+        }
+
+        function restaurarEstadoFiltros() {
+            try {
+                const salvo = JSON.parse(localStorage.getItem('dinamico_filtros')||'{}');
+                if (salvo) {
+                    if (document.getElementById('filtroTipo')) document.getElementById('filtroTipo').value = salvo.tipo || '';
+                    if (document.getElementById('filtroStatus')) document.getElementById('filtroStatus').value = salvo.status || '';
+                    if (document.getElementById('dataInicial')) document.getElementById('dataInicial').value = salvo.dataInicial || '';
+                    if (document.getElementById('dataFinal')) document.getElementById('dataFinal').value = salvo.dataFinal || '';
+                    // colaborador é restaurado após o carregamento das opções
+                    return salvo.colaborador || '';
+                }
+            } catch (_) {}
+            return '';
+        }
+
         function resolverNomeColaboradorPorId(id) {
             if (id === undefined || id === null) return '';
             const raw = String(id).trim();
@@ -315,6 +342,12 @@
                     option.setAttribute('data-id', colaborador.id);
                     selectColaborador.appendChild(option);
                 });
+
+                // Restaurar seleção salva (por nome)
+                const salvoColab = restaurarEstadoFiltros();
+                if (salvoColab) {
+                    selectColaborador.value = salvoColab;
+                }
             } catch (error) {
                 console.error('Erro ao carregar colaboradores:', error);
             }
@@ -673,6 +706,7 @@
             const filtroContainer = document.querySelector('.advanced-filters');
             filtroContainer.addEventListener('change', function(e) {
                 if (e.target.matches('#dataInicial, #dataFinal, #filtroColaborador, #filtroTipo, #filtroStatus')) {
+                    salvarEstadoFiltros();
                     gerarRelatorio();
                 }
             });
@@ -681,6 +715,7 @@
             let debounce;
             filtroContainer.addEventListener('input', function(e) {
                 if (e.target.matches('#dataInicial, #dataFinal')) {
+                    salvarEstadoFiltros();
                     clearTimeout(debounce);
                     debounce = setTimeout(() => gerarRelatorio(), 400);
                 }
