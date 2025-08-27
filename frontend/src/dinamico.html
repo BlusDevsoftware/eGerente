@@ -21,6 +21,24 @@
         /* Correção de crescimento dos gráficos */
         .chart-card { position: relative; }
         .chart-card canvas { max-height: 320px; height: 320px !important; }
+        /* Scroll na grade de resultados com cabeçalho fixo */
+        .table-scroll {
+            max-height: 420px;
+            overflow: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .table-scroll table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-scroll thead th {
+            position: sticky;
+            top: 0;
+            background: #f7f9fc;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
@@ -124,9 +142,9 @@
                     <div style="display:flex; gap:6px; align-items:center; flex-wrap:nowrap; justify-content:flex-start; flex:1;">
                         <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
                         <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
-                        <button id="btnDataGeracao" type="button" title="Filtrar por Data de Geração" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;">Geração</button>
-                        <button id="btnDataVencimento" type="button" title="Filtrar por Data de Vencimento" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;">Vencimento</button>
-                        <button id="btnLimparFiltros" class="btn-secondary" style="height:32px; padding:0 12px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9em; background:#e9ecef; color:#1565c0; border:1px solid #cfd8dc;">
+                        <button id="btnDataGeracao" type="button" title="Filtrar por Data de Geração" style="height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;">Geração</button>
+                        <button id="btnDataVencimento" type="button" title="Filtrar por Data de Vencimento" style="height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;">Vencimento</button>
+                        <button id="btnLimparFiltros" class="btn-secondary" style="height:32px; width:120px; padding:0 12px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9em; background:#e9ecef; color:#1565c0; border:1px solid #cfd8dc;">
                             <i class="fas fa-eraser" style="margin-right:6px;"></i>
                             Limpar
                         </button>
@@ -215,21 +233,23 @@
                     </button>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Geração</th>
-                        <th>Vencimento</th>
-                        <th>Colaborador</th>
-                        <th>Tipo</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dados serão carregados dinamicamente -->
-                </tbody>
-            </table>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Geração</th>
+                            <th>Vencimento</th>
+                            <th>Colaborador</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão carregados dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -730,8 +750,8 @@
             const btnVenc = document.getElementById('btnDataVencimento');
             function atualizarBotoesModo() {
                 if (btnGeracao && btnVenc) {
-                    const ativo = 'height:28px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.85em; cursor:pointer;';
-                    const inativo = 'height:28px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.85em; cursor:pointer;';
+                    const ativo = 'height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;';
+                    const inativo = 'height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;';
                     btnGeracao.setAttribute('style', window.modoFiltroData==='geracao' ? ativo : inativo);
                     btnVenc.setAttribute('style', window.modoFiltroData==='vencimento' ? ativo : inativo);
                 }
