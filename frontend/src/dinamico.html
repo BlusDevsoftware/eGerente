@@ -222,9 +222,7 @@
                         <th>Colaborador</th>
                         <th>Tipo</th>
                         <th>Valor</th>
-                        <th>Comissão</th>
                         <th>Status</th>
-                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -242,10 +240,23 @@
         let dadosRelatorio = [];
         let charts = {};
 
+        function resolverNomeColaboradorPorId(id) {
+            if (id === undefined || id === null) return '';
+            const raw = String(id).trim();
+            const asNumber = raw !== '' && !Number.isNaN(Number(raw)) ? String(Number(raw)) : '';
+            // Alguns IDs podem vir com zeros à esquerda; tente ambos
+            return (
+                mapaColaboradores[raw] ||
+                (asNumber && mapaColaboradores[asNumber]) ||
+                ''
+            );
+        }
+
         function obterNomeColaboradorPorItem(item) {
             const id = item.colaborador_id;
+            const viaMapa = resolverNomeColaboradorPorId(id);
             return (
-                mapaColaboradores[id] ||
+                viaMapa ||
                 item.colaborador ||
                 item.colaborador_nome ||
                 item.nome_colaborador ||
@@ -334,11 +345,13 @@
                 );
             }
 
-            // Filtro por colaborador (por nome)
+            // Filtro por colaborador (por nome, compatível com recebimento)
             if (colaboradorNomeSelecionado && colaboradorNomeSelecionado !== 'todos') {
+                const alvo = colaboradorNomeSelecionado.toString().trim().toLowerCase();
                 dadosFiltrados = dadosFiltrados.filter(item => {
-                    const nome = mapaColaboradores[item.colaborador_id] || '';
-                    return nome === colaboradorNomeSelecionado;
+                    const nomeMap = (mapaColaboradores[item.colaborador_id] || '').toString().trim().toLowerCase();
+                    const nomeDireto = (item.colaborador || item.colaborador_nome || item.nome_colaborador || '').toString().trim().toLowerCase();
+                    return nomeMap === alvo || nomeDireto === alvo;
                 });
             }
 
@@ -593,7 +606,7 @@
             tbody.innerHTML = '';
 
             if (dados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
                 return;
             }
 
@@ -602,7 +615,6 @@
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                 // Status com cor
                 let statusClass = 'pending';
@@ -615,13 +627,7 @@
                     <td>${colaboradorNome}</td>
                     <td>${item.tipo || ''}</td>
                     <td>${valorFormatado}</td>
-                    <td>${comissaoFormatada}</td>
                     <td><span class="status ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button class="action-btn view-btn" title="Visualizar" onclick="visualizarItem('${item.id}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </td>
                 `;
                 tbody.appendChild(row);
             });
@@ -667,14 +673,13 @@
             }
 
             // Criar CSV
-            let csv = 'Data,Colaborador,Tipo,Valor,Comissão,Status\n';
+            let csv = 'Data,Colaborador,Tipo,Valor,Status\n';
             dadosFiltrados.forEach(item => {
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${comissaoFormatada}","${item.status || 'PENDENTE'}"\n`;
+                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${item.status || 'PENDENTE'}"\n`;
             });
 
             // Download
@@ -725,7 +730,6 @@
                                 <th>Colaborador</th>
                                 <th>Tipo</th>
                                 <th>Valor</th>
-                                <th>Comissão</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -736,7 +740,6 @@
                 const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                const comissaoFormatada = Number(item.comissao || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                 let statusClass = 'pending';
                 if (item.status === 'PAGO') statusClass = 'paid';
@@ -748,7 +751,6 @@
                         <td>${colaboradorNome}</td>
                         <td>${item.tipo || ''}</td>
                         <td>${valorFormatado}</td>
-                        <td>${comissaoFormatada}</td>
                         <td><span class="status ${statusClass}">${item.status || 'PENDENTE'}</span></td>
                     </tr>
                 `;
