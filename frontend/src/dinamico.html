@@ -281,16 +281,17 @@
             </div>
             <div class="table-scroll">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Geração</th>
-                            <th>Vencimento</th>
-                            <th>Colaborador</th>
-                            <th>Tipo</th>
-                            <th>Valor</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
+                                    <thead>
+                    <tr>
+                        <th>Geração</th>
+                        <th>Vencimento</th>
+                        <th>Nº Título</th>
+                        <th>Colaborador</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
                     <tbody>
                         <!-- Dados serão carregados dinamicamente -->
                     </tbody>
@@ -759,7 +760,7 @@
             }
 
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
                 return;
             }
 
@@ -777,6 +778,7 @@
                 row.innerHTML = `
                     <td>${geracao}</td>
                     <td>${vencimento}</td>
+                    <td>${item.numero_titulo || ''}</td>
                     <td>${colaboradorNome}</td>
                     <td>${item.tipo || ''}</td>
                     <td>${valorFormatado}</td>
@@ -872,14 +874,14 @@
 
             // Criar CSV
             const modoData = window.modoFiltroData === 'vencimento' ? 'Vencimento' : 'Geração';
-            let csv = `${modoData},Colaborador,Tipo,Valor,Status\n`;
+            let csv = `${modoData},Nº Título,Colaborador,Tipo,Valor,Status\n`;
             dadosFiltrados.forEach(item => {
                 const base = (window.modoFiltroData === 'vencimento') ? item.data_vencimento : item.data_geracao;
                 const dataFormatada = base ? new Date(base).toLocaleDateString('pt-BR') : '';
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                csv += `${dataFormatada},"${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${item.status || 'PENDENTE'}"\n`;
+                csv += `${dataFormatada},"${item.numero_titulo || ''}","${colaboradorNome}","${item.tipo || ''}","${valorFormatado}","${item.status || 'PENDENTE'}"\n`;
             });
 
             // Download
@@ -930,6 +932,7 @@
                         <thead>
                             <tr>
                                 <th>${window.modoFiltroData === 'vencimento' ? 'Vencimento' : 'Geração'}</th>
+                                <th>Nº Título</th>
                                 <th>Colaborador</th>
                                 <th>Tipo</th>
                                 <th>Valor</th>
@@ -950,6 +953,7 @@
                 conteudo += `
                     <tr>
                         <td>${dataFormatada}</td>
+                        <td>${item.numero_titulo || ''}</td>
                         <td>${colaboradorNome}</td>
                         <td>${item.tipo || ''}</td>
                         <td>${valorFormatado}</td>
