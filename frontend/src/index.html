@@ -211,15 +211,11 @@
         // Função para buscar dados reais das APIs
         async function buscarDadosReais() {
             try {
-                // Buscar colaboradores
-                const colaboradores = await fetch('https://e-gerente-backend-gateway.vercel.app/api/colaboradores/colaboradores')
-                    .then(res => res.json())
-                    .catch(() => []);
+                // Buscar colaboradores usando a mesma API da aba movimento de comissões
+                const colaboradores = await window.api.get('/colaboradores');
 
-                // Buscar movimentos de comissões
-                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
-                    .then(res => res.json())
-                    .catch(() => []);
+                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
+                const comissoes = await window.api.get('/movimento_comissoes');
 
                 // Calcular dados dos colaboradores
                 const totalColaboradores = colaboradores.length;
@@ -370,15 +366,11 @@
         // Função para buscar comissões reais da API
         async function buscarComissoesReais() {
             try {
-                // Buscar movimentos de comissões
-                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
-                    .then(res => res.json())
-                    .catch(() => []);
+                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
+                const comissoes = await window.api.get('/movimento_comissoes');
 
-                // Buscar colaboradores para mapear nomes
-                const colaboradores = await fetch('https://e-gerente-backend-gateway.vercel.app/api/colaboradores/colaboradores')
-                    .then(res => res.json())
-                    .catch(() => []);
+                // Buscar colaboradores para mapear nomes usando a mesma API da aba movimento de comissões
+                const colaboradores = await window.api.get('/colaboradores');
 
                 // Criar mapa de colaboradores por ID
                 const mapaColaboradores = {};
@@ -499,10 +491,8 @@
         // Função para buscar dados dos gráficos
         async function buscarDadosGraficos() {
             try {
-                // Buscar movimentos de comissões
-                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
-                    .then(res => res.json())
-                    .catch(() => []);
+                // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
+                const comissoes = await window.api.get('/movimento_comissoes');
 
                 // Calcular dados de evolução (últimos 6 meses)
                 const evolucao = calcularEvolucaoComissoes(comissoes);
