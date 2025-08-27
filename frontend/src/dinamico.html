@@ -18,6 +18,9 @@
         .spinner {
             animation: spin 1s linear infinite;
         }
+        /* Correção de crescimento dos gráficos */
+        .chart-card { position: relative; }
+        .chart-card canvas { max-height: 320px; height: 320px !important; }
     </style>
 </head>
 <body>
@@ -445,17 +448,18 @@
 
             const ctx = document.getElementById('statusChart').getContext('2d');
             charts.statusChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
+                type: 'pie',
+                data: {
                     labels: labels,
                 datasets: [{
                         data: values,
                         backgroundColor: backgroundColors
                 }]
             },
-            options: {
-                responsive: true,
-                    maintainAspectRatio: false,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
                     plugins: {
                         legend: {
                             position: 'bottom'
@@ -489,8 +493,8 @@
 
             const ctx = document.getElementById('colaboradoresChart').getContext('2d');
             charts.colaboradoresChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
+                type: 'bar',
+                data: {
                     labels: labels,
                 datasets: [{
                         label: 'Valor Total (R$)',
@@ -498,9 +502,10 @@
                     backgroundColor: '#007bff'
                 }]
             },
-            options: {
-                responsive: true,
-                    maintainAspectRatio: false,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.2,
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -542,8 +547,8 @@
 
             const ctx = document.getElementById('evolucaoChart').getContext('2d');
             charts.evolucaoChart = new Chart(ctx, {
-            type: 'line',
-            data: {
+                type: 'line',
+                data: {
                     labels: labels,
                 datasets: [{
                         label: 'Valor Total (R$)',
@@ -554,9 +559,10 @@
                         fill: true
                 }]
             },
-            options: {
-                responsive: true,
-                    maintainAspectRatio: false,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.2,
                     scales: {
                         y: {
                             beginAtZero: true,
