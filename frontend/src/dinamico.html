@@ -319,7 +319,8 @@
                 selectColaborador.innerHTML = '<option value="">Selecionar</option><option value="todos">Todos</option>';
 
                 colaboradores.forEach(colaborador => {
-                    const nome = colaborador.nome || colaborador.nome_colaborador || colaborador.descricao || '';
+                    let nome = (colaborador.nome || colaborador.nome_colaborador || colaborador.descricao || '').toString().trim();
+                    const nomeDisplay = nome && nome.length > 1 ? nome : (`ID: ${colaborador.id || colaborador.codigo || ''}`);
                     const possiveisChaves = [
                         colaborador.id,
                         colaborador.codigo,
@@ -329,24 +330,27 @@
                     ].filter(v => v !== undefined && v !== null && String(v).trim() !== '');
 
                     possiveisChaves.forEach(ch => {
-                        mapaColaboradores[String(ch).trim()] = nome;
+                        mapaColaboradores[String(ch).trim()] = nomeDisplay;
                         const asNumber = !Number.isNaN(Number(ch)) ? String(Number(ch)) : '';
                         if (asNumber) {
-                            mapaColaboradores[asNumber] = nome;
+                            mapaColaboradores[asNumber] = nomeDisplay;
                         }
                     });
 
                     const option = document.createElement('option');
-                    option.value = nome; // filtrar por nome
-                    option.textContent = nome;
+                    option.value = nomeDisplay; // filtrar por nome
+                    option.textContent = nomeDisplay;
                     option.setAttribute('data-id', colaborador.id);
                     selectColaborador.appendChild(option);
                 });
 
                 // Restaurar seleção salva (por nome)
                 const salvoColab = restaurarEstadoFiltros();
-                if (salvoColab) {
+                if (salvoColab && Array.from(selectColaborador.options).some(o => o.value === salvoColab)) {
                     selectColaborador.value = salvoColab;
+                } else {
+                    // garantir que um valor válido esteja visível
+                    selectColaborador.value = '';
                 }
             } catch (error) {
                 console.error('Erro ao carregar colaboradores:', error);
