@@ -771,7 +771,7 @@
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                         // Status com cor - idêntico à aba movimento de comissão
-        let statusClass = statusClass(item.status);
+        let statusClassValue = statusClass(item.status);
         let statusText = item.status || 'PENDENTE';
 
                 row.innerHTML = `
@@ -780,7 +780,7 @@
                     <td>${colaboradorNome}</td>
                     <td>${item.tipo || ''}</td>
                     <td>${valorFormatado}</td>
-                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td><span class="status ${statusClassValue}">${statusText}</span></td>
                 `;
                 tbody.appendChild(row);
             });
@@ -945,7 +945,7 @@
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
-                            let statusClass = statusClass(item.status);
+                            let statusClassValue = statusClass(item.status);
 
                 conteudo += `
                     <tr>
@@ -953,7 +953,7 @@
                         <td>${colaboradorNome}</td>
                         <td>${item.tipo || ''}</td>
                         <td>${valorFormatado}</td>
-                        <td><span class="status ${statusClass}">${item.status || 'PENDENTE'}</span></td>
+                        <td><span class="status ${statusClassValue}">${item.status || 'PENDENTE'}</span></td>
                     </tr>
                 `;
             });
