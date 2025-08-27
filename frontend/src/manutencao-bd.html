@@ -193,11 +193,21 @@
     <script src="scripts/navigation.js"></script>
     <script>
     window.addEventListener('DOMContentLoaded', function() {
+        // Inicializar menu de navegação
         if (typeof initializeMenu === 'function') {
             initializeMenu();
         }
+        
+        // Garantir que os links funcionem corretamente
         document.querySelectorAll('.nav-menu a').forEach(function(link) {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function(e) {
+                // Se for um link real (não submenu-trigger), permitir navegação
+                if (!this.classList.contains('submenu-trigger') && this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                    // Permitir navegação normal
+                    return true;
+                }
+                
+                // Fechar modais se existirem
                 var modais = ['paymentModal', 'viewModal', 'baixaModal'];
                 modais.forEach(function(id) {
                     var modal = document.getElementById(id);
@@ -205,6 +215,12 @@
                 });
             });
         });
+        
+        // Garantir que o submenu de configurações esteja sempre acessível
+        const configSubmenu = document.querySelector('.has-submenu:has(.submenu a[href*="manutencao-bd"], .submenu a[href*="sincronizar"])');
+        if (configSubmenu) {
+            configSubmenu.classList.add('active');
+        }
     });
     </script>
 </body>
