@@ -73,91 +73,7 @@
             overflow-y: auto;
         }
 
-        /* Estilos para lista de backups */
-        .backup-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
 
-        .backup-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-
-        .backup-info h4 {
-            margin: 0 0 4px 0;
-            color: #2b2f36;
-            font-size: 1rem;
-        }
-
-        .backup-info p {
-            margin: 0 0 8px 0;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .backup-size {
-            font-weight: 600;
-            color: #1976D2;
-            font-size: 1.1rem;
-        }
-
-        .backup-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-restore,
-        .btn-delete {
-            background: none;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-restore {
-            color: #1976D2;
-        }
-
-        .btn-restore:hover {
-            background: #e3f2fd;
-        }
-
-        .btn-delete {
-            color: #dc3545;
-        }
-
-        .btn-delete:hover {
-            background: #ffebee;
-        }
-
-        .no-backups {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            font-style: italic;
-        }
 
         /* Estilos para logs */
         .logs-container {
@@ -371,24 +287,6 @@
         <div class="dashboard-cards">
             <div class="card">
                 <div class="card-icon">
-                    <i class="fas fa-database"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Tamanho do BD</h3>
-                    <p>2.5 GB</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="card-info">
-                    <h3>Último Backup</h3>
-                    <p>Hoje, 08:30</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-icon">
                     <i class="fas fa-tachometer-alt"></i>
                 </div>
                 <div class="card-info">
@@ -405,33 +303,28 @@
                     <p>100%</p>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Status do BD</h3>
+                    <p>Online</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Última Verificação</h3>
+                    <p>Hoje, 08:30</p>
+                </div>
+            </div>
         </div>
 
         <!-- Maintenance Options -->
         <div class="maintenance-container">
-            <div class="maintenance-section">
-                <h2>Backup</h2>
-                <div class="maintenance-options">
-                    <div class="option-card">
-                        <i class="fas fa-download"></i>
-                        <h3>Backup Completo</h3>
-                        <p>Realiza backup de todos os dados do sistema</p>
-                        <button class="btn-primary">
-                            <i class="fas fa-play"></i>
-                            Iniciar Backup
-                        </button>
-                    </div>
-                    <div class="option-card">
-                        <i class="fas fa-history"></i>
-                        <h3>Histórico de Backups</h3>
-                        <p>Visualiza e gerencia backups anteriores</p>
-                        <button class="btn-secondary">
-                            <i class="fas fa-list"></i>
-                            Ver Histórico
-                        </button>
-                    </div>
-                </div>
-            </div>
 
             <div class="maintenance-section">
                 <h2>Otimização</h2>
@@ -501,7 +394,7 @@
         }
         document.querySelectorAll('.nav-menu a').forEach(function(link) {
             link.addEventListener('click', function() {
-                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'backupModal', 'logsModal'];
+                var modais = ['paymentModal', 'viewModal', 'baixaModal', 'logsModal'];
                 modais.forEach(function(id) {
                     var modal = document.getElementById(id);
                     if (modal) modal.style.display = 'none';
@@ -515,23 +408,17 @@
 
     // Funções de manutenção do banco de dados
     function inicializarManutencao() {
-        // Backup Completo
-        document.querySelector('.option-card:nth-child(1) .btn-primary').addEventListener('click', iniciarBackup);
-        
-        // Histórico de Backups
-        document.querySelector('.option-card:nth-child(2) .btn-secondary').addEventListener('click', mostrarHistoricoBackups);
-        
         // Limpeza de Cache
-        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(1) .btn-primary').addEventListener('click', limparCache);
+        document.querySelector('.maintenance-section:nth-child(1) .option-card:nth-child(1) .btn-primary').addEventListener('click', limparCache);
         
         // Otimização de Tabelas
-        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(2) .btn-primary').addEventListener('click', otimizarTabelas);
+        document.querySelector('.maintenance-section:nth-child(1) .option-card:nth-child(2) .btn-primary').addEventListener('click', otimizarTabelas);
         
         // Verificação de Integridade
-        document.querySelector('.maintenance-section:nth-child(3) .option-card:nth-child(1) .btn-primary').addEventListener('click', verificarIntegridade);
+        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(1) .btn-primary').addEventListener('click', verificarIntegridade);
         
         // Log de Erros
-        document.querySelector('.maintenance-section:nth-child(3) .option-card:nth-child(2) .btn-secondary').addEventListener('click', mostrarLogs);
+        document.querySelector('.maintenance-section:nth-child(2) .option-card:nth-child(2) .btn-secondary').addEventListener('click', mostrarLogs);
     }
 
     // Função para mostrar toast de notificação
@@ -559,166 +446,7 @@
         }, 3000);
     }
 
-    // Função para fazer backup real
-    async function iniciarBackup() {
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        
-        try {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fazendo Backup...';
-            btn.disabled = true;
-            
-            // Fazer backup real via API
-            const response = await fetch('https://e-gerente-backend-gateway.vercel.app/api/backup/backup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                mostrarToast(`Backup realizado com sucesso! (${result.size})`, 'success');
-                
-                // Atualizar card de último backup
-                const cardBackup = document.querySelector('.card:nth-child(2) .card-info p');
-                const agora = new Date();
-                cardBackup.textContent = `${agora.toLocaleDateString()}, ${agora.toLocaleTimeString()}`;
-                
-                // Atualizar card de tamanho do BD
-                const cardTamanho = document.querySelector('.card:nth-child(1) .card-info p');
-                cardTamanho.textContent = result.size;
-            } else {
-                throw new Error(result.message);
-            }
-            
-        } catch (error) {
-            mostrarToast('Erro ao realizar backup: ' + error.message, 'error');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
-    }
 
-    // Função para mostrar histórico de backups
-    async function mostrarHistoricoBackups() {
-        try {
-            // Buscar backups reais da API
-            const response = await fetch('https://e-gerente-backend-gateway.vercel.app/api/backup/backups');
-            const result = await response.json();
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.id = 'backupModal';
-            
-            let backupListHTML = '';
-            
-            if (result.backups && result.backups.length > 0) {
-                result.backups.forEach(backup => {
-                    const data = new Date(backup.createdAt).toLocaleDateString('pt-BR');
-                    const hora = new Date(backup.createdAt).toLocaleTimeString('pt-BR');
-                    
-                    backupListHTML += `
-                        <div class="backup-item">
-                            <div class="backup-info">
-                                <h4>${backup.fileName}</h4>
-                                <p>${data} às ${hora}</p>
-                                <span class="status success">Concluído</span>
-                            </div>
-                            <div class="backup-size">${backup.size}</div>
-                            <div class="backup-actions">
-                                <button class="btn-restore" onclick="restaurarBackup('${backup.fileName}')" title="Restaurar">
-                                    <i class="fas fa-undo"></i>
-                                </button>
-                                <button class="btn-delete" onclick="deletarBackup('${backup.fileName}')" title="Deletar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                backupListHTML = '<div class="no-backups">Nenhum backup encontrado</div>';
-            }
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2><i class="fas fa-history"></i> Histórico de Backups</h2>
-                        <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                        <div class="backup-list">
-                            ${backupListHTML}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            modal.style.display = 'flex';
-            
-        } catch (error) {
-            mostrarToast('Erro ao carregar histórico: ' + error.message, 'error');
-        }
-    }
-
-    // Função para restaurar backup
-    async function restaurarBackup(fileName) {
-        if (!confirm(`Tem certeza que deseja restaurar o backup "${fileName}"? Esta ação irá sobrescrever todos os dados atuais.`)) {
-            return;
-        }
-        
-        try {
-            const response = await fetch(`https://e-gerente-backend-gateway.vercel.app/api/backup/restore/${fileName}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                mostrarToast('Backup restaurado com sucesso!', 'success');
-                // Fechar modal
-                document.getElementById('backupModal').remove();
-            } else {
-                throw new Error(result.message);
-            }
-            
-        } catch (error) {
-            mostrarToast('Erro ao restaurar backup: ' + error.message, 'error');
-        }
-    }
-
-    // Função para deletar backup
-    async function deletarBackup(fileName) {
-        if (!confirm(`Tem certeza que deseja deletar o backup "${fileName}"?`)) {
-            return;
-        }
-        
-        try {
-            const response = await fetch(`https://e-gerente-backend-gateway.vercel.app/api/backup/backup/${fileName}`, {
-                method: 'DELETE'
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                mostrarToast('Backup deletado com sucesso!', 'success');
-                // Recarregar modal
-                document.getElementById('backupModal').remove();
-                mostrarHistoricoBackups();
-            } else {
-                throw new Error(result.message);
-            }
-            
-        } catch (error) {
-            mostrarToast('Erro ao deletar backup: ' + error.message, 'error');
-        }
-    }
 
     // Função para limpar cache
     async function limparCache() {
