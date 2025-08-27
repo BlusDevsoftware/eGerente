@@ -51,6 +51,7 @@
             z-index: 9999;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
 
         .spinner-main {
@@ -60,6 +61,14 @@
             width: 60px;
             height: 60px;
             animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
         }
     </style>
 </head>
@@ -131,6 +140,7 @@
         <!-- Spinner Centralizado de Carregamento -->
         <div id="loader-dashboard" class="loader-overlay-main">
             <div class="spinner-main"></div>
+            <div class="loading-text">Carregando dados...</div>
         </div>
 
         <!-- Dashboard Cards -->
