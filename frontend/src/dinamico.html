@@ -75,6 +75,66 @@
             padding: 4px 12px;
             font-weight: 600;
         }
+        
+        /* Drag and Drop para cards de gráfico */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .chart-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            border: 1px solid #e3f2fd;
+            cursor: grab;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .chart-card:hover {
+            box-shadow: 0 4px 16px rgba(33,150,243,0.12);
+            transform: translateY(-2px);
+        }
+        
+        .chart-card:active {
+            cursor: grabbing;
+        }
+        
+        .chart-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            z-index: 1000;
+        }
+        
+        .chart-card.drag-over {
+            border: 2px dashed #1976D2;
+            background: #f8fbff;
+        }
+        
+        .chart-card h3 {
+            margin: 0 0 15px 0;
+            color: #1976D2;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chart-card h3::after {
+            content: "⋮⋮";
+            color: #90caf9;
+            font-size: 0.8em;
+            cursor: grab;
+        }
+        
+        .chart-card h3:active::after {
+            cursor: grabbing;
+        }
     </style>
 </head>
 <body>
@@ -239,16 +299,16 @@
         </div>
 
         <!-- Charts Container -->
-        <div class="charts-container">
-            <div class="chart-card">
+        <div class="charts-container" id="chartsContainer">
+            <div class="chart-card" draggable="true" data-chart-id="statusChart">
                 <h3>Comissões por Status</h3>
                 <canvas id="statusChart"></canvas>
             </div>
-            <div class="chart-card">
+            <div class="chart-card" draggable="true" data-chart-id="colaboradoresChart">
                 <h3>Top 5 Colaboradores</h3>
                 <canvas id="colaboradoresChart"></canvas>
             </div>
-            <div class="chart-card">
+            <div class="chart-card" draggable="true" data-chart-id="evolucaoChart">
                 <h3>Evolução Mensal</h3>
                 <canvas id="evolucaoChart"></canvas>
             </div>
@@ -566,6 +626,10 @@
             try {
                 await carregarColaboradores();
                 await carregarDadosRelatorio();
+                // Carregar ordem salva dos gráficos
+                carregarOrdemGraficos();
+                // Inicializar drag and drop
+                inicializarDragAndDrop();
                 // Gerar relatório inicial
                 gerarRelatorio();
             } catch (error) {
@@ -986,6 +1050,102 @@
             if (s.includes('pago')) return 'paid';
             if (s.includes('aglutinado')) return 'aglutinado';
             return 'pending';
+        }
+        
+        // Drag and Drop para cards de gráfico
+        function inicializarDragAndDrop() {
+            const chartCards = document.querySelectorAll('.chart-card');
+            const container = document.getElementById('chartsContainer');
+            
+            chartCards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragenter', handleDragEnter);
+                card.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.chart-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (e.target.closest('.chart-card') && !e.target.closest('.chart-card').classList.contains('dragging')) {
+                e.target.closest('.chart-card').classList.add('drag-over');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            if (e.target.closest('.chart-card')) {
+                e.target.closest('.chart-card').classList.remove('drag-over');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const draggingCard = document.querySelector('.dragging');
+            const targetCard = e.target.closest('.chart-card');
+            
+            if (draggingCard && targetCard && draggingCard !== targetCard) {
+                const container = document.getElementById('chartsContainer');
+                const cards = Array.from(container.querySelectorAll('.chart-card'));
+                const draggingIndex = cards.indexOf(draggingCard);
+                const targetIndex = cards.indexOf(targetCard);
+                
+                // Reordenar os cards
+                if (draggingIndex < targetIndex) {
+                    targetCard.parentNode.insertBefore(draggingCard, targetCard.nextSibling);
+                } else {
+                    targetCard.parentNode.insertBefore(draggingCard, targetCard);
+                }
+                
+                // Salvar a nova ordem no localStorage
+                salvarOrdemGraficos();
+            }
+            
+            // Limpar classes
+            document.querySelectorAll('.chart-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+        
+        function salvarOrdemGraficos() {
+            const container = document.getElementById('chartsContainer');
+            const cards = Array.from(container.querySelectorAll('.chart-card'));
+            const ordem = cards.map(card => card.getAttribute('data-chart-id'));
+            localStorage.setItem('ordemGraficosDinamico', JSON.stringify(ordem));
+        }
+        
+        function carregarOrdemGraficos() {
+            const ordemSalva = localStorage.getItem('ordemGraficosDinamico');
+            if (ordemSalva) {
+                const ordem = JSON.parse(ordemSalva);
+                const container = document.getElementById('chartsContainer');
+                
+                ordem.forEach(chartId => {
+                    const card = container.querySelector(`[data-chart-id="${chartId}"]`);
+                    if (card) {
+                        container.appendChild(card);
+                    }
+                });
+            }
         }
     </script>
     <script src="scripts/navigation.js"></script>
