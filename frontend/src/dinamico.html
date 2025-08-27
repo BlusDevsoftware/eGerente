@@ -222,7 +222,17 @@
         <div class="table-container">
             <div class="table-header">
                 <h2>Resultados</h2>
-                <div class="table-actions">
+                <div class="table-actions" style="display:flex; align-items:center; gap:8px;">
+                    <label for="pageSizeSelect" style="margin-right:6px; color:#1976D2; font-weight:700;">Exibir</label>
+                    <select id="pageSizeSelect" title="Quantidade de títulos a exibir" 
+                        style="height:32px; width:80px; padding:0 8px; border:1.5px solid #1976D2; border-radius:8px; margin-right:6px; font-size:0.95em; color:#1976D2; background:#fff;">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">Todos</option>
+                    </select>
+                    <span style="margin-right:10px; color:#1976D2; font-weight:700;">Títulos</span>
                     <button class="btn-secondary" onclick="exportarRelatorio()">
                         <i class="fas fa-download"></i>
                         Exportar
@@ -378,6 +388,7 @@
             const tipo = (document.getElementById('filtroTipo')||{}).value || '';
             const status = (document.getElementById('filtroStatus')||{}).value || '';
             const modoData = window.modoFiltroData || 'geracao'; // 'geracao' | 'vencimento'
+            const termoBusca = '';
 
             let dadosFiltrados = [...dadosRelatorio];
 
@@ -439,6 +450,27 @@
             }
 
             // Filtro por valor removido (faixa de valor não está mais presente)
+
+            // Filtro por termo de busca (livre)
+            if (termoBusca && termoBusca.trim() !== '') {
+                const q = termoBusca.trim().toLowerCase();
+                dadosFiltrados = dadosFiltrados.filter(item => {
+                    const nome = obterNomeColaboradorPorItem(item).toString().toLowerCase();
+                    const tipoTxt = (item.tipo || '').toString().toLowerCase();
+                    const statusTxt = (item.status || '').toString().toLowerCase();
+                    const valorTxt = Number(item.valor||0).toLocaleString('pt-BR');
+                    const dataGer = item.data_geracao ? new Date(item.data_geracao).toLocaleDateString('pt-BR') : '';
+                    const dataVen = item.data_vencimento ? new Date(item.data_vencimento).toLocaleDateString('pt-BR') : '';
+                    return (
+                        nome.includes(q) ||
+                        tipoTxt.includes(q) ||
+                        statusTxt.includes(q) ||
+                        valorTxt.includes(q) ||
+                        dataGer.includes(q) ||
+                        dataVen.includes(q)
+                    );
+                });
+            }
 
             console.log('Dados filtrados:', dadosFiltrados.length, 'registros');
             return dadosFiltrados;
@@ -676,14 +708,26 @@
         // Atualizar tabela de resultados
         function atualizarTabela(dados) {
             const tbody = document.querySelector('.table-container tbody');
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+
             tbody.innerHTML = '';
 
-            if (dados.length === 0) {
+            const total = dados.length;
+            let limitar = total;
+            if (pageSizeSelect) {
+                const val = pageSizeSelect.value;
+                if (val !== 'all') {
+                    const n = parseInt(val, 10);
+                    if (!Number.isNaN(n) && n > 0) limitar = Math.min(n, total);
+                }
+            }
+
+            if (total === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
                 return;
             }
 
-            dados.forEach(item => {
+            dados.slice(0, limitar).forEach(item => {
                 const row = document.createElement('tr');
                 const geracao = item.data_geracao ? new Date(item.data_geracao).toLocaleDateString('pt-BR') : '';
                 const vencimento = item.data_vencimento ? new Date(item.data_vencimento).toLocaleDateString('pt-BR') : '';
@@ -709,6 +753,7 @@
                 `;
                 tbody.appendChild(row);
             });
+
         }
 
         // Visualizar item (placeholder)
@@ -776,6 +821,14 @@
                     debounce = setTimeout(() => gerarRelatorio(), 400);
                 }
             });
+
+            // Busca livre removida
+
+            // Mudança do page size
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener('change', () => gerarRelatorio());
+            }
         });
 
         // Exportar relatório
