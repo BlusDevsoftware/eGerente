@@ -39,6 +39,28 @@
             align-items: center;
             border-radius: 10px;
         }
+
+        .loader-overlay-main {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body>
@@ -106,11 +128,13 @@
             </div>
         </div>
 
+        <!-- Spinner Centralizado de Carregamento -->
+        <div id="loader-dashboard" class="loader-overlay-main">
+            <div class="spinner-main"></div>
+        </div>
+
         <!-- Dashboard Cards -->
-        <div class="dashboard-cards" id="dashboard-cards" style="position: relative;">
-            <div id="loader-cards" class="loader-overlay">
-                <div class="spinner"></div>
-            </div>
+        <div class="dashboard-cards" id="dashboard-cards">
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Total de Colaboradores</h3>
@@ -146,10 +170,7 @@
         </div>
 
         <!-- Charts Section -->
-        <div class="charts-section" style="position: relative;">
-            <div id="loader-charts" class="loader-overlay">
-                <div class="spinner"></div>
-            </div>
+        <div class="charts-section">
             <div class="chart-container">
                 <h2>Evolução das Comissões</h2>
                 <canvas id="comissoesChart"></canvas>
@@ -161,10 +182,7 @@
         </div>
 
         <!-- Latest Commissions -->
-        <div class="latest-commissions" style="position: relative;">
-            <div id="loader-table" class="loader-overlay">
-                <div class="spinner"></div>
-            </div>
+        <div class="latest-commissions">
             <div class="table-header">
             <h2>Últimas Comissões</h2>
                 <button class="btn-primary" onclick="carregarComissoes()">
@@ -206,47 +224,35 @@
             inicializarDragAndDrop();
         });
 
-        // Funções para controlar os spinners
-        function mostrarSpinnerCards() {
-            document.getElementById('loader-cards').style.display = 'flex';
+        // Funções para controlar o spinner centralizado
+        function mostrarSpinner() {
+            document.getElementById('loader-dashboard').style.display = 'flex';
         }
         
-        function ocultarSpinnerCards() {
-            document.getElementById('loader-cards').style.display = 'none';
-        }
-        
-        function mostrarSpinnerCharts() {
-            document.getElementById('loader-charts').style.display = 'flex';
-        }
-        
-        function ocultarSpinnerCharts() {
-            document.getElementById('loader-charts').style.display = 'none';
-        }
-        
-        function mostrarSpinnerTable() {
-            document.getElementById('loader-table').style.display = 'flex';
-        }
-        
-        function ocultarSpinnerTable() {
-            document.getElementById('loader-table').style.display = 'none';
+        function ocultarSpinner() {
+            document.getElementById('loader-dashboard').style.display = 'none';
         }
 
         // Função para inicializar o dashboard
         async function inicializarDashboard() {
             try {
-                // Mostrar spinners ao iniciar
-                mostrarSpinnerCards();
-                mostrarSpinnerCharts();
-                mostrarSpinnerTable();
+                // Mostrar spinner centralizado ao iniciar
+                mostrarSpinner();
                 
                 await Promise.all([
                     carregarDadosCards(),
                     carregarComissoes(),
                     inicializarGraficos()
                 ]);
+                
+                // Ocultar spinner centralizado quando tudo carregar
+                ocultarSpinner();
+                
             } catch (error) {
                 console.error('Erro ao inicializar dashboard:', error);
                 mostrarToast('Erro ao carregar dados do dashboard', 'error');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
             }
         }
 
@@ -272,14 +278,11 @@
                 // Aplicar classes de cor baseadas no crescimento
                 aplicarClassesCrescimento();
                 
-                // Ocultar spinner dos cards
-                ocultarSpinnerCards();
+                // Dados dos cards carregados com sucesso
                 
             } catch (error) {
                 console.error('Erro ao carregar dados dos cards:', error);
                 mostrarToast('Erro ao carregar dados do dashboard', 'error');
-                // Ocultar spinner mesmo em caso de erro
-                ocultarSpinnerCards();
             }
         }
 
@@ -431,15 +434,12 @@
                     </tr>
                 `).join('');
 
-                // Ocultar spinner da tabela
-                ocultarSpinnerTable();
+                // Comissões carregadas com sucesso
 
             } catch (error) {
                 console.error('Erro ao carregar comissões:', error);
                 document.getElementById('comissoes-tbody').innerHTML = 
                     '<tr><td colspan="5" class="error">Erro ao carregar comissões</td></tr>';
-                // Ocultar spinner mesmo em caso de erro
-                ocultarSpinnerTable();
             }
         }
 
@@ -561,15 +561,12 @@
                     }
                 });
 
-                // Ocultar spinner dos gráficos
-                ocultarSpinnerCharts();
+                // Gráficos criados com sucesso
 
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
                 // Criar gráficos com dados padrão em caso de erro
                 criarGraficosPadrao();
-                // Ocultar spinner mesmo em caso de erro
-                ocultarSpinnerCharts();
             }
         }
 
