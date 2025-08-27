@@ -126,27 +126,27 @@
         <!-- Latest Commissions -->
         <div class="latest-commissions">
             <div class="table-header">
-                <h2>Últimas Comissões</h2>
+            <h2>Últimas Comissões</h2>
                 <button class="btn-primary" onclick="carregarComissoes()">
                     <i class="fas fa-sync-alt"></i>
                     Atualizar
                 </button>
             </div>
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Colaborador</th>
-                            <th>Valor</th>
-                            <th>Data</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Colaborador</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
                     <tbody id="comissoes-tbody">
                         <tr>
                             <td colspan="5" class="loading">Carregando comissões...</td>
-                        </tr>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -183,8 +183,8 @@
         // Função para carregar dados dos cards
         async function carregarDadosCards() {
             try {
-                // Simular dados da API (substituir por chamadas reais)
-                const dados = await simularDadosCards();
+                // Buscar dados reais das APIs
+                const dados = await buscarDadosReais();
                 
                 // Atualizar cards
                 document.getElementById('total-colaboradores').textContent = dados.colaboradores.total;
@@ -204,32 +204,108 @@
                 
             } catch (error) {
                 console.error('Erro ao carregar dados dos cards:', error);
+                mostrarToast('Erro ao carregar dados do dashboard', 'error');
             }
         }
 
-        // Função para simular dados dos cards (substituir por API real)
-        async function simularDadosCards() {
-            // Simular delay de API
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            return {
-                colaboradores: {
-                    total: 150,
-                    crescimento: '+12% este mês'
-                },
-                comissoes: {
-                    valor: 45000,
-                    crescimento: '+8% este mês'
-                },
-                vendas: {
-                    valor: 180000,
-                    crescimento: '-3% este mês'
-                },
-                pendentes: {
-                    valor: 15000,
-                    quantidade: '5 pendentes'
-                }
-            };
+        // Função para buscar dados reais das APIs
+        async function buscarDadosReais() {
+            try {
+                // Buscar colaboradores
+                const colaboradores = await fetch('https://e-gerente-backend-gateway.vercel.app/api/colaboradores/colaboradores')
+                    .then(res => res.json())
+                    .catch(() => []);
+
+                // Buscar movimentos de comissões
+                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
+                    .then(res => res.json())
+                    .catch(() => []);
+
+                // Calcular dados dos colaboradores
+                const totalColaboradores = colaboradores.length;
+                const crescimentoColaboradores = calcularCrescimento(colaboradores, 'data_cadastro');
+
+                // Calcular dados das comissões do mês atual
+                const mesAtual = new Date().getMonth();
+                const anoAtual = new Date().getFullYear();
+                const comissoesMes = comissoes.filter(c => {
+                    const dataComissao = new Date(c.data_geracao);
+                    return dataComissao.getMonth() === mesAtual && dataComissao.getFullYear() === anoAtual;
+                });
+
+                const valorComissoesMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+                const crescimentoComissoes = calcularCrescimento(comissoesMes, 'data_geracao');
+
+                // Calcular vendas (soma dos valores de venda das comissões)
+                const vendasMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_venda) || 0), 0);
+                const crescimentoVendas = calcularCrescimento(comissoesMes, 'data_geracao');
+
+                // Calcular pagamentos pendentes
+                const comissoesPendentes = comissoes.filter(c => 
+                    c.status && c.status.toLowerCase().includes('pendente')
+                );
+                const valorPendentes = comissoesPendentes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+
+                return {
+                    colaboradores: {
+                        total: totalColaboradores,
+                        crescimento: crescimentoColaboradores
+                    },
+                    comissoes: {
+                        valor: valorComissoesMes,
+                        crescimento: crescimentoComissoes
+                    },
+                    vendas: {
+                        valor: vendasMes,
+                        crescimento: crescimentoVendas
+                    },
+                    pendentes: {
+                        valor: valorPendentes,
+                        quantidade: `${comissoesPendentes.length} pendentes`
+                    }
+                };
+
+            } catch (error) {
+                console.error('Erro ao buscar dados reais:', error);
+                // Retornar dados padrão em caso de erro
+                return {
+                    colaboradores: { total: 0, crescimento: 'Erro ao carregar' },
+                    comissoes: { valor: 0, crescimento: 'Erro ao carregar' },
+                    vendas: { valor: 0, crescimento: 'Erro ao carregar' },
+                    pendentes: { valor: 0, quantidade: 'Erro ao carregar' }
+                };
+            }
+        }
+
+        // Função para calcular crescimento percentual
+        function calcularCrescimento(dados, campoData) {
+            if (!dados || dados.length === 0) return '0% este mês';
+
+            const mesAtual = new Date().getMonth();
+            const anoAtual = new Date().getFullYear();
+            const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+            const anoAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+
+            const dadosMesAtual = dados.filter(item => {
+                const data = new Date(item[campoData]);
+                return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+            });
+
+            const dadosMesAnterior = dados.filter(item => {
+                const data = new Date(item[campoData]);
+                return data.getMonth() === mesAnterior && data.getFullYear() === anoAnterior;
+            });
+
+            const totalAtual = dadosMesAtual.length;
+            const totalAnterior = dadosMesAnterior.length;
+
+            if (totalAnterior === 0) {
+                return totalAtual > 0 ? '+100% este mês' : '0% este mês';
+            }
+
+            const crescimento = ((totalAtual - totalAnterior) / totalAnterior) * 100;
+            const sinal = crescimento >= 0 ? '+' : '';
+            return `${sinal}${Math.round(crescimento)}% este mês`;
         }
 
         // Função para aplicar classes de cor baseadas no crescimento
@@ -256,8 +332,8 @@
                 const tbody = document.getElementById('comissoes-tbody');
                 tbody.innerHTML = '<tr><td colspan="5" class="loading">Carregando comissões...</td></tr>';
 
-                // Simular dados de comissões (substituir por API real)
-                const comissoes = await simularComissoes();
+                // Buscar dados reais das comissões
+                const comissoes = await buscarComissoesReais();
                 
                 if (comissoes.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma comissão encontrada</td></tr>';
@@ -291,57 +367,215 @@
             }
         }
 
-        // Função para simular comissões (substituir por API real)
-        async function simularComissoes() {
-            await new Promise(resolve => setTimeout(resolve, 800));
+        // Função para buscar comissões reais da API
+        async function buscarComissoesReais() {
+            try {
+                // Buscar movimentos de comissões
+                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
+                    .then(res => res.json())
+                    .catch(() => []);
+
+                // Buscar colaboradores para mapear nomes
+                const colaboradores = await fetch('https://e-gerente-backend-gateway.vercel.app/api/colaboradores/colaboradores')
+                    .then(res => res.json())
+                    .catch(() => []);
+
+                // Criar mapa de colaboradores por ID
+                const mapaColaboradores = {};
+                colaboradores.forEach(col => {
+                    mapaColaboradores[col.id] = col.nome;
+                });
+
+                // Processar comissões e pegar apenas as 5 mais recentes
+                const comissoesProcessadas = comissoes
+                    .map(comissao => ({
+                        id: comissao.id,
+                        colaborador: mapaColaboradores[comissao.id_colaborador] || 'Colaborador não encontrado',
+                        valor: parseFloat(comissao.valor_receber) || 0,
+                        data: comissao.data_geracao,
+                        status: mapearStatus(comissao.status),
+                        statusText: comissao.status || 'Pendente'
+                    }))
+                    .sort((a, b) => new Date(b.data) - new Date(a.data))
+                    .slice(0, 5);
+
+                return comissoesProcessadas;
+
+            } catch (error) {
+                console.error('Erro ao buscar comissões reais:', error);
+                return [];
+            }
+        }
+
+        // Função para mapear status para classes CSS
+        function mapearStatus(status) {
+            if (!status) return 'pending';
             
-            return [
-                {
-                    id: 1,
-                    colaborador: 'João Silva',
-                    valor: 1500,
-                    data: '2024-03-15',
-                    status: 'pending',
-                    statusText: 'Pendente'
-                },
-                {
-                    id: 2,
-                    colaborador: 'Maria Santos',
-                    valor: 2300,
-                    data: '2024-03-14',
-                    status: 'paid',
-                    statusText: 'Pago'
-                },
-                {
-                    id: 3,
-                    colaborador: 'Pedro Oliveira',
-                    valor: 1800,
-                    data: '2024-03-13',
-                    status: 'cancelled',
-                    statusText: 'Cancelado'
-                },
-                {
-                    id: 4,
-                    colaborador: 'Ana Costa',
-                    valor: 3200,
-                    data: '2024-03-12',
-                    status: 'paid',
-                    statusText: 'Pago'
-                },
-                {
-                    id: 5,
-                    colaborador: 'Carlos Lima',
-                    valor: 950,
-                    data: '2024-03-11',
-                    status: 'pending',
-                    statusText: 'Pendente'
-                }
-            ];
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('pago') || statusLower.includes('paid')) return 'paid';
+            if (statusLower.includes('cancelado') || statusLower.includes('cancelled')) return 'cancelled';
+            if (statusLower.includes('pendente') || statusLower.includes('pending')) return 'pending';
+            if (statusLower.includes('vencido') || statusLower.includes('vencido')) return 'cancelled';
+            
+            return 'pending';
         }
 
         // Função para inicializar gráficos
-        function inicializarGraficos() {
-            // Gráfico de evolução das comissões
+        async function inicializarGraficos() {
+            try {
+                // Buscar dados reais para os gráficos
+                const dadosGraficos = await buscarDadosGraficos();
+                
+                // Gráfico de evolução das comissões
+                const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
+                comissoesChart = new Chart(ctxComissoes, {
+                    type: 'line',
+                    data: {
+                        labels: dadosGraficos.evolucao.labels,
+                        datasets: [{
+                            label: 'Comissões (R$)',
+                            data: dadosGraficos.evolucao.dados,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + value.toLocaleString('pt-BR');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Gráfico de status das comissões
+                const ctxStatus = document.getElementById('statusChart').getContext('2d');
+                statusChart = new Chart(ctxStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: dadosGraficos.status.labels,
+                        datasets: [{
+                            data: dadosGraficos.status.dados,
+                            backgroundColor: [
+                                '#28a745',
+                                '#ffc107',
+                                '#dc3545'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Erro ao inicializar gráficos:', error);
+                // Criar gráficos com dados padrão em caso de erro
+                criarGraficosPadrao();
+            }
+        }
+
+        // Função para buscar dados dos gráficos
+        async function buscarDadosGraficos() {
+            try {
+                // Buscar movimentos de comissões
+                const comissoes = await fetch('https://e-gerente-backend-gateway.vercel.app/api/movimento_comissoes/movimento_comissoes')
+                    .then(res => res.json())
+                    .catch(() => []);
+
+                // Calcular dados de evolução (últimos 6 meses)
+                const evolucao = calcularEvolucaoComissoes(comissoes);
+                
+                // Calcular dados de status
+                const status = calcularStatusComissoes(comissoes);
+
+                return { evolucao, status };
+
+            } catch (error) {
+                console.error('Erro ao buscar dados dos gráficos:', error);
+                return {
+                    evolucao: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
+                    status: { labels: ['Pago', 'Pendente', 'Cancelado'], dados: [0, 0, 0] }
+                };
+            }
+        }
+
+        // Função para calcular evolução das comissões
+        function calcularEvolucaoComissoes(comissoes) {
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const dados = new Array(6).fill(0);
+            const labels = [];
+
+            // Pegar os últimos 6 meses
+            const hoje = new Date();
+            for (let i = 5; i >= 0; i--) {
+                const mes = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+                labels.push(meses[mes.getMonth()]);
+                
+                // Filtrar comissões do mês
+                const comissoesMes = comissoes.filter(c => {
+                    const dataComissao = new Date(c.data_geracao);
+                    return dataComissao.getMonth() === mes.getMonth() && 
+                           dataComissao.getFullYear() === mes.getFullYear();
+                });
+
+                // Somar valores
+                const totalMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+                dados[5 - i] = totalMes;
+            }
+
+            return { labels, dados };
+        }
+
+        // Função para calcular status das comissões
+        function calcularStatusComissoes(comissoes) {
+            const status = {
+                pago: 0,
+                pendente: 0,
+                cancelado: 0
+            };
+
+            comissoes.forEach(comissao => {
+                const statusLower = (comissao.status || '').toLowerCase();
+                if (statusLower.includes('pago') || statusLower.includes('paid')) {
+                    status.pago++;
+                } else if (statusLower.includes('cancelado') || statusLower.includes('cancelled') || 
+                          statusLower.includes('vencido')) {
+                    status.cancelado++;
+                } else {
+                    status.pendente++;
+                }
+            });
+
+            return {
+                labels: ['Pago', 'Pendente', 'Cancelado'],
+                dados: [status.pago, status.pendente, status.cancelado]
+            };
+        }
+
+        // Função para criar gráficos padrão em caso de erro
+        function criarGraficosPadrao() {
             const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
             comissoesChart = new Chart(ctxComissoes, {
                 type: 'line',
@@ -349,7 +583,7 @@
                     labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
                     datasets: [{
                         label: 'Comissões (R$)',
-                        data: [35000, 42000, 45000, 38000, 52000, 48000],
+                        data: [0, 0, 0, 0, 0, 0],
                         borderColor: '#007bff',
                         backgroundColor: 'rgba(0, 123, 255, 0.1)',
                         tension: 0.4,
@@ -377,14 +611,13 @@
                 }
             });
 
-            // Gráfico de status das comissões
             const ctxStatus = document.getElementById('statusChart').getContext('2d');
             statusChart = new Chart(ctxStatus, {
                 type: 'doughnut',
                 data: {
                     labels: ['Pago', 'Pendente', 'Cancelado'],
                     datasets: [{
-                        data: [65, 25, 10],
+                        data: [0, 0, 0],
                         backgroundColor: [
                             '#28a745',
                             '#ffc107',
@@ -468,7 +701,7 @@
                 <div class="toast-content">
                     <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                     <span>${mensagem}</span>
-                </div>
+        </div>
             `;
             
             document.body.appendChild(toast);
