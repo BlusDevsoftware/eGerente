@@ -93,23 +93,23 @@
             <div class="filter-group" style="display:grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 10px; align-items: end;">
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Colaborador</label>
-                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                    <select id="filtroColaborador" style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
                         <option value="">Selecionar</option>
                         <option value="todos">Todos</option>
                     </select>
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Tipo</label>
-                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                    <select id="filtroTipo" style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
                         <option value="">Selecionar</option>
-                        <option value="produtos">Produtos</option>
-                        <option value="servicos">Serviços</option>
-                        <option value="ambos">Ambos</option>
-                    </select>
+                    <option value="produtos">Produtos</option>
+                    <option value="servicos">Serviços</option>
+                    <option value="ambos">Ambos</option>
+                </select>
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Status</label>
-                    <select style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                    <select id="filtroStatus" style="height:32px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
                         <option value="">Selecionar</option>
                         <option value="PAGO">Pago</option>
                         <option value="PENDENTE">Pendente</option>
@@ -117,13 +117,13 @@
                         <option value="CLIENTE NÃO PAGOU">Cliente não pagou</option>
                         <option value="AGLUTINADO">Aglutinado</option>
                         <option value="CANCELADO">Cancelado</option>
-                    </select>
+                </select>
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Período</label>
                     <div style="display:flex; gap:8px;">
-                        <input type="date" placeholder="Data Inicial" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
-                        <input type="date" placeholder="Data Final" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                        <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
                     </div>
                 </div>
             </div>
@@ -131,8 +131,8 @@
                 <label style="visibility:hidden; height:16px;">Ação</label>
                 <button class="btn-primary" style="width: auto; min-width: 120px; height: 32px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9em;">
                     <i class="fas fa-search" style="margin-right: 6px;"></i>
-                    Gerar Relatório
-                </button>
+                Gerar Relatório
+            </button>
             </div>
         </div>
 
@@ -301,13 +301,11 @@
 
         // Aplicar filtros
         function aplicarFiltros() {
-            const dataInicial = document.querySelector('.date-range input[type="date"]:first-of-type').value;
-            const dataFinal = document.querySelector('.date-range input[type="date"]:last-of-type').value;
-            const colaboradorId = document.querySelector('.advanced-filters select:nth-of-type(1)').value;
-            const tipo = document.querySelector('.advanced-filters select:nth-of-type(2)').value;
-            const status = document.querySelector('.advanced-filters select:nth-of-type(3)').value;
-            const valorMinimo = document.querySelector('.value-range input:first-of-type').value;
-            const valorMaximo = document.querySelector('.value-range input:last-of-type').value;
+            const dataInicial = (document.getElementById('dataInicial')||{}).value || '';
+            const dataFinal = (document.getElementById('dataFinal')||{}).value || '';
+            const colaboradorId = (document.getElementById('filtroColaborador')||{}).value || '';
+            const tipo = (document.getElementById('filtroTipo')||{}).value || '';
+            const status = (document.getElementById('filtroStatus')||{}).value || '';
 
             let dadosFiltrados = [...dadosRelatorio];
 
@@ -350,17 +348,7 @@
                 );
             }
 
-            // Filtro por valor
-            if (valorMinimo) {
-                dadosFiltrados = dadosFiltrados.filter(item => 
-                    Number(item.valor) >= Number(valorMinimo)
-                );
-            }
-            if (valorMaximo) {
-                dadosFiltrados = dadosFiltrados.filter(item => 
-                    Number(item.valor) <= Number(valorMaximo)
-                );
-            }
+            // Filtro por valor removido (faixa de valor não está mais presente)
 
             console.log('Dados filtrados:', dadosFiltrados.length, 'registros');
             return dadosFiltrados;
@@ -642,7 +630,7 @@
             // Autoatualização ao mudar filtros
             const filtroContainer = document.querySelector('.advanced-filters');
             filtroContainer.addEventListener('change', function(e) {
-                if (e.target.matches('input, select')) {
+                if (e.target.matches('#dataInicial, #dataFinal, #filtroColaborador, #filtroTipo, #filtroStatus')) {
                     gerarRelatorio();
                 }
             });
@@ -650,7 +638,7 @@
             // Atualiza ao digitar valores numéricos (debounce simples)
             let debounce;
             filtroContainer.addEventListener('input', function(e) {
-                if (e.target.matches('.value-range input')) {
+                if (e.target.matches('#dataInicial, #dataFinal')) {
                     clearTimeout(debounce);
                     debounce = setTimeout(() => gerarRelatorio(), 400);
                 }
