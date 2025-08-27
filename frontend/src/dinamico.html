@@ -90,7 +90,7 @@
 
         <!-- Advanced Filters -->
         <div class="advanced-filters" style="grid-template-columns: 1fr auto; align-items: end; gap: 12px;">
-            <div class="filter-group" style="display:grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 10px; align-items: end;">
+            <div class="filter-group" style="display:grid; grid-template-columns: 1.1fr 1.1fr 0.5fr 1.3fr; gap: 12px; align-items: end;">
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Colaborador</label>
                     <select id="filtroColaborador" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
@@ -109,7 +109,7 @@
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Status</label>
-                    <select id="filtroStatus" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <select id="filtroStatus" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         <option value="">Selecionar</option>
                         <option value="PAGO">Pago</option>
                         <option value="PENDENTE">Pendente</option>
@@ -121,19 +121,19 @@
                 </div>
                 <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
                     <label style="color:#1976D2; font-weight:600;">Período</label>
-                    <div style="display:flex; gap:8px;">
-                        <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
-                        <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 8px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%;">
+                    <div style="display:flex; gap:6px; align-items:center; flex-wrap:nowrap; justify-content:flex-start; flex:1;">
+                        <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
+                        <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
+                        <button id="btnDataGeracao" type="button" title="Filtrar por Data de Geração" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;">Geração</button>
+                        <button id="btnDataVencimento" type="button" title="Filtrar por Data de Vencimento" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;">Vencimento</button>
+                        <button id="btnLimparFiltros" class="btn-secondary" style="height:32px; padding:0 12px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9em; background:#e9ecef; color:#1565c0; border:1px solid #cfd8dc;">
+                            <i class="fas fa-eraser" style="margin-right:6px;"></i>
+                            Limpar
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="form-group" style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-                <label style="visibility:hidden; height:16px;">Ação</label>
-                <button class="btn-primary" style="width: auto; min-width: 120px; height: 32px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9em;">
-                    <i class="fas fa-search" style="margin-right: 6px;"></i>
-                Gerar Relatório
-            </button>
-            </div>
+            
         </div>
 
         <!-- Spinner de Carregamento -->
@@ -218,7 +218,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Data</th>
+                        <th>Geração</th>
+                        <th>Vencimento</th>
                         <th>Colaborador</th>
                         <th>Tipo</th>
                         <th>Valor</th>
@@ -236,36 +237,12 @@
     <script>
         // Variáveis globais
         let mapaColaboradores = {};
-        let mapaClientes = {};
         let dadosRelatorio = [];
         let charts = {};
 
-        // Persistência simples dos filtros
-        function salvarEstadoFiltros() {
-            const estado = {
-                colaborador: (document.getElementById('filtroColaborador')||{}).value || '',
-                tipo: (document.getElementById('filtroTipo')||{}).value || '',
-                status: (document.getElementById('filtroStatus')||{}).value || '',
-                dataInicial: (document.getElementById('dataInicial')||{}).value || '',
-                dataFinal: (document.getElementById('dataFinal')||{}).value || ''
-            };
-            try { localStorage.setItem('dinamico_filtros', JSON.stringify(estado)); } catch (_) {}
-        }
-
-        function restaurarEstadoFiltros() {
-            try {
-                const salvo = JSON.parse(localStorage.getItem('dinamico_filtros')||'{}');
-                if (salvo) {
-                    if (document.getElementById('filtroTipo')) document.getElementById('filtroTipo').value = salvo.tipo || '';
-                    if (document.getElementById('filtroStatus')) document.getElementById('filtroStatus').value = salvo.status || '';
-                    if (document.getElementById('dataInicial')) document.getElementById('dataInicial').value = salvo.dataInicial || '';
-                    if (document.getElementById('dataFinal')) document.getElementById('dataFinal').value = salvo.dataFinal || '';
-                    // colaborador é restaurado após o carregamento das opções
-                    return salvo.colaborador || '';
-                }
-            } catch (_) {}
-            return '';
-        }
+        // Persistência desativada a pedido do usuário
+        function salvarEstadoFiltros() {}
+        function restaurarEstadoFiltros() { return ''; }
 
         function resolverNomeColaboradorPorId(id) {
             if (id === undefined || id === null) return '';
@@ -321,6 +298,13 @@
                 colaboradores.forEach(colaborador => {
                     let nome = (colaborador.nome || colaborador.nome_colaborador || colaborador.descricao || '').toString().trim();
                     const nomeDisplay = nome && nome.length > 1 ? nome : (`ID: ${colaborador.id || colaborador.codigo || ''}`);
+                    const primaryId = [
+                        colaborador.id,
+                        colaborador.codigo,
+                        colaborador.codigo_colaborador,
+                        colaborador.colaborador_id,
+                        colaborador.colaborador_codigo
+                    ].find(v => v !== undefined && v !== null && String(v).trim() !== '');
                     const possiveisChaves = [
                         colaborador.id,
                         colaborador.codigo,
@@ -338,32 +322,17 @@
                     });
 
                     const option = document.createElement('option');
-                    option.value = nomeDisplay; // filtrar por nome
+                    option.value = primaryId !== undefined && primaryId !== null ? String(primaryId).trim() : nomeDisplay;
                     option.textContent = nomeDisplay;
-                    option.setAttribute('data-id', colaborador.id);
+                    if (primaryId !== undefined && primaryId !== null) {
+                        option.setAttribute('data-id', String(primaryId).trim());
+                    }
                     selectColaborador.appendChild(option);
                 });
 
-                // Restaurar seleção salva (por nome)
-                const salvoColab = restaurarEstadoFiltros();
-                if (salvoColab && Array.from(selectColaborador.options).some(o => o.value === salvoColab)) {
-                    selectColaborador.value = salvoColab;
-                }
+                // Persistência desativada, não restaurar valor salvo
             } catch (error) {
                 console.error('Erro ao carregar colaboradores:', error);
-            }
-        }
-
-        // Carregar clientes
-        async function carregarClientes() {
-            try {
-                const clientes = await window.api.get('/clientes');
-                mapaClientes = {};
-                clientes.forEach(cliente => {
-                    mapaClientes[cliente.id] = cliente.nome;
-                });
-            } catch (error) {
-                console.error('Erro ao carregar clientes:', error);
             }
         }
 
@@ -385,30 +354,47 @@
         function aplicarFiltros() {
             const dataInicial = (document.getElementById('dataInicial')||{}).value || '';
             const dataFinal = (document.getElementById('dataFinal')||{}).value || '';
-            const colaboradorNomeSelecionado = (document.getElementById('filtroColaborador')||{}).value || '';
+            const colaboradorIdSelecionado = (document.getElementById('filtroColaborador')||{}).value || '';
             const tipo = (document.getElementById('filtroTipo')||{}).value || '';
             const status = (document.getElementById('filtroStatus')||{}).value || '';
+            const modoData = window.modoFiltroData || 'geracao'; // 'geracao' | 'vencimento'
 
             let dadosFiltrados = [...dadosRelatorio];
 
             // Filtro por data
             if (dataInicial) {
-                dadosFiltrados = dadosFiltrados.filter(item => 
-                    new Date(item.data_geracao) >= new Date(dataInicial)
-                );
+                dadosFiltrados = dadosFiltrados.filter(item => {
+                    const base = modoData === 'vencimento' ? item.data_vencimento : item.data_geracao;
+                    return base ? new Date(base) >= new Date(dataInicial) : true;
+                });
             }
             if (dataFinal) {
-                dadosFiltrados = dadosFiltrados.filter(item => 
-                    new Date(item.data_geracao) <= new Date(dataFinal)
-                );
+                dadosFiltrados = dadosFiltrados.filter(item => {
+                    const base = modoData === 'vencimento' ? item.data_vencimento : item.data_geracao;
+                    return base ? new Date(base) <= new Date(dataFinal) : true;
+                });
             }
 
-            // Filtro por colaborador (por nome, compatível com recebimento)
-            if (colaboradorNomeSelecionado && colaboradorNomeSelecionado !== 'todos') {
-                const alvo = colaboradorNomeSelecionado.toString().trim().toLowerCase();
+            // Filtro por colaborador (por ID, robusto a zeros à esquerda)
+            if (colaboradorIdSelecionado && colaboradorIdSelecionado !== 'todos') {
+                const alvoRaw = String(colaboradorIdSelecionado).trim();
+                const alvoNum = !Number.isNaN(Number(alvoRaw)) ? String(Number(alvoRaw)) : '';
                 dadosFiltrados = dadosFiltrados.filter(item => {
-                    const nome = obterNomeColaboradorPorItem(item).toString().trim().toLowerCase();
-                    return nome === alvo;
+                    const candidatos = [
+                        item.colaborador_id,
+                        item.colaborador_codigo,
+                        item.colaborador_codigo_id,
+                        item.codigo_colaborador,
+                        item.colaborador
+                    ].filter(v => v !== undefined && v !== null);
+                    for (const c of candidatos) {
+                        const raw = String(c).trim();
+                        const asNum = !Number.isNaN(Number(raw)) ? String(Number(raw)) : '';
+                        if (raw === alvoRaw || (alvoNum && asNum && alvoNum === asNum)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
             }
 
@@ -488,12 +474,20 @@
 
         // Inicializar página
         async function inicializarPagina() {
-            await carregarColaboradores();
-            await carregarClientes();
-            await carregarDadosRelatorio();
-            
-            // Gerar relatório inicial
-            gerarRelatorio();
+            try {
+                await carregarColaboradores();
+                await carregarDadosRelatorio();
+                // Gerar relatório inicial
+                gerarRelatorio();
+            } catch (error) {
+                console.error('Falha ao inicializar a página Dinâmico:', error);
+                if (typeof mostrarToast === 'function') {
+                    mostrarToast('Erro ao inicializar a página de Relatório Dinâmico.', 'error');
+                } else {
+                    alert('Erro ao inicializar a página de Relatório Dinâmico.');
+                }
+                ocultarSpinner();
+            }
         }
 
         // Atualizar gráficos com dados reais
@@ -604,7 +598,9 @@
         function atualizarGraficoEvolucao(dados) {
             const evolucaoMensal = {};
             dados.forEach(item => {
-                const data = new Date(item.data_geracao);
+                const base = (window.modoFiltroData === 'vencimento') ? item.data_vencimento : item.data_geracao;
+                if (!base) return;
+                const data = new Date(base);
                 const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
                 const valor = Number(item.valor) || 0;
                 evolucaoMensal[mesAno] = (evolucaoMensal[mesAno] || 0) + valor;
@@ -663,24 +659,29 @@
             tbody.innerHTML = '';
 
             if (dados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">Nenhum resultado encontrado</td></tr>';
                 return;
             }
 
             dados.forEach(item => {
                 const row = document.createElement('tr');
-                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const geracao = item.data_geracao ? new Date(item.data_geracao).toLocaleDateString('pt-BR') : '';
+                const vencimento = item.data_vencimento ? new Date(item.data_vencimento).toLocaleDateString('pt-BR') : '';
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                 // Status com cor
                 let statusClass = 'pending';
                 let statusText = item.status || 'PENDENTE';
-                if (item.status === 'PAGO') statusClass = 'paid';
-                if (item.status === 'VENCIDO') statusClass = 'overdue';
+                if (statusText === 'PAGO') statusClass = 'paid';
+                else if (statusText === 'VENCIDO') statusClass = 'overdue';
+                else if (statusText === 'CLIENTE NÃO PAGOU') statusClass = 'notpaid';
+                else if (statusText === 'AGLUTINADO') statusClass = 'aglutinado';
+                else if (statusText === 'CANCELADO') statusClass = 'cancelled';
 
                 row.innerHTML = `
-                    <td>${dataFormatada}</td>
+                    <td>${geracao}</td>
+                    <td>${vencimento}</td>
                     <td>${colaboradorNome}</td>
                     <td>${item.tipo || ''}</td>
                     <td>${valorFormatado}</td>
@@ -700,23 +701,50 @@
         document.addEventListener('DOMContentLoaded', function() {
             inicializarPagina();
 
-            // Botão gerar relatório
-            document.querySelector('.btn-primary').addEventListener('click', gerarRelatorio);
+            // Botão limpar filtros
+            const btnLimpar = document.getElementById('btnLimparFiltros');
+            if (btnLimpar) {
+                btnLimpar.addEventListener('click', () => {
+                    const ids = ['filtroColaborador','filtroTipo','filtroStatus','dataInicial','dataFinal'];
+                    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value=''; });
+                    window.modoFiltroData = 'geracao';
+                    // resetar estilo dos botões
+                    const evt = new Event('click');
+                    const btnGeracao = document.getElementById('btnDataGeracao');
+                    if (btnGeracao) btnGeracao.dispatchEvent(evt);
+                    gerarRelatorio();
+                });
+            }
 
             // Autoatualização ao mudar filtros
             const filtroContainer = document.querySelector('.advanced-filters');
             filtroContainer.addEventListener('change', function(e) {
                 if (e.target.matches('#dataInicial, #dataFinal, #filtroColaborador, #filtroTipo, #filtroStatus')) {
-                    salvarEstadoFiltros();
                     gerarRelatorio();
                 }
             });
+
+            // Botões de modo de data
+            window.modoFiltroData = 'geracao';
+            const btnGeracao = document.getElementById('btnDataGeracao');
+            const btnVenc = document.getElementById('btnDataVencimento');
+            function atualizarBotoesModo() {
+                if (btnGeracao && btnVenc) {
+                    const ativo = 'height:28px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.85em; cursor:pointer;';
+                    const inativo = 'height:28px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.85em; cursor:pointer;';
+                    btnGeracao.setAttribute('style', window.modoFiltroData==='geracao' ? ativo : inativo);
+                    btnVenc.setAttribute('style', window.modoFiltroData==='vencimento' ? ativo : inativo);
+                }
+            }
+            if (btnGeracao) btnGeracao.addEventListener('click', () => { window.modoFiltroData='geracao'; atualizarBotoesModo(); gerarRelatorio(); });
+            if (btnVenc) btnVenc.addEventListener('click', () => { window.modoFiltroData='vencimento'; atualizarBotoesModo(); gerarRelatorio(); });
+            atualizarBotoesModo();
 
             // Garantir que o select mostre o texto clicado imediatamente (especialmente em navegadores móveis)
             ['filtroColaborador','filtroTipo','filtroStatus'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.addEventListener('input', () => salvarEstadoFiltros());
+                    el.addEventListener('input', () => {});
                 }
             });
 
@@ -724,7 +752,6 @@
             let debounce;
             filtroContainer.addEventListener('input', function(e) {
                 if (e.target.matches('#dataInicial, #dataFinal')) {
-                    salvarEstadoFiltros();
                     clearTimeout(debounce);
                     debounce = setTimeout(() => gerarRelatorio(), 400);
                 }
@@ -740,9 +767,11 @@
             }
 
             // Criar CSV
-            let csv = 'Data,Colaborador,Tipo,Valor,Status\n';
+            const modoData = window.modoFiltroData === 'vencimento' ? 'Vencimento' : 'Geração';
+            let csv = `${modoData},Colaborador,Tipo,Valor,Status\n`;
             dadosFiltrados.forEach(item => {
-                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const base = (window.modoFiltroData === 'vencimento') ? item.data_vencimento : item.data_geracao;
+                const dataFormatada = base ? new Date(base).toLocaleDateString('pt-BR') : '';
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
@@ -784,16 +813,20 @@
                         .paid { background-color: #28a745; }
                         .pending { background-color: #ffc107; color: black; }
                         .overdue { background-color: #dc3545; }
+                        .notpaid { background-color: #6c757d; }
+                        .aglutinado { background-color: #17a2b8; }
+                        .cancelled { background-color: #9e9e9e; }
                     </style>
                 </head>
                 <body>
                     <h1>Relatório Dinâmico de Comissões</h1>
                     <p><strong>Data de geração:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+                    <p><strong>Modo de data:</strong> ${window.modoFiltroData === 'vencimento' ? 'Vencimento' : 'Geração'}</p>
                     <p><strong>Total de registros:</strong> ${dadosFiltrados.length}</p>
                     <table>
                         <thead>
                             <tr>
-                                <th>Data</th>
+                                <th>${window.modoFiltroData === 'vencimento' ? 'Vencimento' : 'Geração'}</th>
                                 <th>Colaborador</th>
                                 <th>Tipo</th>
                                 <th>Valor</th>
@@ -804,13 +837,17 @@
             `;
 
             dadosFiltrados.forEach(item => {
-                const dataFormatada = new Date(item.data_geracao).toLocaleDateString('pt-BR');
+                const base = (window.modoFiltroData === 'vencimento') ? item.data_vencimento : item.data_geracao;
+                const dataFormatada = base ? new Date(base).toLocaleDateString('pt-BR') : '';
                 const colaboradorNome = obterNomeColaboradorPorItem(item);
                 const valorFormatado = Number(item.valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                 let statusClass = 'pending';
                 if (item.status === 'PAGO') statusClass = 'paid';
-                if (item.status === 'VENCIDO') statusClass = 'overdue';
+                else if (item.status === 'VENCIDO') statusClass = 'overdue';
+                else if (item.status === 'CLIENTE NÃO PAGOU') statusClass = 'notpaid';
+                else if (item.status === 'AGLUTINADO') statusClass = 'aglutinado';
+                else if (item.status === 'CANCELADO') statusClass = 'cancelled';
 
                 conteudo += `
                     <tr>
