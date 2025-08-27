@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -81,87 +82,408 @@
                     <h3>Total de Colaboradores</h3>
                     <i class="fas fa-users"></i>
                 </div>
-                <div class="card-value">150</div>
-                <div class="card-change">+12% este mês</div>
+                <div class="card-value" id="total-colaboradores">-</div>
+                <div class="card-change" id="crescimento-colaboradores">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Comissões do Mês</h3>
                     <i class="fas fa-hand-holding-usd"></i>
                 </div>
-                <div class="card-value">R$ 45.000</div>
-                <div class="card-change">+8% este mês</div>
+                <div class="card-value" id="comissoes-mes">-</div>
+                <div class="card-change" id="crescimento-comissoes">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Vendas do Mês</h3>
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="card-value">R$ 180.000</div>
-                <div class="card-change negative">-3% este mês</div>
+                <div class="card-value" id="vendas-mes">-</div>
+                <div class="card-change" id="crescimento-vendas">Carregando...</div>
             </div>
             <div class="card" draggable="true">
                 <div class="card-header">
                     <h3>Pagamentos Pendentes</h3>
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="card-value">R$ 15.000</div>
-                <div class="card-change">5 pendentes</div>
+                <div class="card-value" id="pagamentos-pendentes">-</div>
+                <div class="card-change" id="qtd-pendentes">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h2>Evolução das Comissões</h2>
+                <canvas id="comissoesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Status das Comissões</h2>
+                <canvas id="statusChart"></canvas>
             </div>
         </div>
 
         <!-- Latest Commissions -->
         <div class="latest-commissions">
-            <h2>Últimas Comissões</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Colaborador</th>
-                        <th>Valor</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>João Silva</td>
-                        <td>R$ 1.500,00</td>
-                        <td>15/03/2024</td>
-                        <td><span class="status pending">Pendente</span></td>
-                        <td>
-                            <button class="action-btn view-btn">Ver</button>
-                            <button class="action-btn edit-btn">Editar</button>
-                            <button class="action-btn delete-btn">Excluir</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Maria Santos</td>
-                        <td>R$ 2.300,00</td>
-                        <td>14/03/2024</td>
-                        <td><span class="status paid">Pago</span></td>
-                        <td>
-                            <button class="action-btn view-btn">Ver</button>
-                            <button class="action-btn edit-btn">Editar</button>
-                            <button class="action-btn delete-btn">Excluir</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Pedro Oliveira</td>
-                        <td>R$ 1.800,00</td>
-                        <td>13/03/2024</td>
-                        <td><span class="status cancelled">Cancelado</span></td>
-                        <td>
-                            <button class="action-btn view-btn">Ver</button>
-                            <button class="action-btn edit-btn">Editar</button>
-                            <button class="action-btn delete-btn">Excluir</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-header">
+                <h2>Últimas Comissões</h2>
+                <button class="btn-primary" onclick="carregarComissoes()">
+                    <i class="fas fa-sync-alt"></i>
+                    Atualizar
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Colaborador</th>
+                            <th>Valor</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comissoes-tbody">
+                        <tr>
+                            <td colspan="5" class="loading">Carregando comissões...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script src="scripts/navigation.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script>
+        // Variáveis globais
+        let comissoesChart, statusChart;
+        let dashboardData = {};
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarDashboard();
+            inicializarDragAndDrop();
+        });
+
+        // Função para inicializar o dashboard
+        async function inicializarDashboard() {
+            try {
+                await Promise.all([
+                    carregarDadosCards(),
+                    carregarComissoes(),
+                    inicializarGraficos()
+                ]);
+            } catch (error) {
+                console.error('Erro ao inicializar dashboard:', error);
+                mostrarToast('Erro ao carregar dados do dashboard', 'error');
+            }
+        }
+
+        // Função para carregar dados dos cards
+        async function carregarDadosCards() {
+            try {
+                // Simular dados da API (substituir por chamadas reais)
+                const dados = await simularDadosCards();
+                
+                // Atualizar cards
+                document.getElementById('total-colaboradores').textContent = dados.colaboradores.total;
+                document.getElementById('crescimento-colaboradores').textContent = dados.colaboradores.crescimento;
+                
+                document.getElementById('comissoes-mes').textContent = formatarMoeda(dados.comissoes.valor);
+                document.getElementById('crescimento-comissoes').textContent = dados.comissoes.crescimento;
+                
+                document.getElementById('vendas-mes').textContent = formatarMoeda(dados.vendas.valor);
+                document.getElementById('crescimento-vendas').textContent = dados.vendas.crescimento;
+                
+                document.getElementById('pagamentos-pendentes').textContent = formatarMoeda(dados.pendentes.valor);
+                document.getElementById('qtd-pendentes').textContent = dados.pendentes.quantidade;
+
+                // Aplicar classes de cor baseadas no crescimento
+                aplicarClassesCrescimento();
+                
+            } catch (error) {
+                console.error('Erro ao carregar dados dos cards:', error);
+            }
+        }
+
+        // Função para simular dados dos cards (substituir por API real)
+        async function simularDadosCards() {
+            // Simular delay de API
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            return {
+                colaboradores: {
+                    total: 150,
+                    crescimento: '+12% este mês'
+                },
+                comissoes: {
+                    valor: 45000,
+                    crescimento: '+8% este mês'
+                },
+                vendas: {
+                    valor: 180000,
+                    crescimento: '-3% este mês'
+                },
+                pendentes: {
+                    valor: 15000,
+                    quantidade: '5 pendentes'
+                }
+            };
+        }
+
+        // Função para aplicar classes de cor baseadas no crescimento
+        function aplicarClassesCrescimento() {
+            const elementos = [
+                { id: 'crescimento-colaboradores', texto: '+12% este mês' },
+                { id: 'crescimento-comissoes', texto: '+8% este mês' },
+                { id: 'crescimento-vendas', texto: '-3% este mês' }
+            ];
+
+            elementos.forEach(item => {
+                const elemento = document.getElementById(item.id);
+                if (item.texto.includes('-')) {
+                    elemento.classList.add('negative');
+                } else {
+                    elemento.classList.remove('negative');
+                }
+            });
+        }
+
+        // Função para carregar comissões
+        async function carregarComissoes() {
+            try {
+                const tbody = document.getElementById('comissoes-tbody');
+                tbody.innerHTML = '<tr><td colspan="5" class="loading">Carregando comissões...</td></tr>';
+
+                // Simular dados de comissões (substituir por API real)
+                const comissoes = await simularComissoes();
+                
+                if (comissoes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nenhuma comissão encontrada</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = comissoes.map(comissao => `
+                    <tr>
+                        <td>${comissao.colaborador}</td>
+                        <td>${formatarMoeda(comissao.valor)}</td>
+                        <td>${formatarData(comissao.data)}</td>
+                        <td><span class="status ${comissao.status}">${comissao.statusText}</span></td>
+                        <td>
+                            <button class="action-btn view-btn" onclick="verComissao(${comissao.id})" title="Ver">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn edit-btn" onclick="editarComissao(${comissao.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="excluirComissao(${comissao.id})" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar comissões:', error);
+                document.getElementById('comissoes-tbody').innerHTML = 
+                    '<tr><td colspan="5" class="error">Erro ao carregar comissões</td></tr>';
+            }
+        }
+
+        // Função para simular comissões (substituir por API real)
+        async function simularComissoes() {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            return [
+                {
+                    id: 1,
+                    colaborador: 'João Silva',
+                    valor: 1500,
+                    data: '2024-03-15',
+                    status: 'pending',
+                    statusText: 'Pendente'
+                },
+                {
+                    id: 2,
+                    colaborador: 'Maria Santos',
+                    valor: 2300,
+                    data: '2024-03-14',
+                    status: 'paid',
+                    statusText: 'Pago'
+                },
+                {
+                    id: 3,
+                    colaborador: 'Pedro Oliveira',
+                    valor: 1800,
+                    data: '2024-03-13',
+                    status: 'cancelled',
+                    statusText: 'Cancelado'
+                },
+                {
+                    id: 4,
+                    colaborador: 'Ana Costa',
+                    valor: 3200,
+                    data: '2024-03-12',
+                    status: 'paid',
+                    statusText: 'Pago'
+                },
+                {
+                    id: 5,
+                    colaborador: 'Carlos Lima',
+                    valor: 950,
+                    data: '2024-03-11',
+                    status: 'pending',
+                    statusText: 'Pendente'
+                }
+            ];
+        }
+
+        // Função para inicializar gráficos
+        function inicializarGraficos() {
+            // Gráfico de evolução das comissões
+            const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
+            comissoesChart = new Chart(ctxComissoes, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Comissões (R$)',
+                        data: [35000, 42000, 45000, 38000, 52000, 48000],
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de status das comissões
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pago', 'Pendente', 'Cancelado'],
+                    datasets: [{
+                        data: [65, 25, 10],
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107',
+                            '#dc3545'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para inicializar drag and drop
+        function inicializarDragAndDrop() {
+            const container = document.getElementById('dashboard-cards');
+            new Sortable(container, {
+                animation: 150,
+                ghostClass: 'card-ghost',
+                chosenClass: 'card-chosen',
+                dragClass: 'card-drag',
+                onEnd: function() {
+                    salvarOrdemCards();
+                }
+            });
+        }
+
+        // Função para salvar ordem dos cards
+        function salvarOrdemCards() {
+            const cards = document.querySelectorAll('#dashboard-cards .card');
+            const ordem = Array.from(cards).map(card => {
+                const titulo = card.querySelector('h3').textContent;
+                return titulo;
+            });
+            
+            localStorage.setItem('dashboardCardsOrder', JSON.stringify(ordem));
+        }
+
+        // Funções de ação das comissões
+        function verComissao(id) {
+            mostrarToast(`Visualizando comissão #${id}`, 'info');
+            // Implementar modal de visualização
+        }
+
+        function editarComissao(id) {
+            mostrarToast(`Editando comissão #${id}`, 'info');
+            // Redirecionar para página de edição
+            window.location.href = `movimento-comissao.html?id=${id}`;
+        }
+
+        function excluirComissao(id) {
+            if (confirm('Tem certeza que deseja excluir esta comissão?')) {
+                mostrarToast(`Comissão #${id} excluída`, 'success');
+                carregarComissoes(); // Recarregar tabela
+            }
+        }
+
+        // Funções utilitárias
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        function formatarData(data) {
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function mostrarToast(mensagem, tipo = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${tipo}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${mensagem}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+    </script>
 </body>
 </html> 
