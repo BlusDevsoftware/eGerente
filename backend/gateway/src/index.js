@@ -9,6 +9,7 @@ const clienteRoutes = require('./routes/clienteRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const servicoRoutes = require('./routes/servicoRoutes');
 const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
+const backupRoutes = require('./routes/backupRoutes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/clientes', clienteRoutes);
 app.use('/api/produtos', produtoRoutes);
 app.use('/api/servicos', servicoRoutes);
 app.use('/api/movimento_comissoes', movimentoComissaoRoutes);
+app.use('/api/backup', backupRoutes);
 
 // Configuração dos serviços
 const services = {
