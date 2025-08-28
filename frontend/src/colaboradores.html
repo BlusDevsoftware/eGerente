@@ -482,8 +482,8 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-top: 20px;
-            /* Tamanho equilibrado com espaçamento inferior */
-            height: 650px;
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 200px);
             position: relative;
         }
 
@@ -563,8 +563,8 @@
 
         /* Scroll personalizado para o corpo da tabela */
         .table-scroll {
-            /* Altura equilibrada com espaçamento inferior */
-            height: 550px;
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 300px);
             overflow-y: auto;
             overflow-x: auto;
         }
@@ -617,11 +617,11 @@
         /* Responsividade para tabelas pequenas */
         @media (max-width: 768px) {
             .table-container {
-                height: 550px;
+                height: calc(100vh - 150px);
             }
             
             .table-scroll {
-                height: 450px;
+                height: calc(100vh - 250px);
             }
         }
     </style>
