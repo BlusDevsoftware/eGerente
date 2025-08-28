@@ -72,31 +72,7 @@
         }
 
         /* Rolagem na tabela de Últimas Comissões com cabeçalho fixo */
-        .latest-commissions .table-container {
-            max-height: 360px;
-            overflow-y: auto;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-        }
-
-        .latest-commissions table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .latest-commissions th,
-        .latest-commissions td {
-            padding: 12px;
-            border-bottom: 1px solid #eef2f7;
-            text-align: left;
-        }
-
-        .latest-commissions thead th {
-            position: sticky;
-            top: 0;
-            background: #f8fbff;
-            z-index: 2;
-        }
+        /* (removido) estilos da lista de últimas comissões */
     </style>
 </head>
 <body>
@@ -218,32 +194,15 @@
             </div>
         </div>
 
-        <!-- Latest Commissions -->
-        <div class="latest-commissions">
-            <div class="table-header">
-            <h2>Últimas Comissões</h2>
-                <button class="btn-primary" onclick="carregarComissoes()">
-                    <i class="fas fa-sync-alt"></i>
-                    Atualizar
-                </button>
+        <!-- Insights Adicionais -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h2>Vendas por Produto</h2>
+                <canvas id="vendasProdutoChart"></canvas>
             </div>
-            <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Colaborador</th>
-                        <th>Valor</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                    <tbody id="comissoes-tbody">
-                        <tr>
-                            <td colspan="5" class="loading">Carregando comissões...</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="chart-container">
+                <h2>Top 5 Colaboradores</h2>
+                <canvas id="topColaboradoresChart"></canvas>
             </div>
         </div>
     </div>
@@ -534,6 +493,7 @@
             try {
                 // Buscar dados reais para os gráficos
                 const dadosGraficos = await buscarDadosGraficos();
+                const insightsGraficos = await buscarDadosInsights();
                 
                 // Gráfico de evolução das comissões
                 const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
@@ -600,6 +560,59 @@
 
                 // Gráficos criados com sucesso
 
+                // Vendas por Produto (bar)
+                const ctxVendasProduto = document.getElementById('vendasProdutoChart').getContext('2d');
+                new Chart(ctxVendasProduto, {
+                    type: 'bar',
+                    data: {
+                        labels: insightsGraficos.vendasProduto.labels,
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: insightsGraficos.vendasProduto.dados,
+                            backgroundColor: '#42a5f5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); }
+                                }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                // Top 5 Colaboradores (horizontal bar)
+                const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
+                new Chart(ctxTopColab, {
+                    type: 'bar',
+                    data: {
+                        labels: insightsGraficos.topColaboradores.labels,
+                        datasets: [{
+                            label: 'Comissões (R$)',
+                            data: insightsGraficos.topColaboradores.dados,
+                            backgroundColor: '#66bb6a'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { callback: function(value){ return 'R$ ' + value.toLocaleString('pt-BR'); } }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
                 // Criar gráficos com dados padrão em caso de erro
@@ -626,6 +639,60 @@
                 return {
                     evolucao: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] },
                     status: { labels: ['Pago', 'Pendente', 'Cancelado'], dados: [0, 0, 0] }
+                };
+            }
+        }
+
+        // Função para buscar dados dos insights (vendas por produto e top colaboradores)
+        async function buscarDadosInsights() {
+            try {
+                const [comissoes, produtos, colaboradores] = await Promise.all([
+                    window.api.get('/movimento_comissoes'),
+                    window.api.get('/produtos'),
+                    window.api.get('/colaboradores')
+                ]);
+
+                // Vendas por produto: somatório de valor_venda por produto_nome (se existir)
+                const mapaProdutoParaValor = {};
+                comissoes.forEach(c => {
+                    const nomeProduto = (c.nome_produto || c.produto_nome || 'Sem Produto');
+                    const valor = parseFloat(c.valor_venda) || 0;
+                    mapaProdutoParaValor[nomeProduto] = (mapaProdutoParaValor[nomeProduto] || 0) + valor;
+                });
+                const produtosOrdenados = Object.entries(mapaProdutoParaValor)
+                    .sort((a,b) => b[1]-a[1])
+                    .slice(0, 8);
+
+                const vendasProduto = {
+                    labels: produtosOrdenados.map(([nome]) => nome),
+                    dados: produtosOrdenados.map(([,valor]) => valor)
+                };
+
+                // Top 5 colaboradores por soma de valor_receber
+                const mapaColab = {};
+                const idToNome = {};
+                colaboradores.forEach(col => { idToNome[col.id] = col.nome; });
+                comissoes.forEach(c => {
+                    const idColab = c.id_colaborador;
+                    const nome = idToNome[idColab] || 'Colaborador';
+                    const valor = parseFloat(c.valor_receber) || 0;
+                    mapaColab[nome] = (mapaColab[nome] || 0) + valor;
+                });
+                const topColabOrdenado = Object.entries(mapaColab)
+                    .sort((a,b) => b[1]-a[1])
+                    .slice(0, 5);
+
+                const topColaboradores = {
+                    labels: topColabOrdenado.map(([nome]) => nome),
+                    dados: topColabOrdenado.map(([,valor]) => valor)
+                };
+
+                return { vendasProduto, topColaboradores };
+            } catch (e) {
+                console.error('Erro ao buscar dados de insights:', e);
+                return {
+                    vendasProduto: { labels: [], dados: [] },
+                    topColaboradores: { labels: [], dados: [] }
                 };
             }
         }
