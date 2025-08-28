@@ -2,7 +2,7 @@
 async function carregarColaboradores() {
     try {
         const colaboradores = await api.get('/colaboradores');
-        const tbody = document.querySelector('.table-scroll table tbody');
+        const tbody = document.querySelector('.table-container table tbody');
         tbody.innerHTML = '';
 
         colaboradores.forEach(colaborador => {
