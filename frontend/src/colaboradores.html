@@ -487,7 +487,22 @@
             position: relative;
         }
 
-        .table-container table {
+        /* Scroll personalizado para a tabela completa */
+        .table-scroll {
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
+        .table-scroll table {
             width: 100%;
             border-collapse: collapse;
             margin: 0;
@@ -495,14 +510,14 @@
             min-width: 1000px;
         }
 
-        .table-container thead {
+        .table-scroll thead {
             background: #f8f9fa;
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
-        .table-container thead th {
+        .table-scroll thead th {
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
@@ -513,68 +528,52 @@
         }
 
         /* Larguras específicas para cada coluna */
-        .table-container th:nth-child(1), /* Código */
+        .table-scroll th:nth-child(1), /* Código */
         .table-scroll td:nth-child(1) {
             width: 80px;
             min-width: 80px;
         }
 
-        .table-container th:nth-child(2), /* Nome */
+        .table-scroll th:nth-child(2), /* Nome */
         .table-scroll td:nth-child(2) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-container th:nth-child(3), /* Email */
+        .table-scroll th:nth-child(3), /* Email */
         .table-scroll td:nth-child(3) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-container th:nth-child(4), /* Telefone */
+        .table-scroll th:nth-child(4), /* Telefone */
         .table-scroll td:nth-child(4) {
             width: 120px;
             min-width: 120px;
         }
 
-        .table-container th:nth-child(5), /* Cargo */
+        .table-scroll th:nth-child(5), /* Cargo */
         .table-scroll td:nth-child(5) {
             width: 150px;
             min-width: 150px;
         }
 
-        .table-container th:nth-child(6), /* Data Admissão */
+        .table-scroll th:nth-child(6), /* Data Admissão */
         .table-scroll td:nth-child(6) {
             width: 120px;
             min-width: 120px;
         }
 
-        .table-container th:nth-child(7), /* Status */
+        .table-scroll th:nth-child(7), /* Status */
         .table-scroll td:nth-child(7) {
             width: 100px;
             min-width: 100px;
         }
 
-        .table-container th:nth-child(8), /* Ações */
+        .table-scroll th:nth-child(8), /* Ações */
         .table-scroll td:nth-child(8) {
             width: 120px;
             min-width: 120px;
-        }
-
-        /* Scroll personalizado para o corpo da tabela */
-        .table-scroll {
-            /* Ocupar máximo da tela com pequeno espaçamento */
-            height: calc(100vh - 300px);
-            overflow-y: auto;
-            overflow-x: auto;
-        }
-
-        .table-scroll table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-            table-layout: auto;
-            min-width: 1000px;
         }
 
         .table-scroll tbody tr {
@@ -720,23 +719,25 @@
                     <div class="loading-text">Carregando colaboradores...</div>
                 </div>
                 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Cargo</th>
-                            <th>Data Admissão</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Dados serão carregados dinamicamente via JavaScript -->
-                    </tbody>
-                </table>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Cargo</th>
+                                <th>Data Admissão</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão carregados dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
