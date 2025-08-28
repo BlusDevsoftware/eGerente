@@ -292,7 +292,8 @@
 
                 // Calcular dados dos colaboradores
                 const totalColaboradores = colaboradores.length;
-                const crescimentoColaboradores = calcularCrescimento(colaboradores, 'data_cadastro');
+                const campoDataColab = colaboradores.some(c => c && c.data_admissao) ? 'data_admissao' : 'data_cadastro';
+                const crescimentoColaboradores = calcularCrescimento(colaboradores, campoDataColab);
 
                 // Calcular dados das comissões do mês atual
                 const mesAtual = new Date().getMonth();
@@ -302,7 +303,7 @@
                     return dataComissao.getMonth() === mesAtual && dataComissao.getFullYear() === anoAtual;
                 });
 
-                const valorComissoesMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
+                const valorComissoesMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor), 0);
                 const crescimentoComissoes = calcularCrescimento(comissoesMes, 'data_geracao');
 
                 // Calcular vendas (soma dos valores de venda das comissões)
@@ -313,7 +314,7 @@
                 const comissoesPendentes = comissoes.filter(c => 
                     c.status && c.status.toLowerCase().includes('pendente')
                 );
-                const valorPendentes = comissoesPendentes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
+                const valorPendentes = comissoesPendentes.reduce((total, c) => total + parseValorBr(c.valor), 0);
 
                 return {
                     colaboradores: {
@@ -451,18 +452,21 @@
                 // Buscar colaboradores para mapear nomes usando a mesma API da aba movimento de comissões
                 const colaboradores = await window.api.get('/colaboradores');
 
-                // Criar mapa de colaboradores por ID
-                const mapaColaboradores = {};
+                // Criar mapa de colaboradores por ID e por CÓDIGO
+                const mapaColabPorId = {};
+                const mapaColabPorCodigo = {};
                 colaboradores.forEach(col => {
-                    mapaColaboradores[col.id] = col.nome;
+                    if (!col) return;
+                    if (col.id !== undefined && col.id !== null) mapaColabPorId[String(col.id)] = col.nome || col.descricao || 'Colaborador';
+                    if (col.codigo !== undefined && col.codigo !== null) mapaColabPorCodigo[String(col.codigo)] = col.nome || col.descricao || 'Colaborador';
                 });
 
                 // Processar comissões e pegar apenas as 5 mais recentes
                 const comissoesProcessadas = comissoes
                     .map(comissao => ({
                         id: comissao.id,
-                        colaborador: mapaColaboradores[comissao.id_colaborador] || 'Colaborador não encontrado',
-                        valor: parseFloat(comissao.valor_receber) || 0,
+                        colaborador: mapaColabPorId[String(comissao.colaborador_id)] || mapaColabPorCodigo[String(comissao.colaborador_codigo)] || 'Colaborador',
+                        valor: parseValorBr(comissao.valor) || 0,
                         data: comissao.data_geracao,
                         status: mapearStatus(comissao.status),
                         statusText: comissao.status || 'Pendente'
@@ -704,7 +708,7 @@
                         }
                     }
                     const chave = nomeColab || 'Colaborador';
-                    const valor = parseValorBr(t.valor_receber);
+                    const valor = parseValorBr(t.valor);
                     somaPorColaborador[chave] = (somaPorColaborador[chave] || 0) + valor;
                 });
                 const topColabOrdenado = Object.entries(somaPorColaborador)
