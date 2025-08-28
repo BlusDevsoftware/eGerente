@@ -696,6 +696,13 @@
                     } else if (possivelId !== undefined && idToNome[String(possivelId)]) {
                         nomeColab = idToNome[String(possivelId)];
                     }
+                    // Fallback final: usar string de nome presente no registro (como em Recebimento)
+                    if (!nomeColab) {
+                        const nomeDireto = t.colaborador_nome || t.nome_colaborador || t.colaborador;
+                        if (nomeDireto && typeof nomeDireto === 'string' && nomeDireto.trim().length > 0) {
+                            nomeColab = nomeDireto.trim();
+                        }
+                    }
                     const chave = nomeColab || 'Colaborador';
                     const valor = parseFloat(t.valor_receber) || 0;
                     somaPorColaborador[chave] = (somaPorColaborador[chave] || 0) + valor;
