@@ -379,7 +379,22 @@
             position: relative;
         }
 
-        .table-container table {
+        /* Scroll personalizado para a tabela completa */
+        .table-scroll {
+            /* Ocupar máximo da tela com pequeno espaçamento */
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+            background: #fff;
+            margin-bottom: 16px;
+            padding-bottom: 24px;
+            flex: 1 1 auto;
+        }
+
+        .table-scroll table {
             width: 100%;
             border-collapse: collapse;
             margin: 0;
@@ -387,14 +402,14 @@
             min-width: 800px;
         }
 
-        .table-container thead {
+        .table-scroll thead {
             background: #f8f9fa;
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
-        .table-container thead th {
+        .table-scroll thead th {
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
@@ -405,60 +420,52 @@
         }
 
         /* Larguras específicas para cada coluna */
-        .table-container th:nth-child(1), /* Código */
-        .table-container td:nth-child(1) {
+        .table-scroll th:nth-child(1), /* Código */
+        .table-scroll td:nth-child(1) {
             width: 80px;
             min-width: 80px;
         }
 
-        .table-container th:nth-child(2), /* Nome */
-        .table-container td:nth-child(2) {
+        .table-scroll th:nth-child(2), /* Nome */
+        .table-scroll td:nth-child(2) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-container th:nth-child(3), /* Email */
-        .table-container td:nth-child(3) {
+        .table-scroll th:nth-child(3), /* Email */
+        .table-scroll td:nth-child(3) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-container th:nth-child(4), /* Perfil */
-        .table-container td:nth-child(4) {
+        .table-scroll th:nth-child(4), /* Perfil */
+        .table-scroll td:nth-child(4) {
             width: 120px;
             min-width: 120px;
         }
 
-        .table-container th:nth-child(5), /* Status */
-        .table-container td:nth-child(5) {
+        .table-scroll th:nth-child(5), /* Status */
+        .table-scroll td:nth-child(5) {
             width: 100px;
             min-width: 100px;
         }
 
-        .table-container th:nth-child(6), /* Ações */
-        .table-container td:nth-child(6) {
+        .table-scroll th:nth-child(6), /* Ações */
+        .table-scroll td:nth-child(6) {
             width: 120px;
             min-width: 120px;
         }
 
-        /* Scroll personalizado para o corpo da tabela */
-        .table-container {
-            /* Ocupar máximo da tela com pequeno espaçamento */
-            height: calc(100vh - 300px);
-            overflow-y: auto;
-            overflow-x: auto;
-        }
-
-        .table-container tbody tr {
+        .table-scroll tbody tr {
             border-bottom: 1px solid #e9ecef;
             transition: background-color 0.2s ease;
         }
 
-        .table-container tbody tr:hover {
+        .table-scroll tbody tr:hover {
             background-color: #f8f9fa;
         }
 
-        .table-container tbody td {
+        .table-scroll tbody td {
             padding: 12px;
             vertical-align: middle;
             color: #495057;
@@ -467,31 +474,35 @@
             white-space: nowrap;
         }
 
-        .table-container::-webkit-scrollbar {
+        .table-scroll::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
 
-        .table-container::-webkit-scrollbar-track {
+        .table-scroll::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
 
-        .table-container::-webkit-scrollbar-thumb {
+        .table-scroll::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 4px;
         }
 
-        .table-container::-webkit-scrollbar-thumb:hover {
+        .table-scroll::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
 
-                    /* Responsividade para tabelas pequenas */
-            @media (max-width: 768px) {
-                .table-container {
-                    height: calc(100vh - 150px);
-                }
+        /* Responsividade para tabelas pequenas */
+        @media (max-width: 768px) {
+            .table-container {
+                height: calc(100vh - 150px);
             }
+            
+            .table-scroll {
+                height: calc(100vh - 250px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -582,21 +593,23 @@
 
             <!-- Table -->
             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Perfil</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <!-- Dados dos usuários serão inseridos aqui via JavaScript -->
-                    </tbody>
-                </table>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Perfil</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Dados dos usuários serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
