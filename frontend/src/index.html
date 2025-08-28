@@ -547,9 +547,10 @@
                         datasets: [{
                             data: dadosGraficos.status.dados,
                             backgroundColor: [
-                                '#28a745',
-                                '#ffc107',
-                                '#dc3545'
+                                '#28a745', // Pago
+                                '#ffc107', // Pendente
+                                '#17a2b8', // Aglutinado
+                                '#dc3545'  // Cancelado
                             ],
                             borderWidth: 0
                         }]
@@ -793,15 +794,17 @@
             const status = {
                 pago: 0,
                 pendente: 0,
+                aglutinado: 0,
                 cancelado: 0
             };
 
-            comissoes.forEach(comissao => {
-                const statusLower = (comissao.status || '').toLowerCase();
-                if (statusLower.includes('pago') || statusLower.includes('paid')) {
+            (comissoes || []).forEach(comissao => {
+                const raw = (comissao.status || '').toString().trim().toUpperCase();
+                if (raw === 'PAGO' || raw === 'PAID') {
                     status.pago++;
-                } else if (statusLower.includes('cancelado') || statusLower.includes('cancelled') || 
-                          statusLower.includes('vencido')) {
+                } else if (raw === 'AGLUTINADO') {
+                    status.aglutinado++;
+                } else if (raw === 'CANCELADO' || raw === 'CANCELLED' || raw === 'VENCIDO') {
                     status.cancelado++;
                 } else {
                     status.pendente++;
@@ -809,8 +812,8 @@
             });
 
             return {
-                labels: ['Pago', 'Pendente', 'Cancelado'],
-                dados: [status.pago, status.pendente, status.cancelado]
+                labels: ['Pago', 'Pendente', 'Aglutinado', 'Cancelado'],
+                dados: [status.pago, status.pendente, status.aglutinado, status.cancelado]
             };
         }
 
