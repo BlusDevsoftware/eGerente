@@ -237,7 +237,6 @@
                 
                 await Promise.all([
                     carregarDadosCards(),
-                    carregarComissoes(),
                     inicializarGraficos()
                 ]);
                 
@@ -400,6 +399,10 @@
         async function carregarComissoes() {
             try {
                 const tbody = document.getElementById('comissoes-tbody');
+                if (!tbody) {
+                    // Tabela removida do layout; sair silenciosamente
+                    return;
+                }
                 tbody.innerHTML = '<tr><td colspan="5" class="loading">Carregando comissões...</td></tr>';
 
                 // Buscar dados reais das comissões
