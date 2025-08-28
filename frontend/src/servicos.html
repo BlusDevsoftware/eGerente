@@ -285,6 +285,126 @@
         .btn-danger:hover {
             background-color: #b71c1c;
         }
+
+        /* Estilos para a tabela de serviços - Mesmo padrão da tabela de colaboradores */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            /* Tamanho equilibrado com espaçamento inferior */
+            height: 650px;
+            position: relative;
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            table-layout: auto;
+            min-width: 700px;
+        }
+
+        .table-container thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-container thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+            background: #f8f9fa;
+        }
+
+        /* Larguras específicas para cada coluna */
+        .table-container th:nth-child(1), /* Código */
+        .table-container td:nth-child(1) {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        .table-container th:nth-child(2), /* Nome */
+        .table-container td:nth-child(2) {
+            width: 300px;
+            min-width: 300px;
+        }
+
+        .table-container th:nth-child(3), /* Valor */
+        .table-container td:nth-child(3) {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .table-container th:nth-child(4), /* Status */
+        .table-container td:nth-child(4) {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .table-container th:nth-child(5), /* Ações */
+        .table-container td:nth-child(5) {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        /* Scroll personalizado para o corpo da tabela */
+        .table-container {
+            /* Altura equilibrada com espaçamento inferior */
+            height: 650px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .table-container tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .table-container tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .table-container tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            color: #495057;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Responsividade para tabelas pequenas */
+        @media (max-width: 768px) {
+            .table-container {
+                height: 550px;
+            }
+        }
     </style>
 </head>
 <body>
