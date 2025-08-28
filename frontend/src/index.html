@@ -672,34 +672,35 @@
                 };
 
                 // Top 5 colaboradores por soma de valor_receber
-                const mapaColab = {};
+                const somaPorColaborador = {};
                 const idToNome = {};
                 const codigoToNome = {};
-                // Mapear possíveis identificadores de colaborador
-                colaboradores.forEach(col => {
-                    if (col && typeof col === 'object') {
-                        if (col.id !== undefined && col.id !== null) {
-                            idToNome[String(col.id)] = col.nome || col.descricao || col.nome_colaborador || 'Colaborador';
-                        }
-                        if (col.codigo !== undefined && col.codigo !== null) {
-                            codigoToNome[String(col.codigo)] = col.nome || col.descricao || col.nome_colaborador || 'Colaborador';
-                        }
+                // Mapear como na aba Recebimento: chave por codigo
+                colaboradores.forEach(colab => {
+                    if (!colab) return;
+                    const nome = colab.nome || colab.descricao || colab.nome_colaborador || 'Colaborador';
+                    if (colab.codigo !== undefined && colab.codigo !== null) {
+                        codigoToNome[String(colab.codigo)] = nome;
+                    }
+                    if (colab.id !== undefined && colab.id !== null) {
+                        idToNome[String(colab.id)] = nome;
                     }
                 });
-                comissoes.forEach(c => {
-                    // Detectar campo de referência ao colaborador com fallback
-                    const possivelCodigo = c.colaborador_codigo || c.colaborador_codigo_id || c.colaborador || c.codigo_colaborador;
-                    const possivelId = c.id_colaborador || c.colaborador_id;
-                    let nome = 'Colaborador';
+                comissoes.forEach(t => {
+                    // Mesmo padrão da Recebimento: tentar por codigo primeiro
+                    const possivelCodigo = t.colaborador_codigo || t.colaborador_codigo_id || t.colaborador || t.codigo_colaborador;
+                    const possivelId = t.id_colaborador || t.colaborador_id;
+                    let nomeColab = undefined;
                     if (possivelCodigo !== undefined && codigoToNome[String(possivelCodigo)]) {
-                        nome = codigoToNome[String(possivelCodigo)];
+                        nomeColab = codigoToNome[String(possivelCodigo)];
                     } else if (possivelId !== undefined && idToNome[String(possivelId)]) {
-                        nome = idToNome[String(possivelId)];
+                        nomeColab = idToNome[String(possivelId)];
                     }
-                    const valor = parseFloat(c.valor_receber) || 0;
-                    mapaColab[nome] = (mapaColab[nome] || 0) + valor;
+                    const chave = nomeColab || 'Colaborador';
+                    const valor = parseFloat(t.valor_receber) || 0;
+                    somaPorColaborador[chave] = (somaPorColaborador[chave] || 0) + valor;
                 });
-                const topColabOrdenado = Object.entries(mapaColab)
+                const topColabOrdenado = Object.entries(somaPorColaborador)
                     .sort((a,b) => b[1]-a[1])
                     .slice(0, 5);
 
