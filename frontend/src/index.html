@@ -768,14 +768,20 @@
                 labels.push(meses[mes.getMonth()]);
                 
                 // Filtrar comissões do mês
-                const comissoesMes = comissoes.filter(c => {
+                const comissoesMes = (comissoes || []).filter(c => {
+                    if (!c || !c.data_geracao) return false;
                     const dataComissao = new Date(c.data_geracao);
+                    if (isNaN(dataComissao.getTime())) return false;
                     return dataComissao.getMonth() === mes.getMonth() && 
                            dataComissao.getFullYear() === mes.getFullYear();
                 });
 
-                // Somar valores
-                const totalMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
+                // Somar valores: prioriza valor_venda, fallback para valor
+                const totalMes = comissoesMes.reduce((total, c) => {
+                    const v = parseValorBr(c.valor_venda);
+                    const fallback = parseValorBr(c.valor);
+                    return total + (v || fallback || 0);
+                }, 0);
                 dados[5 - i] = totalMes;
             }
 
