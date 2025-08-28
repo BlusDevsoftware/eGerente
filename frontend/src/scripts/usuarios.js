@@ -84,9 +84,32 @@ function closeDeleteModal() {
 let usuarios = [];
 let usuarioAtual = null;
 
+// Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
+function mostrarSpinner() {
+    document.getElementById('loader-usuarios').style.display = 'flex';
+}
+
+function ocultarSpinner() {
+    document.getElementById('loader-usuarios').style.display = 'none';
+}
+
 // Carregar usuários ao iniciar a página e configurar listeners
-document.addEventListener('DOMContentLoaded', () => {
-    carregarUsuarios();
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Mostrar spinner centralizado ao iniciar
+        mostrarSpinner();
+        
+        // Carregar dados
+        await carregarUsuarios();
+        
+        // Ocultar spinner centralizado quando tudo carregar
+        ocultarSpinner();
+    } catch (error) {
+        console.error('Erro ao inicializar página:', error);
+        // Ocultar spinner mesmo em caso de erro
+        ocultarSpinner();
+    }
+    
     setupEventListeners();
 });
 
@@ -172,6 +195,8 @@ async function carregarUsuarios() {
     const RETRY_DELAY_MS = 200; // 200ms
     for (let i = 0; i < MAX_RETRIES; i++) {
         try {
+            // Mostrar spinner ao iniciar carregamento
+            mostrarSpinner();
             const tbody = document.getElementById('userTableBody');
             if (!tbody) {
                 if (i < MAX_RETRIES - 1) {
@@ -222,6 +247,9 @@ async function carregarUsuarios() {
             });
         
             usuarios = response;
+            
+            // Ocultar spinner após carregar com sucesso
+            ocultarSpinner();
             return; // Sai do loop se o carregamento for bem-sucedido
         } catch (error) {
             console.error('Erro ao carregar usuários:', error);
@@ -230,6 +258,8 @@ async function carregarUsuarios() {
                 await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
             } else {
                 mostrarToast('Erro ao carregar usuários: ' + error.message, 'error');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
             }
         }
     }

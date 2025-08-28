@@ -254,6 +254,45 @@
             position: relative;
         }
 
+        /* Spinner de carregamento - IDÊNTICO AO DA ABA DE COLABORADORES */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Loader específico para a tabela de clientes */
+        .loader-overlay-clientes {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 8px;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
         /* Scroll personalizado para a tabela completa */
         .table-scroll {
             /* Ocupar máximo da tela com pequeno espaçamento */
@@ -462,6 +501,12 @@
 
             <!-- Table -->
             <div class="table-container">
+                <!-- Spinner de Carregamento - DENTRO DA TABELA -->
+                <div id="loader-clientes" class="loader-overlay-clientes">
+                    <div class="spinner-main"></div>
+                    <div class="loading-text">Carregando clientes...</div>
+                </div>
+                
                 <div class="table-scroll">
                     <table id="clientesTable">
                         <thead>
@@ -591,6 +636,9 @@
         // Função para carregar clientes
         async function carregarClientes() {
             try {
+                // Mostrar spinner ao iniciar carregamento
+                mostrarSpinner();
+                
                 const clientes = await api.get('/clientes');
                 const tbody = document.querySelector('#clientesTable tbody');
                 tbody.innerHTML = '';
@@ -616,9 +664,14 @@
                     `;
                     tbody.appendChild(tr);
                 });
+                
+                // Ocultar spinner após carregar com sucesso
+                ocultarSpinner();
             } catch (error) {
                 console.error('Erro ao carregar clientes:', error);
                 alert('Erro ao carregar clientes');
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
             }
         }
 
@@ -724,6 +777,15 @@
             }, 300);
         }
 
+        // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
+        function mostrarSpinner() {
+            document.getElementById('loader-clientes').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-clientes').style.display = 'none';
+        }
+
         // Função para visualizar cliente
         async function visualizarCliente(codigo) {
             try {
@@ -763,8 +825,21 @@
         }
 
         // Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            carregarClientes();
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Mostrar spinner centralizado ao iniciar
+                mostrarSpinner();
+                
+                // Carregar dados
+                await carregarClientes();
+                
+                // Ocultar spinner centralizado quando tudo carregar
+                ocultarSpinner();
+            } catch (error) {
+                console.error('Erro ao inicializar página:', error);
+                // Ocultar spinner mesmo em caso de erro
+                ocultarSpinner();
+            }
             document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
             document.getElementById('tipo').addEventListener('change', (e) => toggleTipoCliente(e.target.value));
             document.getElementById('confirmDeleteBtn').onclick = async function() {
