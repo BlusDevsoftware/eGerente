@@ -674,10 +674,28 @@
                 // Top 5 colaboradores por soma de valor_receber
                 const mapaColab = {};
                 const idToNome = {};
-                colaboradores.forEach(col => { idToNome[col.id] = col.nome; });
+                const codigoToNome = {};
+                // Mapear possíveis identificadores de colaborador
+                colaboradores.forEach(col => {
+                    if (col && typeof col === 'object') {
+                        if (col.id !== undefined && col.id !== null) {
+                            idToNome[String(col.id)] = col.nome || col.descricao || col.nome_colaborador || 'Colaborador';
+                        }
+                        if (col.codigo !== undefined && col.codigo !== null) {
+                            codigoToNome[String(col.codigo)] = col.nome || col.descricao || col.nome_colaborador || 'Colaborador';
+                        }
+                    }
+                });
                 comissoes.forEach(c => {
-                    const idColab = c.id_colaborador;
-                    const nome = idToNome[idColab] || 'Colaborador';
+                    // Detectar campo de referência ao colaborador com fallback
+                    const possivelCodigo = c.colaborador_codigo || c.colaborador_codigo_id || c.colaborador || c.codigo_colaborador;
+                    const possivelId = c.id_colaborador || c.colaborador_id;
+                    let nome = 'Colaborador';
+                    if (possivelCodigo !== undefined && codigoToNome[String(possivelCodigo)]) {
+                        nome = codigoToNome[String(possivelCodigo)];
+                    } else if (possivelId !== undefined && idToNome[String(possivelId)]) {
+                        nome = idToNome[String(possivelId)];
+                    }
                     const valor = parseFloat(c.valor_receber) || 0;
                     mapaColab[nome] = (mapaColab[nome] || 0) + valor;
                 });
