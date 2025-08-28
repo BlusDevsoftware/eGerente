@@ -136,6 +136,9 @@
                     <i class="fas fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
+                <button onclick="debugGraficos()" style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-right: 10px; font-size: 12px;">
+                    Debug
+                </button>
                 <div class="user-avatar">A</div>
             </div>
         </div>
@@ -211,13 +214,28 @@
     <script src="scripts/config/api.js"></script>
     <script>
         // Variáveis globais
-        let comissoesChart, statusChart;
+        let comissoesChart, statusChart, vendasProdutoChart, topColaboradoresChart;
         let dashboardData = {};
 
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', function() {
             inicializarDashboard();
             inicializarDragAndDrop();
+        });
+
+        // Limpar gráficos quando a página for fechada ou recarregada
+        window.addEventListener('beforeunload', function() {
+            destruirGraficos();
+        });
+
+        // Limpar gráficos quando a página perder o foco (evita problemas de memória)
+        window.addEventListener('blur', function() {
+            // Não destruir imediatamente, apenas marcar para limpeza
+            setTimeout(() => {
+                if (!document.hasFocus()) {
+                    destruirGraficos();
+                }
+            }, 5000); // Aguarda 5 segundos
         });
 
         // Funções para controlar o spinner centralizado
@@ -229,11 +247,58 @@
             document.getElementById('loader-dashboard').style.display = 'none';
         }
 
+        // Função para debug dos gráficos
+        function debugGraficos() {
+            console.log('=== DEBUG DOS GRÁFICOS ===');
+            console.log('comissoesChart:', comissoesChart);
+            console.log('statusChart:', statusChart);
+            console.log('vendasProdutoChart:', vendasProdutoChart);
+            console.log('topColaboradoresChart:', topColaboradoresChart);
+            
+            // Verificar se os elementos canvas existem
+            const canvasIds = ['comissoesChart', 'statusChart', 'vendasProdutoChart', 'topColaboradoresChart'];
+            canvasIds.forEach(id => {
+                const canvas = document.getElementById(id);
+                console.log(`Canvas ${id}:`, canvas);
+                if (canvas) {
+                    console.log(`- Contexto:`, canvas.getContext('2d'));
+                }
+            });
+        }
+
+        // Função para destruir gráficos existentes
+        function destruirGraficos() {
+            try {
+                if (comissoesChart) {
+                    comissoesChart.destroy();
+                    comissoesChart = null;
+                }
+                if (statusChart) {
+                    statusChart.destroy();
+                    statusChart = null;
+                }
+                if (vendasProdutoChart) {
+                    vendasProdutoChart.destroy();
+                    vendasProdutoChart = null;
+                }
+                if (topColaboradoresChart) {
+                    topColaboradoresChart.destroy();
+                    topColaboradoresChart = null;
+                }
+                console.log('Gráficos destruídos com sucesso');
+            } catch (error) {
+                console.error('Erro ao destruir gráficos:', error);
+            }
+        }
+
         // Função para inicializar o dashboard
         async function inicializarDashboard() {
             try {
                 // Mostrar spinner centralizado ao iniciar
                 mostrarSpinner();
+                
+                // Destruir gráficos existentes antes de criar novos
+                destruirGraficos();
                 
                 await Promise.all([
                     carregarDadosCards(),
@@ -502,6 +567,31 @@
                 const dadosGraficos = await buscarDadosGraficos();
                 const insightsGraficos = await buscarDadosInsights();
                 
+                // Validar dados antes de criar gráficos
+                if (!dadosGraficos || !insightsGraficos) {
+                    throw new Error('Dados dos gráficos inválidos');
+                }
+
+                // Validar dados de evolução
+                if (!dadosGraficos.evolucao || !Array.isArray(dadosGraficos.evolucao.dados) || dadosGraficos.evolucao.dados.length === 0) {
+                    dadosGraficos.evolucao = { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'], dados: [0, 0, 0, 0, 0, 0] };
+                }
+
+                // Validar dados de status
+                if (!dadosGraficos.status || !Array.isArray(dadosGraficos.status.dados) || dadosGraficos.status.dados.length === 0) {
+                    dadosGraficos.status = { labels: ['Pago', 'Pendente', 'Aglutinado', 'Cancelado'], dados: [0, 0, 0, 0] };
+                }
+
+                // Validar dados de vendas por produto
+                if (!insightsGraficos.vendasProduto || !Array.isArray(insightsGraficos.vendasProduto.dados) || insightsGraficos.vendasProduto.dados.length === 0) {
+                    insightsGraficos.vendasProduto = { labels: ['Sem dados'], dados: [0] };
+                }
+
+                // Validar dados de top colaboradores
+                if (!insightsGraficos.topColaboradores || !Array.isArray(insightsGraficos.topColaboradores.dados) || insightsGraficos.topColaboradores.dados.length === 0) {
+                    insightsGraficos.topColaboradores = { labels: ['Sem dados'], dados: [0] };
+                }
+                
                 // Gráfico de evolução das comissões
                 const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
                 comissoesChart = new Chart(ctxComissoes, {
@@ -570,7 +660,7 @@
 
                 // Vendas por Produto (bar)
                 const ctxVendasProduto = document.getElementById('vendasProdutoChart').getContext('2d');
-                new Chart(ctxVendasProduto, {
+                vendasProdutoChart = new Chart(ctxVendasProduto, {
                     type: 'bar',
                     data: {
                         labels: insightsGraficos.vendasProduto.labels,
@@ -597,7 +687,7 @@
 
                 // Top 5 Colaboradores (horizontal bar)
                 const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
-                const topColabChart = new Chart(ctxTopColab, {
+                topColaboradoresChart = new Chart(ctxTopColab, {
                     type: 'bar',
                     data: {
                         labels: insightsGraficos.topColaboradores.labels,
@@ -621,16 +711,23 @@
                     }
                 });
 
-                // Desenhar os valores nas barras (labels de dados)
-                topColabChart.options.animation = false;
-                topColabChart.options.plugins.tooltip = topColabChart.options.plugins.tooltip || {};
-                topColabChart.options.plugins.tooltip.callbacks = topColabChart.options.plugins.tooltip.callbacks || {};
-                topColabChart.options.plugins.tooltip.callbacks.label = function(context){
-                    const val = context.raw || 0;
-                    return 'R$ ' + Number(val).toLocaleString('pt-BR');
-                };
-                topColabChart.options.plugins.datalabelsCustom = true;
-                topColabChart.update();
+                // Configurar tooltip personalizado de forma segura
+                if (topColaboradoresChart && topColaboradoresChart.options && topColaboradoresChart.options.plugins) {
+                    topColaboradoresChart.options.animation = false;
+                    
+                    // Configurar tooltip de forma segura
+                    if (!topColaboradoresChart.options.plugins.tooltip) {
+                        topColaboradoresChart.options.plugins.tooltip = {};
+                    }
+                    if (!topColaboradoresChart.options.plugins.tooltip.callbacks) {
+                        topColaboradoresChart.options.plugins.tooltip.callbacks = {};
+                    }
+                    
+                    topColaboradoresChart.options.plugins.tooltip.callbacks.label = function(context) {
+                        const val = context.raw || 0;
+                        return 'R$ ' + Number(val).toLocaleString('pt-BR');
+                    };
+                }
 
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
@@ -819,66 +916,125 @@
 
         // Função para criar gráficos padrão em caso de erro
         function criarGraficosPadrao() {
-            const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
-            comissoesChart = new Chart(ctxComissoes, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [{
-                        label: 'Comissões (R$)',
-                        data: [0, 0, 0, 0, 0, 0],
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            try {
+                // Destruir gráficos existentes primeiro
+                destruirGraficos();
+                
+                const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
+                comissoesChart = new Chart(ctxComissoes, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                        datasets: [{
+                            label: 'Comissões (R$)',
+                            data: [0, 0, 0, 0, 0, 0],
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'R$ ' + value.toLocaleString('pt-BR');
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
 
-            const ctxStatus = document.getElementById('statusChart').getContext('2d');
-            statusChart = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pago', 'Pendente', 'Cancelado'],
-                    datasets: [{
-                        data: [0, 0, 0],
-                        backgroundColor: [
-                            '#28a745',
-                            '#ffc107',
-                            '#dc3545'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+                const ctxStatus = document.getElementById('statusChart').getContext('2d');
+                statusChart = new Chart(ctxStatus, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pago', 'Pendente', 'Cancelado'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: [
+                                '#28a745',
+                                '#ffc107',
+                                '#dc3545'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
                         }
                     }
-                }
-            });
+                });
+
+                // Criar gráficos vazios para os outros também
+                const ctxVendasProduto = document.getElementById('vendasProdutoChart').getContext('2d');
+                vendasProdutoChart = new Chart(ctxVendasProduto, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sem dados'],
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: [0],
+                            backgroundColor: '#42a5f5'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) { return 'R$ ' + value.toLocaleString('pt-BR'); }
+                                }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
+                topColaboradoresChart = new Chart(ctxTopColab, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sem dados'],
+                        datasets: [{
+                            label: 'Comissões (R$)',
+                            data: [0],
+                            backgroundColor: '#66bb6a'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { callback: function(value){ return 'R$ ' + value.toLocaleString('pt-BR'); } }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao criar gráficos padrão:', error);
+            }
         }
 
         // Função para inicializar drag and drop
