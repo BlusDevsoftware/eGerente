@@ -302,18 +302,18 @@
                     return dataComissao.getMonth() === mesAtual && dataComissao.getFullYear() === anoAtual;
                 });
 
-                const valorComissoesMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+                const valorComissoesMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
                 const crescimentoComissoes = calcularCrescimento(comissoesMes, 'data_geracao');
 
                 // Calcular vendas (soma dos valores de venda das comissões)
-                const vendasMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_venda) || 0), 0);
+                const vendasMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_venda), 0);
                 const crescimentoVendas = calcularCrescimento(comissoesMes, 'data_geracao');
 
                 // Calcular pagamentos pendentes
                 const comissoesPendentes = comissoes.filter(c => 
                     c.status && c.status.toLowerCase().includes('pendente')
                 );
-                const valorPendentes = comissoesPendentes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+                const valorPendentes = comissoesPendentes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
 
                 return {
                     colaboradores: {
@@ -659,7 +659,7 @@
                 const mapaProdutoParaValor = {};
                 comissoes.forEach(c => {
                     const nomeProduto = (c.nome_produto || c.produto_nome || 'Sem Produto');
-                    const valor = parseFloat(c.valor_venda) || 0;
+                    const valor = parseValorBr(c.valor_venda);
                     mapaProdutoParaValor[nomeProduto] = (mapaProdutoParaValor[nomeProduto] || 0) + valor;
                 });
                 const produtosOrdenados = Object.entries(mapaProdutoParaValor)
@@ -704,7 +704,7 @@
                         }
                     }
                     const chave = nomeColab || 'Colaborador';
-                    const valor = parseFloat(t.valor_receber) || 0;
+                    const valor = parseValorBr(t.valor_receber);
                     somaPorColaborador[chave] = (somaPorColaborador[chave] || 0) + valor;
                 });
                 const topColabOrdenado = Object.entries(somaPorColaborador)
@@ -746,7 +746,7 @@
                 });
 
                 // Somar valores
-                const totalMes = comissoesMes.reduce((total, c) => total + (parseFloat(c.valor_receber) || 0), 0);
+                const totalMes = comissoesMes.reduce((total, c) => total + parseValorBr(c.valor_receber), 0);
                 dados[5 - i] = totalMes;
             }
 
@@ -893,6 +893,22 @@
                 style: 'currency',
                 currency: 'BRL'
             }).format(valor);
+        }
+
+        // Converte valores monetários em string (pt-BR) para número
+        function parseValorBr(valor) {
+            if (typeof valor === 'number' && isFinite(valor)) return valor;
+            if (valor == null) return 0;
+            const s = String(valor).trim();
+            if (s === '') return 0;
+            // Se contiver vírgula, tratar como pt-BR: remover pontos de milhar e trocar vírgula por ponto
+            if (s.includes(',')) {
+                const normalizado = s.replace(/\./g, '').replace(',', '.');
+                const n = Number(normalizado);
+                return isNaN(n) ? 0 : n;
+            }
+            const n = Number(s);
+            return isNaN(n) ? 0 : n;
         }
 
         function formatarData(data) {
