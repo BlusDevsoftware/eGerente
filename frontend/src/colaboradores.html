@@ -84,7 +84,8 @@
             border-radius: 10px;
         }
 
-        .loader-overlay-main {
+        /* Loader específico para a tabela de colaboradores */
+        .loader-overlay-colaboradores {
             display: none;
             position: absolute;
             top: 0;
@@ -92,10 +93,11 @@
             right: 0;
             bottom: 0;
             background: rgba(255,255,255,0.95);
-            z-index: 9999;
+            z-index: 10;
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            border-radius: 8px;
         }
 
         .spinner-main {
@@ -467,6 +469,11 @@
             from { transform: translateY(-20px); }
             to { transform: translateY(0); }
         }
+
+        /* Posicionamento relativo para o container da tabela */
+        .table-container {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -534,12 +541,6 @@
             </div>
         </div>
 
-        <!-- Spinner Centralizado de Carregamento - IDÊNTICO AO DASHBOARD -->
-        <div id="loader-colaboradores" class="loader-overlay-main">
-            <div class="spinner-main"></div>
-            <div class="loading-text">Carregando colaboradores...</div>
-        </div>
-
         <!-- Conteúdo da página -->
         <div class="content">
             <!-- Filters -->
@@ -563,6 +564,12 @@
 
             <!-- Table -->
             <div class="table-container">
+                <!-- Spinner de Carregamento - DENTRO DA TABELA -->
+                <div id="loader-colaboradores" class="loader-overlay-colaboradores">
+                    <div class="spinner-main"></div>
+                    <div class="loading-text">Carregando colaboradores...</div>
+                </div>
+                
                 <table>
                     <thead>
                         <tr>
