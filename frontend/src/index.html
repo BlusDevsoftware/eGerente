@@ -670,12 +670,34 @@
                     window.api.get('/colaboradores')
                 ]);
 
-                // Vendas por produto: somatório de valor_venda por produto_nome (se existir)
+                // Vendas por produto: extrair de item_id ("id-descricao, id-descricao") quando existir
                 const mapaProdutoParaValor = {};
                 comissoes.forEach(c => {
-                    const nomeProduto = (c.nome_produto || c.produto_nome || 'Sem Produto');
-                    const valor = parseValorBr(c.valor_venda);
-                    mapaProdutoParaValor[nomeProduto] = (mapaProdutoParaValor[nomeProduto] || 0) + valor;
+                    const valorTitulo = parseValorBr(c.valor_venda) || parseValorBr(c.valor);
+
+                    // Se houver lista de itens no título, dividir o valor igualmente entre os itens
+                    if (c.item_id && typeof c.item_id === 'string' && c.item_id.trim().length > 0) {
+                        const itens = c.item_id.split(',')
+                            .map(s => s.trim())
+                            .filter(Boolean)
+                            .map(s => {
+                                const [id, ...descParts] = s.split('-');
+                                const desc = descParts.join('-').trim();
+                                return { id: (id || '').trim(), desc: desc || (id || '').trim() };
+                            })
+                            .filter(it => it.id || it.desc);
+                        const partes = itens.length || 1;
+                        const valorPorItem = valorTitulo / partes;
+                        itens.forEach(it => {
+                            const chave = it.desc || it.id || 'Sem Produto';
+                            mapaProdutoParaValor[chave] = (mapaProdutoParaValor[chave] || 0) + valorPorItem;
+                        });
+                        return;
+                    }
+
+                    // Fallback: usar campos diretos de nome de produto, se existirem
+                    const nomeDireto = (c.nome_produto || c.produto_nome || 'Sem Produto');
+                    mapaProdutoParaValor[nomeDireto] = (mapaProdutoParaValor[nomeDireto] || 0) + valorTitulo;
                 });
                 const produtosOrdenados = Object.entries(mapaProdutoParaValor)
                     .sort((a,b) => b[1]-a[1])
