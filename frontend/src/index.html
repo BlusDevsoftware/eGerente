@@ -223,19 +223,9 @@
             inicializarDragAndDrop();
         });
 
-        // Limpar gráficos quando a página for fechada ou recarregada
+        // Limpar gráficos apenas quando a página for fechada/recarregada
         window.addEventListener('beforeunload', function() {
             destruirGraficos();
-        });
-
-        // Limpar gráficos quando a página perder o foco (evita problemas de memória)
-        window.addEventListener('blur', function() {
-            // Não destruir imediatamente, apenas marcar para limpeza
-            setTimeout(() => {
-                if (!document.hasFocus()) {
-                    destruirGraficos();
-                }
-            }, 5000); // Aguarda 5 segundos
         });
 
         // Funções para controlar o spinner centralizado
@@ -269,19 +259,19 @@
         // Função para destruir gráficos existentes
         function destruirGraficos() {
             try {
-                if (comissoesChart) {
+                if (comissoesChart && typeof comissoesChart.destroy === 'function') {
                     comissoesChart.destroy();
                     comissoesChart = null;
                 }
-                if (statusChart) {
+                if (statusChart && typeof statusChart.destroy === 'function') {
                     statusChart.destroy();
                     statusChart = null;
                 }
-                if (vendasProdutoChart) {
+                if (vendasProdutoChart && typeof vendasProdutoChart.destroy === 'function') {
                     vendasProdutoChart.destroy();
                     vendasProdutoChart = null;
                 }
-                if (topColaboradoresChart) {
+                if (topColaboradoresChart && typeof topColaboradoresChart.destroy === 'function') {
                     topColaboradoresChart.destroy();
                     topColaboradoresChart = null;
                 }
@@ -297,8 +287,10 @@
                 // Mostrar spinner centralizado ao iniciar
                 mostrarSpinner();
                 
-                // Destruir gráficos existentes antes de criar novos
-                destruirGraficos();
+                // Destruir gráficos existentes apenas se já existirem
+                if (comissoesChart || statusChart || vendasProdutoChart || topColaboradoresChart) {
+                    destruirGraficos();
+                }
                 
                 await Promise.all([
                     carregarDadosCards(),
@@ -917,8 +909,10 @@
         // Função para criar gráficos padrão em caso de erro
         function criarGraficosPadrao() {
             try {
-                // Destruir gráficos existentes primeiro
-                destruirGraficos();
+                // Destruir gráficos existentes apenas se já existirem
+                if (comissoesChart || statusChart || vendasProdutoChart || topColaboradoresChart) {
+                    destruirGraficos();
+                }
                 
                 const ctxComissoes = document.getElementById('comissoesChart').getContext('2d');
                 comissoesChart = new Chart(ctxComissoes, {
