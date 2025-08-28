@@ -596,7 +596,7 @@
 
                 // Top 5 Colaboradores (horizontal bar)
                 const ctxTopColab = document.getElementById('topColaboradoresChart').getContext('2d');
-                new Chart(ctxTopColab, {
+                const topColabChart = new Chart(ctxTopColab, {
                     type: 'bar',
                     data: {
                         labels: insightsGraficos.topColaboradores.labels,
@@ -619,6 +619,17 @@
                         plugins: { legend: { display: false } }
                     }
                 });
+
+                // Desenhar os valores nas barras (labels de dados)
+                topColabChart.options.animation = false;
+                topColabChart.options.plugins.tooltip = topColabChart.options.plugins.tooltip || {};
+                topColabChart.options.plugins.tooltip.callbacks = topColabChart.options.plugins.tooltip.callbacks || {};
+                topColabChart.options.plugins.tooltip.callbacks.label = function(context){
+                    const val = context.raw || 0;
+                    return 'R$ ' + Number(val).toLocaleString('pt-BR');
+                };
+                topColabChart.options.plugins.datalabelsCustom = true;
+                topColabChart.update();
 
             } catch (error) {
                 console.error('Erro ao inicializar gráficos:', error);
@@ -677,32 +688,24 @@
 
                 // Top 5 colaboradores por soma de valor_receber
                 const somaPorColaborador = {};
-                const idToNome = {};
-                const codigoToNome = {};
-                // Mapear como na aba Recebimento: chave por codigo
+                const mapaCodigoParaNome = {};
                 colaboradores.forEach(colab => {
                     if (!colab) return;
                     const nome = colab.nome || colab.descricao || colab.nome_colaborador || 'Colaborador';
                     if (colab.codigo !== undefined && colab.codigo !== null) {
-                        codigoToNome[String(colab.codigo)] = nome;
-                    }
-                    if (colab.id !== undefined && colab.id !== null) {
-                        idToNome[String(colab.id)] = nome;
+                        mapaCodigoParaNome[String(colab.codigo)] = nome;
                     }
                 });
                 comissoes.forEach(t => {
-                    // Mesmo padrão da Recebimento: tentar por codigo primeiro
-                    const possivelCodigo = t.colaborador_codigo || t.colaborador_codigo_id || t.colaborador || t.codigo_colaborador;
-                    const possivelId = t.id_colaborador || t.colaborador_id;
+                    // Mesma estratégia da aba Recebimento: prioriza código do colaborador
+                    const possivelCodigo = t.colaborador_codigo || t.colaborador_codigo_id || t.colaborador_id || t.colaborador || t.codigo_colaborador;
                     let nomeColab = undefined;
-                    if (possivelCodigo !== undefined && codigoToNome[String(possivelCodigo)]) {
-                        nomeColab = codigoToNome[String(possivelCodigo)];
-                    } else if (possivelId !== undefined && idToNome[String(possivelId)]) {
-                        nomeColab = idToNome[String(possivelId)];
+                    if (possivelCodigo !== undefined && mapaCodigoParaNome[String(possivelCodigo)]) {
+                        nomeColab = mapaCodigoParaNome[String(possivelCodigo)];
                     }
-                    // Fallback final: usar string de nome presente no registro (como em Recebimento)
+                    // Fallback: tenta campos de nome diretamente
                     if (!nomeColab) {
-                        const nomeDireto = t.colaborador_nome || t.nome_colaborador || t.colaborador;
+                        const nomeDireto = t.colaborador || t.colaborador_nome || t.nome_colaborador;
                         if (nomeDireto && typeof nomeDireto === 'string' && nomeDireto.trim().length > 0) {
                             nomeColab = nomeDireto.trim();
                         }
