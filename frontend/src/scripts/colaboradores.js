@@ -2,7 +2,7 @@
 async function carregarColaboradores() {
     try {
         const colaboradores = await api.get('/colaboradores');
-        const tbody = document.querySelector('.table-container table tbody');
+        const tbody = document.querySelector('.table-scroll table tbody');
         tbody.innerHTML = '';
 
         colaboradores.forEach(colaborador => {
@@ -29,9 +29,11 @@ async function carregarColaboradores() {
             `;
             tbody.appendChild(tr);
         });
+        
     } catch (error) {
         console.error('Erro ao carregar colaboradores:', error);
         mostrarToast('Erro ao carregar colaboradores', 'error');
+        throw error; // Propagar erro para a função principal
     }
 }
 
@@ -241,9 +243,11 @@ async function carregarUsuarios() {
             option.textContent = `${usuario.nome} (${usuario.email})`;
             select.appendChild(option);
         });
+        
     } catch (error) {
         console.error('Erro ao carregar usuários:', error);
         mostrarToast('Erro ao carregar lista de usuários', 'error');
+        throw error; // Propagar erro para a função principal
     }
 }
 
@@ -263,9 +267,26 @@ function confirmarExclusao(codigo) {
 }
 
 // Carregar colaboradores quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    carregarColaboradores();
-    carregarUsuarios();
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Mostrar spinner centralizado ao iniciar
+        mostrarSpinner();
+        
+        // Carregar dados em paralelo
+        await Promise.all([
+            carregarColaboradores(),
+            carregarUsuarios()
+        ]);
+        
+        // Ocultar spinner centralizado quando tudo carregar
+        ocultarSpinner();
+        
+    } catch (error) {
+        console.error('Erro ao inicializar página:', error);
+        mostrarToast('Erro ao carregar dados da página', 'error');
+        // Ocultar spinner mesmo em caso de erro
+        ocultarSpinner();
+    }
     
     // Adicionar evento de submit ao formulário
     const form = document.getElementById('colaboradorForm');

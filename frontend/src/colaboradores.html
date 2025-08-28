@@ -44,8 +44,77 @@
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
+
+        // Funções para controlar o spinner centralizado - IDÊNTICAS AO DASHBOARD
+        function mostrarSpinner() {
+            document.getElementById('loader-colaboradores').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-colaboradores').style.display = 'none';
+        }
     </script>
     <style>
+        /* Spinner de carregamento - IDÊNTICO AO DASHBOARD */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            border: 6px solid #e3f2fd;
+            border-top: 6px solid #1976D2;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 2;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+        }
+
+        .loader-overlay-main {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
         .toast-container {
             position: fixed;
             top: 20px;
@@ -463,6 +532,12 @@
                 </div>
                 <div class="user-avatar">A</div>
             </div>
+        </div>
+
+        <!-- Spinner Centralizado de Carregamento - IDÊNTICO AO DASHBOARD -->
+        <div id="loader-colaboradores" class="loader-overlay-main">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando colaboradores...</div>
         </div>
 
         <!-- Conteúdo da página -->
