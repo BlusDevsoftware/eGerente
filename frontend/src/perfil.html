@@ -13,8 +13,25 @@
     <script type="module">
         import api from './services/api.js';
         window.api = api;
+        window.dispatchEvent(new Event('api:ready'));
     </script>
-    <script src="scripts/perfil.js" defer></script>
+    <script>
+        // Garante que perfil.js só rode após a API estar disponível
+        if (!window.api) {
+            window.addEventListener('api:ready', function initPerfilOnce() {
+                window.removeEventListener('api:ready', initPerfilOnce);
+                var s = document.createElement('script');
+                s.src = 'scripts/perfil.js';
+                s.defer = true;
+                document.head.appendChild(s);
+            });
+        } else {
+            var s = document.createElement('script');
+            s.src = 'scripts/perfil.js';
+            s.defer = true;
+            document.head.appendChild(s);
+        }
+    </script>
     <script src="scripts/navigation.js"></script>
     <style>
         .toast-container {
