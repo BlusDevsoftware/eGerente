@@ -150,6 +150,141 @@ function ocultarSpinner() {
     document.getElementById('loader-usuarios').style.display = 'none';
 }
 
+// Carregar perfis (mesma animação/fluxo da aba de Serviços)
+async function carregarPerfis() {
+    try {
+        // Mostrar spinner ao iniciar carregamento
+        mostrarSpinner();
+
+        const tbody = document.getElementById('profilesTableBody');
+        if (!tbody) {
+            console.error('Tabela de perfis não encontrada.');
+            return;
+        }
+
+        const perfis = await api.get('/perfis');
+
+        tbody.innerHTML = '';
+        (perfis || []).forEach((perfil) => {
+            const tr = document.createElement('tr');
+            const codigo = (perfil.codigo ?? '').toString().padStart(5, '0');
+            const nome = perfil.nome ?? '';
+            const permissoesResumo = Array.isArray(perfil.permissoes)
+                ? `${perfil.permissoes.length} seção(ões)`
+                : '';
+            tr.innerHTML = `
+                <td>${codigo}</td>
+                <td>${nome}</td>
+                <td>${permissoesResumo}</td>
+                <td class="actions">
+                    <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPerfil('${codigo}')"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" title="Editar" onclick="editarPerfil('${codigo}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoPerfil('${codigo}')"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar perfis:', error);
+        if (typeof mostrarToast === 'function') {
+            mostrarToast('Erro ao carregar perfis', 'error');
+        }
+    } finally {
+        // Ocultar spinner após carregar (com sucesso ou erro)
+        ocultarSpinner();
+    }
+}
+
+// Visualizar perfil
+async function visualizarPerfil(codigo) {
+    try {
+        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        // Reaproveita o modal de perfil em modo somente leitura
+        const form = document.getElementById('perfilForm');
+        document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-eye"></i> Visualizar Perfil';
+        form.codigo.value = perfil.codigo || '';
+        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        form.nome.value = perfil.nome || '';
+        // Renderizar permissões marcadas
+        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        renderPermissionsMatrix(mapa);
+        // Desabilitar campos
+        Array.from(form.elements).forEach(el => el.disabled = true);
+        // Esconder botões de ação do formulário
+        const formActions = form.querySelector('.form-actions');
+        if (formActions) {
+            formActions.style.display = 'none';
+        }
+        const modal = document.getElementById('perfilModal');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao visualizar perfil:', error);
+        mostrarToast('Erro ao visualizar perfil', 'error');
+    }
+}
+
+// Editar perfil
+async function editarPerfil(codigo) {
+    try {
+        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        const form = document.getElementById('perfilForm');
+        document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Perfil';
+        form.codigo.value = perfil.codigo || '';
+        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        form.nome.value = perfil.nome || '';
+        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        renderPermissionsMatrix(mapa);
+        // Habilitar campos
+        Array.from(form.elements).forEach(el => el.disabled = false);
+        // Mostrar botões de ação do formulário
+        const formActions = form.querySelector('.form-actions');
+        if (formActions) {
+            formActions.style.display = 'flex';
+        }
+        const modal = document.getElementById('perfilModal');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao editar perfil:', error);
+        mostrarToast('Erro ao editar perfil', 'error');
+    }
+}
+
+// Confirmar exclusão de perfil
+function confirmarExclusaoPerfil(codigo) {
+    try {
+        const modal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        if (!modal || !confirmBtn) return;
+        const newBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+        newBtn.addEventListener('click', async () => {
+            await excluirPerfil(codigo);
+        });
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao preparar exclusão do perfil:', error);
+    }
+}
+
+// Excluir perfil
+async function excluirPerfil(codigo) {
+    try {
+        await api.delete(`/perfis/${parseInt(codigo, 10)}`);
+        mostrarToast('Perfil excluído com sucesso!', 'success');
+        closeDeleteModal();
+        await carregarPerfis();
+    } catch (error) {
+        console.error('Erro ao excluir perfil:', error);
+        mostrarToast('Erro ao excluir perfil', 'error');
+    }
+}
+
 // Carregar perfis ao iniciar a página e configurar listeners
 document.addEventListener('DOMContentLoaded', async () => {
     try {
