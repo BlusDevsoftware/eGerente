@@ -125,6 +125,14 @@ async function criarPerfil(req, res) {
             
             console.log('🔍 DEBUG - Rows para inserir:', rows);
             
+            // Verificar se a tabela existe primeiro
+            const { data: tableCheck, error: tableError } = await supabase
+                .from('perfis_permissoes')
+                .select('*')
+                .limit(1);
+            
+            console.log('🔍 DEBUG - Verificação da tabela perfis_permissoes:', { tableCheck, tableError });
+            
             const { data: permsData, error: errPerm } = await supabase
                 .from('perfis_permissoes')
                 .insert(rows)
@@ -133,6 +141,8 @@ async function criarPerfil(req, res) {
             if (errPerm) {
                 console.error('❌ Erro ao inserir permissões:', errPerm);
                 console.error('❌ Detalhes do erro:', errPerm.details, errPerm.hint);
+                console.error('❌ Código do erro:', errPerm.code);
+                console.error('❌ Mensagem do erro:', errPerm.message);
                 throw errPerm;
             }
             
