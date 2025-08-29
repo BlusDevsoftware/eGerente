@@ -14,9 +14,9 @@ function openPerfilModal() {
     if (!window.perfisMemoria) {
         window.perfisMemoria = [];
     }
-    const nextCode = String((window.perfisMemoria[window.perfisMemoria.length - 1]?.codigo || 0) + 1).padStart(5, '0');
-    form.codigo.value = nextCode;
-    form.codigo_perfil.value = nextCode;
+    // Em criação, não definir código; backend gera automaticamente
+    form.codigo.value = '';
+    form.codigo_perfil.value = '';
     // Renderiza matriz de permissões (básica por enquanto)
     if (typeof renderPermissionsMatrix !== 'function') {
         window.renderPermissionsMatrix = function(permissoes = {}) {
