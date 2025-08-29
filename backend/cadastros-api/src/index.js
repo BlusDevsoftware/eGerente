@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const corsMiddleware = require('./middleware/cors');
 const cadastroRoutes = require('./routes/cadastroRoutes');
 const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
+const perfilRoutes = require('./routes/perfilRoutes');
 
 const app = express();
 
@@ -28,7 +29,8 @@ app.get('/', (req, res) => {
             colaboradores: '/api/cadastros/colaboradores',
             clientes: '/api/cadastros/clientes',
             produtos: '/api/cadastros/produtos',
-            servicos: '/api/cadastros/servicos'
+            servicos: '/api/cadastros/servicos',
+            perfis: '/api/cadastros/perfis'
         }
     });
 });
@@ -36,6 +38,7 @@ app.get('/', (req, res) => {
 // Rotas
 app.use('/api/cadastros', movimentoComissaoRoutes);
 app.use('/api/cadastros', cadastroRoutes);
+app.use('/api/cadastros', perfilRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
