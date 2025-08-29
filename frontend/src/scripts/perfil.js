@@ -1,56 +1,28 @@
-// Funções de Modal
-function openModal() {
-    const modal = document.getElementById('userModal');
+// Funções de Modal de Perfil
+function openPerfilModal() {
+    const modal = document.getElementById('perfilModal');
     if (!modal) {
-        console.error('Modal de usuário não encontrado');
-        mostrarToast('Modal de usuário não encontrado!', 'error');
+        console.error('Modal de perfil não encontrado');
+        mostrarToast('Modal de perfil não encontrado!', 'error');
         return;
     }
-    
-    // Resetar o formulário
-    const form = document.getElementById('usuarioForm');
-    if (form) {
-        form.reset();
-        form.codigo.value = '';
-        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Novo Usuário';
-        
-        // Garantir que os campos de senha sejam obrigatórios para novo usuário
-        form.senha.setAttribute('required', 'required');
-        form.confirmar_senha.setAttribute('required', 'required');
-
-        // Re-habilitar todos os campos, caso venha de visualização
-        Array.from(form.elements).forEach(element => {
-            element.disabled = false;
-        });
-    }
-    
-    // Mostrar o modal imediatamente, sem animação
+    const form = document.getElementById('perfilForm');
+    if (!form) return;
+    form.reset();
+    document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-user-shield"></i> Novo Perfil';
+    const nextCode = String((perfisMemoria[perfisMemoria.length - 1]?.codigo || 0) + 1).padStart(5, '0');
+    form.codigo.value = nextCode;
+    form.codigo_perfil.value = nextCode;
+    renderPermissionsMatrix({});
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-    const modal = document.getElementById('userModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        const form = document.getElementById('usuarioForm');
-        if (form) {
-            form.reset();
-            // Re-habilitar todos os campos
-            Array.from(form.elements).forEach(element => {
-                element.disabled = false;
-            });
-            // Mostrar campos de senha
-            form.senha.parentElement.style.display = 'block';
-            form.confirmar_senha.parentElement.style.display = 'block';
-            // Mostrar botões de ação
-            const formActions = form.querySelector('.form-actions');
-            if (formActions) {
-                formActions.style.display = 'flex';
-            }
-        }
-    }
+function closePerfilModal() {
+    const modal = document.getElementById('perfilModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
 function closeViewModal() {

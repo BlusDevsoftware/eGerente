@@ -624,9 +624,9 @@
                         <option value="inativo">Inativo</option>
                     </select>
                 </div>
-                <button id="addUserBtn" class="btn-primary" onclick="openModal()">
+                <button id="addPerfilBtn" class="btn-primary" onclick="openPerfilModal()">
                     <i class="fas fa-plus"></i>
-                    Novo Usuário
+                    Novo Perfil
                 </button>
             </div>
 
@@ -643,15 +643,13 @@
                         <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Perfil</th>
-                                <th>Status</th>
+                                <th>Nome do Perfil</th>
+                                <th>Permissões</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="userTableBody">
-                            <!-- Dados dos usuários serão inseridos aqui via JavaScript -->
+                        <tbody id="profilesTableBody">
+                            <!-- Perfis serão inseridos aqui via JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -662,62 +660,38 @@
     <!-- Toast Container -->
     <div class="toast-container"></div>
 
-    <!-- Modal -->
-    <div class="modal" id="userModal">
-        <div class="modal-content">
+    <!-- Modal de Perfil -->
+    <div class="modal" id="perfilModal">
+        <div class="modal-content" style="max-width: 900px; width: 95%;">
             <div class="modal-header">
-                <h2 id="modalTitle"><i class="fas fa-user-plus"></i> Novo Usuário</h2>
-                <button class="close-modal">&times;</button>
+                <h2 id="perfilModalTitle"><i class="fas fa-user-shield"></i> Novo Perfil</h2>
+                <button class="close-modal" onclick="closePerfilModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="usuarioForm" class="form-container">
+                <form id="perfilForm" class="form-container">
                     <input type="hidden" name="codigo">
                     <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-hashtag"></i> Código</label>
-                            <input type="text" name="codigo_usuario" readonly>
-                            <div class="form-text">Código gerado automaticamente</div>
+                            <input type="text" name="codigo_perfil" readonly>
+                            <div class="form-text">Gerado automaticamente</div>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-user"></i> Nome Completo</label>
-                            <input type="text" name="nome" required placeholder="Digite o nome completo">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipo"><i class="fas fa-user-shield"></i> Tipo</label>
-                            <select id="tipo" name="tipo" required>
-                                <option value="user">Usuário</option>
-                                <option value="admin">Administrador</option>
-                                <option value="manager">Gerente</option>
-                            </select>
+                            <label><i class="fas fa-id-badge"></i> Nome do Perfil</label>
+                            <input type="text" name="nome" required placeholder="Ex.: Gerente, Administrativo, Colaborador">
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label for="senha"><i class="fas fa-lock"></i> Senha</label>
-                            <input type="password" id="senha" name="senha" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmar_senha"><i class="fas fa-lock"></i> Confirmar Senha</label>
-                            <input type="password" id="confirmar_senha" name="confirmar_senha" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="status"><i class="fas fa-toggle-on"></i> Status</label>
-                            <select id="status" name="status" required>
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
-                            </select>
+                        <div class="form-group" style="flex: 1 1 100%">
+                            <label><i class="fas fa-list"></i> Permissões</label>
+                            <div id="permissionsMatrix">
+                                <!-- Matriz de permissões gerada via JS -->
+                            </div>
+                            <div class="form-text">Marque o que este perfil pode ver e fazer no sistema.</div>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal()">
+                        <button type="button" class="btn-secondary" onclick="closePerfilModal()">
                             <i class="fas fa-times"></i>
                             Cancelar
                         </button>
