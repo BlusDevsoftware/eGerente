@@ -96,6 +96,12 @@ async function visualizarColaborador(codigo) {
             element.disabled = true;
         });
 
+        // Esconder ações (Cancelar/Salvar) no modo visualização
+        const actions = form.querySelector('.form-actions');
+        if (actions) {
+            actions.style.display = 'none';
+        }
+
         // Mostrar o modal imediatamente, sem animação
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
@@ -136,6 +142,19 @@ async function editarColaborador(codigo) {
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
         form = newForm;
+
+        // Reabilitar campos (exceto código) para edição
+        Array.from(form.elements).forEach(element => {
+            if (element.name !== 'codigo') {
+                element.disabled = false;
+            }
+        });
+
+        // Garantir que ações estejam visíveis no modo edição
+        const actions = form.querySelector('.form-actions');
+        if (actions) {
+            actions.style.display = 'flex';
+        }
 
         // Mostrar o modal imediatamente, sem animação
         modal.style.display = 'flex';

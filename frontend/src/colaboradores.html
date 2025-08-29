@@ -19,6 +19,14 @@
             modalTitle.textContent = 'Novo Colaborador';
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+
+            // Reabilitar campos e exibir ações para modo de criação
+            const form = document.getElementById('colaboradorForm');
+            Array.from(form.elements).forEach(el => {
+                if (el.name !== 'codigo') el.disabled = false;
+            });
+            const actions = form.querySelector('.form-actions');
+            if (actions) actions.style.display = 'flex';
         }
 
         window.closeModal = function() {
