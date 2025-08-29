@@ -669,7 +669,7 @@
                     <li><a href="clientes.html"><i class="fas fa-user-tie"></i><span>Clientes</span></a></li>
                     <li><a href="produtos.html"><i class="fas fa-box"></i><span>Produtos</span></a></li>
                     <li><a href="servicos.html"><i class="fas fa-cogs"></i><span>Serviços</span></a></li>
-                    <li><a href="usuarios.html"><i class="fas fa-user-shield"></i><span>Usuários</span></a></li>
+                    <li><a href="perfil.html"><i class="fas fa-user-shield"></i><span>Perfil</span></a></li>
                 </ul>
             </li>
             <li class="has-submenu">
@@ -984,7 +984,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal Visualizar/Edição de Título -->
     <div id="modalTitulo" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 2000; align-items: center; justify-content: center;">
       <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 1000px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; display: flex; flex-direction: column;">
@@ -1355,7 +1354,6 @@
             document.addEventListener('DOMContentLoaded', carregarModais);
         }
     </script>
-
     <script>
         // Toggle submenu
         document.querySelectorAll('.submenu-trigger').forEach(trigger => {
@@ -1799,10 +1797,8 @@
                 });
             });
         });
-
         // Variável global para armazenar o título atual sendo visualizado/editado
         let tituloAtual = null;
-
         // Funções para o Modal Visualizar/Editar Título
         function abrirModalTitulo(titulo, modo) {
             console.log('abrirModalTitulo - titulo:', titulo);
@@ -2233,7 +2229,6 @@
             
             produtosContainer.innerHTML = produtosHTML;
         }
-        
         // Função para carregar produtos do título (mantida para compatibilidade, mas não será mais usada)
         async function carregarProdutosTitulo(tituloId) {
             try {
@@ -2699,12 +2694,8 @@
         // let tituloParaCancelarBaixa = null; // Removido - já declarado no arquivo de modais
         // let modoExclusaoParcelamento = 'unico';
         // let titulosParaExcluirAnimacao = [];
-
         // Funções dos modais foram movidas para modais-movimento.html
         // As funções abrirModalConfirmExclusao, fecharModalConfirmExclusao, etc. estão no arquivo separado
-
-
-
         let linhasSelecionadas = [];
         let ultimaLinhaSelecionada = null;
 
@@ -3203,7 +3194,6 @@
                 console.log('Modal liberado para fechamento ao clicar fora');
             }, 500);
         }
-
         async function executarCancelamentoBaixa(tituloOriginal, titulosParciais) {
             try {
                 // Se há títulos parciais, excluí-los primeiro
@@ -4189,7 +4179,6 @@ function validateAndDisplayFileMultipla(file) {
   // Exibir preview do arquivo
   displayFilePreviewMultipla(file);
 }
-
 function displayFilePreviewMultipla(file) {
   const dropContent = document.getElementById('fileDropContentMultipla');
   const filePreview = document.getElementById('filePreviewMultipla');
@@ -4662,7 +4651,6 @@ function confirmarBaixaParcial() {
   let aviso = document.getElementById('avisoNovoTitulo');
   if (aviso) aviso.remove();
 }
-
 // Adicionar event listener para o formulário de pagamento
 document.addEventListener('DOMContentLoaded', function() {
   const paymentForm = document.getElementById('paymentForm');
