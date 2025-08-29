@@ -138,10 +138,8 @@ async function editarColaborador(codigo) {
         form.data_admissao.value = colaborador.data_admissao;
         form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
 
-        // Remover qualquer evento de submit anterior
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        form = newForm;
+        // Substituir handler de submit anterior de forma segura
+        form.onsubmit = null;
 
         // Reabilitar campos (exceto código) para edição
         Array.from(form.elements).forEach(element => {
