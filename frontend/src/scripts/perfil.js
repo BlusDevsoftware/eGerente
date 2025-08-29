@@ -168,6 +168,11 @@ async function visualizarPerfil(codigo) {
         renderPermissionsMatrix(mapa);
         // Desabilitar campos
         Array.from(form.elements).forEach(el => el.disabled = true);
+        // Esconder botões de ação do formulário
+        const formActions = form.querySelector('.form-actions');
+        if (formActions) {
+            formActions.style.display = 'none';
+        }
         const modal = document.getElementById('perfilModal');
         modal.style.display = 'flex';
         modal.style.opacity = '1';
