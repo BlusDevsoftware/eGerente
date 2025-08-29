@@ -150,6 +150,86 @@ function ocultarSpinner() {
     document.getElementById('loader-usuarios').style.display = 'none';
 }
 
+// Visualizar perfil
+async function visualizarPerfil(codigo) {
+    try {
+        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        // Reaproveita o modal de perfil em modo somente leitura
+        const form = document.getElementById('perfilForm');
+        document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-eye"></i> Visualizar Perfil';
+        form.codigo.value = perfil.codigo || '';
+        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        form.nome.value = perfil.nome || '';
+        // Renderizar permissões marcadas
+        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        renderPermissionsMatrix(mapa);
+        // Desabilitar campos
+        Array.from(form.elements).forEach(el => el.disabled = true);
+        const modal = document.getElementById('perfilModal');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao visualizar perfil:', error);
+        mostrarToast('Erro ao visualizar perfil', 'error');
+    }
+}
+
+// Editar perfil
+async function editarPerfil(codigo) {
+    try {
+        const perfil = await api.get(`/perfis/${parseInt(codigo, 10)}`);
+        const form = document.getElementById('perfilForm');
+        document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Perfil';
+        form.codigo.value = perfil.codigo || '';
+        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        form.nome.value = perfil.nome || '';
+        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        renderPermissionsMatrix(mapa);
+        // Habilitar campos
+        Array.from(form.elements).forEach(el => el.disabled = false);
+        const modal = document.getElementById('perfilModal');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao editar perfil:', error);
+        mostrarToast('Erro ao editar perfil', 'error');
+    }
+}
+
+// Confirmar exclusão de perfil
+function confirmarExclusaoPerfil(codigo) {
+    try {
+        const modal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        if (!modal || !confirmBtn) return;
+        const newBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+        newBtn.addEventListener('click', async () => {
+            await excluirPerfil(codigo);
+        });
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Erro ao preparar exclusão do perfil:', error);
+    }
+}
+
+// Excluir perfil
+async function excluirPerfil(codigo) {
+    try {
+        await api.delete(`/perfis/${parseInt(codigo, 10)}`);
+        mostrarToast('Perfil excluído com sucesso!', 'success');
+        closeDeleteModal();
+        await carregarPerfis();
+    } catch (error) {
+        console.error('Erro ao excluir perfil:', error);
+        mostrarToast('Erro ao excluir perfil', 'error');
+    }
+}
+
 // Carregar perfis (mesma animação/fluxo da aba de Serviços)
 async function carregarPerfis() {
     try {
@@ -176,7 +256,11 @@ async function carregarPerfis() {
                 <td>${codigo}</td>
                 <td>${nome}</td>
                 <td>${permissoesResumo}</td>
-                <td class="actions"></td>
+                <td class="actions">
+                    <button class="action-btn view-btn" title="Visualizar" onclick="visualizarPerfil('${codigo}')"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-btn" title="Editar" onclick="editarPerfil('${codigo}')"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete-btn" title="Excluir" onclick="confirmarExclusaoPerfil('${codigo}')"><i class="fas fa-trash"></i></button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
