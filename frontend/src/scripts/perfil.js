@@ -21,20 +21,18 @@ function openPerfilModal() {
             if (!c) return;
             c.innerHTML = '';
             
-            // Adicionar botão "Marcar Todas" no topo
+            // Adicionar botões "Marcar Todas" e "Desmarcar Todas" no topo
             const marcarTodasContainer = document.createElement('div');
-            marcarTodasContainer.className = 'marcar-todas-container';
-            marcarTodasContainer.style.cssText = 'margin-bottom: 20px; text-align: center;';
+            marcarTodasContainer.style.cssText = 'margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;';
             
             const marcarTodasBtn = document.createElement('button');
             marcarTodasBtn.type = 'button';
-            marcarTodasBtn.className = 'btn btn-primary';
-            marcarTodasBtn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todas as Permissões';
-            marcarTodasBtn.style.cssText = 'margin-right: 10px;';
+            marcarTodasBtn.className = 'btn-primary';
+            marcarTodasBtn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todas';
             
             const desmarcarTodasBtn = document.createElement('button');
             desmarcarTodasBtn.type = 'button';
-            desmarcarTodasBtn.className = 'btn btn-secondary';
+            desmarcarTodasBtn.className = 'btn-secondary';
             desmarcarTodasBtn.innerHTML = '<i class="fas fa-times"></i> Desmarcar Todas';
             
             marcarTodasContainer.appendChild(marcarTodasBtn);
