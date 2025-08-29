@@ -82,10 +82,9 @@ async function listarPermissoes(req, res) {
 // Criar perfil com permissões
 async function criarPerfil(req, res) {
     try {
-        const { nome, status = 'ativo', permissoes = [] } = req.body || {};
+        const { nome, status = 'ativo', ...permissoes } = req.body || {};
         
         console.log('🔍 DEBUG - Dados recebidos:', { nome, status, permissoes });
-        console.log('🔍 DEBUG - Tipo de permissoes:', typeof permissoes, Array.isArray(permissoes));
         
         if (!nome) {
             return res.status(400).json({ error: 'Nome do perfil é obrigatório' });
@@ -95,15 +94,20 @@ async function criarPerfil(req, res) {
         const novoCodigo = await gerarProximoCodigo();
         console.log('🔍 DEBUG - Novo código gerado:', novoCodigo);
         
-        // Inserir perfil
+        // Preparar dados para inserção (incluindo todas as permissões)
+        const dadosPerfil = {
+            codigo: novoCodigo,
+            nome,
+            status,
+            ...permissoes // Todas as permissões vão direto para a tabela perfis
+        };
+        
+        console.log('🔍 DEBUG - Dados para inserção:', dadosPerfil);
+        
+        // Inserir perfil com todas as permissões em uma única operação
         const { data: perfil, error: errPerfil } = await supabase
             .from('perfis')
-            .insert([{ 
-                codigo: novoCodigo, 
-                nome, 
-                status,
-                permissoes: {} // Campo JSONB vazio inicialmente
-            }])
+            .insert([dadosPerfil])
             .select()
             .single();
         
@@ -113,44 +117,6 @@ async function criarPerfil(req, res) {
         }
         
         console.log('✅ Perfil criado com sucesso:', perfil);
-        
-        // Inserir permissões se vierem
-        if (Array.isArray(permissoes) && permissoes.length > 0) {
-            console.log('🔍 DEBUG - Processando permissões:', permissoes);
-            
-            const rows = permissoes.map(p => ({ 
-                perfil_codigo: novoCodigo, 
-                ...p 
-            }));
-            
-            console.log('🔍 DEBUG - Rows para inserir:', rows);
-            
-            // Verificar se a tabela existe primeiro
-            const { data: tableCheck, error: tableError } = await supabase
-                .from('perfis_permissoes')
-                .select('*')
-                .limit(1);
-            
-            console.log('🔍 DEBUG - Verificação da tabela perfis_permissoes:', { tableCheck, tableError });
-            
-            const { data: permsData, error: errPerm } = await supabase
-                .from('perfis_permissoes')
-                .insert(rows)
-                .select();
-            
-            if (errPerm) {
-                console.error('❌ Erro ao inserir permissões:', errPerm);
-                console.error('❌ Detalhes do erro:', errPerm.details, errPerm.hint);
-                console.error('❌ Código do erro:', errPerm.code);
-                console.error('❌ Mensagem do erro:', errPerm.message);
-                throw errPerm;
-            }
-            
-            console.log('✅ Permissões inseridas com sucesso:', permsData);
-        } else {
-            console.log('⚠️ Nenhuma permissão para inserir ou formato inválido');
-        }
-        
         res.status(201).json(perfil);
     } catch (error) {
         console.error('❌ Erro ao criar perfil:', error);
@@ -165,7 +131,7 @@ async function criarPerfil(req, res) {
 async function atualizarPerfil(req, res) {
     try {
         const { codigo } = req.params;
-        const { nome, status, permissoes } = req.body || {};
+        const { nome, status, ...permissoes } = req.body || {};
         
         console.log('🔍 DEBUG - Atualizando perfil:', { codigo, nome, status, permissoes });
         
@@ -180,66 +146,34 @@ async function atualizarPerfil(req, res) {
             return res.status(404).json({ error: 'Perfil não encontrado' });
         }
         
-        // Atualizar perfil
+        // Preparar dados para atualização (incluindo todas as permissões)
         const updates = {};
         if (nome !== undefined) updates.nome = nome;
         if (status !== undefined) updates.status = status;
         
-        let perfilAtualizado = null;
-        if (Object.keys(updates).length > 0) {
-            const { data, error } = await supabase
-                .from('perfis')
-                .update(updates)
-                .eq('codigo', codigo)
-                .select()
-                .single();
-            
-            if (error) throw error;
-            perfilAtualizado = data;
-        } else {
-            perfilAtualizado = perfilExistente;
+        // Adicionar todas as permissões aos updates
+        Object.keys(permissoes).forEach(key => {
+            if (permissoes[key] !== undefined) {
+                updates[key] = permissoes[key];
+            }
+        });
+        
+        console.log('🔍 DEBUG - Updates para aplicar:', updates);
+        
+        // Atualizar perfil com todas as permissões em uma única operação
+        const { data: perfilAtualizado, error: errUpdate } = await supabase
+            .from('perfis')
+            .update(updates)
+            .eq('codigo', codigo)
+            .select()
+            .single();
+        
+        if (errUpdate) {
+            console.error('❌ Erro ao atualizar perfil:', errUpdate);
+            throw errUpdate;
         }
         
-        // Atualizar permissões se vierem
-        if (Array.isArray(permissoes)) {
-            console.log('🔍 DEBUG - Processando permissões para atualização:', permissoes);
-            
-            // Primeiro, remover permissões existentes
-            const { error: errDelete } = await supabase
-                .from('perfis_permissoes')
-                .delete()
-                .eq('perfil_codigo', codigo);
-            
-            if (errDelete) {
-                console.error('❌ Erro ao deletar permissões existentes:', errDelete);
-                throw errDelete;
-            }
-            
-            console.log('✅ Permissões existentes removidas');
-            
-            // Inserir novas permissões
-            if (permissoes.length > 0) {
-                const rows = permissoes.map(p => ({ 
-                    perfil_codigo: codigo, 
-                    ...p 
-                }));
-                
-                console.log('🔍 DEBUG - Rows para inserir na atualização:', rows);
-                
-                const { data: permsData, error: errInsert } = await supabase
-                    .from('perfis_permissoes')
-                    .insert(rows)
-                    .select();
-                
-                if (errInsert) {
-                    console.error('❌ Erro ao inserir novas permissões:', errInsert);
-                    throw errInsert;
-                }
-                
-                console.log('✅ Novas permissões inseridas:', permsData);
-            }
-        }
-        
+        console.log('✅ Perfil atualizado com sucesso:', perfilAtualizado);
         res.json(perfilAtualizado);
     } catch (error) {
         console.error('❌ Erro ao atualizar perfil:', error);

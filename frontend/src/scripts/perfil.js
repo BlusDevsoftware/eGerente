@@ -166,9 +166,17 @@ async function carregarPerfis() {
             const tr = document.createElement('tr');
             const codigo = (perfil.codigo ?? '').toString().padStart(5, '0');
             const nome = perfil.nome ?? '';
-            const permissoesResumo = Array.isArray(perfil.permissoes)
-                ? `${perfil.permissoes.length} seção(ões)`
-                : '';
+            
+            // Contar permissões ativas
+            let permissoesAtivas = 0;
+            Object.keys(perfil).forEach(key => {
+                if (key.includes('_') && typeof perfil[key] === 'boolean' && perfil[key] === true) {
+                    permissoesAtivas++;
+                }
+            });
+            
+            const permissoesResumo = `${permissoesAtivas} permissão(ões)`;
+            
             tr.innerHTML = `
                 <td>${codigo}</td>
                 <td>${nome}</td>
@@ -202,8 +210,19 @@ async function visualizarPerfil(codigo) {
         form.codigo.value = perfil.codigo || '';
         form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
         form.nome.value = perfil.nome || '';
-        // Renderizar permissões marcadas
-        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        
+        // Renderizar permissões marcadas no novo formato
+        const mapa = {};
+        Object.keys(perfil).forEach(key => {
+            if (key.includes('_') && typeof perfil[key] === 'boolean') {
+                const [secao, acao] = key.split('_', 2);
+                if (!mapa[secao]) mapa[secao] = [];
+                if (perfil[key] === true) {
+                    mapa[secao].push(acao);
+                }
+            }
+        });
+        
         renderPermissionsMatrix(mapa);
         // Desabilitar campos
         Array.from(form.elements).forEach(el => el.disabled = true);
@@ -231,7 +250,19 @@ async function editarPerfil(codigo) {
         form.codigo.value = perfil.codigo || '';
         form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
         form.nome.value = perfil.nome || '';
-        const mapa = mapearPermsPorSecao(perfil.permissoes || []);
+        
+        // Renderizar permissões marcadas no novo formato
+        const mapa = {};
+        Object.keys(perfil).forEach(key => {
+            if (key.includes('_') && typeof perfil[key] === 'boolean') {
+                const [secao, acao] = key.split('_', 2);
+                if (!mapa[secao]) mapa[secao] = [];
+                if (perfil[key] === true) {
+                    mapa[secao].push(acao);
+                }
+            }
+        });
+        
         renderPermissionsMatrix(mapa);
         // Habilitar campos
         Array.from(form.elements).forEach(el => el.disabled = false);
@@ -495,30 +526,84 @@ async function salvarPerfil(e) {
     
     console.log('🔍 FRONTEND - Form data:', { nome });
     console.log('🔍 FRONTEND - Permissões mapa:', permissoesMapa);
-    console.log('🔍 FRONTEND - Tipo de permissoesMapa:', typeof permissoesMapa);
     
-    // Converter mapa em array de linhas
-    const permissoes = Object.entries(permissoesMapa).map(([secao, acoes]) => ({
-        secao,
-        ver: acoes.includes('ver'),
-        criar: acoes.includes('criar'),
-        editar: acoes.includes('editar'),
-        excluir: acoes.includes('excluir'),
-        exportar: acoes.includes('exportar'),
-        executar: acoes.includes('executar'),
-    }));
+    // Converter mapa de permissões para o novo formato de colunas
+    const permissoes = {};
     
-    console.log('🔍 FRONTEND - Permissões convertidas:', permissoes);
-    console.log('🔍 FRONTEND - Dados a enviar:', { nome, permissoes });
+    // Dashboard
+    permissoes.dashboard_ver = permissoesMapa['Dashboard']?.includes('ver') || false;
+    
+    // Cadastros/Colaboradores
+    permissoes.cadastros_colaboradores_ver = permissoesMapa['Cadastros/Colaboradores']?.includes('ver') || false;
+    permissoes.cadastros_colaboradores_criar = permissoesMapa['Cadastros/Colaboradores']?.includes('criar') || false;
+    permissoes.cadastros_colaboradores_editar = permissoesMapa['Cadastros/Colaboradores']?.includes('editar') || false;
+    permissoes.cadastros_colaboradores_excluir = permissoesMapa['Cadastros/Colaboradores']?.includes('excluir') || false;
+    
+    // Cadastros/Clientes
+    permissoes.cadastros_clientes_ver = permissoesMapa['Cadastros/Clientes']?.includes('ver') || false;
+    permissoes.cadastros_clientes_criar = permissoesMapa['Cadastros/Clientes']?.includes('criar') || false;
+    permissoes.cadastros_clientes_editar = permissoesMapa['Cadastros/Clientes']?.includes('editar') || false;
+    permissoes.cadastros_clientes_excluir = permissoesMapa['Cadastros/Clientes']?.includes('excluir') || false;
+    
+    // Cadastros/Produtos
+    permissoes.cadastros_produtos_ver = permissoesMapa['Cadastros/Produtos']?.includes('ver') || false;
+    permissoes.cadastros_produtos_criar = permissoesMapa['Cadastros/Produtos']?.includes('criar') || false;
+    permissoes.cadastros_produtos_editar = permissoesMapa['Cadastros/Produtos']?.includes('editar') || false;
+    permissoes.cadastros_produtos_excluir = permissoesMapa['Cadastros/Produtos']?.includes('excluir') || false;
+    
+    // Cadastros/Serviços
+    permissoes.cadastros_servicos_ver = permissoesMapa['Cadastros/Serviços']?.includes('ver') || false;
+    permissoes.cadastros_servicos_criar = permissoesMapa['Cadastros/Serviços']?.includes('criar') || false;
+    permissoes.cadastros_servicos_editar = permissoesMapa['Cadastros/Serviços']?.includes('editar') || false;
+    permissoes.cadastros_servicos_excluir = permissoesMapa['Cadastros/Serviços']?.includes('excluir') || false;
+    
+    // Comissões/Lançar
+    permissoes.comissoes_lancar_ver = permissoesMapa['Comissões/Lançar']?.includes('ver') || false;
+    permissoes.comissoes_lancar_criar = permissoesMapa['Comissões/Lançar']?.includes('criar') || false;
+    
+    // Comissões/Movimento
+    permissoes.comissoes_movimento_ver = permissoesMapa['Comissões/Movimento']?.includes('ver') || false;
+    permissoes.comissoes_movimento_criar = permissoesMapa['Comissões/Movimento']?.includes('criar') || false;
+    permissoes.comissoes_movimento_editar = permissoesMapa['Comissões/Movimento']?.includes('editar') || false;
+    permissoes.comissoes_movimento_excluir = permissoesMapa['Comissões/Movimento']?.includes('excluir') || false;
+    
+    // Comissões/Consulta
+    permissoes.comissoes_consulta_ver = permissoesMapa['Comissões/Consulta']?.includes('ver') || false;
+    
+    // Relatórios/Recebimento
+    permissoes.relatorios_recebimento_ver = permissoesMapa['Relatórios/Recebimento']?.includes('ver') || false;
+    permissoes.relatorios_recebimento_exportar = permissoesMapa['Relatórios/Recebimento']?.includes('exportar') || false;
+    
+    // Relatórios/Conferência
+    permissoes.relatorios_conferencia_ver = permissoesMapa['Relatórios/Conferência']?.includes('ver') || false;
+    permissoes.relatorios_conferencia_exportar = permissoesMapa['Relatórios/Conferência']?.includes('exportar') || false;
+    
+    // Relatórios/Dinâmico
+    permissoes.relatorios_dinamico_ver = permissoesMapa['Relatórios/Dinâmico']?.includes('ver') || false;
+    permissoes.relatorios_dinamico_exportar = permissoesMapa['Relatórios/Dinâmico']?.includes('exportar') || false;
+    
+    // Configurações/Manutenção BD
+    permissoes.configuracoes_manutencao_ver = permissoesMapa['Configurações/Manutenção BD']?.includes('ver') || false;
+    permissoes.configuracoes_manutencao_executar = permissoesMapa['Configurações/Manutenção BD']?.includes('executar') || false;
+    
+    // Configurações/Sincronizar
+    permissoes.configuracoes_sincronizar_ver = permissoesMapa['Configurações/Sincronizar']?.includes('ver') || false;
+    permissoes.configuracoes_sincronizar_executar = permissoesMapa['Configurações/Sincronizar']?.includes('executar') || false;
+    
+    console.log('🔍 FRONTEND - Permissões convertidas para colunas:', permissoes);
+    
+    // Preparar dados finais para envio
+    const dadosEnvio = { nome, ...permissoes };
+    console.log('🔍 FRONTEND - Dados a enviar:', dadosEnvio);
     
     try {
         if (form.codigo.value) {
             console.log('🔍 FRONTEND - Atualizando perfil:', form.codigo.value);
-            await api.put(`/perfis/${form.codigo.value}`, { nome, permissoes });
+            await api.put(`/perfis/${form.codigo.value}`, dadosEnvio);
             mostrarToast('Perfil atualizado com sucesso!', 'success');
         } else {
             console.log('🔍 FRONTEND - Criando novo perfil');
-            await api.post('/perfis', { nome, permissoes });
+            await api.post('/perfis', dadosEnvio);
             mostrarToast('Perfil criado com sucesso!', 'success');
         }
         closePerfilModal();
