@@ -96,9 +96,8 @@ async function visualizarColaborador(codigo) {
             element.disabled = true;
         });
 
-        // Mostrar o modal com animação
+        // Mostrar o modal imediatamente, sem animação
         modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
@@ -138,9 +137,8 @@ async function editarColaborador(codigo) {
         form.parentNode.replaceChild(newForm, form);
         form = newForm;
 
-        // Mostrar o modal com animação
+        // Mostrar o modal imediatamente, sem animação
         modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
