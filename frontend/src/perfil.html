@@ -224,6 +224,55 @@
             transform: translateY(0);
         }
 
+        /* Estilos específicos do modal de Perfil */
+        #perfilModal .modal-content {
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+
+        /* Matriz de Permissões */
+        #permissionsMatrix {
+            display: block;
+            margin-top: 6px;
+        }
+        .perm-group {
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+        .perm-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .perm-actions {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(90px, auto);
+            gap: 10px;
+            align-items: center;
+        }
+        .perm-actions label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #555;
+            font-size: 14px;
+        }
+        .perm-actions input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
         .modal-header {
             padding: 20px;
             border-bottom: 1px solid #eee;
@@ -272,6 +321,18 @@
 
         .form-group {
             flex: 1;
+        }
+
+        /* Alinhamento específico do campo Código + Nome do Perfil */
+        #perfilModal .form-row.align-code {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            column-gap: 20px;
+            align-items: center;
+        }
+        #perfilModal .form-row.align-code .form-group { min-width: 0; }
+        #perfilModal .form-row.align-code .form-group input[name="codigo_perfil"] {
+            text-align: center;
         }
 
         .form-group label {
@@ -615,15 +676,9 @@
             <div class="filters-container">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Buscar usuário...">
+                    <input type="text" placeholder="Buscar perfil...">
                 </div>
-                <div class="filter-options">
-                    <select>
-                        <option value="">Status</option>
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                    </select>
-                </div>
+                
                 <button id="addPerfilBtn" class="btn-primary" onclick="openPerfilModal()">
                     <i class="fas fa-plus"></i>
                     Novo Perfil
@@ -635,7 +690,7 @@
                 <!-- Spinner de Carregamento - DENTRO DA TABELA -->
                 <div id="loader-usuarios" class="loader-overlay-usuarios">
                     <div class="spinner-main"></div>
-                    <div class="loading-text">Carregando usuários...</div>
+                    <div class="loading-text">Carregando perfis...</div>
                 </div>
                 
                 <div class="table-scroll">
@@ -670,16 +725,18 @@
             <div class="modal-body">
                 <form id="perfilForm" class="form-container">
                     <input type="hidden" name="codigo">
-                    <div class="form-row">
+                    <div class="form-row align-code">
                         <div class="form-group">
                             <label><i class="fas fa-hashtag"></i> Código</label>
                             <input type="text" name="codigo_perfil" readonly>
-                            <div class="form-text">Gerado automaticamente</div>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-id-badge"></i> Nome do Perfil</label>
                             <input type="text" name="nome" required placeholder="Ex.: Gerente, Administrativo, Colaborador">
                         </div>
+                    </div>
+                    <div class="form-text" style="margin-top: -8px; margin-bottom: 12px;">
+                        Gerado automaticamente
                     </div>
                     <div class="form-row">
                         <div class="form-group" style="flex: 1 1 100%">

@@ -8,21 +8,116 @@ function openPerfilModal() {
     }
     const form = document.getElementById('perfilForm');
     if (!form) return;
-    form.reset();
+        form.reset();
     document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-user-shield"></i> Novo Perfil';
-    const nextCode = String((perfisMemoria[perfisMemoria.length - 1]?.codigo || 0) + 1).padStart(5, '0');
+    // Garante estrutura em memória
+    if (!window.perfisMemoria) {
+        window.perfisMemoria = [];
+    }
+    const nextCode = String((window.perfisMemoria[window.perfisMemoria.length - 1]?.codigo || 0) + 1).padStart(5, '0');
     form.codigo.value = nextCode;
     form.codigo_perfil.value = nextCode;
+    // Renderiza matriz de permissões (básica por enquanto)
+    if (typeof renderPermissionsMatrix !== 'function') {
+        window.renderPermissionsMatrix = function(permissoes = {}) {
+            const c = document.getElementById('permissionsMatrix');
+            if (!c) return;
+            c.innerHTML = '';
+            const iconByAction = {
+                ver: 'fa-eye',
+                criar: 'fa-plus',
+                editar: 'fa-pen',
+                excluir: 'fa-trash',
+                exportar: 'fa-file-export',
+                executar: 'fa-play'
+            };
+            const grupos = [
+                { titulo: 'Dashboard', acoes: ['ver'] },
+                { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
+                { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
+                { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
+                { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
+                { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
+                { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
+                { titulo: 'Comissões/Consulta', acoes: ['ver'] },
+                { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
+                { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
+                { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
+                { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
+                { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
+            ];
+            grupos.forEach((g, gi) => {
+                const box = document.createElement('div');
+                box.className = 'perm-group';
+                const title = document.createElement('div');
+                title.className = 'perm-title';
+                title.innerHTML = `<i class="fas fa-folder"></i> ${g.titulo}`;
+                const row = document.createElement('div');
+                row.className = 'perm-actions';
+                g.acoes.forEach(acao => {
+                    const label = document.createElement('label');
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.name = `perm_${gi}_${acao}`;
+                    cb.checked = Boolean(permissoes[g.titulo]?.includes(acao));
+                    cb.addEventListener('change', () => {
+                        if (!permissoes[g.titulo]) permissoes[g.titulo] = [];
+                        // Se marcar criar/editar/excluir, garantir 'ver' marcado
+                        if (acao !== 'ver' && cb.checked) {
+                            const viewCb = c.querySelector(`input[name="perm_${gi}_ver"]`);
+                            if (viewCb && !viewCb.checked) {
+                                viewCb.checked = true;
+                                if (!permissoes[g.titulo].includes('ver')) permissoes[g.titulo].push('ver');
+                            }
+                        }
+                        // Se desmarcar 'ver', desmarca as demais opções
+                        if (acao === 'ver' && !cb.checked) {
+                            g.acoes.forEach(a2 => {
+                                if (a2 !== 'ver') {
+                                    const other = c.querySelector(`input[name="perm_${gi}_${a2}"]`);
+                                    if (other && other.checked) other.checked = false;
+                                }
+                            });
+                            delete permissoes[g.titulo];
+                            return;
+                        }
+                        if (cb.checked) {
+                            if (!permissoes[g.titulo].includes(acao)) permissoes[g.titulo].push(acao);
+                        } else {
+                            permissoes[g.titulo] = permissoes[g.titulo].filter(a => a !== acao);
+                            if (permissoes[g.titulo].length === 0) delete permissoes[g.titulo];
+                        }
+                    });
+                    const icon = document.createElement('i');
+                    icon.className = `fas ${iconByAction[acao] || 'fa-check'}`;
+                    const span = document.createElement('span');
+                    span.textContent = acao;
+                    label.appendChild(cb);
+                    label.appendChild(icon);
+                    label.appendChild(span);
+                    row.appendChild(label);
+                });
+                box.appendChild(title);
+                box.appendChild(row);
+                c.appendChild(box);
+            });
+            const form = document.getElementById('perfilForm');
+            form._permissoesAtual = permissoes;
+        }
+    }
     renderPermissionsMatrix({});
     modal.style.display = 'flex';
+    modal.classList.remove('show');
+    modal.style.opacity = '1';
     document.body.style.overflow = 'hidden';
 }
 
 function closePerfilModal() {
     const modal = document.getElementById('perfilModal');
     if (!modal) return;
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    modal.style.opacity = '0';
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
 }
 
 function closeViewModal() {
@@ -43,9 +138,8 @@ function closeDeleteModal() {
     }
 }
 
-// Funções de manipulação de usuários
-let usuarios = [];
-let usuarioAtual = null;
+// Dados cacheados desta página
+window.perfisMemoria = [];
 
 // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
 function mostrarSpinner() {
@@ -56,14 +150,55 @@ function ocultarSpinner() {
     document.getElementById('loader-usuarios').style.display = 'none';
 }
 
-// Carregar usuários ao iniciar a página e configurar listeners
+// Carregar perfis (mesma animação/fluxo da aba de Serviços)
+async function carregarPerfis() {
+    try {
+        // Mostrar spinner ao iniciar carregamento
+        mostrarSpinner();
+
+        const tbody = document.getElementById('profilesTableBody');
+        if (!tbody) {
+            console.error('Tabela de perfis não encontrada.');
+            return;
+        }
+
+        const perfis = await api.get('/perfis');
+
+        tbody.innerHTML = '';
+        (perfis || []).forEach((perfil) => {
+            const tr = document.createElement('tr');
+            const codigo = (perfil.codigo ?? '').toString().padStart(5, '0');
+            const nome = perfil.nome ?? '';
+            const permissoesResumo = Array.isArray(perfil.permissoes)
+                ? `${perfil.permissoes.length} seção(ões)`
+                : '';
+            tr.innerHTML = `
+                <td>${codigo}</td>
+                <td>${nome}</td>
+                <td>${permissoesResumo}</td>
+                <td class="actions"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar perfis:', error);
+        if (typeof mostrarToast === 'function') {
+            mostrarToast('Erro ao carregar perfis', 'error');
+        }
+    } finally {
+        // Ocultar spinner após carregar (com sucesso ou erro)
+        ocultarSpinner();
+    }
+}
+
+// Carregar perfis ao iniciar a página e configurar listeners
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Mostrar spinner centralizado ao iniciar
         mostrarSpinner();
         
-        // Carregar dados
-        await carregarUsuarios();
+        // Carregar dados de perfis via API
+        await carregarPerfis();
         
         // Ocultar spinner centralizado quando tudo carregar
         ocultarSpinner();
@@ -78,24 +213,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Configurar event listeners
 function setupEventListeners() {
-    // Form de usuário
-    let form = document.getElementById('usuarioForm');
+    // Form de perfil
+    let form = document.getElementById('perfilForm');
     if (form) {
-        // Substituir handler para evitar duplicação
-        form.onsubmit = (e) => {
+        form.onsubmit = async (e) => {
             e.preventDefault();
-            if (form.codigo.value) {
-                editarUsuarioSubmit(e);
-            } else {
-                criarUsuario(e);
-            }
+            await salvarPerfil(e);
         };
     }
 
     // Botão de fechar modal
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
-            closeModal();
+            closePerfilModal();
             // closeViewModal(); // Remover se não for mais usado
             closeDeleteModal();
         });
@@ -106,27 +236,15 @@ function setupEventListeners() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            filtrarUsuarios(searchTerm);
+            filtrarPerfis(searchTerm);
         });
     }
 
     // Filtro de status
-    const statusFilter = document.querySelector('.filter-options select');
-    if (statusFilter) {
-        statusFilter.addEventListener('change', (e) => {
-            const status = e.target.value;
-            filtrarPorStatus(status);
-        });
-    }
+    // sem filtro de status nesta aba
 
     // Filtro de tipo
-    const tipoFilter = document.getElementById('tipoFilter');
-    if (tipoFilter) {
-        tipoFilter.addEventListener('change', (e) => {
-            const tipo = e.target.value;
-            filtrarPorTipo(tipo);
-        });
-    }
+    // sem filtro de tipo nesta aba
 }
 
 // Código é gerado no backend
@@ -217,24 +335,20 @@ function filtrarUsuarios(termo) {
     atualizarTabela(filtrados);
 }
 
-// Filtrar por status
-function filtrarPorStatus(status) {
-    if (!status) {
-        atualizarTabela(usuarios);
-        return;
-    }
-    const filtrados = usuarios.filter(usuario => usuario.status === status);
-    atualizarTabela(filtrados);
-}
-
-// Filtrar por tipo
-function filtrarPorTipo(tipo) {
-    if (!tipo) {
-        atualizarTabela(usuarios);
-        return;
-    }
-    const filtrados = usuarios.filter(usuario => usuario.nivel === tipo);
-    atualizarTabela(filtrados);
+// Helpers para permissões/tabela
+function mapearPermsPorSecao(permsArray) {
+    const mapa = {};
+    (permsArray || []).forEach(p => {
+        const acoes = [];
+        if (p.ver) acoes.push('ver');
+        if (p.criar) acoes.push('criar');
+        if (p.editar) acoes.push('editar');
+        if (p.excluir) acoes.push('excluir');
+        if (p.exportar) acoes.push('exportar');
+        if (p.executar) acoes.push('executar');
+        if (acoes.length) mapa[p.secao] = acoes;
+    });
+    return mapa;
 }
 
 // Atualizar tabela (reutilizada para filtros)
@@ -281,40 +395,35 @@ function atualizarTabela(usuarios) {
     });
 }
 
-// Criar usuário
-async function criarUsuario(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-
-        // Validar senhas
-    if (formData.get('senha') !== formData.get('confirmar_senha')) {
-            mostrarToast('As senhas não coincidem', 'error');
-            return;
-        }
-
-    const usuario = {
-        nome: formData.get('nome'),
-        email: formData.get('email'),
-        senha: formData.get('senha'),
-        nivel: formData.get('tipo'),
-        status: formData.get('status')
-    };
-
+// Salvar perfil (criar/atualizar) contra a API
+async function salvarPerfil(e) {
+    const form = e.target;
+    const data = new FormData(form);
+    const nome = data.get('nome');
+    const permissoesMapa = form._permissoesAtual || {};
+    // Converter mapa em array de linhas
+    const permissoes = Object.entries(permissoesMapa).map(([secao, acoes]) => ({
+        secao,
+        ver: acoes.includes('ver'),
+        criar: acoes.includes('criar'),
+        editar: acoes.includes('editar'),
+        excluir: acoes.includes('excluir'),
+        exportar: acoes.includes('exportar'),
+        executar: acoes.includes('executar'),
+    }));
     try {
-        await api.post('/usuarios', usuario); // Corrigido o endpoint
-        mostrarToast('Usuário criado com sucesso!', 'success');
-        carregarUsuarios();
-        event.target.reset();
-        closeModal();
-    } catch (error) {
-        console.error('Erro ao criar usuário:', error);
-        if (error.data?.details?.includes('usuarios_email_key')) {
-            mostrarToast('Este email já está cadastrado para outro usuário.', 'error');
-        } else if (error.status === 500) {
-            mostrarToast('Erro ao criar usuário. Por favor, tente novamente.', 'error');
+        if (form.codigo.value) {
+            await api.put(`/perfis/${form.codigo.value}`, { nome, permissoes });
+            mostrarToast('Perfil atualizado com sucesso!', 'success');
         } else {
-            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
+            await api.post('/perfis', { nome, permissoes });
+            mostrarToast('Perfil criado com sucesso!', 'success');
         }
+        closePerfilModal();
+        await carregarPerfis();
+    } catch (error) {
+        console.error('Erro ao salvar perfil:', error);
+        mostrarToast('Erro ao salvar perfil', 'error');
     }
 }
 
@@ -529,18 +638,9 @@ function mostrarToast(mensagem, tipo) {
     }, 3000);
 }
 
-// Adicionar funções ao escopo global
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.closeViewModal = closeViewModal;
-window.closeDeleteModal = closeDeleteModal;
-window.carregarUsuarios = carregarUsuarios;
-window.criarUsuario = criarUsuario;
-window.visualizarUsuario = visualizarUsuario;
-window.editarUsuario = editarUsuario;
-window.editarUsuarioSubmit = editarUsuarioSubmit; // Exportar nova função
-window.confirmarExclusao = confirmarExclusao;
-window.excluirUsuario = excluirUsuario;
+// Adicionar funções ao escopo global (Perfil)
+window.openPerfilModal = openPerfilModal;
+window.closePerfilModal = closePerfilModal;
 window.mostrarToast = mostrarToast;
 
 function fecharModal() {
