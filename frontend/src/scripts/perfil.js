@@ -20,6 +20,27 @@ function openPerfilModal() {
             const c = document.getElementById('permissionsMatrix');
             if (!c) return;
             c.innerHTML = '';
+            
+            // Adicionar botão "Marcar Todas" no topo
+            const marcarTodasContainer = document.createElement('div');
+            marcarTodasContainer.className = 'marcar-todas-container';
+            marcarTodasContainer.style.cssText = 'margin-bottom: 20px; text-align: center;';
+            
+            const marcarTodasBtn = document.createElement('button');
+            marcarTodasBtn.type = 'button';
+            marcarTodasBtn.className = 'btn btn-primary';
+            marcarTodasBtn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todas as Permissões';
+            marcarTodasBtn.style.cssText = 'margin-right: 10px;';
+            
+            const desmarcarTodasBtn = document.createElement('button');
+            desmarcarTodasBtn.type = 'button';
+            desmarcarTodasBtn.className = 'btn btn-secondary';
+            desmarcarTodasBtn.innerHTML = '<i class="fas fa-times"></i> Desmarcar Todas';
+            
+            marcarTodasContainer.appendChild(marcarTodasBtn);
+            marcarTodasContainer.appendChild(desmarcarTodasBtn);
+            c.appendChild(marcarTodasContainer);
+            
             const iconByAction = {
                 ver: 'fa-eye',
                 criar: 'fa-plus',
@@ -43,6 +64,39 @@ function openPerfilModal() {
                 { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
                 { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
             ];
+            
+            // Função para marcar todas as permissões
+            marcarTodasBtn.addEventListener('click', () => {
+                grupos.forEach((g, gi) => {
+                    g.acoes.forEach(acao => {
+                        const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
+                        if (cb) {
+                            cb.checked = true;
+                            // Simular o evento change para atualizar o mapa
+                            const event = new Event('change');
+                            cb.dispatchEvent(event);
+                        }
+                    });
+                });
+                mostrarToast('Todas as permissões foram marcadas!', 'success');
+            });
+            
+            // Função para desmarcar todas as permissões
+            desmarcarTodasBtn.addEventListener('click', () => {
+                grupos.forEach((g, gi) => {
+                    g.acoes.forEach(acao => {
+                        const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
+                        if (cb) {
+                            cb.checked = false;
+                            // Simular o evento change para atualizar o mapa
+                            const event = new Event('change');
+                            cb.dispatchEvent(event);
+                        }
+                    });
+                });
+                mostrarToast('Todas as permissões foram desmarcadas!', 'success');
+            });
+            
             grupos.forEach((g, gi) => {
                 const box = document.createElement('div');
                 box.className = 'perm-group';
