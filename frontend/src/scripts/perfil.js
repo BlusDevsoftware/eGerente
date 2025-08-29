@@ -24,41 +24,32 @@ function openModal() {
         });
     }
     
-    // Mostrar o modal
+    // Mostrar o modal imediatamente, sem animação
     modal.style.display = 'flex';
-    modal.style.opacity = '0';
-    requestAnimationFrame(() => {
-        modal.style.opacity = '1';
-        modal.classList.add('show');
-    });
     document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
     const modal = document.getElementById('userModal');
     if (modal) {
-        modal.style.opacity = '0';
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            const form = document.getElementById('usuarioForm');
-            if (form) {
-                form.reset();
-                // Re-habilitar todos os campos
-                Array.from(form.elements).forEach(element => {
-                    element.disabled = false;
-                });
-                // Mostrar campos de senha
-                form.senha.parentElement.style.display = 'block';
-                form.confirmar_senha.parentElement.style.display = 'block';
-                // Mostrar botões de ação
-                const formActions = form.querySelector('.form-actions');
-                if (formActions) {
-                    formActions.style.display = 'flex';
-                }
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        const form = document.getElementById('usuarioForm');
+        if (form) {
+            form.reset();
+            // Re-habilitar todos os campos
+            Array.from(form.elements).forEach(element => {
+                element.disabled = false;
+            });
+            // Mostrar campos de senha
+            form.senha.parentElement.style.display = 'block';
+            form.confirmar_senha.parentElement.style.display = 'block';
+            // Mostrar botões de ação
+            const formActions = form.querySelector('.form-actions');
+            if (formActions) {
+                formActions.style.display = 'flex';
             }
-        }, 300);
+        }
     }
 }
 
@@ -118,23 +109,15 @@ function setupEventListeners() {
     // Form de usuário
     let form = document.getElementById('usuarioForm');
     if (form) {
-        // Remover qualquer evento de submit anterior para evitar duplicação
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        form = newForm;
-
-        form.addEventListener('submit', (e) => {
+        // Substituir handler para evitar duplicação
+        form.onsubmit = (e) => {
             e.preventDefault();
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Decide se é criação ou edição baseado no campo 'codigo'
-            if (form.codigo.value) { // Se o campo código não estiver vazio, é edição
-                editarUsuarioSubmit(e); // Nova função para lidar com o submit de edição
+            if (form.codigo.value) {
+                editarUsuarioSubmit(e);
             } else {
                 criarUsuario(e);
             }
-        });
+        };
     }
 
     // Botão de fechar modal
@@ -174,20 +157,7 @@ function setupEventListeners() {
     }
 }
 
-// Gerar código do usuário
-function gerarCodigoUsuario() {
-    const ultimoUsuario = usuarios.length > 0 ? usuarios[usuarios.length - 1] : null;
-    let proximoNumero = 1;
-    
-    if (ultimoUsuario && ultimoUsuario.codigo) {
-        // Converter para número, remover zeros à esquerda e incrementar
-        const ultimoNumero = parseInt(ultimoUsuario.codigo.toString().replace(/^0+/, ''));
-        proximoNumero = ultimoNumero + 1;
-    }
-    
-    // Garantir que o número tenha 5 dígitos com zeros à esquerda
-    return proximoNumero.toString().padStart(5, '0');
-}
+// Código é gerado no backend
 
 // Carregar usuários
 async function carregarUsuarios() {
@@ -209,7 +179,7 @@ async function carregarUsuarios() {
                 }
             }
 
-            const response = await api.get('/usuarios'); // Corrigido o endpoint
+            const response = await api.get('/usuarios');
             tbody.innerHTML = '';
         
             if (!response || response.length === 0) {
@@ -225,7 +195,7 @@ async function carregarUsuarios() {
                     <td>${usuario.codigo.toString().padStart(5, '0')}</td>
                     <td>${usuario.nome}</td>
                     <td>${usuario.email}</td>
-                    <td>${usuario.tipo}</td>
+                    <td>${usuario.nivel}</td>
                     <td>
                         <span class="status ${usuario.status}">
                             ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
@@ -291,7 +261,7 @@ function filtrarPorTipo(tipo) {
         atualizarTabela(usuarios);
         return;
     }
-    const filtrados = usuarios.filter(usuario => usuario.tipo === tipo);
+    const filtrados = usuarios.filter(usuario => usuario.nivel === tipo);
     atualizarTabela(filtrados);
 }
 
@@ -317,7 +287,7 @@ function atualizarTabela(usuarios) {
             <td>${usuario.codigo.toString().padStart(5, '0')}</td>
             <td>${usuario.nome}</td>
             <td>${usuario.email}</td>
-            <td>${usuario.tipo}</td>
+            <td>${usuario.nivel}</td>
             <td>
                 <span class="status ${usuario.status}">
                     ${usuario.status === 'ativo' ? 'Ativo' : 'Inativo'}
@@ -350,15 +320,11 @@ async function criarUsuario(event) {
             return;
         }
 
-    // Gerar código do usuário com 5 dígitos
-    const codigo = gerarCodigoUsuario(); // Reutiliza a função existente
-
     const usuario = {
-        codigo: codigo, // Agora a função gerarCodigoUsuario já retorna a string formatada
         nome: formData.get('nome'),
         email: formData.get('email'),
         senha: formData.get('senha'),
-        tipo: formData.get('tipo'),
+        nivel: formData.get('tipo'),
         status: formData.get('status')
     };
 
@@ -383,7 +349,7 @@ async function criarUsuario(event) {
 // Visualizar usuário
 async function visualizarUsuario(codigo) {
     try {
-        const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
+        const usuario = await api.get(`/usuarios/${codigo}`);
 
         const modal = document.getElementById('userModal'); // ID correto
         const modalTitle = modal.querySelector('#modalTitle');
@@ -396,7 +362,7 @@ async function visualizarUsuario(codigo) {
         form.codigo.value = usuario.codigo;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
-        form.tipo.value = usuario.tipo;
+        form.tipo.value = usuario.nivel;
         form.status.value = usuario.status;
 
         // Desabilitar todos os campos
@@ -414,9 +380,8 @@ async function visualizarUsuario(codigo) {
             formActions.style.display = 'none';
         }
 
-        // Mostrar o modal com animação
+        // Mostrar o modal imediatamente
         modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário para fechar o modal
@@ -434,7 +399,7 @@ async function visualizarUsuario(codigo) {
 // Editar usuário (função que abre o modal de edição)
 async function editarUsuario(codigo) {
     try {
-        const usuario = await api.get(`/usuarios/${codigo}`); // Corrigido o endpoint
+        const usuario = await api.get(`/usuarios/${codigo}`);
 
         const modal = document.getElementById('userModal'); // ID correto
         const modalTitle = modal.querySelector('#modalTitle');
@@ -446,7 +411,7 @@ async function editarUsuario(codigo) {
         form.codigo.value = usuario.codigo;
         form.nome.value = usuario.nome;
         form.email.value = usuario.email;
-        form.tipo.value = usuario.tipo;
+        form.tipo.value = usuario.nivel;
         form.status.value = usuario.status;
 
         // Reativar e mostrar campos de senha para edição, mas torná-los opcionais
@@ -462,14 +427,11 @@ async function editarUsuario(codigo) {
             element.disabled = false;
         });
 
-        // Remover qualquer evento de submit anterior e recriar para evitar duplicação
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        form = newForm; // Atribuir o novo formulário à variável
+        // Substituir handler anterior
+        form.onsubmit = null;
 
-        // Mostrar o modal com animação
+        // Mostrar o modal imediatamente
         modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
 
         // O evento de submit será tratado por editarUsuarioSubmit
@@ -493,7 +455,7 @@ async function editarUsuarioSubmit(event) {
                 codigo: form.codigo.value,
                 nome: formData.get('nome'),
                 email: formData.get('email'),
-                tipo: formData.get('tipo'),
+                nivel: formData.get('tipo'),
                 status: formData.get('status')
             };
 
@@ -509,7 +471,7 @@ async function editarUsuarioSubmit(event) {
             }
 
             try {
-        const response = await api.put(`/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado); // Corrigido o endpoint
+        const response = await api.put(`/usuarios/${usuarioAtualizado.codigo}`, usuarioAtualizado);
 
         if (response) {
                 mostrarToast('Usuário atualizado com sucesso!', 'success');
@@ -567,18 +529,10 @@ function confirmarExclusao(codigo) {
 // Função para excluir usuário
 async function excluirUsuario(codigo) {
     try {
-        // Garantir que o código seja uma string com 5 dígitos
-        const codigoStr = codigo.toString().padStart(5, '0');
-        
-        const response = await api.delete(`/usuarios/${codigoStr}`);
-        
-        if (response && response.message) {
-            mostrarToast('Usuário excluído com sucesso!', 'success');
-            closeDeleteModal();
-            await carregarUsuarios();
-        } else {
-            throw new Error('Resposta inválida do servidor');
-        }
+        await api.delete(`/usuarios/${codigo}`);
+        mostrarToast('Usuário excluído com sucesso!', 'success');
+        closeDeleteModal();
+        await carregarUsuarios();
     } catch (error) {
         console.error('Erro ao excluir usuário:', error);
         mostrarToast('Erro ao excluir usuário: ' + error.message, 'error');
