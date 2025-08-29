@@ -8,15 +8,12 @@ function openPerfilModal() {
     }
     const form = document.getElementById('perfilForm');
     if (!form) return;
-        form.reset();
+    form.reset();
     document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-user-shield"></i> Novo Perfil';
-    // Garante estrutura em memória
-    if (!window.perfisMemoria) {
-        window.perfisMemoria = [];
-    }
-    const nextCode = String((window.perfisMemoria[window.perfisMemoria.length - 1]?.codigo || 0) + 1).padStart(5, '0');
-    form.codigo.value = nextCode;
-    form.codigo_perfil.value = nextCode;
+    
+    // Para novos perfis, NÃO preencher o código - deixar vazio para o backend gerar
+    form.codigo.value = '';
+    form.codigo_perfil.value = '';
     // Renderiza matriz de permissões (básica por enquanto)
     if (typeof renderPermissionsMatrix !== 'function') {
         window.renderPermissionsMatrix = function(permissoes = {}) {
