@@ -196,6 +196,11 @@ async function editarPerfil(codigo) {
         renderPermissionsMatrix(mapa);
         // Habilitar campos
         Array.from(form.elements).forEach(el => el.disabled = false);
+        // Mostrar botões de ação do formulário
+        const formActions = form.querySelector('.form-actions');
+        if (formActions) {
+            formActions.style.display = 'flex';
+        }
         const modal = document.getElementById('perfilModal');
         modal.style.display = 'flex';
         modal.style.opacity = '1';
