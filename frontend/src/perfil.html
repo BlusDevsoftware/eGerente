@@ -20,12 +20,18 @@
         if (!window.api) {
             window.addEventListener('api:ready', function initPerfilOnce() {
                 window.removeEventListener('api:ready', initPerfilOnce);
+                var pre = document.createElement('script');
+                pre.text = 'var api = window.api;';
+                document.head.appendChild(pre);
                 var s = document.createElement('script');
                 s.src = 'scripts/perfil.js';
                 s.defer = true;
                 document.head.appendChild(s);
             });
         } else {
+            var pre = document.createElement('script');
+            pre.text = 'var api = window.api;';
+            document.head.appendChild(pre);
             var s = document.createElement('script');
             s.src = 'scripts/perfil.js';
             s.defer = true;

@@ -1,3 +1,7 @@
+// Evita sobrescrever se já houver um cliente global (ex.: gateway axios)
+if (window.api) {
+    // Já existe um cliente definido; não sobrescrever
+} else {
 // Configuração da API
 const API_URL = 'https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros';
 
@@ -111,4 +115,5 @@ const api = {
 };
 
 // Torna a API disponível globalmente
-window.api = api; 
+window.api = api;
+}
