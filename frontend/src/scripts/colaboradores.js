@@ -43,12 +43,13 @@ async function criarColaborador(event) {
     const formData = new FormData(event.target);
     
     const colaborador = {
-        nome: formData.get('nome'),
-        email: formData.get('email'),
-        telefone: formData.get('telefone'),
-        cargo: formData.get('cargo'),
+        nome: (formData.get('nome') || '').trim(),
+        email: (formData.get('email') || '').trim(),
+        telefone: (formData.get('telefone') || '').trim(),
+        cargo: (formData.get('cargo') || '').trim(),
         data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
-        status: formData.get('status')
+        status: formData.get('status'),
+        usuario_vinculado: formData.get('usuario_vinculado') || null
     };
 
     try {
@@ -61,9 +62,9 @@ async function criarColaborador(event) {
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
         } else if (error.status === 500) {
-            mostrarToast('Erro ao criar colaborador. Por favor, tente novamente.', 'error');
+            mostrarToast('Erro ao criar colaborador: ' + (error.data?.message || 'verifique os campos e tente novamente.'), 'error');
         } else {
-            mostrarToast('Erro ao processar a requisição. Por favor, tente novamente.', 'error');
+            mostrarToast('Erro ao processar a requisição: ' + (error.data?.message || error.message || ''), 'error');
         }
     }
 }
