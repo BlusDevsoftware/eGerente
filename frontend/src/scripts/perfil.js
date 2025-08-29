@@ -1,4 +1,94 @@
 // Funções de Modal de Perfil
+
+// Função global para renderizar matriz de permissões
+function renderPermissionsMatrix(permissoes = {}) {
+    const c = document.getElementById('permissionsMatrix');
+    if (!c) return;
+    c.innerHTML = '';
+    const iconByAction = {
+        ver: 'fa-eye',
+        criar: 'fa-plus',
+        editar: 'fa-pen',
+        excluir: 'fa-trash',
+        exportar: 'fa-file-export',
+        executar: 'fa-play'
+    };
+    const grupos = [
+        { titulo: 'Dashboard', acoes: ['ver'] },
+        { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
+        { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Comissões/Consulta', acoes: ['ver'] },
+        { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
+        { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
+        { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
+        { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
+        { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
+    ];
+    grupos.forEach((g, gi) => {
+        const box = document.createElement('div');
+        box.className = 'perm-group';
+        const title = document.createElement('div');
+        title.className = 'perm-title';
+        title.innerHTML = `<i class="fas fa-folder"></i> ${g.titulo}`;
+        const row = document.createElement('div');
+        row.className = 'perm-actions';
+        g.acoes.forEach(acao => {
+            const label = document.createElement('label');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.name = `perm_${gi}_${acao}`;
+            cb.checked = Boolean(permissoes[g.titulo]?.includes(acao));
+            cb.addEventListener('change', () => {
+                if (!permissoes[g.titulo]) permissoes[g.titulo] = [];
+                // Se marcar criar/editar/excluir, garantir 'ver' marcado
+                if (acao !== 'ver' && cb.checked) {
+                    const viewCb = c.querySelector(`input[name="perm_${gi}_ver"]`);
+                    if (viewCb && !viewCb.checked) {
+                        viewCb.checked = true;
+                        if (!permissoes[g.titulo].includes('ver')) permissoes[g.titulo].push('ver');
+                    }
+                }
+                // Se desmarcar 'ver', desmarca as demais opções
+                if (acao === 'ver' && !cb.checked) {
+                    g.acoes.forEach(a2 => {
+                        if (a2 !== 'ver') {
+                            const other = c.querySelector(`input[name="perm_${gi}_${a2}"]`);
+                            if (other && other.checked) other.checked = false;
+                        }
+                    });
+                    delete permissoes[g.titulo];
+                    return;
+                }
+                if (cb.checked) {
+                    if (!permissoes[g.titulo].includes(acao)) permissoes[g.titulo].push(acao);
+                } else {
+                    permissoes[g.titulo] = permissoes[g.titulo].filter(a => a !== acao);
+                    if (permissoes[g.titulo].length === 0) delete permissoes[g.titulo];
+                }
+            });
+            const icon = document.createElement('i');
+            icon.className = `fas ${iconByAction[acao] || 'fa-check'}`;
+            const span = document.createElement('span');
+            span.textContent = acao;
+            label.appendChild(cb);
+            label.appendChild(icon);
+            label.appendChild(span);
+            row.appendChild(label);
+        });
+        box.appendChild(title);
+        box.appendChild(row);
+        c.appendChild(box);
+    });
+    const form = document.getElementById('perfilForm');
+    if (form) {
+        form._permissoesAtual = permissoes;
+    }
+}
+
 function openPerfilModal() {
     const modal = document.getElementById('perfilModal');
     if (!modal) {
@@ -18,93 +108,6 @@ function openPerfilModal() {
     form.codigo.value = '';
     form.codigo_perfil.value = '';
     // Renderiza matriz de permissões (básica por enquanto)
-    if (typeof renderPermissionsMatrix !== 'function') {
-        window.renderPermissionsMatrix = function(permissoes = {}) {
-            const c = document.getElementById('permissionsMatrix');
-            if (!c) return;
-            c.innerHTML = '';
-            const iconByAction = {
-                ver: 'fa-eye',
-                criar: 'fa-plus',
-                editar: 'fa-pen',
-                excluir: 'fa-trash',
-                exportar: 'fa-file-export',
-                executar: 'fa-play'
-            };
-            const grupos = [
-                { titulo: 'Dashboard', acoes: ['ver'] },
-                { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
-                { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
-                { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
-                { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
-                { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
-                { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
-                { titulo: 'Comissões/Consulta', acoes: ['ver'] },
-                { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
-                { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
-                { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
-                { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
-                { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
-            ];
-            grupos.forEach((g, gi) => {
-                const box = document.createElement('div');
-                box.className = 'perm-group';
-                const title = document.createElement('div');
-                title.className = 'perm-title';
-                title.innerHTML = `<i class="fas fa-folder"></i> ${g.titulo}`;
-                const row = document.createElement('div');
-                row.className = 'perm-actions';
-                g.acoes.forEach(acao => {
-                    const label = document.createElement('label');
-                    const cb = document.createElement('input');
-                    cb.type = 'checkbox';
-                    cb.name = `perm_${gi}_${acao}`;
-                    cb.checked = Boolean(permissoes[g.titulo]?.includes(acao));
-                    cb.addEventListener('change', () => {
-                        if (!permissoes[g.titulo]) permissoes[g.titulo] = [];
-                        // Se marcar criar/editar/excluir, garantir 'ver' marcado
-                        if (acao !== 'ver' && cb.checked) {
-                            const viewCb = c.querySelector(`input[name="perm_${gi}_ver"]`);
-                            if (viewCb && !viewCb.checked) {
-                                viewCb.checked = true;
-                                if (!permissoes[g.titulo].includes('ver')) permissoes[g.titulo].push('ver');
-                            }
-                        }
-                        // Se desmarcar 'ver', desmarca as demais opções
-                        if (acao === 'ver' && !cb.checked) {
-                            g.acoes.forEach(a2 => {
-                                if (a2 !== 'ver') {
-                                    const other = c.querySelector(`input[name="perm_${gi}_${a2}"]`);
-                                    if (other && other.checked) other.checked = false;
-                                }
-                            });
-                            delete permissoes[g.titulo];
-                            return;
-                        }
-                        if (cb.checked) {
-                            if (!permissoes[g.titulo].includes(acao)) permissoes[g.titulo].push(acao);
-                        } else {
-                            permissoes[g.titulo] = permissoes[g.titulo].filter(a => a !== acao);
-                            if (permissoes[g.titulo].length === 0) delete permissoes[g.titulo];
-                        }
-                    });
-                    const icon = document.createElement('i');
-                    icon.className = `fas ${iconByAction[acao] || 'fa-check'}`;
-                    const span = document.createElement('span');
-                    span.textContent = acao;
-                    label.appendChild(cb);
-                    label.appendChild(icon);
-                    label.appendChild(span);
-                    row.appendChild(label);
-                });
-                box.appendChild(title);
-                box.appendChild(row);
-                c.appendChild(box);
-            });
-            const form = document.getElementById('perfilForm');
-            form._permissoesAtual = permissoes;
-        }
-    }
     renderPermissionsMatrix({});
     modal.style.display = 'flex';
     modal.classList.remove('show');
