@@ -72,9 +72,11 @@ async function criarColaborador(event) {
 // Função para visualizar colaborador
 async function visualizarColaborador(codigo) {
     try {
+        console.log('Visualizando colaborador com código:', codigo);
         const response = await api.get(`/colaboradores/${codigo}`);
         // A resposta já é o objeto do colaborador, não precisa acessar .data
         const colaborador = response;
+        console.log('Dados do colaborador carregados:', colaborador);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -108,10 +110,10 @@ async function visualizarColaborador(codigo) {
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
-        form.onsubmit = (e) => {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
             closeModal();
-        };
+        });
     } catch (error) {
         mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
@@ -120,8 +122,10 @@ async function visualizarColaborador(codigo) {
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
+        console.log('Editando colaborador com código:', codigo);
         const response = await api.get(`/colaboradores/${codigo}`);
         const colaborador = response;
+        console.log('Dados do colaborador carregados para edição:', colaborador);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -142,17 +146,16 @@ async function editarColaborador(codigo) {
         // Remover todos os event listeners anteriores
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
-        form = newForm;
-
+        
         // Reabilitar campos (exceto código) para edição
-        Array.from(form.elements).forEach(element => {
+        Array.from(newForm.elements).forEach(element => {
             if (element.name !== 'codigo') {
                 element.disabled = false;
             }
         });
 
         // Garantir que ações estejam visíveis no modo edição
-        const actions = form.querySelector('.form-actions');
+        const actions = newForm.querySelector('.form-actions');
         if (actions) {
             actions.style.display = 'flex';
         }
@@ -162,12 +165,12 @@ async function editarColaborador(codigo) {
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
-        form.addEventListener('submit', async (event) => {
+        newForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const formData = new FormData(form);
+            const formData = new FormData(newForm);
             
             const colaborador = {
-                codigo: form.codigo.value,
+                codigo: newForm.codigo.value,
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
@@ -178,12 +181,12 @@ async function editarColaborador(codigo) {
             };
 
             try {
-                const response = await api.put(`/colaboradores/${form.codigo.value}`, colaborador);
+                const response = await api.put(`/colaboradores/${newForm.codigo.value}`, colaborador);
                 
                 if (response) {
                     mostrarToast('Colaborador atualizado com sucesso!', 'success');
                     carregarColaboradores();
-                    form.reset();
+                    newForm.reset();
                     closeModal();
                 } else {
                     throw new Error('Resposta inválida do servidor');
