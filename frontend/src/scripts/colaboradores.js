@@ -77,6 +77,7 @@ async function visualizarColaborador(codigo) {
         // A resposta já é o objeto do colaborador, não precisa acessar .data
         const colaborador = response;
         console.log('Dados do colaborador carregados:', colaborador);
+        console.log('Valor do perfil:', colaborador.perfil);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -93,6 +94,7 @@ async function visualizarColaborador(codigo) {
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
         form.perfil.value = colaborador.perfil || '';
+        console.log('Valor definido no campo perfil (visualizar):', form.perfil.value);
 
         // Desabilitar todos os campos
         Array.from(form.elements).forEach(element => {
@@ -126,6 +128,7 @@ async function editarColaborador(codigo) {
         const response = await api.get(`/colaboradores/${codigo}`);
         const colaborador = response;
         console.log('Dados do colaborador carregados para edição:', colaborador);
+        console.log('Valor do perfil para edição:', colaborador.perfil);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
@@ -142,6 +145,7 @@ async function editarColaborador(codigo) {
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
         form.perfil.value = colaborador.perfil || '';
+        console.log('Valor definido no campo perfil (editar):', form.perfil.value);
 
         // Remover todos os event listeners anteriores
         const newForm = form.cloneNode(true);
@@ -251,7 +255,9 @@ function mostrarToast(mensagem, tipo) {
 // Função para carregar a lista de perfis
 async function carregarPerfis() {
     try {
+        console.log('Carregando lista de perfis...');
         const perfis = await api.get('/perfis');
+        console.log('Perfis carregados:', perfis);
         const select = document.querySelector('select[name="perfil"]');
         
         // Limpar opções existentes
@@ -264,6 +270,8 @@ async function carregarPerfis() {
             option.textContent = `${perfil.nome}`;
             select.appendChild(option);
         });
+        
+        console.log('Perfis adicionados ao select:', select.options.length);
         
     } catch (error) {
         console.error('Erro ao carregar perfis:', error);
