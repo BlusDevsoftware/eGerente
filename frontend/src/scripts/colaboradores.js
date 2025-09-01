@@ -139,8 +139,10 @@ async function editarColaborador(codigo) {
         form.data_admissao.value = colaborador.data_admissao;
         form.perfil.value = colaborador.perfil || '';
 
-        // Substituir handler de submit anterior de forma segura
-        form.onsubmit = null;
+        // Remover todos os event listeners anteriores
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        form = newForm;
 
         // Reabilitar campos (exceto código) para edição
         Array.from(form.elements).forEach(element => {
@@ -304,9 +306,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         ocultarSpinner();
     }
     
-    // Adicionar evento de submit ao formulário
+    // Adicionar evento de submit ao formulário apenas para criação
     const form = document.getElementById('colaboradorForm');
-    form.addEventListener('submit', criarColaborador);
+    
+    // Remover event listeners anteriores
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Adicionar event listener apenas para criação
+    document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
 });
 
 // Exportar funções para uso global
