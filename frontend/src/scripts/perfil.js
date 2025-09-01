@@ -1,26 +1,28 @@
 // Função para renderizar matriz de permissões
-function renderPermissionsMatrix(permissoes = {}) {
+function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
     const c = document.getElementById('permissionsMatrix');
     if (!c) return;
     c.innerHTML = '';
     
-    // Adicionar botões "Marcar Todas" e "Desmarcar Todas" no topo
-    const marcarTodasContainer = document.createElement('div');
-    marcarTodasContainer.style.cssText = 'margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;';
-    
-    const marcarTodasBtn = document.createElement('button');
-    marcarTodasBtn.type = 'button';
-    marcarTodasBtn.className = 'btn-primary';
-    marcarTodasBtn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todas';
-    
-    const desmarcarTodasBtn = document.createElement('button');
-    desmarcarTodasBtn.type = 'button';
-    desmarcarTodasBtn.className = 'btn-secondary';
-    desmarcarTodasBtn.innerHTML = '<i class="fas fa-times"></i> Desmarcar Todas';
-    
-    marcarTodasContainer.appendChild(marcarTodasBtn);
-    marcarTodasContainer.appendChild(desmarcarTodasBtn);
-    c.appendChild(marcarTodasContainer);
+    // Adicionar botões "Marcar Todas" e "Desmarcar Todas" apenas no modo de edição
+    if (isEditMode) {
+        const marcarTodasContainer = document.createElement('div');
+        marcarTodasContainer.style.cssText = 'margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;';
+        
+        const marcarTodasBtn = document.createElement('button');
+        marcarTodasBtn.type = 'button';
+        marcarTodasBtn.className = 'btn-primary';
+        marcarTodasBtn.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todas';
+        
+        const desmarcarTodasBtn = document.createElement('button');
+        desmarcarTodasBtn.type = 'button';
+        desmarcarTodasBtn.className = 'btn-secondary';
+        desmarcarTodasBtn.innerHTML = '<i class="fas fa-times"></i> Desmarcar Todas';
+        
+        marcarTodasContainer.appendChild(marcarTodasBtn);
+        marcarTodasContainer.appendChild(desmarcarTodasBtn);
+        c.appendChild(marcarTodasContainer);
+    }
     
     const iconByAction = {
         ver: 'fa-eye',
@@ -46,37 +48,37 @@ function renderPermissionsMatrix(permissoes = {}) {
         { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
     ];
     
-    // Função para marcar todas as permissões
-    marcarTodasBtn.addEventListener('click', () => {
-        grupos.forEach((g, gi) => {
-            g.acoes.forEach(acao => {
-                const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
-                if (cb) {
-                    cb.checked = true;
-                    // Simular o evento change para atualizar o mapa
-                    const event = new Event('change');
-                    cb.dispatchEvent(event);
-                }
+        // Função para marcar todas as permissões
+        marcarTodasBtn.addEventListener('click', () => {
+            grupos.forEach((g, gi) => {
+                g.acoes.forEach(acao => {
+                    const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
+                    if (cb) {
+                        cb.checked = true;
+                        // Simular o evento change para atualizar o mapa
+                        const event = new Event('change');
+                        cb.dispatchEvent(event);
+                    }
+                });
             });
+            mostrarToast('Todas as permissões foram marcadas!', 'success');
         });
-        mostrarToast('Todas as permissões foram marcadas!', 'success');
-    });
-    
-    // Função para desmarcar todas as permissões
-    desmarcarTodasBtn.addEventListener('click', () => {
-        grupos.forEach((g, gi) => {
-            g.acoes.forEach(acao => {
-                const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
-                if (cb) {
-                    cb.checked = false;
-                    // Simular o evento change para atualizar o mapa
-                    const event = new Event('change');
-                    cb.dispatchEvent(event);
-                }
+        
+        // Função para desmarcar todas as permissões
+        desmarcarTodasBtn.addEventListener('click', () => {
+            grupos.forEach((g, gi) => {
+                g.acoes.forEach(acao => {
+                    const cb = c.querySelector(`input[name="perm_${gi}_${acao}"]`);
+                    if (cb) {
+                        cb.checked = false;
+                        // Simular o evento change para atualizar o mapa
+                        const event = new Event('change');
+                        cb.dispatchEvent(event);
+                    }
+                });
             });
+            mostrarToast('Todas as permissões foram desmarcadas!', 'success');
         });
-        mostrarToast('Todas as permissões foram desmarcadas!', 'success');
-    });
     
     grupos.forEach((g, gi) => {
         const box = document.createElement('div');
@@ -155,8 +157,8 @@ function openPerfilModal() {
     // Para novos perfis, NÃO preencher o código - deixar vazio para o backend gerar
     form.codigo.value = '';
     form.codigo_perfil.value = '';
-    // Renderiza matriz de permissões
-    renderPermissionsMatrix({});
+    // Renderiza matriz de permissões (modo de edição para novo perfil)
+    renderPermissionsMatrix({}, true);
     modal.style.display = 'flex';
     modal.classList.remove('show');
     modal.style.opacity = '1';
@@ -277,7 +279,7 @@ async function visualizarPerfil(codigo) {
             }
         });
         
-        renderPermissionsMatrix(mapa);
+        renderPermissionsMatrix(mapa, false); // Modo de visualização - sem botões
         // Desabilitar campos
         Array.from(form.elements).forEach(el => el.disabled = true);
         // Esconder botões de ação do formulário
@@ -317,7 +319,7 @@ async function editarPerfil(codigo) {
             }
         });
         
-        renderPermissionsMatrix(mapa);
+        renderPermissionsMatrix(mapa, true); // Modo de edição - com botões
         // Habilitar campos
         Array.from(form.elements).forEach(el => el.disabled = false);
         // Mostrar botões de ação do formulário
