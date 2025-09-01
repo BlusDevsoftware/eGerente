@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const supabase = require('../config/supabase');
 
 // Listar todos os colaboradores
 const listarColaboradores = async (req, res) => {
@@ -43,6 +43,9 @@ const buscarColaborador = async (req, res) => {
 const criarColaborador = async (req, res) => {
     try {
         const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
+        
+        // Adicionar departamento padrão se não fornecido
+        const departamento = req.body.departamento || 'Geral';
 
         // Gerar código único
         const { data: ultimoColaborador } = await supabase
@@ -64,6 +67,7 @@ const criarColaborador = async (req, res) => {
                     email,
                     telefone,
                     cargo,
+                    departamento,
                     data_admissao,
                     status,
                     perfil
@@ -86,6 +90,9 @@ const atualizarColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
         const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
+        
+        // Adicionar departamento padrão se não fornecido
+        const departamento = req.body.departamento || 'Geral';
 
         const { data, error } = await supabase
             .from('colaboradores')
@@ -94,6 +101,7 @@ const atualizarColaborador = async (req, res) => {
                 email,
                 telefone,
                 cargo,
+                departamento,
                 data_admissao,
                 status,
                 perfil

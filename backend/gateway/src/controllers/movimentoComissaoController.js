@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const supabase = require('../config/supabase');
 
 // Listar todos os movimentos de comissão
 const listarMovimentos = async (req, res) => {
