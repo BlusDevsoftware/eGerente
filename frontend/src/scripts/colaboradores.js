@@ -49,7 +49,7 @@ async function criarColaborador(event) {
         cargo: (formData.get('cargo') || '').trim(),
         data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
         status: formData.get('status'),
-        usuario_vinculado: formData.get('usuario_vinculado') || null
+        perfil: formData.get('perfil') || null
     };
 
     try {
@@ -90,7 +90,7 @@ async function visualizarColaborador(codigo) {
         form.telefone.value = colaborador.telefone;
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
-        form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
+        form.perfil.value = colaborador.perfil || '';
 
         // Desabilitar todos os campos
         Array.from(form.elements).forEach(element => {
@@ -137,7 +137,7 @@ async function editarColaborador(codigo) {
         form.telefone.value = colaborador.telefone;
         form.cargo.value = colaborador.cargo;
         form.data_admissao.value = colaborador.data_admissao;
-        form.usuario_vinculado.value = colaborador.usuario_vinculado || '';
+        form.perfil.value = colaborador.perfil || '';
 
         // Substituir handler de submit anterior de forma segura
         form.onsubmit = null;
@@ -172,7 +172,7 @@ async function editarColaborador(codigo) {
                 cargo: formData.get('cargo'),
                 data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
                 status: formData.get('status'),
-                usuario_vinculado: formData.get('usuario_vinculado') || null
+                perfil: formData.get('perfil') || null
             };
 
             try {
@@ -243,26 +243,26 @@ function mostrarToast(mensagem, tipo) {
     }, 3000);
 }
 
-// Função para carregar a lista de usuários
-async function carregarUsuarios() {
+// Função para carregar a lista de perfis
+async function carregarPerfis() {
     try {
-        const usuarios = await api.get('/usuarios');
-        const select = document.querySelector('select[name="usuario_vinculado"]');
+        const perfis = await api.get('/perfis');
+        const select = document.querySelector('select[name="perfil"]');
         
         // Limpar opções existentes
-        select.innerHTML = '<option value="">Selecione um usuário</option>';
+        select.innerHTML = '<option value="">Selecione um perfil</option>';
         
-        // Adicionar usuários
-        usuarios.forEach(usuario => {
+        // Adicionar perfis
+        perfis.forEach(perfil => {
             const option = document.createElement('option');
-            option.value = usuario.codigo;
-            option.textContent = `${usuario.nome} (${usuario.email})`;
+            option.value = perfil.codigo;
+            option.textContent = `${perfil.nome}`;
             select.appendChild(option);
         });
         
     } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-        mostrarToast('Erro ao carregar lista de usuários', 'error');
+        console.error('Erro ao carregar perfis:', error);
+        mostrarToast('Erro ao carregar lista de perfis', 'error');
         throw error; // Propagar erro para a função principal
     }
 }
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Carregar dados em paralelo
         await Promise.all([
             carregarColaboradores(),
-            carregarUsuarios()
+            carregarPerfis()
         ]);
         
         // Ocultar spinner centralizado quando tudo carregar

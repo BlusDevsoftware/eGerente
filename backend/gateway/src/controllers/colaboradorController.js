@@ -42,7 +42,7 @@ const buscarColaborador = async (req, res) => {
 // Criar novo colaborador
 const criarColaborador = async (req, res) => {
     try {
-        const { nome, email, telefone, cargo, data_admissao, status, usuario_vinculado } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
 
         // Gerar código único
         const { data: ultimoColaborador } = await supabase
@@ -66,7 +66,7 @@ const criarColaborador = async (req, res) => {
                     cargo,
                     data_admissao,
                     status,
-                    usuario_vinculado
+                    perfil
                 }
             ])
             .select()
@@ -85,7 +85,7 @@ const criarColaborador = async (req, res) => {
 const atualizarColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
-        const { nome, email, telefone, cargo, data_admissao, status, usuario_vinculado } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
 
         const { data, error } = await supabase
             .from('colaboradores')
@@ -96,7 +96,7 @@ const atualizarColaborador = async (req, res) => {
                 cargo,
                 data_admissao,
                 status,
-                usuario_vinculado
+                perfil
             })
             .eq('codigo', codigo)
             .select()
