@@ -21,20 +21,34 @@ const listarColaboradores = async (req, res) => {
 const buscarColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
+        console.log('🔍 Buscando colaborador com código:', codigo);
+        console.log('Tipo do código:', typeof codigo);
+        
         const { data, error } = await supabase
             .from('colaboradores')
             .select('*')
             .eq('codigo', codigo)
             .single();
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Erro na consulta:', error);
+            throw error;
+        }
+        
         if (!data) {
+            console.log('❌ Colaborador não encontrado para código:', codigo);
             return res.status(404).json({ error: 'Colaborador não encontrado' });
         }
 
+        console.log('✅ Colaborador encontrado:', {
+            codigo: data.codigo,
+            nome: data.nome,
+            email: data.email
+        });
+        
         res.json(data);
     } catch (error) {
-        console.error('Erro ao buscar colaborador:', error);
+        console.error('❌ Erro ao buscar colaborador:', error);
         res.status(500).json({ error: 'Erro ao buscar colaborador' });
     }
 };

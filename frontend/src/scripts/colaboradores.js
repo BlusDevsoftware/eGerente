@@ -1,3 +1,61 @@
+// Função de debug para testar a funcionalidade
+function debugColaboradores() {
+    console.log('🐛 === DEBUG COLABORADORES ===');
+    console.log('Testando carregamento de colaboradores...');
+    
+    // Testar carregamento
+    carregarColaboradores().then(() => {
+        console.log('✅ Carregamento de colaboradores OK');
+        
+        // Verificar se há colaboradores na tabela
+        const tbody = document.querySelector('.table-container table tbody');
+        const rows = tbody.querySelectorAll('tr');
+        console.log('📊 Número de colaboradores na tabela:', rows.length);
+        
+        if (rows.length > 0) {
+            // Testar visualização do primeiro colaborador
+            const firstRow = rows[0];
+            const viewBtn = firstRow.querySelector('.view-btn');
+            if (viewBtn) {
+                const onclick = viewBtn.getAttribute('onclick');
+                console.log('🔍 Primeiro botão de visualização:', onclick);
+                
+                // Extrair código do onclick
+                const match = onclick.match(/visualizarColaborador\((\d+)\)/);
+                if (match) {
+                    const codigo = match[1];
+                    console.log('🧪 Testando visualização do colaborador:', codigo);
+                    
+                    // Simular clique após 2 segundos
+                    setTimeout(() => {
+                        visualizarColaborador(codigo);
+                    }, 2000);
+                }
+            }
+        }
+    }).catch(error => {
+        console.error('❌ Erro no debug:', error);
+    });
+}
+
+// Função para verificar se os dados estão corretos
+function verificarDadosColaborador(colaborador, codigoEsperado) {
+    console.log('=== VERIFICAÇÃO DE DADOS ===');
+    console.log('Código esperado:', codigoEsperado);
+    console.log('Código recebido:', colaborador.codigo);
+    console.log('Nome:', colaborador.nome);
+    console.log('Email:', colaborador.email);
+    console.log('Dados completos:', colaborador);
+    console.log('==========================');
+    
+    if (colaborador.codigo != codigoEsperado) {
+        console.error('❌ ERRO: Código não confere!');
+        return false;
+    }
+    console.log('✅ Dados verificados com sucesso');
+    return true;
+}
+
 // Função para carregar colaboradores
 async function carregarColaboradores() {
     try {
@@ -69,14 +127,41 @@ async function criarColaborador(event) {
     }
 }
 
+// Função para limpar formulário
+function limparFormulario() {
+    const form = document.getElementById('colaboradorForm');
+    if (form) {
+        console.log('🧹 Limpando formulário...');
+        form.reset();
+        // Limpar campos manualmente para garantir
+        form.codigo.value = '';
+        form.nome.value = '';
+        form.email.value = '';
+        form.telefone.value = '';
+        form.cargo.value = '';
+        form.data_admissao.value = '';
+        form.status.value = 'Ativo';
+        form.perfil.value = '';
+        console.log('✅ Formulário limpo');
+    }
+}
+
 // Função para visualizar colaborador
 async function visualizarColaborador(codigo) {
     try {
-        console.log('Visualizando colaborador com código:', codigo);
+        console.log('👁️ Visualizando colaborador com código:', codigo);
+        
+        // Limpar formulário antes de carregar novos dados
+        limparFormulario();
+        
         const response = await api.get(`/colaboradores/${codigo}`);
-        // A resposta já é o objeto do colaborador, não precisa acessar .data
         const colaborador = response;
-        console.log('Dados do colaborador carregados:', colaborador);
+        
+        // Verificar se os dados estão corretos
+        if (!verificarDadosColaborador(colaborador, codigo)) {
+            throw new Error('Dados incorretos recebidos do servidor');
+        }
+        
         console.log('Valor do perfil:', colaborador.perfil);
 
         const modal = document.getElementById('colaboradorModal');
@@ -86,13 +171,13 @@ async function visualizarColaborador(codigo) {
         modalTitle.textContent = 'Visualizar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
-        form.codigo.value = colaborador.codigo;
-        form.status.value = colaborador.status;
-        form.nome.value = colaborador.nome;
-        form.email.value = colaborador.email;
-        form.telefone.value = colaborador.telefone;
-        form.cargo.value = colaborador.cargo;
-        form.data_admissao.value = colaborador.data_admissao;
+        form.codigo.value = colaborador.codigo || '';
+        form.status.value = colaborador.status || 'Ativo';
+        form.nome.value = colaborador.nome || '';
+        form.email.value = colaborador.email || '';
+        form.telefone.value = colaborador.telefone || '';
+        form.cargo.value = colaborador.cargo || '';
+        form.data_admissao.value = colaborador.data_admissao || '';
         form.perfil.value = colaborador.perfil || '';
         console.log('Valor definido no campo perfil (visualizar):', form.perfil.value);
 
@@ -107,7 +192,7 @@ async function visualizarColaborador(codigo) {
             actions.style.display = 'none';
         }
 
-        // Mostrar o modal imediatamente, sem animação
+        // Mostrar o modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
@@ -117,6 +202,7 @@ async function visualizarColaborador(codigo) {
             closeModal();
         });
     } catch (error) {
+        console.error('❌ Erro ao visualizar colaborador:', error);
         mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
@@ -124,57 +210,62 @@ async function visualizarColaborador(codigo) {
 // Função para editar colaborador
 async function editarColaborador(codigo) {
     try {
-        console.log('Editando colaborador com código:', codigo);
+        console.log('✏️ Editando colaborador com código:', codigo);
+        
+        // Limpar formulário antes de carregar novos dados
+        limparFormulario();
+        
         const response = await api.get(`/colaboradores/${codigo}`);
         const colaborador = response;
-        console.log('Dados do colaborador carregados para edição:', colaborador);
+        
+        // Verificar se os dados estão corretos
+        if (!verificarDadosColaborador(colaborador, codigo)) {
+            throw new Error('Dados incorretos recebidos do servidor');
+        }
+        
         console.log('Valor do perfil para edição:', colaborador.perfil);
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
-        let form = document.getElementById('colaboradorForm');
+        const form = document.getElementById('colaboradorForm');
 
         modalTitle.textContent = 'Editar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
-        form.codigo.value = colaborador.codigo;
-        form.status.value = colaborador.status;
-        form.nome.value = colaborador.nome;
-        form.email.value = colaborador.email;
-        form.telefone.value = colaborador.telefone;
-        form.cargo.value = colaborador.cargo;
-        form.data_admissao.value = colaborador.data_admissao;
+        form.codigo.value = colaborador.codigo || '';
+        form.status.value = colaborador.status || 'Ativo';
+        form.nome.value = colaborador.nome || '';
+        form.email.value = colaborador.email || '';
+        form.telefone.value = colaborador.telefone || '';
+        form.cargo.value = colaborador.cargo || '';
+        form.data_admissao.value = colaborador.data_admissao || '';
         form.perfil.value = colaborador.perfil || '';
         console.log('Valor definido no campo perfil (editar):', form.perfil.value);
 
-        // Remover todos os event listeners anteriores
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        
         // Reabilitar campos (exceto código) para edição
-        Array.from(newForm.elements).forEach(element => {
+        Array.from(form.elements).forEach(element => {
             if (element.name !== 'codigo') {
                 element.disabled = false;
             }
         });
 
         // Garantir que ações estejam visíveis no modo edição
-        const actions = newForm.querySelector('.form-actions');
+        const actions = form.querySelector('.form-actions');
         if (actions) {
             actions.style.display = 'flex';
         }
 
-        // Mostrar o modal imediatamente, sem animação
+        // Mostrar o modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
         // Configurar o evento de submit do formulário
-        newForm.addEventListener('submit', async (event) => {
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const formData = new FormData(newForm);
+            const formData = new FormData(form);
             
-            const colaborador = {
-                codigo: newForm.codigo.value,
+            const colaboradorAtualizado = {
+                codigo: form.codigo.value,
                 nome: formData.get('nome'),
                 email: formData.get('email'),
                 telefone: formData.get('telefone'),
@@ -185,12 +276,11 @@ async function editarColaborador(codigo) {
             };
 
             try {
-                const response = await api.put(`/colaboradores/${newForm.codigo.value}`, colaborador);
+                const response = await api.put(`/colaboradores/${form.codigo.value}`, colaboradorAtualizado);
                 
                 if (response) {
                     mostrarToast('Colaborador atualizado com sucesso!', 'success');
                     carregarColaboradores();
-                    newForm.reset();
                     closeModal();
                 } else {
                     throw new Error('Resposta inválida do servidor');
@@ -207,6 +297,7 @@ async function editarColaborador(codigo) {
             }
         });
     } catch (error) {
+        console.error('❌ Erro ao editar colaborador:', error);
         mostrarToast('Erro ao carregar dados do colaborador: ' + error.message, 'error');
     }
 }
@@ -310,6 +401,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Ocultar spinner centralizado quando tudo carregar
         ocultarSpinner();
         
+        // Executar debug após carregamento (opcional)
+        // setTimeout(() => debugColaboradores(), 3000);
+        
     } catch (error) {
         console.error('Erro ao inicializar página:', error);
         mostrarToast('Erro ao carregar dados da página', 'error');
@@ -332,4 +426,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.visualizarColaborador = visualizarColaborador;
 window.editarColaborador = editarColaborador;
 window.excluirColaborador = excluirColaborador;
-window.confirmarExclusao = confirmarExclusao; 
+window.confirmarExclusao = confirmarExclusao;
+window.debugColaboradores = debugColaboradores; 
