@@ -45,6 +45,11 @@
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
             document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
+            
+            // Limpar formulário e reinicializar handlers
+            limparFormulario();
+            inicializarStatusToggle();
+            inicializarFotoHandlers();
         }
 
         window.closeModal = function() {
