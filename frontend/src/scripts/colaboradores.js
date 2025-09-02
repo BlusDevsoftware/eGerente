@@ -218,6 +218,10 @@ async function visualizarColaborador(codigo) {
         if (previewView) previewView.src = colaborador.foto || DEFAULT_AVATAR;
         console.log('Valor definido no campo perfil (visualizar):', form.perfil.value);
 
+        // Inicializar handlers antes de desabilitar
+        inicializarStatusToggle();
+        inicializarFotoHandlers();
+        
         // Desabilitar todos os campos
         Array.from(form.elements).forEach(element => {
             element.disabled = true;
@@ -308,6 +312,7 @@ async function editarColaborador(codigo) {
                 element.disabled = false;
             }
         });
+        inicializarStatusToggle();
         inicializarFotoHandlers();
 
         // Garantir que ações estejam visíveis no modo edição
