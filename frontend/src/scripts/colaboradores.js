@@ -194,7 +194,7 @@ async function visualizarColaborador(codigo) {
         modalTitle.textContent = 'Visualizar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
-        form.codigo.value = colaborador.codigo || '';
+        // Código não é mais exibido no formulário de cadastro/edição
         const statusInput = form.querySelector('input[name="status"]');
         const statusValor = colaborador.status || 'Ativo';
         if (statusInput) statusInput.value = statusValor;
