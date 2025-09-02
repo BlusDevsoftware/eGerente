@@ -85,6 +85,11 @@
 
         // Função para mostrar modal de sucesso
         window.showSuccessModal = function() {
+            // Preencher data de cadastro
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dataCadastro').textContent = dataAtual;
+            
+            // Mostrar modal
             document.getElementById('successModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
@@ -94,6 +99,14 @@
             document.getElementById('successModal').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
+
+        // Fechar modal de sucesso quando clicar fora dele
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('successModal');
+            if (event.target === modal) {
+                closeSuccessModal();
+            }
+        });
 
         // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA  DASHBOARD
         function mostrarSpinner() {
@@ -991,21 +1004,26 @@
     </div>
 
     <!-- Modal de Sucesso -->
-    <div id="successModal" class="modal">
-        <div class="modal-content" style="width: 400px; margin: auto;">
-            <div class="modal-header" style="background: #4CAF50; color: white;">
-                <h2><i class="fas fa-check-circle"></i> Sucesso!</h2>
-                <button class="close-modal" onclick="closeSuccessModal()">&times;</button>
+    <div id="successModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Cadastro Realizado!</h2>
+                <button class="close-modal" onclick="closeSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
             </div>
-            <div class="modal-body" style="text-align: center; padding: 30px;">
-                <div style="font-size: 48px; color: #4CAF50; margin-bottom: 20px;">
-                    <i class="fas fa-check-circle"></i>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Colaborador cadastrado com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    O colaborador foi adicionado ao sistema e já está disponível para uso.
                 </div>
-                <h3 style="color: #333; margin-bottom: 15px;">Colaborador Cadastrado!</h3>
-                <p style="color: #666; margin-bottom: 25px;">O colaborador foi cadastrado com sucesso no sistema.</p>
-                <button class="btn-primary" onclick="closeSuccessModal()" style="width: 100%;">
-                    <i class="fas fa-check"></i> Entendi
-                </button>
+                <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
+                    <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
+                    <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
+                    <div><strong>Sistema:</strong> eGerente</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
             </div>
         </div>
     </div>
