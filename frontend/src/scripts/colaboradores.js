@@ -77,7 +77,7 @@ async function carregarColaboradores() {
         colaboradores.forEach(colaborador => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><img src="${colaborador.foto || DEFAULT_AVATAR}" alt="Foto do colaborador" title="${colaborador.nome}"></td>
+                <td><img src="${colaborador.foto || DEFAULT_AVATAR}"></td>
                 <td>${colaborador.codigo}</td>
                 <td>${colaborador.nome}</td>
                 <td>${colaborador.email}</td>
