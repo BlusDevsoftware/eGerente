@@ -83,6 +83,18 @@
             document.body.style.overflow = 'auto';
         }
 
+        // Função para mostrar modal de sucesso
+        window.showSuccessModal = function() {
+            document.getElementById('successModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Função para fechar modal de sucesso
+        window.closeSuccessModal = function() {
+            document.getElementById('successModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
         // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA  DASHBOARD
         function mostrarSpinner() {
             document.getElementById('loader-colaboradores').style.display = 'flex';
@@ -974,6 +986,26 @@
                     <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
                     <button type="button" id="confirmDeleteBtn" class="btn-danger">Excluir</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div id="successModal" class="modal">
+        <div class="modal-content" style="width: 400px; margin: auto;">
+            <div class="modal-header" style="background: #4CAF50; color: white;">
+                <h2><i class="fas fa-check-circle"></i> Sucesso!</h2>
+                <button class="close-modal" onclick="closeSuccessModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 30px;">
+                <div style="font-size: 48px; color: #4CAF50; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="color: #333; margin-bottom: 15px;">Colaborador Cadastrado!</h3>
+                <p style="color: #666; margin-bottom: 25px;">O colaborador foi cadastrado com sucesso no sistema.</p>
+                <button class="btn-primary" onclick="closeSuccessModal()" style="width: 100%;">
+                    <i class="fas fa-check"></i> Entendi
+                </button>
             </div>
         </div>
     </div>
