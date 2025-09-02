@@ -486,18 +486,47 @@ function inicializarFotoHandlers() {
     fileInput.addEventListener('change', () => {
         const file = fileInput.files && fileInput.files[0];
         if (!file) return;
-        if (file.size > 1024 * 1024) {
-            mostrarToast('A imagem deve ter no máximo 1MB.', 'error');
+        if (file.size > 500 * 1024) {
+            mostrarToast('A imagem deve ter no máximo 500KB.', 'error');
             fileInput.value = '';
             return;
         }
-        const reader = new FileReader();
-        reader.onload = () => {
-            const base64 = reader.result;
+        
+        // Comprimir imagem antes de converter para Base64
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+            // Redimensionar para máximo 300x300px
+            const maxSize = 300;
+            let { width, height } = img;
+            
+            if (width > height) {
+                if (width > maxSize) {
+                    height = (height * maxSize) / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width = (width * maxSize) / height;
+                    height = maxSize;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Desenhar imagem redimensionada
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Converter para Base64 com qualidade 0.8
+            const base64 = canvas.toDataURL('image/jpeg', 0.8);
             preview.src = base64;
             hidden.value = base64;
         };
-        reader.readAsDataURL(file);
+        
+        img.src = URL.createObjectURL(file);
     });
 
     // Clicar na foto abre o seletor de arquivo
