@@ -65,7 +65,7 @@ function formatarDataPtBr(dataStr) {
 }
 
 // Avatar padrão inline (evita 404)
-const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><rect width="100%" height="100%" rx="12" ry="12" fill="%23f5f5f5"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-size="14">Sem foto</text></svg>';
+const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><rect width="100%" height="100%" rx="12" ry="12" fill="%23f5f5f5"/><circle cx="90" cy="65" r="25" fill="%23ddd"/><path d="M30 140c0-33 27-60 60-60s60 27 60 60v40H30v-40z" fill="%23ddd"/></svg>';
 
 // Função para carregar colaboradores
 async function carregarColaboradores() {
