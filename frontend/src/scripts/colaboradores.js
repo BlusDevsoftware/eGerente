@@ -152,10 +152,8 @@ function limparFormulario() {
         if (statusInput) statusInput.value = 'Ativo';
         const toggle = form.querySelector('.status-toggle');
         if (toggle) {
-            toggle.classList.remove('btn-primary');
-            toggle.classList.add('btn-secondary');
-            toggle.textContent = 'Ativo';
-            toggle.setAttribute('aria-pressed', 'true');
+            toggle.checked = true;
+            toggle.disabled = false;
         }
         form.perfil.value = '';
         console.log('✅ Formulário limpo');
@@ -198,10 +196,7 @@ async function visualizarColaborador(codigo) {
         const toggle = form.querySelector('.status-toggle');
         if (toggle) {
             const ativo = (statusValor || '').toLowerCase() === 'ativo';
-            toggle.textContent = ativo ? 'Ativo' : 'Inativo';
-            toggle.setAttribute('aria-pressed', ativo ? 'true' : 'false');
-            toggle.classList.toggle('btn-primary', ativo);
-            toggle.classList.toggle('btn-secondary', !ativo);
+            toggle.checked = ativo;
         }
         form.nome.value = colaborador.nome || '';
         form.email.value = colaborador.email || '';
@@ -275,10 +270,7 @@ async function editarColaborador(codigo) {
         const toggle2 = form.querySelector('.status-toggle');
         if (toggle2) {
             const ativo = (statusValor2 || '').toLowerCase() === 'ativo';
-            toggle2.textContent = ativo ? 'Ativo' : 'Inativo';
-            toggle2.setAttribute('aria-pressed', ativo ? 'true' : 'false');
-            toggle2.classList.toggle('btn-primary', ativo);
-            toggle2.classList.toggle('btn-secondary', !ativo);
+            toggle2.checked = ativo;
             toggle2.disabled = false;
         }
         form.nome.value = colaborador.nome || '';
@@ -443,18 +435,16 @@ function inicializarStatusToggle(context) {
     const novoToggle = toggle.cloneNode(true);
     toggle.parentNode.replaceChild(novoToggle, toggle);
     const t = root.querySelector('.status-toggle');
-    const syncVisual = () => {
-        const ativo = (input.value || '').toLowerCase() === 'ativo';
-        t.textContent = ativo ? 'Ativo' : 'Inativo';
-        t.setAttribute('aria-pressed', ativo ? 'true' : 'false');
-        t.classList.toggle('btn-primary', ativo);
-        t.classList.toggle('btn-secondary', !ativo);
+    const syncFromModel = () => {
+        t.checked = (input.value || '').toLowerCase() === 'ativo';
     };
-    syncVisual();
-    t.addEventListener('click', () => {
+    const syncFromToggle = () => {
+        input.value = t.checked ? 'Ativo' : 'Inativo';
+    };
+    syncFromModel();
+    t.addEventListener('change', () => {
         if (t.disabled) return;
-        input.value = (input.value || '').toLowerCase() === 'ativo' ? 'Inativo' : 'Ativo';
-        syncVisual();
+        syncFromToggle();
     });
 }
 

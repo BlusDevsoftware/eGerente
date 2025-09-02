@@ -648,6 +648,57 @@
                 height: calc(100vh - 250px);
             }
         }
+
+        /* Toggle de Status (estilo switch) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 64px;
+            height: 34px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cfd8dc;
+            transition: 0.2s ease;
+            border-radius: 34px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            top: 4px;
+            background-color: #fff;
+            transition: 0.2s ease;
+            border-radius: 50%;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+        }
+
+        .switch input:checked + .slider {
+            background-color: #34C759; /* verde iOS */
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .switch input:disabled + .slider {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -790,10 +841,11 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-toggle-on"></i> Status</label>
-                            <div>
-                                <input type="hidden" name="status" value="Ativo">
-                                <button type="button" class="btn-secondary status-toggle" aria-pressed="true">Ativo</button>
+                            <div class="switch">
+                                <input type="checkbox" class="status-toggle" id="statusToggle">
+                                <span class="slider"></span>
                             </div>
+                            <input type="hidden" name="status" value="Ativo">
                         </div>
                     </div>
                     <div class="form-row">
