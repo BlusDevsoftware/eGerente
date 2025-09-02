@@ -216,7 +216,6 @@ async function visualizarColaborador(codigo) {
             element.disabled = true;
         });
         // Desabilitar toggle visualmente
-        const toggle = form.querySelector('.status-toggle');
         if (toggle) toggle.disabled = true;
 
         // Esconder ações (Cancelar/Salvar) no modo visualização
