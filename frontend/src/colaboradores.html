@@ -24,7 +24,7 @@
             form.reset();
             
             // Limpar campos manualmente para garantir
-            form.codigo.value = '';
+            if (form.codigo) form.codigo.value = '';
             form.nome.value = '';
             form.email.value = '';
             form.telefone.value = '';
@@ -57,7 +57,7 @@
             form.reset();
             
             // Limpar campos manualmente para garantir
-            form.codigo.value = '';
+            if (form.codigo) form.codigo.value = '';
             form.nome.value = '';
             form.email.value = '';
             form.telefone.value = '';
@@ -900,7 +900,7 @@
                     <div class="form-row">
                         <div class="form-group" style="flex: 1 1 100%; align-items: center;">
                             <div class="foto-container" style="justify-content: center;">
-                                <img id="fotoPreview" class="foto-preview" src="public/avatar-placeholder.png" alt="Pré-visualização">
+                                <img id="fotoPreview" class="foto-preview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0yMCA4MEMyMCA3MC4zNTg5IDI3LjM1ODkgNjMgMzcgNjNINjNDNzIuNjQxMSA2MyA4MCA3MC4zNTg5IDgwIDgwVjEwMEgyMFY4MFoiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+" alt="Pré-visualização">
                                 <input type="file" id="fotoInput" accept="image/*" style="display:none">
                             </div>
                             <input type="hidden" name="status" value="Ativo">
