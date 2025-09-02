@@ -346,9 +346,9 @@ async function editarColaborador(codigo) {
                 const response = await api.put(`/colaboradores/${codigo}`, colaboradorAtualizado);
                 
                 if (response) {
-                    mostrarToast('Colaborador atualizado com sucesso!', 'success');
                     carregarColaboradores();
                     closeModal();
+                    showUpdateSuccessModal(colaboradorAtualizado.status);
                 } else {
                     throw new Error('Resposta inválida do servidor');
                 }
