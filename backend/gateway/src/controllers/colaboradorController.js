@@ -56,7 +56,7 @@ const buscarColaborador = async (req, res) => {
 // Criar novo colaborador
 const criarColaborador = async (req, res) => {
     try {
-        const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, perfil, foto } = req.body;
         
         // Adicionar departamento padrão se não fornecido
         const departamento = req.body.departamento || 'Geral';
@@ -84,7 +84,8 @@ const criarColaborador = async (req, res) => {
                     departamento,
                     data_admissao,
                     status,
-                    perfil
+                    perfil,
+                    foto: foto || null
                 }
             ])
             .select()
@@ -103,7 +104,7 @@ const criarColaborador = async (req, res) => {
 const atualizarColaborador = async (req, res) => {
     try {
         const { codigo } = req.params;
-        const { nome, email, telefone, cargo, data_admissao, status, perfil } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, perfil, foto } = req.body;
         
         // Adicionar departamento padrão se não fornecido
         const departamento = req.body.departamento || 'Geral';
@@ -118,7 +119,8 @@ const atualizarColaborador = async (req, res) => {
                 departamento,
                 data_admissao,
                 status,
-                perfil
+                perfil,
+                foto: foto !== undefined ? foto : undefined
             })
             .eq('codigo', codigo)
             .select()
