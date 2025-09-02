@@ -621,52 +621,68 @@
         }
 
         /* Larguras específicas para cada coluna */
-        .table-scroll th:nth-child(1), /* Código */
+        .table-scroll th:nth-child(1), /* Foto */
         .table-scroll td:nth-child(1) {
+            width: 60px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .table-scroll th:nth-child(2), /* Código */
+        .table-scroll td:nth-child(2) {
             width: 80px;
             min-width: 80px;
         }
 
-        .table-scroll th:nth-child(2), /* Nome */
-        .table-scroll td:nth-child(2) {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        .table-scroll th:nth-child(3), /* Email */
+        .table-scroll th:nth-child(3), /* Nome */
         .table-scroll td:nth-child(3) {
             width: 200px;
             min-width: 200px;
         }
 
-        .table-scroll th:nth-child(4), /* Telefone */
+        .table-scroll th:nth-child(4), /* Email */
         .table-scroll td:nth-child(4) {
+            width: 200px;
+            min-width: 200px;
+        }
+
+        .table-scroll th:nth-child(5), /* Telefone */
+        .table-scroll td:nth-child(5) {
             width: 120px;
             min-width: 120px;
         }
 
-        .table-scroll th:nth-child(5), /* Cargo */
-        .table-scroll td:nth-child(5) {
+        .table-scroll th:nth-child(6), /* Cargo */
+        .table-scroll td:nth-child(6) {
             width: 150px;
             min-width: 150px;
         }
 
-        .table-scroll th:nth-child(6), /* Data Admissão */
-        .table-scroll td:nth-child(6) {
+        .table-scroll th:nth-child(7), /* Data Admissão */
+        .table-scroll td:nth-child(7) {
             width: 120px;
             min-width: 120px;
         }
 
-        .table-scroll th:nth-child(7), /* Status */
-        .table-scroll td:nth-child(7) {
+        .table-scroll th:nth-child(8), /* Status */
+        .table-scroll td:nth-child(8) {
             width: 100px;
             min-width: 100px;
         }
 
-        .table-scroll th:nth-child(8), /* Ações */
-        .table-scroll td:nth-child(8) {
+        .table-scroll th:nth-child(9), /* Ações */
+        .table-scroll td:nth-child(9) {
             width: 120px;
             min-width: 120px;
+        }
+
+        /* Estilo para foto na tabela */
+        .table-scroll td:nth-child(1) img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e3f2fd;
         }
 
         .table-scroll tbody tr {
@@ -914,6 +930,7 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>Foto</th>
                                 <th>Código</th>
                                 <th>Nome</th>
                                 <th>Email</th>
