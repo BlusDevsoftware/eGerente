@@ -333,7 +333,8 @@ async function editarColaborador(codigo) {
                 cargo: formData.get('cargo'),
                 data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
                 status: formData.get('status'),
-                perfil: formData.get('perfil') || null
+                perfil: formData.get('perfil') || null,
+                foto: formData.get('foto') || null
             };
 
             try {
