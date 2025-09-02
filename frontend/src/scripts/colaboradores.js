@@ -56,6 +56,14 @@ function verificarDadosColaborador(colaborador, codigoEsperado) {
     return true;
 }
 
+// Função auxiliar para formatar data em pt-BR
+function formatarDataPtBr(dataStr) {
+    if (!dataStr) return '';
+    const d = new Date(dataStr);
+    if (isNaN(d)) return dataStr;
+    return d.toLocaleDateString('pt-BR');
+}
+
 // Função para carregar colaboradores
 async function carregarColaboradores() {
     try {
@@ -71,16 +79,16 @@ async function carregarColaboradores() {
                 <td>${colaborador.email}</td>
                 <td>${colaborador.telefone}</td>
                 <td>${colaborador.cargo}</td>
-                <td>${colaborador.data_admissao}</td>
+                <td>${formatarDataPtBr(colaborador.data_admissao)}</td>
                 <td><span class="status ${colaborador.status.toLowerCase()}">${colaborador.status}</span></td>
                 <td class="actions">
-                    <button class="action-btn view-btn" onclick="visualizarColaborador(${colaborador.codigo})">
+                    <button class="action-btn view-btn" onclick="visualizarColaborador('${colaborador.codigo}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="action-btn edit-btn" onclick="editarColaborador(${colaborador.codigo})">
+                    <button class="action-btn edit-btn" onclick="editarColaborador('${colaborador.codigo}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn delete-btn" onclick="confirmarExclusao(${colaborador.codigo})">
+                    <button class="action-btn delete-btn" onclick="confirmarExclusao('${colaborador.codigo}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -166,6 +174,10 @@ async function visualizarColaborador(codigo) {
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
+        // Remover event listeners anteriores do formulário antes de adicionar novos
+        const formOriginal = document.getElementById('colaboradorForm');
+        const formClonado = formOriginal.cloneNode(true);
+        formOriginal.parentNode.replaceChild(formClonado, formOriginal);
         const form = document.getElementById('colaboradorForm');
 
         modalTitle.textContent = 'Visualizar Colaborador';
@@ -227,6 +239,10 @@ async function editarColaborador(codigo) {
 
         const modal = document.getElementById('colaboradorModal');
         const modalTitle = modal.querySelector('#modalTitle');
+        // Remover event listeners anteriores do formulário antes de adicionar novos
+        const formOriginal = document.getElementById('colaboradorForm');
+        const formClonado = formOriginal.cloneNode(true);
+        formOriginal.parentNode.replaceChild(formClonado, formOriginal);
         const form = document.getElementById('colaboradorForm');
 
         modalTitle.textContent = 'Editar Colaborador';
@@ -386,6 +402,23 @@ function confirmarExclusao(codigo) {
     modal.style.display = 'flex';
 }
 
+// Filtro de busca e status (cliente)
+function aplicarFiltros() {
+    const termo = (document.querySelector('.search-box input')?.value || '').toLowerCase();
+    const statusFiltro = (document.querySelector('.filter-options select')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('.table-container table tbody tr');
+
+    rows.forEach(row => {
+        const textoLinha = row.innerText.toLowerCase();
+        const statusSpan = row.querySelector('.status');
+        const statusLinha = statusSpan ? statusSpan.textContent.toLowerCase() : '';
+
+        const passaBusca = termo === '' || textoLinha.includes(termo);
+        const passaStatus = statusFiltro === '' || statusLinha === statusFiltro;
+        row.style.display = (passaBusca && passaStatus) ? '' : 'none';
+    });
+}
+
 // Carregar colaboradores quando a página carregar
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -420,6 +453,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Adicionar event listener apenas para criação
     document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
+
+    // Listeners de filtro
+    const inputBusca = document.querySelector('.search-box input');
+    const selectStatus = document.querySelector('.filter-options select');
+    if (inputBusca) inputBusca.addEventListener('input', aplicarFiltros);
+    if (selectStatus) selectStatus.addEventListener('change', aplicarFiltros);
 });
 
 // Exportar funções para uso global

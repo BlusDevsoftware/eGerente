@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/config/api.js"></script>
     <script src="scripts/colaboradores.js"></script>
     <script>
@@ -71,12 +70,6 @@
             Array.from(form.elements).forEach(el => {
                 el.disabled = false;
             });
-        }
-
-        window.closeViewModal = function() {
-            const modal = document.getElementById('viewModal');
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
         window.closeDeleteModal = function() {
@@ -846,20 +839,7 @@
         </div>
     </div>
 
-    <!-- Modal de Visualização -->
-    <div id="viewModal" class="modal">
-        <div class="modal-content" style="max-width: 600px; width: 90%;">
-            <div class="modal-header">
-                <h2>Detalhes do Colaborador</h2>
-                <span class="close" onclick="closeViewModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="viewContent" class="view-content">
-                    <!-- O conteúdo será preenchido dinamicamente -->
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Modal de Exclusão -->
     <div id="deleteModal" class="modal">
