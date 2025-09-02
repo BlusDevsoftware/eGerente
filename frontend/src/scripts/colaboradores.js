@@ -115,7 +115,8 @@ async function criarColaborador(event) {
         cargo: (formData.get('cargo') || '').trim(),
         data_admissao: formData.get('data_admissao') ? formData.get('data_admissao') : new Date().toISOString().split('T')[0],
         status: formData.get('status'),
-        perfil: formData.get('perfil') || null
+        perfil: formData.get('perfil') || null,
+        foto: formData.get('foto') || null
     };
 
     try {
@@ -156,6 +157,10 @@ function limparFormulario() {
             toggle.disabled = false;
         }
         form.perfil.value = '';
+        const fotoHidden = form.querySelector('input[name="foto"]');
+        if (fotoHidden) fotoHidden.value = '';
+        const preview = document.getElementById('fotoPreview');
+        if (preview) preview.src = 'public/avatar-placeholder.png';
         console.log('✅ Formulário limpo');
     }
 }
@@ -204,12 +209,21 @@ async function visualizarColaborador(codigo) {
         form.cargo.value = colaborador.cargo || '';
         form.data_admissao.value = colaborador.data_admissao || '';
         form.perfil.value = colaborador.perfil || '';
+        const fotoHiddenView = form.querySelector('input[name="foto"]');
+        const previewView = document.getElementById('fotoPreview');
+        if (fotoHiddenView) fotoHiddenView.value = colaborador.foto || '';
+        if (previewView) previewView.src = colaborador.foto || 'public/avatar-placeholder.png';
         console.log('Valor definido no campo perfil (visualizar):', form.perfil.value);
 
         // Desabilitar todos os campos
         Array.from(form.elements).forEach(element => {
             element.disabled = true;
         });
+        // Desabilitar handlers de foto
+        const fotoInputV = document.getElementById('fotoInput');
+        if (fotoInputV) fotoInputV.disabled = true;
+        const removeBtnV = document.getElementById('removeFotoBtn');
+        if (removeBtnV) removeBtnV.disabled = true;
         // Desabilitar toggle visualmente
         if (toggle) toggle.disabled = true;
 
@@ -279,6 +293,10 @@ async function editarColaborador(codigo) {
         form.cargo.value = colaborador.cargo || '';
         form.data_admissao.value = colaborador.data_admissao || '';
         form.perfil.value = colaborador.perfil || '';
+        const fotoHiddenEdit = form.querySelector('input[name="foto"]');
+        const previewEdit = document.getElementById('fotoPreview');
+        if (fotoHiddenEdit) fotoHiddenEdit.value = colaborador.foto || '';
+        if (previewEdit) previewEdit.src = colaborador.foto || 'public/avatar-placeholder.png';
         console.log('Valor definido no campo perfil (editar):', form.perfil.value);
 
         // Reabilitar campos (exceto código) para edição
@@ -287,6 +305,7 @@ async function editarColaborador(codigo) {
                 element.disabled = false;
             }
         });
+        inicializarFotoHandlers();
 
         // Garantir que ações estejam visíveis no modo edição
         const actions = form.querySelector('.form-actions');
@@ -427,14 +446,12 @@ function confirmarExclusao(codigo) {
 
 // Inicializar toggle de status
 function inicializarStatusToggle(context) {
-    const root = context || document;
+    const root = document; // agora o controle fica no header
     const toggle = root.querySelector('.status-toggle');
     const input = root.querySelector('input[name="status"]');
     if (!toggle || !input) return;
-    // Remover listeners antigos
-    const novoToggle = toggle.cloneNode(true);
-    toggle.parentNode.replaceChild(novoToggle, toggle);
-    const t = root.querySelector('.status-toggle');
+    // Remover listeners antigos mantendo o input dentro do label
+    const t = toggle; // já é o input do tipo checkbox
     const syncFromModel = () => {
         t.checked = (input.value || '').toLowerCase() === 'ativo';
     };
@@ -446,6 +463,46 @@ function inicializarStatusToggle(context) {
         if (t.disabled) return;
         syncFromToggle();
     });
+}
+
+// Inicializar foto (preview + base64 no hidden)
+function inicializarFotoHandlers() {
+    const input = document.getElementById('fotoInput'); // agora no header
+    const preview = document.getElementById('fotoPreview'); // no header
+    const hidden = document.querySelector('input[name="foto"]');
+    const removeBtn = document.getElementById('removeFotoBtn');
+
+    if (!input || !preview || !hidden) return;
+
+    // Remover listeners antigos
+    const novoInput = input.cloneNode(true);
+    input.parentNode.replaceChild(novoInput, input);
+    const fileInput = document.getElementById('fotoInput');
+
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        if (file.size > 1024 * 1024) {
+            mostrarToast('A imagem deve ter no máximo 1MB.', 'error');
+            fileInput.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result;
+            preview.src = base64;
+            hidden.value = base64;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Clicar na foto abre o seletor de arquivo
+    preview.addEventListener('click', () => {
+        if (input.disabled) return;
+        fileInput.click();
+    });
+
+    // Remover botão de remover do layout atual (não exibido)
 }
 
 // Filtro de busca e status (cliente)
@@ -499,6 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Inicializar toggle de status no formulário clonado
     inicializarStatusToggle(document.getElementById('colaboradorForm'));
+    inicializarFotoHandlers();
     
     // Adicionar event listener apenas para criação
     document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
