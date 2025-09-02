@@ -64,6 +64,9 @@ function formatarDataPtBr(dataStr) {
     return d.toLocaleDateString('pt-BR');
 }
 
+// Avatar padrão inline (evita 404)
+const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><rect width="100%" height="100%" rx="12" ry="12" fill="%23f5f5f5"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-size="14">Sem foto</text></svg>';
+
 // Função para carregar colaboradores
 async function carregarColaboradores() {
     try {
@@ -143,7 +146,7 @@ function limparFormulario() {
         console.log('🧹 Limpando formulário...');
         form.reset();
         // Limpar campos manualmente para garantir
-        form.codigo.value = '';
+        if (form.codigo) form.codigo.value = '';
         form.nome.value = '';
         form.email.value = '';
         form.telefone.value = '';
@@ -160,7 +163,7 @@ function limparFormulario() {
         const fotoHidden = form.querySelector('input[name="foto"]');
         if (fotoHidden) fotoHidden.value = '';
         const preview = document.getElementById('fotoPreview');
-        if (preview) preview.src = 'public/avatar-placeholder.png';
+        if (preview) preview.src = DEFAULT_AVATAR;
         console.log('✅ Formulário limpo');
     }
 }
@@ -212,7 +215,7 @@ async function visualizarColaborador(codigo) {
         const fotoHiddenView = form.querySelector('input[name="foto"]');
         const previewView = document.getElementById('fotoPreview');
         if (fotoHiddenView) fotoHiddenView.value = colaborador.foto || '';
-        if (previewView) previewView.src = colaborador.foto || 'public/avatar-placeholder.png';
+        if (previewView) previewView.src = colaborador.foto || DEFAULT_AVATAR;
         console.log('Valor definido no campo perfil (visualizar):', form.perfil.value);
 
         // Desabilitar todos os campos
@@ -277,7 +280,7 @@ async function editarColaborador(codigo) {
         modalTitle.textContent = 'Editar Colaborador';
         
         // Preencher o formulário com os dados do colaborador
-        form.codigo.value = colaborador.codigo || '';
+        // Código não exibido no formulário
         const statusInput2 = form.querySelector('input[name="status"]');
         const statusValor2 = colaborador.status || 'Ativo';
         if (statusInput2) statusInput2.value = statusValor2;
@@ -296,7 +299,7 @@ async function editarColaborador(codigo) {
         const fotoHiddenEdit = form.querySelector('input[name="foto"]');
         const previewEdit = document.getElementById('fotoPreview');
         if (fotoHiddenEdit) fotoHiddenEdit.value = colaborador.foto || '';
-        if (previewEdit) previewEdit.src = colaborador.foto || 'public/avatar-placeholder.png';
+        if (previewEdit) previewEdit.src = colaborador.foto || DEFAULT_AVATAR;
         console.log('Valor definido no campo perfil (editar):', form.perfil.value);
 
         // Reabilitar campos (exceto código) para edição
