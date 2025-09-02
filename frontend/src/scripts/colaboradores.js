@@ -148,7 +148,15 @@ function limparFormulario() {
         form.telefone.value = '';
         form.cargo.value = '';
         form.data_admissao.value = '';
-        form.status.value = 'Ativo';
+        const statusInput = form.querySelector('input[name="status"]');
+        if (statusInput) statusInput.value = 'Ativo';
+        const toggle = form.querySelector('.status-toggle');
+        if (toggle) {
+            toggle.classList.remove('btn-primary');
+            toggle.classList.add('btn-secondary');
+            toggle.textContent = 'Ativo';
+            toggle.setAttribute('aria-pressed', 'true');
+        }
         form.perfil.value = '';
         console.log('✅ Formulário limpo');
     }
@@ -184,7 +192,17 @@ async function visualizarColaborador(codigo) {
         
         // Preencher o formulário com os dados do colaborador
         form.codigo.value = colaborador.codigo || '';
-        form.status.value = colaborador.status || 'Ativo';
+        const statusInput = form.querySelector('input[name="status"]');
+        const statusValor = colaborador.status || 'Ativo';
+        if (statusInput) statusInput.value = statusValor;
+        const toggle = form.querySelector('.status-toggle');
+        if (toggle) {
+            const ativo = (statusValor || '').toLowerCase() === 'ativo';
+            toggle.textContent = ativo ? 'Ativo' : 'Inativo';
+            toggle.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+            toggle.classList.toggle('btn-primary', ativo);
+            toggle.classList.toggle('btn-secondary', !ativo);
+        }
         form.nome.value = colaborador.nome || '';
         form.email.value = colaborador.email || '';
         form.telefone.value = colaborador.telefone || '';
@@ -197,6 +215,9 @@ async function visualizarColaborador(codigo) {
         Array.from(form.elements).forEach(element => {
             element.disabled = true;
         });
+        // Desabilitar toggle visualmente
+        const toggle = form.querySelector('.status-toggle');
+        if (toggle) toggle.disabled = true;
 
         // Esconder ações (Cancelar/Salvar) no modo visualização
         const actions = form.querySelector('.form-actions');
@@ -249,7 +270,18 @@ async function editarColaborador(codigo) {
         
         // Preencher o formulário com os dados do colaborador
         form.codigo.value = colaborador.codigo || '';
-        form.status.value = colaborador.status || 'Ativo';
+        const statusInput2 = form.querySelector('input[name="status"]');
+        const statusValor2 = colaborador.status || 'Ativo';
+        if (statusInput2) statusInput2.value = statusValor2;
+        const toggle2 = form.querySelector('.status-toggle');
+        if (toggle2) {
+            const ativo = (statusValor2 || '').toLowerCase() === 'ativo';
+            toggle2.textContent = ativo ? 'Ativo' : 'Inativo';
+            toggle2.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+            toggle2.classList.toggle('btn-primary', ativo);
+            toggle2.classList.toggle('btn-secondary', !ativo);
+            toggle2.disabled = false;
+        }
         form.nome.value = colaborador.nome || '';
         form.email.value = colaborador.email || '';
         form.telefone.value = colaborador.telefone || '';
@@ -402,6 +434,31 @@ function confirmarExclusao(codigo) {
     modal.style.display = 'flex';
 }
 
+// Inicializar toggle de status
+function inicializarStatusToggle(context) {
+    const root = context || document;
+    const toggle = root.querySelector('.status-toggle');
+    const input = root.querySelector('input[name="status"]');
+    if (!toggle || !input) return;
+    // Remover listeners antigos
+    const novoToggle = toggle.cloneNode(true);
+    toggle.parentNode.replaceChild(novoToggle, toggle);
+    const t = root.querySelector('.status-toggle');
+    const syncVisual = () => {
+        const ativo = (input.value || '').toLowerCase() === 'ativo';
+        t.textContent = ativo ? 'Ativo' : 'Inativo';
+        t.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+        t.classList.toggle('btn-primary', ativo);
+        t.classList.toggle('btn-secondary', !ativo);
+    };
+    syncVisual();
+    t.addEventListener('click', () => {
+        if (t.disabled) return;
+        input.value = (input.value || '').toLowerCase() === 'ativo' ? 'Inativo' : 'Ativo';
+        syncVisual();
+    });
+}
+
 // Filtro de busca e status (cliente)
 function aplicarFiltros() {
     const termo = (document.querySelector('.search-box input')?.value || '').toLowerCase();
@@ -450,6 +507,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Remover event listeners anteriores
     const newForm = form.cloneNode(true);
     form.parentNode.replaceChild(newForm, form);
+    
+    // Inicializar toggle de status no formulário clonado
+    inicializarStatusToggle(document.getElementById('colaboradorForm'));
     
     // Adicionar event listener apenas para criação
     document.getElementById('colaboradorForm').addEventListener('submit', criarColaborador);
