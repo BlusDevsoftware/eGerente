@@ -411,6 +411,39 @@
                 height: calc(100vh - 250px);
             }
         }
+
+        /* Botões de ação – igual à aba Colaboradores */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            margin: 0 2px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 18px;
+        }
+        .view-btn { background-color: #0d6efd; color: #fff; }
+        .edit-btn { background-color: #198754; color: #fff; }
+        .delete-btn { background-color: #dc3545; color: #fff; }
+        .action-btn:hover { opacity: 0.8; }
+        .action-btn i { font-size: 14px; }
+        .actions {
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Altura consistente das linhas para alinhar com Colaboradores */
+        .table-scroll tbody tr { height: 72px; }
     </style>
 </head>
 <body>
