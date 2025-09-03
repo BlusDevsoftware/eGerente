@@ -159,6 +159,10 @@
         .actions {
             white-space: nowrap !important;
             min-width: 110px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .action-btn {
             background: none;
@@ -462,6 +466,18 @@
                     height: calc(100vh - 150px);
                 }
             }
+        /* Padronizar ações como Clientes/Colaboradores */
+        .actions {
+            white-space: nowrap !important;
+            min-width: 110px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-scroll tbody tr { height: 72px; }
+        /* Remover linha sob Ações para visual mais limpo (opcional) */
+        .table-scroll td:nth-child(5) { border-bottom: none !important; }
     </style>
 </head>
 <body>

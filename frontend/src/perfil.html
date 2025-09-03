@@ -90,6 +90,7 @@
             color: #333;
         }
 
+        /* Padronizar botões e coluna de Ações como Colaboradores */
         .action-btn {
             background: none;
             border: none;
@@ -100,37 +101,26 @@
             transition: all 0.2s ease;
             width: 30px;
             height: 30px;
-            display: inline-flex;
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 18px;
+        }
+        .view-btn { background-color: #0d6efd; color: #fff; }
+        .edit-btn { background-color: #198754; color: #fff; }
+        .delete-btn { background-color: #dc3545; color: #fff; }
+        .action-btn:hover { opacity: 0.8; }
+        .action-btn i { font-size: 14px; }
+        .actions {
+            white-space: nowrap;
+            height: 100%;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .view-btn {
-            background-color: #0d6efd;
-            color: white;
-        }
-
-        .edit-btn {
-            background-color: #198754;
-            color: white;
-        }
-
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-
-        .action-btn i {
-            font-size: 14px;
-        }
-
-        .actions {
-            white-space: nowrap;
-        }
+        .table-scroll tbody tr { height: 72px; }
+        /* Remover linha sob Ações (opcional para consistência) */
+        .table-scroll td:nth-child(6) { border-bottom: none !important; }
 
         .status {
             padding: 4px 8px;
