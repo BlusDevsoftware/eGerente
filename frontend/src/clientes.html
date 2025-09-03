@@ -839,6 +839,60 @@
     </div>
 
     <script type="module">
+        // Importar API
+        import { api } from '../scripts/api.js';
+        
+        // Função para mostrar modal de sucesso
+        window.showSuccessModal = function() {
+            console.log('🎉 showSuccessModal chamada!');
+            // Preencher data de cadastro
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dataCadastro').textContent = dataAtual;
+            
+            // Mostrar modal
+            const modal = document.getElementById('successModal');
+            console.log('🔍 Modal encontrado:', modal);
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                console.log('✅ Modal de sucesso exibido!');
+            } else {
+                console.error('❌ Modal successModal não encontrado!');
+            }
+        }
+
+        // Função para fechar modal de sucesso
+        window.closeSuccessModal = function() {
+            document.getElementById('successModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Função para mostrar modal de sucesso de atualização
+        window.showUpdateSuccessModal = function(status) {
+            console.log('🎉 showUpdateSuccessModal chamada com status:', status);
+            // Preencher dados de atualização
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('dataAtualizacao').textContent = dataAtual;
+            document.getElementById('statusAtualizado').textContent = status || 'Ativo';
+            
+            // Mostrar modal
+            const modal = document.getElementById('updateSuccessModal');
+            console.log('🔍 Modal de atualização encontrado:', modal);
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                console.log('✅ Modal de atualização exibido!');
+            } else {
+                console.error('❌ Modal updateSuccessModal não encontrado!');
+            }
+        }
+
+        // Função para fechar modal de sucesso de atualização
+        window.closeUpdateSuccessModal = function() {
+            document.getElementById('updateSuccessModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
         // Função para formatar código com 5 dígitos
         function formatarCodigo(codigo) {
             return String(codigo).padStart(5, '0');
@@ -1034,13 +1088,19 @@
 
             try {
                 if (form.dataset.codigo) {
+                    console.log('🔄 Atualizando cliente...');
                     await api.put(`/clientes/${form.dataset.codigo}`, cliente);
+                    console.log('✅ Cliente atualizado com sucesso');
                     // Mostrar modal de sucesso de atualização
+                    console.log('🎯 Chamando showUpdateSuccessModal...');
                     window.showUpdateSuccessModal(cliente.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
+                    console.log('🆕 Criando novo cliente...');
                     // Não enviar o campo codigo no POST
                     await api.post('/clientes', cliente);
+                    console.log('✅ Cliente criado com sucesso');
                     // Mostrar modal de sucesso de cadastro
+                    console.log('🎯 Chamando showSuccessModal...');
                     window.showSuccessModal();
                 }
                 closeModal();
@@ -1076,41 +1136,6 @@
         
         function ocultarSpinner() {
             document.getElementById('loader-clientes').style.display = 'none';
-        }
-
-        // Função para mostrar modal de sucesso
-        window.showSuccessModal = function() {
-            // Preencher data de cadastro
-            const dataAtual = new Date().toLocaleDateString('pt-BR');
-            document.getElementById('dataCadastro').textContent = dataAtual;
-            
-            // Mostrar modal
-            document.getElementById('successModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Função para fechar modal de sucesso
-        window.closeSuccessModal = function() {
-            document.getElementById('successModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Função para mostrar modal de sucesso de atualização
-        window.showUpdateSuccessModal = function(status) {
-            // Preencher dados de atualização
-            const dataAtual = new Date().toLocaleDateString('pt-BR');
-            document.getElementById('dataAtualizacao').textContent = dataAtual;
-            document.getElementById('statusAtualizado').textContent = status || 'Ativo';
-            
-            // Mostrar modal
-            document.getElementById('updateSuccessModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Função para fechar modal de sucesso de atualização
-        window.closeUpdateSuccessModal = function() {
-            document.getElementById('updateSuccessModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
         // Função para visualizar cliente
