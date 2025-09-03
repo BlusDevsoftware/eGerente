@@ -160,6 +160,11 @@ function limparFormulario() {
             toggle.checked = true;
             toggle.disabled = false;
         }
+        // Atualizar label de status
+        const statusLabel = document.querySelector('.status-label-modal');
+        if (statusLabel) {
+            statusLabel.textContent = 'Ativo';
+        }
         form.perfil.value = '';
         const fotoHidden = form.querySelector('input[name="foto"]');
         if (fotoHidden) fotoHidden.value = '';
@@ -206,6 +211,11 @@ async function visualizarColaborador(codigo) {
         if (toggle) {
             const ativo = (statusValor || '').toLowerCase() === 'ativo';
             toggle.checked = ativo;
+        }
+        // Atualizar label de status
+        const statusLabel = document.querySelector('.status-label-modal');
+        if (statusLabel) {
+            statusLabel.textContent = ativo ? 'Ativo' : 'Inativo';
         }
         form.nome.value = colaborador.nome || '';
         form.email.value = colaborador.email || '';
@@ -294,6 +304,11 @@ async function editarColaborador(codigo) {
             const ativo = (statusValor2 || '').toLowerCase() === 'ativo';
             toggle2.checked = ativo;
             toggle2.disabled = false;
+        }
+        // Atualizar label de status
+        const statusLabel = document.querySelector('.status-label-modal');
+        if (statusLabel) {
+            statusLabel.textContent = ativo ? 'Ativo' : 'Inativo';
         }
         form.nome.value = colaborador.nome || '';
         form.email.value = colaborador.email || '';
@@ -459,14 +474,24 @@ function inicializarStatusToggle(context) {
     const root = document; // agora o controle fica no header
     const toggle = root.querySelector('.status-toggle');
     const input = root.querySelector('input[name="status"]');
+    const statusLabel = root.querySelector('.status-label-modal');
     if (!toggle || !input) return;
+    
     // Remover listeners antigos mantendo o input dentro do label
     const t = toggle; // já é o input do tipo checkbox
     const syncFromModel = () => {
         t.checked = (input.value || '').toLowerCase() === 'ativo';
+        // Atualizar label de status
+        if (statusLabel) {
+            statusLabel.textContent = t.checked ? 'Ativo' : 'Inativo';
+        }
     };
     const syncFromToggle = () => {
         input.value = t.checked ? 'Ativo' : 'Inativo';
+        // Atualizar label de status
+        if (statusLabel) {
+            statusLabel.textContent = t.checked ? 'Ativo' : 'Inativo';
+        }
     };
     syncFromModel();
     t.addEventListener('change', () => {

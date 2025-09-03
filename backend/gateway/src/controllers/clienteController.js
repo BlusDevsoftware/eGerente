@@ -42,7 +42,18 @@ const buscarCliente = async (req, res) => {
 // Criar novo cliente
 const criarCliente = async (req, res) => {
     try {
-        const { nome, tipo, email, telefone, status } = req.body;
+        const { 
+            nome, 
+            tipo, 
+            email, 
+            telefone, 
+            status, 
+            codigo_crm, 
+            documento, 
+            responsavel, 
+            contato, 
+            observacao 
+        } = req.body;
 
         const { data, error } = await supabase
             .from('clientes')
@@ -52,7 +63,12 @@ const criarCliente = async (req, res) => {
                     tipo,
                     email,
                     telefone,
-                    status
+                    status,
+                    codigo_crm,
+                    documento,
+                    responsavel,
+                    contato,
+                    observacao
                 }
             ])
             .select()
@@ -71,7 +87,18 @@ const criarCliente = async (req, res) => {
 const atualizarCliente = async (req, res) => {
     try {
         const { codigo } = req.params;
-        const { nome, tipo, email, telefone, status } = req.body;
+        const { 
+            nome, 
+            tipo, 
+            email, 
+            telefone, 
+            status, 
+            codigo_crm, 
+            documento, 
+            responsavel, 
+            contato, 
+            observacao 
+        } = req.body;
 
         const { data, error } = await supabase
             .from('clientes')
@@ -80,7 +107,12 @@ const atualizarCliente = async (req, res) => {
                 tipo,
                 email,
                 telefone,
-                status
+                status,
+                codigo_crm,
+                documento,
+                responsavel,
+                contato,
+                observacao
             })
             .eq('codigo', codigo)
             .select()

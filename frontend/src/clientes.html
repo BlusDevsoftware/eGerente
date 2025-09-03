@@ -93,25 +93,47 @@
             margin-right: 5px;
             color: #2196F3;
         }
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2196F3;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-        }
-        .form-group input[readonly] {
-            background-color: #f5f5f5;
-            cursor: not-allowed;
-        }
+                 .form-group input,
+         .form-group select,
+         .form-group textarea {
+             width: 100%;
+             padding: 10px;
+             border: 1px solid #ddd;
+             border-radius: 4px;
+             font-size: 14px;
+             transition: border-color 0.3s;
+         }
+                 .form-group input:focus,
+         .form-group select:focus,
+         .form-group textarea:focus {
+             border-color: #2196F3;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+         }
+                 .form-group input[readonly],
+         .form-group textarea[readonly] {
+             background-color: #f5f5f5;
+             cursor: not-allowed;
+         }
+         
+         .form-group textarea {
+             resize: vertical;
+             min-height: 80px;
+             font-family: inherit;
+         }
+         
+         .char-counter {
+             display: flex;
+             justify-content: flex-end;
+             margin-top: 5px;
+             font-size: 12px;
+             color: #666;
+         }
+         
+         .char-counter span {
+             font-weight: 500;
+             color: #2196F3;
+         }
         .form-text {
             font-size: 12px;
             color: #666;
@@ -358,11 +380,17 @@
             min-width: 150px;
         }
 
-        .table-scroll th:nth-child(5), /* Ações */
-        .table-scroll td:nth-child(5) {
-            width: 120px;
-            min-width: 120px;
-        }
+                 .table-scroll th:nth-child(5), /* Status */
+         .table-scroll td:nth-child(5) {
+             width: 100px;
+             min-width: 100px;
+         }
+         
+         .table-scroll th:nth-child(6), /* Ações */
+         .table-scroll td:nth-child(6) {
+             width: 120px;
+             min-width: 120px;
+         }
 
         .table-scroll tbody tr {
             border-bottom: 1px solid #e9ecef;
@@ -444,10 +472,96 @@
         }
         /* Altura consistente das linhas para alinhar com Colaboradores */
         .table-scroll tbody tr { height: 72px; }
-        /* Remover linha (border-bottom) sob a coluna Ações */
-        .table-scroll td:nth-child(5) {
-            border-bottom: none !important;
-        }
+                 /* Remover linha (border-bottom) sob a coluna Ações */
+         .table-scroll td:nth-child(6) {
+             border-bottom: none !important;
+         }
+         
+         /* Estilos para a coluna de Status - Mesmo padrão da aba de colaboradores */
+         .status {
+             padding: 4px 8px;
+             border-radius: 4px;
+             font-size: 0.9em;
+         }
+         
+         .status.ativo {
+             background-color: #e8f5e9;
+             color: #4CAF50;
+         }
+         
+         .status.inativo {
+             background-color: #ffebee;
+             color: #f44336;
+         }
+         
+         /* Estilos para o toggle switch do modal */
+         .modal-header-actions {
+             display: flex;
+             align-items: center;
+             gap: 15px;
+         }
+         
+         .status-toggle-modal {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+         }
+         
+         .status-label-modal {
+             font-size: 13px;
+             font-weight: 500;
+             color: #333;
+             white-space: nowrap;
+         }
+         
+         .switch-modal {
+             position: relative;
+             display: inline-block;
+             width: 40px;
+             height: 20px;
+         }
+         
+         .switch-modal input {
+             opacity: 0;
+             width: 0;
+             height: 0;
+         }
+         
+         .slider-modal {
+             position: absolute;
+             cursor: pointer;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             background-color: #ccc;
+             transition: .4s;
+             border-radius: 20px;
+         }
+         
+         .slider-modal:before {
+             position: absolute;
+             content: "";
+             height: 14px;
+             width: 14px;
+             left: 3px;
+             bottom: 3px;
+             background-color: white;
+             transition: .4s;
+             border-radius: 50%;
+         }
+         
+         input:checked + .slider-modal {
+             background-color: #2196F3;
+         }
+         
+         input:checked + .slider-modal:before {
+             transform: translateX(20px);
+         }
+         
+         .switch-modal:hover .slider-modal {
+             box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+         }
     </style>
 </head>
 <body>
@@ -546,15 +660,16 @@
                 
                 <div class="table-scroll">
                     <table id="clientesTable">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Código CRM</th>
-                                <th>Nome/Razão Social</th>
-                                <th>CNPJ/CPF</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
+                                                 <thead>
+                             <tr>
+                                 <th>Código</th>
+                                 <th>Código CRM</th>
+                                 <th>Nome/Razão Social</th>
+                                 <th>CNPJ/CPF</th>
+                                 <th>Status</th>
+                                 <th>Ações</th>
+                             </tr>
+                         </thead>
                         <tbody>
                             <!-- A tabela será preenchida dinamicamente pelo JavaScript -->
                         </tbody>
@@ -567,34 +682,26 @@
     <!-- Modal -->
     <div class="modal" id="clienteModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle"><i class="fas fa-user-tie"></i> Novo Cliente</h2>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
-            </div>
+                         <div class="modal-header">
+                 <h2 id="modalTitle"><i class="fas fa-user-tie"></i> Novo Cliente</h2>
+                 <div class="modal-header-actions">
+                     <div class="status-toggle-modal">
+                         <label class="switch-modal">
+                             <input type="checkbox" id="statusToggleModal" checked>
+                             <span class="slider-modal round"></span>
+                         </label>
+                         <span class="status-label-modal">Ativo</span>
+                     </div>
+                     <button class="close-modal" onclick="closeModal()">&times;</button>
+                 </div>
+             </div>
             <div class="modal-body">
                 <form id="clienteForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="codigo"><i class="fas fa-hashtag"></i> Código</label>
-                            <input type="text" id="codigo" name="codigo" readonly disabled>
-                            <div class="form-text">Gerado automaticamente</div>
-                        </div>
-                        <div class="form-group">
                             <label for="codigo_crm"><i class="fas fa-id-card"></i> Código CRM</label>
                             <input type="text" id="codigo_crm" name="codigo_crm" required autocomplete="off">
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label id="nomeLabel" for="nome"><i class="fas fa-user"></i> Nome/Razão Social</label>
-                            <input type="text" id="nome" name="nome" required autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label id="documentoLabel" for="documento"><i class="fas fa-id-card-alt"></i> CPF</label>
-                            <input type="text" id="documento" name="documento" required autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="tipo"><i class="fas fa-users"></i> Tipo de Cliente</label>
                             <select id="tipo" name="tipo" required onchange="toggleTipoCliente(this.value, true)" autocomplete="off">
@@ -604,6 +711,39 @@
                             </select>
                         </div>
                     </div>
+                                         <div class="form-row">
+                         <div class="form-group">
+                             <label id="nomeLabel" for="nome"><i class="fas fa-user"></i> Nome/Razão Social</label>
+                             <input type="text" id="nome" name="nome" required autocomplete="name">
+                         </div>
+                         <div class="form-group">
+                             <label id="documentoLabel" for="documento"><i class="fas fa-id-card-alt"></i> CPF</label>
+                             <input type="text" id="documento" name="documento" required autocomplete="off">
+                         </div>
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group">
+                             <label for="responsavel"><i class="fas fa-user-tie"></i> Responsável</label>
+                             <input type="text" id="responsavel" name="responsavel" autocomplete="off" placeholder="Nome do responsável">
+                         </div>
+                         <div class="form-group">
+                             <label for="contato"><i class="fas fa-phone"></i> Contato</label>
+                             <input type="text" id="contato" name="contato" autocomplete="off" placeholder="Telefone ou email">
+                         </div>
+                     </div>
+                     <div class="form-row">
+                         <div class="form-group">
+                             <label for="observacao"><i class="fas fa-sticky-note"></i> Observação</label>
+                             <textarea id="observacao" name="observacao" maxlength="100" rows="3" placeholder="Digite observações sobre o cliente..." oninput="atualizarContador(this)"></textarea>
+                             <div class="char-counter">
+                                 <span id="charCount">0</span>/100 caracteres
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Campo hidden para status -->
+                     <input type="hidden" id="status" name="status" value="ativo">
+
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="closeModal()">
                             <i class="fas fa-times"></i> Cancelar
@@ -669,6 +809,38 @@
             }
             if (limpar) input.value = '';
         }
+        
+        // Função para atualizar contador de caracteres
+        function atualizarContador(textarea) {
+            const contador = document.getElementById('charCount');
+            const caracteresAtuais = textarea.value.length;
+            const limite = textarea.maxLength;
+            contador.textContent = caracteresAtuais;
+            
+            // Mudar cor do contador baseado no uso
+            if (caracteresAtuais >= limite) {
+                contador.style.color = '#dc3545'; // Vermelho quando atingir o limite
+            } else if (caracteresAtuais >= limite * 0.8) {
+                contador.style.color = '#ff9800'; // Laranja quando próximo do limite
+            } else {
+                contador.style.color = '#2196F3'; // Azul normal
+            }
+        }
+        
+        // Função para controlar o toggle de status
+        function toggleStatus() {
+            const toggle = document.getElementById('statusToggleModal');
+            const statusLabel = document.querySelector('.status-label-modal');
+            const statusInput = document.getElementById('status');
+            
+            if (toggle.checked) {
+                statusLabel.textContent = 'Ativo';
+                statusInput.value = 'ativo';
+            } else {
+                statusLabel.textContent = 'Inativo';
+                statusInput.value = 'inativo';
+            }
+        }
 
         // Função para carregar clientes
         async function carregarClientes() {
@@ -680,27 +852,28 @@
                 const tbody = document.querySelector('#clientesTable tbody');
                 tbody.innerHTML = '';
 
-                clientes.forEach(cliente => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${formatarCodigo(cliente.codigo)}</td>
-                        <td>${cliente.codigo_crm || '-'}</td>
-                        <td>${cliente.nome}</td>
-                        <td>${cliente.documento || '-'}</td>
-                        <td class="actions">
-                            <button class="action-btn view-btn" title="Visualizar" onclick="visualizarCliente('${cliente.codigo}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn edit-btn" title="Editar" onclick="editarCliente('${cliente.codigo}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-btn" title="Excluir" onclick="excluirCliente('${cliente.codigo}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+                                 clientes.forEach(cliente => {
+                     const tr = document.createElement('tr');
+                     tr.innerHTML = `
+                         <td>${formatarCodigo(cliente.codigo)}</td>
+                         <td>${cliente.codigo_crm || '-'}</td>
+                         <td>${cliente.nome}</td>
+                         <td>${cliente.documento || '-'}</td>
+                         <td><span class="status ${cliente.status === 'ativo' ? 'ativo' : 'inativo'}">${cliente.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
+                         <td class="actions">
+                             <button class="action-btn view-btn" title="Visualizar" onclick="visualizarCliente('${cliente.codigo}')">
+                                 <i class="fas fa-eye"></i>
+                             </button>
+                             <button class="action-btn edit-btn" title="Editar" onclick="editarCliente('${cliente.codigo}')">
+                                 <i class="fas fa-edit"></i>
+                             </button>
+                             <button class="action-btn delete-btn" title="Excluir" onclick="excluirCliente('${cliente.codigo}')">
+                                 <i class="fas fa-trash"></i>
+                             </button>
+                         </td>
+                     `;
+                     tbody.appendChild(tr);
+                 });
                 
                 // Ocultar spinner após carregar com sucesso
                 ocultarSpinner();
@@ -717,8 +890,20 @@
             const form = document.getElementById('clienteForm');
             form.reset();
             delete form.dataset.codigo;
-            form.codigo.value = '';
             toggleTipoCliente('pf', true);
+            // Limpar campos adicionais
+            form.responsavel.value = '';
+            form.contato.value = '';
+            form.observacao.value = '';
+            // Resetar contador
+            atualizarContador(form.observacao);
+            // Resetar status para ativo
+            const statusToggle = document.getElementById('statusToggleModal');
+            const statusLabel = document.querySelector('.status-label-modal');
+            const statusInput = document.getElementById('status');
+            statusToggle.checked = true;
+            statusLabel.textContent = 'Ativo';
+            statusInput.value = 'ativo';
             const modal = document.getElementById('clienteModal');
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '<i class="fas fa-user-tie"></i> Novo Cliente';
@@ -751,11 +936,23 @@
                 const cliente = await api.get(`/clientes/${codigo}`);
                 const form = document.getElementById('clienteForm');
                 form.dataset.codigo = cliente.codigo;
-                form.codigo.value = formatarCodigo(cliente.codigo);
                 form.codigo_crm.value = cliente.codigo_crm || '';
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
                 form.documento.value = cliente.documento || '';
+                form.responsavel.value = cliente.responsavel || '';
+                form.contato.value = cliente.contato || '';
+                form.observacao.value = cliente.observacao || '';
+                // Atualizar contador
+                atualizarContador(form.observacao);
+                // Atualizar status
+                const statusToggle = document.getElementById('statusToggleModal');
+                const statusLabel = document.querySelector('.status-label-modal');
+                const statusInput = document.getElementById('status');
+                const status = cliente.status || 'ativo';
+                statusToggle.checked = status === 'ativo';
+                statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                statusInput.value = status;
                 toggleTipoCliente(cliente.tipo, false);
                 const modal = document.getElementById('clienteModal');
                 const modalTitle = document.getElementById('modalTitle');
@@ -778,7 +975,11 @@
                 codigo_crm: formData.get('codigo_crm'),
                 nome: formData.get('nome'),
                 tipo: formData.get('tipo'),
-                documento: formData.get('documento')
+                documento: formData.get('documento'),
+                responsavel: formData.get('responsavel'),
+                contato: formData.get('contato'),
+                observacao: formData.get('observacao'),
+                status: formData.get('status')
             };
 
             try {
@@ -829,11 +1030,23 @@
                 const cliente = await api.get(`/clientes/${codigo}`);
                 const form = document.getElementById('clienteForm');
                 // Preencher formulário
-                form.codigo.value = formatarCodigo(cliente.codigo);
                 form.codigo_crm.value = cliente.codigo_crm || '';
                 form.nome.value = cliente.nome;
                 form.tipo.value = cliente.tipo;
                 form.documento.value = cliente.documento || '';
+                form.responsavel.value = cliente.responsavel || '';
+                form.contato.value = cliente.contato || '';
+                form.observacao.value = cliente.observacao || '';
+                // Atualizar contador
+                atualizarContador(form.observacao);
+                // Atualizar status
+                const statusToggle = document.getElementById('statusToggleModal');
+                const statusLabel = document.querySelector('.status-label-modal');
+                const statusInput = document.getElementById('status');
+                const status = cliente.status || 'ativo';
+                statusToggle.checked = status === 'ativo';
+                statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                statusInput.value = status;
                 toggleTipoCliente(cliente.tipo, false);
                 // Desabilitar todos os campos
                 Array.from(form.elements).forEach(element => {
@@ -877,8 +1090,9 @@
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
-            document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
-            document.getElementById('tipo').addEventListener('change', (e) => toggleTipoCliente(e.target.value));
+                         document.getElementById('clienteForm').addEventListener('submit', salvarCliente);
+             document.getElementById('tipo').addEventListener('change', (e) => toggleTipoCliente(e.target.value));
+             document.getElementById('statusToggleModal').addEventListener('change', toggleStatus);
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
@@ -900,6 +1114,8 @@
         window.closeModal = closeModal;
         window.visualizarCliente = visualizarCliente;
         window.closeDeleteModal = closeDeleteModal;
+        window.atualizarContador = atualizarContador;
+        window.toggleStatus = toggleStatus;
     </script>
 
     <script src="scripts/navigation.js"></script>
