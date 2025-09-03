@@ -203,6 +203,41 @@ function ocultarSpinner() {
     document.getElementById('loader-usuarios').style.display = 'none';
 }
 
+// Função para mostrar modal de sucesso
+function showSuccessModal() {
+    // Preencher data de cadastro
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('dataCadastro').textContent = dataAtual;
+    
+    // Mostrar modal
+    document.getElementById('successModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Função para fechar modal de sucesso
+function closeSuccessModal() {
+    document.getElementById('successModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Função para mostrar modal de sucesso de atualização
+function showUpdateSuccessModal() {
+    // Preencher dados de atualização
+    const dataAtual = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('dataAtualizacao').textContent = dataAtual;
+    document.getElementById('statusAtualizado').textContent = 'Ativo';
+    
+    // Mostrar modal
+    document.getElementById('updateSuccessModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Função para fechar modal de sucesso de atualização
+function closeUpdateSuccessModal() {
+    document.getElementById('updateSuccessModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
 // Carregar perfis (mesma animação/fluxo da aba de Serviços)
 async function carregarPerfis() {
     try {
@@ -656,11 +691,13 @@ async function salvarPerfil(e) {
         if (form.codigo.value) {
             console.log('🔍 FRONTEND - Atualizando perfil:', form.codigo.value);
             await api.put(`/perfis/${form.codigo.value}`, dadosEnvio);
-            mostrarToast('Perfil atualizado com sucesso!', 'success');
+            // Mostrar modal de sucesso de atualização
+            showUpdateSuccessModal();
         } else {
             console.log('🔍 FRONTEND - Criando novo perfil');
             await api.post('/perfis', dadosEnvio);
-            mostrarToast('Perfil criado com sucesso!', 'success');
+            // Mostrar modal de sucesso de cadastro
+            showSuccessModal();
         }
         closePerfilModal();
         await carregarPerfis();
@@ -882,6 +919,19 @@ function mostrarToast(mensagem, tipo) {
     }, 3000);
 }
 
+// Fechar modal de sucesso quando clicar fora dele
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('successModal');
+    if (modal && event.target === modal) {
+        closeSuccessModal();
+    }
+    
+    const updateModal = document.getElementById('updateSuccessModal');
+    if (updateModal && event.target === updateModal) {
+        closeUpdateSuccessModal();
+    }
+});
+
 // Adicionar funções ao escopo global (Perfil)
 window.openPerfilModal = openPerfilModal;
 window.closePerfilModal = closePerfilModal;
@@ -890,6 +940,10 @@ window.editarPerfil = editarPerfil;
 window.confirmarExclusaoPerfil = confirmarExclusaoPerfil;
 window.renderPermissionsMatrix = renderPermissionsMatrix;
 window.mostrarToast = mostrarToast;
+window.showSuccessModal = showSuccessModal;
+window.closeSuccessModal = closeSuccessModal;
+window.showUpdateSuccessModal = showUpdateSuccessModal;
+window.closeUpdateSuccessModal = closeUpdateSuccessModal;
 
 function fecharModal() {
     const modal = document.getElementById('modalUsuario');
