@@ -208,8 +208,9 @@ async function visualizarColaborador(codigo) {
         const statusValor = colaborador.status || 'Ativo';
         if (statusInput) statusInput.value = statusValor;
         const toggle = form.querySelector('.status-toggle');
+        let ativo = false; // Declarar variável fora do bloco if
         if (toggle) {
-            const ativo = (statusValor || '').toLowerCase() === 'ativo';
+            ativo = (statusValor || '').toLowerCase() === 'ativo';
             toggle.checked = ativo;
         }
         // Atualizar label de status
@@ -300,8 +301,9 @@ async function editarColaborador(codigo) {
         const statusValor2 = colaborador.status || 'Ativo';
         if (statusInput2) statusInput2.value = statusValor2;
         const toggle2 = form.querySelector('.status-toggle');
+        let ativo = false; // Declarar variável fora do bloco if
         if (toggle2) {
-            const ativo = (statusValor2 || '').toLowerCase() === 'ativo';
+            ativo = (statusValor2 || '').toLowerCase() === 'ativo';
             toggle2.checked = ativo;
             toggle2.disabled = false;
         }
