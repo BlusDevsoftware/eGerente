@@ -204,7 +204,7 @@ function ocultarSpinner() {
 }
 
 // Função para mostrar modal de sucesso
-function showSuccessModal() {
+window.showSuccessModal = function() {
     // Preencher data de cadastro
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     document.getElementById('dataCadastro').textContent = dataAtual;
@@ -215,13 +215,13 @@ function showSuccessModal() {
 }
 
 // Função para fechar modal de sucesso
-function closeSuccessModal() {
+window.closeSuccessModal = function() {
     document.getElementById('successModal').style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
 // Função para mostrar modal de sucesso de atualização
-function showUpdateSuccessModal() {
+window.showUpdateSuccessModal = function() {
     // Preencher dados de atualização
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     document.getElementById('dataAtualizacao').textContent = dataAtual;
@@ -233,7 +233,7 @@ function showUpdateSuccessModal() {
 }
 
 // Função para fechar modal de sucesso de atualização
-function closeUpdateSuccessModal() {
+window.closeUpdateSuccessModal = function() {
     document.getElementById('updateSuccessModal').style.display = 'none';
     document.body.style.overflow = 'auto';
 }
