@@ -489,6 +489,69 @@
         .table-scroll tbody tr { height: 72px; }
         /* Remover linha sob Ações para visual mais limpo (opcional) */
         .table-scroll td:nth-child(5) { border-bottom: none !important; }
+        
+        /* Estilos para o toggle switch de status - Mesmo padrão das outras abas */
+        .status-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        .switch:hover .slider {
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+        }
+        
+        .status-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
     </style>
     <script>
         // Funções de Modal - Escopo Global
@@ -641,26 +704,25 @@
                 <form id="produtoForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="codigo"><i class="fas fa-hashtag"></i> Código</label>
-                            <input type="text" id="codigo" name="codigo" readonly disabled>
-                            <div class="form-text">Gerado automaticamente</div>
-                        </div>
-                        <div class="form-group">
                             <label for="nome"><i class="fas fa-box"></i> Nome</label>
                             <input type="text" id="nome" name="nome" required>
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="preco"><i class="fas fa-dollar-sign"></i> Preço</label>
                             <input type="number" step="0.01" min="0" id="preco" name="preco" required>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="status"><i class="fas fa-toggle-on"></i> Status</label>
-                            <select id="status" name="status" required>
-                                <option value="ativo">Ativo</option>
-                                <option value="inativo">Inativo</option>
-                            </select>
+                            <div class="status-toggle-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="statusToggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="status-label">Ativo</span>
+                            </div>
+                            <input type="hidden" id="status" name="status" value="ativo">
                         </div>
                     </div>
                     <div class="form-group">
@@ -763,7 +825,15 @@
             const form = document.getElementById('produtoForm');
             form.reset();
             delete form.dataset.codigo;
-            form.codigo.value = '';
+            
+            // Inicializar toggle de status
+            const statusToggle = document.getElementById('statusToggle');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label');
+            if (statusToggle) statusToggle.checked = true;
+            if (statusInput) statusInput.value = 'ativo';
+            if (statusLabel) statusLabel.textContent = 'Ativo';
+            
             const modal = document.getElementById('produtoModal');
             const modalTitle = document.getElementById('modalTitle');
             modalTitle.innerHTML = '<i class="fas fa-box"></i> Novo Produto';
@@ -821,11 +891,19 @@
                 const produto = await api.get(`/produtos/${codigo}`);
                 const form = document.getElementById('produtoForm');
                 form.dataset.codigo = produto.codigo;
-                form.codigo.value = formatarCodigo(produto.codigo);
                 form.nome.value = produto.nome;
                 form.preco.value = produto.preco;
-                form.status.value = produto.status;
                 form.descricao.value = produto.descricao || '';
+                
+                // Atualizar toggle de status
+                const statusToggle = document.getElementById('statusToggle');
+                const statusInput = document.getElementById('status');
+                const statusLabel = document.querySelector('.status-label');
+                const status = produto.status || 'ativo';
+                if (statusToggle) statusToggle.checked = status === 'ativo';
+                if (statusInput) statusInput.value = status;
+                if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                
                 const modal = document.getElementById('produtoModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-box"></i> Editar Produto';
@@ -843,26 +921,38 @@
             try {
                 const produto = await api.get(`/produtos/${codigo}`);
                 const form = document.getElementById('produtoForm');
-                form.codigo.value = formatarCodigo(produto.codigo);
                 form.nome.value = produto.nome;
                 form.preco.value = produto.preco;
-                form.status.value = produto.status;
                 form.descricao.value = produto.descricao || '';
+                
+                // Atualizar toggle de status
+                const statusToggle = document.getElementById('statusToggle');
+                const statusInput = document.getElementById('status');
+                const statusLabel = document.querySelector('.status-label');
+                const status = produto.status || 'ativo';
+                if (statusToggle) statusToggle.checked = status === 'ativo';
+                if (statusInput) statusInput.value = status;
+                if (statusLabel) statusLabel.textContent = status === 'ativo' ? 'Ativo' : 'Inativo';
+                
                 // Desabilitar todos os campos
                 Array.from(form.elements).forEach(element => {
                     element.disabled = true;
                 });
+                
                 // Ajustar título
                 const modal = document.getElementById('produtoModal');
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.innerHTML = '<i class="fas fa-eye"></i> Visualizar Produto';
+                
                 // Esconder botões de ação
                 const formActions = form.querySelector('.form-actions');
                 if (formActions) formActions.style.display = 'none';
+                
                 // Abrir modal
                 modal.style.display = 'flex';
                 setTimeout(() => modal.classList.add('show'), 10);
                 document.body.style.overflow = 'hidden';
+                
                 // Ao fechar, reabilitar campos e mostrar botões
                 form.onsubmit = (e) => {
                     e.preventDefault();
@@ -892,6 +982,19 @@
             }, 300);
         }
 
+        // Função para controlar o toggle de status
+        function toggleStatus() {
+            const toggle = document.getElementById('statusToggle');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label');
+            
+            if (toggle && statusInput && statusLabel) {
+                const isAtivo = toggle.checked;
+                statusInput.value = isAtivo ? 'ativo' : 'inativo';
+                statusLabel.textContent = isAtivo ? 'Ativo' : 'Inativo';
+            }
+        }
+        
         // Funções para controlar o spinner centralizado - IDÊNTICAS AO DA ABA DE COLABORADORES
         function mostrarSpinner() {
             document.getElementById('loader-produtos').style.display = 'flex';
@@ -916,6 +1019,13 @@
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
+            
+            // Adicionar event listener para o toggle de status
+            const statusToggle = document.getElementById('statusToggle');
+            if (statusToggle) {
+                statusToggle.addEventListener('change', toggleStatus);
+            }
+            
             document.getElementById('produtoForm').addEventListener('submit', salvarProduto);
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
@@ -936,6 +1046,7 @@
         window.visualizarProduto = visualizarProduto;
         window.closeModal = closeModal;
         window.closeDeleteModal = closeDeleteModal;
+        window.toggleStatus = toggleStatus;
     </script>
 </body>
 </html> 
