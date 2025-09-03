@@ -490,28 +490,33 @@
         /* Remover linha sob Ações para visual mais limpo (opcional) */
         .table-scroll td:nth-child(5) { border-bottom: none !important; }
         
-        /* Estilos para o toggle switch de status - Mesmo padrão das outras abas */
-        .status-toggle-container {
+        /* Estilos para o toggle switch no cabeçalho do modal - Mesmo padrão das outras abas */
+        .modal-header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 5px;
+            gap: 15px;
         }
         
-        .switch {
+        .status-toggle-modal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .switch-modal {
             position: relative;
             display: inline-block;
             width: 40px;
             height: 20px;
         }
         
-        .switch input {
+        .switch-modal input {
             opacity: 0;
             width: 0;
             height: 0;
         }
         
-        .slider {
+        .slider-modal {
             position: absolute;
             cursor: pointer;
             top: 0;
@@ -523,7 +528,7 @@
             border-radius: 20px;
         }
         
-        .slider:before {
+        .slider-modal:before {
             position: absolute;
             content: "";
             height: 14px;
@@ -535,22 +540,23 @@
             border-radius: 50%;
         }
         
-        input:checked + .slider {
+        .switch-modal input:checked + .slider-modal {
             background-color: #2196F3;
         }
         
-        input:checked + .slider:before {
+        .switch-modal input:checked + .slider-modal:before {
             transform: translateX(20px);
         }
         
-        .switch:hover .slider {
+        .switch-modal:hover .slider-modal {
             box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
         }
         
-        .status-label {
-            font-size: 14px;
+        .status-label-modal {
+            font-size: 13px;
             font-weight: 500;
             color: #333;
+            white-space: nowrap;
         }
     </style>
     <script>
@@ -698,7 +704,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle"><i class="fas fa-box"></i> Novo Produto</h2>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <div class="modal-header-actions">
+                    <div class="status-toggle-modal">
+                        <label class="switch-modal">
+                            <input type="checkbox" id="statusToggleModal" checked>
+                            <span class="slider-modal round"></span>
+                        </label>
+                        <span class="status-label-modal">Ativo</span>
+                    </div>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
             </div>
             <div class="modal-body">
                 <form id="produtoForm">
@@ -712,19 +727,7 @@
                             <input type="number" step="0.01" min="0" id="preco" name="preco" required>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="status"><i class="fas fa-toggle-on"></i> Status</label>
-                            <div class="status-toggle-container">
-                                <label class="switch">
-                                    <input type="checkbox" id="statusToggle" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                                <span class="status-label">Ativo</span>
-                            </div>
-                            <input type="hidden" id="status" name="status" value="ativo">
-                        </div>
-                    </div>
+                    <input type="hidden" id="status" name="status" value="ativo">
                     <div class="form-group">
                         <label for="descricao"><i class="fas fa-align-left"></i> Descrição</label>
                         <textarea rows="3" id="descricao" name="descricao"></textarea>
@@ -827,9 +830,9 @@
             delete form.dataset.codigo;
             
             // Inicializar toggle de status
-            const statusToggle = document.getElementById('statusToggle');
+            const statusToggle = document.getElementById('statusToggleModal');
             const statusInput = document.getElementById('status');
-            const statusLabel = document.querySelector('.status-label');
+            const statusLabel = document.querySelector('.status-label-modal');
             if (statusToggle) statusToggle.checked = true;
             if (statusInput) statusInput.value = 'ativo';
             if (statusLabel) statusLabel.textContent = 'Ativo';
@@ -896,9 +899,9 @@
                 form.descricao.value = produto.descricao || '';
                 
                 // Atualizar toggle de status
-                const statusToggle = document.getElementById('statusToggle');
+                const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
-                const statusLabel = document.querySelector('.status-label');
+                const statusLabel = document.querySelector('.status-label-modal');
                 const status = produto.status || 'ativo';
                 if (statusToggle) statusToggle.checked = status === 'ativo';
                 if (statusInput) statusInput.value = status;
@@ -926,9 +929,9 @@
                 form.descricao.value = produto.descricao || '';
                 
                 // Atualizar toggle de status
-                const statusToggle = document.getElementById('statusToggle');
+                const statusToggle = document.getElementById('statusToggleModal');
                 const statusInput = document.getElementById('status');
-                const statusLabel = document.querySelector('.status-label');
+                const statusLabel = document.querySelector('.status-label-modal');
                 const status = produto.status || 'ativo';
                 if (statusToggle) statusToggle.checked = status === 'ativo';
                 if (statusInput) statusInput.value = status;
@@ -984,9 +987,9 @@
 
         // Função para controlar o toggle de status
         function toggleStatus() {
-            const toggle = document.getElementById('statusToggle');
+            const toggle = document.getElementById('statusToggleModal');
             const statusInput = document.getElementById('status');
-            const statusLabel = document.querySelector('.status-label');
+            const statusLabel = document.querySelector('.status-label-modal');
             
             if (toggle && statusInput && statusLabel) {
                 const isAtivo = toggle.checked;
@@ -1021,7 +1024,7 @@
             }
             
             // Adicionar event listener para o toggle de status
-            const statusToggle = document.getElementById('statusToggle');
+            const statusToggle = document.getElementById('statusToggleModal');
             if (statusToggle) {
                 statusToggle.addEventListener('change', toggleStatus);
             }
