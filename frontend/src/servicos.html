@@ -478,6 +478,92 @@
         .table-scroll tbody tr { height: 72px; }
         /* Remover linha sob Ações para visual mais limpo (opcional) */
         .table-scroll td:nth-child(5) { border-bottom: none !important; }
+        
+        /* Estilos para o toggle switch no cabeçalho do modal - Mesmo padrão das outras abas */
+        .modal-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-toggle-modal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .switch-modal {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        
+        .switch-modal input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider-modal {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .slider-modal:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .switch-modal input:checked + .slider-modal {
+            background-color: #2196F3;
+        }
+        
+        .switch-modal input:checked + .slider-modal:before {
+            transform: translateX(20px);
+        }
+        
+        .switch-modal:hover .slider-modal {
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+        }
+        
+        .status-label-modal {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            white-space: nowrap;
+        }
+        
+        /* Estilos para a coluna de Status - Mesmo padrão da aba de clientes */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .status.ativo {
+            background-color: #e8f5e9;
+            color: #4CAF50;
+        }
+        
+        .status.inativo {
+            background-color: #ffebee;
+            color: #f44336;
+        }
     </style>
 </head>
 <body>
@@ -602,34 +688,30 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="servicoModalTitle"><i class="fas fa-cogs"></i> Novo Serviço</h2>
-                <button class="close-modal" onclick="closeServicoModal()">&times;</button>
+                <div class="modal-header-actions">
+                    <div class="status-toggle-modal">
+                        <label class="switch-modal">
+                            <input type="checkbox" id="statusToggleModal" checked>
+                            <span class="slider-modal round"></span>
+                        </label>
+                        <span class="status-label-modal">Ativo</span>
+                    </div>
+                    <button class="close-modal" onclick="closeServicoModal()">&times;</button>
+                </div>
             </div>
             <div class="modal-body">
                 <form id="servicoForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label><i class="fas fa-hashtag"></i> Código</label>
-                            <input type="text" id="codigo" name="codigo" readonly disabled>
-                            <small class="form-text text-muted">Gerado automaticamente</small>
-                        </div>
-                        <div class="form-group">
                             <label><i class="fas fa-box"></i> Nome</label>
                             <input type="text" id="nome" name="nome" required>
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
                             <label><i class="fas fa-dollar-sign"></i> Valor</label>
                             <input type="number" id="valor" name="valor" step="0.01" min="0" required>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-toggle-on"></i> Status</label>
-                            <select id="status" name="status" required>
-                                <option value="Ativo">Ativo</option>
-                                <option value="Inativo">Inativo</option>
-                            </select>
-                        </div>
                     </div>
+                    <input type="hidden" id="status" name="status" value="ativo">
                     <div class="form-group">
                         <label><i class="fas fa-align-left"></i> Descrição</label>
                         <textarea id="descricao" name="descricao" rows="3" required></textarea>
@@ -682,14 +764,27 @@
             modalTitle.innerHTML = `<i class='fas fa-cogs'></i> ${titulo}`;
             form.reset();
             form.dataset.codigo = '';
+            
+            // Inicializar toggle de status
+            const statusToggle = document.getElementById('statusToggleModal');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label-modal');
+            if (statusToggle) statusToggle.checked = true;
+            if (statusInput) statusInput.value = 'ativo';
+            if (statusLabel) statusLabel.textContent = 'Ativo';
+            
             // Preencher dados se for edição ou visualização
             if (servico) {
-                form.codigo.value = servico.codigo;
                 form.nome.value = servico.nome;
                 form.valor.value = servico.valor;
-                form.status.value = servico.status;
                 form.descricao.value = servico.descricao;
                 form.dataset.codigo = servico.codigo;
+                
+                // Atualizar toggle de status
+                const status = servico.status || 'Ativo';
+                if (statusToggle) statusToggle.checked = status === 'Ativo';
+                if (statusInput) statusInput.value = status === 'Ativo' ? 'ativo' : 'inativo';
+                if (statusLabel) statusLabel.textContent = status === 'Ativo' ? 'Ativo' : 'Inativo';
             }
             // Modo visualização: desabilitar campos e esconder botões
             Array.from(form.elements).forEach(el => {
@@ -752,7 +847,11 @@
                         <td>${servico.codigo}</td>
                         <td>${servico.nome}</td>
                         <td>R$ ${parseFloat(servico.valor).toFixed(2)}</td>
-                        <td><span class="badge ${servico.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">${servico.status}</span></td>
+                        <td>
+                            <span class="status ${servico.status === 'Ativo' ? 'ativo' : 'inativo'}">
+                                ${servico.status === 'Ativo' ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
                         <td class="actions">
                             <button class="action-btn view-btn" title="Visualizar" onclick="visualizarServico('${servico.codigo}')"><i class="fas fa-eye"></i></button>
                             <button class="action-btn edit-btn" title="Editar" onclick="editarServico('${servico.codigo}')"><i class="fas fa-edit"></i></button>
@@ -771,6 +870,19 @@
                 ocultarSpinner();
             }
         }
+        // Função para controlar o toggle de status
+        function toggleStatus() {
+            const toggle = document.getElementById('statusToggleModal');
+            const statusInput = document.getElementById('status');
+            const statusLabel = document.querySelector('.status-label-modal');
+            
+            if (toggle && statusInput && statusLabel) {
+                const isAtivo = toggle.checked;
+                statusInput.value = isAtivo ? 'ativo' : 'inativo';
+                statusLabel.textContent = isAtivo ? 'Ativo' : 'Inativo';
+            }
+        }
+        
         // CRUD
         window.visualizarServico = async function(codigo) {
             try {
@@ -794,7 +906,7 @@
             const servico = {
                 nome: form.nome.value,
                 valor: parseFloat(form.valor.value),
-                status: form.status.value,
+                status: form.status.value === 'ativo' ? 'Ativo' : 'Inativo',
                 descricao: form.descricao.value
             };
             try {
@@ -830,12 +942,21 @@
                 
                 // Ocultar spinner centralizado quando tudo carregar
                 ocultarSpinner();
+                
+                // Adicionar event listener para o toggle de status
+                const statusToggle = document.getElementById('statusToggleModal');
+                if (statusToggle) {
+                    statusToggle.addEventListener('change', toggleStatus);
+                }
             } catch (error) {
                 console.error('Erro ao inicializar página:', error);
                 // Ocultar spinner mesmo em caso de erro
                 ocultarSpinner();
             }
         });
+        
+        // Funções globais
+        window.toggleStatus = toggleStatus;
     </script>
     <script src="scripts/navigation.js"></script>
 </body>
