@@ -286,26 +286,21 @@
         .btn-secondary:hover {
             background-color: #e0e0e0;
         }
-        /* Badge de status para Ativo/Inativo */
-        .badge {
-            display: inline-block;
+        /* Estilos para a coluna de Status - Mesmo padrão da aba de clientes */
+        .status {
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin: 0 auto;
-            text-align: center;
         }
-        .bg-success {
-            background: #e6f9ec;
-            color: #1ca14b;
-            border: 1px solid #b6e7c7;
+        
+        .status.ativo {
+            background-color: #e8f5e9;
+            color: #4CAF50;
         }
-        .bg-danger {
-            background: #ffeaea;
-            color: #e53935;
-            border: 1px solid #ffcdd2;
+        
+        .status.inativo {
+            background-color: #ffebee;
+            color: #f44336;
         }
 
         /* Estilos para a tabela de produtos - Mesmo padrão da tabela de colaboradores */
@@ -794,7 +789,7 @@
                         <td>${produto.nome}</td>
                         <td>R$ ${parseFloat(produto.preco).toFixed(2)}</td>
                         <td>
-                            <span class="badge ${produto.status === 'ativo' ? 'bg-success' : 'bg-danger'}">
+                            <span class="status ${produto.status === 'ativo' ? 'ativo' : 'inativo'}">
                                 ${produto.status === 'ativo' ? 'Ativo' : 'Inativo'}
                             </span>
                         </td>
