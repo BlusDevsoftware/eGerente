@@ -1036,12 +1036,12 @@
                 if (form.dataset.codigo) {
                     await api.put(`/clientes/${form.dataset.codigo}`, cliente);
                     // Mostrar modal de sucesso de atualização
-                    showUpdateSuccessModal(cliente.status === 'ativo' ? 'Ativo' : 'Inativo');
+                    window.showUpdateSuccessModal(cliente.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
                     // Não enviar o campo codigo no POST
                     await api.post('/clientes', cliente);
                     // Mostrar modal de sucesso de cadastro
-                    showSuccessModal();
+                    window.showSuccessModal();
                 }
                 closeModal();
                 carregarClientes();

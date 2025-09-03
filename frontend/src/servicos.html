@@ -998,11 +998,11 @@
                 if (form.dataset.codigo) {
                     await api.put(`/servicos/${form.dataset.codigo}`, servico);
                     // Mostrar modal de sucesso de atualização
-                    showUpdateSuccessModal(servico.status);
+                    window.showUpdateSuccessModal(servico.status);
                 } else {
                     await api.post('/servicos', servico);
                     // Mostrar modal de sucesso de cadastro
-                    showSuccessModal();
+                    window.showSuccessModal();
                 }
                 closeServicoModal();
                 carregarServicos();

@@ -923,11 +923,11 @@
                 if (form.dataset.codigo) {
                     await api.put(`/produtos/${form.dataset.codigo}`, produto);
                     // Mostrar modal de sucesso de atualização
-                    showUpdateSuccessModal(produto.status === 'ativo' ? 'Ativo' : 'Inativo');
+                    window.showUpdateSuccessModal(produto.status === 'ativo' ? 'Ativo' : 'Inativo');
                 } else {
                     await api.post('/produtos', produto);
                     // Mostrar modal de sucesso de cadastro
-                    showSuccessModal();
+                    window.showSuccessModal();
                 }
                 closeModal();
                 carregarProdutos();

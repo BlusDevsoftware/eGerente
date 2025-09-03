@@ -692,12 +692,12 @@ async function salvarPerfil(e) {
             console.log('🔍 FRONTEND - Atualizando perfil:', form.codigo.value);
             await api.put(`/perfis/${form.codigo.value}`, dadosEnvio);
             // Mostrar modal de sucesso de atualização
-            showUpdateSuccessModal();
+            window.showUpdateSuccessModal();
         } else {
             console.log('🔍 FRONTEND - Criando novo perfil');
             await api.post('/perfis', dadosEnvio);
             // Mostrar modal de sucesso de cadastro
-            showSuccessModal();
+            window.showSuccessModal();
         }
         closePerfilModal();
         await carregarPerfis();
