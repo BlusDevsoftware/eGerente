@@ -19,8 +19,14 @@
             const resp = await window.api.get(`/${entity}/${id}/dependencies`);
             return resp || { hasDependencies: false };
         } catch (error) {
-            // Silencioso: endpoint opcional, segue para tentativa de delete
-            return { hasDependencies: false };
+            // Comportamento: 404 => endpoint inexistente, tratar como sem dependências.
+            // Outros erros => não foi possível validar, bloquear por segurança.
+            const status = (error && error.status) ?? (error && error.response && error.response.status);
+            if (status === 404) {
+                return { hasDependencies: false };
+            }
+            showMessage('Não foi possível validar vínculos. Tente novamente.', 'error');
+            return { hasDependencies: true, error: true };
         }
     }
 
@@ -31,9 +37,9 @@
         modal.id = 'dependencyBlockModal';
         modal.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,0.18); z-index:5000; align-items:center; justify-content:center;';
         modal.innerHTML = `
-            <div class="modal-content" style="background:#fff; border-radius:16px; max-width:520px; width:96%; box-shadow:0 8px 32px rgba(33,150,243,0.13); padding:0;">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="dependencyBlockTitle" style="background:#fff; border-radius:16px; max-width:520px; width:96%; box-shadow:0 8px 32px rgba(33,150,243,0.13); padding:0;">
                 <div class="modal-header" style="padding:24px 36px 0 36px; border-bottom:1px solid #eee; display:flex; align-items:center; justify-content:space-between;">
-                    <h2 style="margin:0; font-size:1.2em; color:#dc3545; display:flex; align-items:center; gap:10px; font-weight:700;">
+                    <h2 id="dependencyBlockTitle" style="margin:0; font-size:1.2em; color:#dc3545; display:flex; align-items:center; gap:10px; font-weight:700;">
                         <i class="fas fa-ban"></i> Ação não permitida
                     </h2>
                     <button id="dependencyBlockCloseBtn" style="background:none; border:none; font-size:1.5em; color:#666; cursor:pointer; padding:5px;">&times;</button>
@@ -55,6 +61,7 @@
             setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }, 300);
         };
         modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+        modal.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
         modal.querySelector('#dependencyBlockCloseBtn').addEventListener('click', close);
         modal.querySelector('#dependencyBlockOkBtn').addEventListener('click', close);
         return modal;
@@ -82,6 +89,8 @@
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
         document.body.style.overflow = 'hidden';
+        // Foco no botão de ação
+        try { modal.querySelector('#dependencyBlockOkBtn').focus(); } catch (_) {}
     }
 
     async function deleteWithCheck(entity, id, onSuccess, onBlocked) {
@@ -101,17 +110,19 @@
 
         // 2) tentativa de exclusão
         try {
-            await window.api.delete(`/${entity}/${id}`);
+            const safeEntity = encodeURIComponent(String(entity || '').trim());
+            const safeId = encodeURIComponent(String(id || '').trim());
+            await window.api.delete(`/${safeEntity}/${safeId}`);
             if (typeof onSuccess === 'function') onSuccess();
             showMessage('Excluído com sucesso!', 'success');
             return { ok: true };
         } catch (error) {
-            const isFk500 = error && error.status === 500 && (
-                (error.data && (String(error.data.details || '').includes('violates foreign key constraint') || String(error.data.details || '').includes('chave estrangeira'))) ||
-                (error.data && /foreign key|chave estrangeira/i.test(String(error.data.error || '')))
-            );
-            if (error && (error.status === 409 || error.status === 400 || isFk500)) {
-                const details = error.data || {};
+            const status = (error && error.status) ?? (error && error.response && error.response.status);
+            const data = (error && error.data) ?? (error && error.response && error.response.data) ?? {};
+            const detailsStr = String(data.details || data.error || '');
+            const isFk500 = status === 500 && /foreign key|chave estrangeira/i.test(detailsStr);
+            if (status === 409 || status === 400 || isFk500 || data.code === 'FOREIGN_KEY_VIOLATION') {
+                const details = data || {};
                 const msg = details.message || 'Não é possível excluir: existem vínculos.';
                 if (typeof onBlocked === 'function') {
                     onBlocked(details);
