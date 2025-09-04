@@ -19,7 +19,7 @@
             const resp = await window.api.get(`/${entity}/${id}/dependencies`);
             return resp || { hasDependencies: false };
         } catch (error) {
-            // Se endpoint não existir, assume que não há checagem prévia
+            // Silencioso: endpoint opcional, segue para tentativa de delete
             return { hasDependencies: false };
         }
     }

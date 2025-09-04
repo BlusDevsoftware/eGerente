@@ -391,7 +391,7 @@ async function editarColaborador(codigo) {
 async function excluirColaborador(codigo) {
     try {
         const codigoStr = codigo.toString().padStart(5, '0');
-        console.log('Tentando excluir colaborador com código:', codigoStr);
+        
         const result = await window.bloqueioExclusao.deleteWithCheck(
             'colaboradores',
             codigoStr,
@@ -437,9 +437,9 @@ function mostrarToast(mensagem, tipo) {
 // Função para carregar a lista de perfis
 async function carregarPerfis() {
     try {
-        console.log('Carregando lista de perfis...');
+        
         const perfis = await api.get('/perfis');
-        console.log('Perfis carregados:', perfis);
+        
         const select = document.querySelector('select[name="perfil"]');
         
         // Limpar opções existentes
@@ -453,7 +453,7 @@ async function carregarPerfis() {
             select.appendChild(option);
         });
         
-        console.log('Perfis adicionados ao select:', select.options.length);
+        
         
     } catch (error) {
         console.error('Erro ao carregar perfis:', error);
