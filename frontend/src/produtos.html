@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="scripts/config/api.js"></script>
+    <script src="scripts/bloqueio_exclusao.js"></script>
     <script src="scripts/navigation.js"></script>
     <style>
         /* Estilos do modal e botões padronizados */
@@ -1135,14 +1136,16 @@
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
-                    await api.delete(`/produtos/${codigoParaExcluir}`);
-                    closeDeleteModal();
-                    carregarProdutos();
+                    await window.bloqueioExclusao.deleteWithCheck(
+                        'produtos',
+                        codigoParaExcluir,
+                        () => { closeDeleteModal(); carregarProdutos(); }
+                    );
                 } catch (error) {
                     console.error('Erro ao excluir produto:', error);
-                    alert('Erro ao excluir produto');
+                } finally {
+                    codigoParaExcluir = null;
                 }
-                codigoParaExcluir = null;
             };
         });
         // Fechar modal de sucesso quando clicar fora dele

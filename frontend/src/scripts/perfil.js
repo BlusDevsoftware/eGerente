@@ -401,7 +401,15 @@ function confirmarExclusaoPerfil(codigo) {
         const newBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
         newBtn.addEventListener('click', async () => {
-            await excluirPerfil(codigo);
+            try {
+                await window.bloqueioExclusao.deleteWithCheck(
+                    'perfis',
+                    parseInt(codigo, 10),
+                    async () => { closeDeleteModal(); await carregarPerfis(); }
+                );
+            } catch (error) {
+                console.error('Erro ao excluir perfil:', error);
+            }
         });
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
@@ -413,14 +421,15 @@ function confirmarExclusaoPerfil(codigo) {
 
 // Excluir perfil
 async function excluirPerfil(codigo) {
+    // Mantido apenas para compatibilidade se chamado diretamente em outro lugar
     try {
-        await api.delete(`/perfis/${parseInt(codigo, 10)}`);
-        mostrarToast('Perfil excluído com sucesso!', 'success');
-        closeDeleteModal();
-        await carregarPerfis();
+        await window.bloqueioExclusao.deleteWithCheck(
+            'perfis',
+            parseInt(codigo, 10),
+            async () => { closeDeleteModal(); await carregarPerfis(); }
+        );
     } catch (error) {
         console.error('Erro ao excluir perfil:', error);
-        mostrarToast('Erro ao excluir perfil', 'error');
     }
 }
 

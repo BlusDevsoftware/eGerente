@@ -805,6 +805,7 @@
         </div>
     </div>
 
+    <script src="scripts/bloqueio_exclusao.js"></script>
     <script type="module">
         // Funções globais para modais
         window.openServicoModal = function(titulo = 'Novo Serviço', servico = null, modo = 'novo') {
@@ -1032,11 +1033,13 @@
             const modal = document.getElementById('deleteModal');
             const codigo = modal.dataset.codigo;
             try {
-                await api.delete(`/servicos/${codigo}`);
-                closeDeleteModal();
-                carregarServicos();
+                await window.bloqueioExclusao.deleteWithCheck(
+                    'servicos',
+                    codigo,
+                    () => { closeDeleteModal(); carregarServicos(); }
+                );
             } catch (error) {
-                alert('Erro ao excluir serviço');
+                console.error('Erro ao excluir serviço:', error);
             }
         }
         document.addEventListener('DOMContentLoaded', async () => {
