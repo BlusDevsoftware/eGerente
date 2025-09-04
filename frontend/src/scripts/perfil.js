@@ -209,33 +209,53 @@ window.showSuccessModal = function() {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     document.getElementById('dataCadastro').textContent = dataAtual;
     
-    // Mostrar modal
-    document.getElementById('successModal').style.display = 'flex';
+    // Mostrar modal com transição
+    const modal = document.getElementById('successModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
     document.body.style.overflow = 'hidden';
 }
 
 // Função para fechar modal de sucesso
 window.closeSuccessModal = function() {
-    document.getElementById('successModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const modal = document.getElementById('successModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
 }
 
 // Função para mostrar modal de sucesso de atualização
-window.showUpdateSuccessModal = function() {
+window.showUpdateSuccessModal = function(status) {
     // Preencher dados de atualização
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     document.getElementById('dataAtualizacao').textContent = dataAtual;
-    document.getElementById('statusAtualizado').textContent = 'Ativo';
+    if (typeof status === 'string' && status.length) {
+        document.getElementById('statusAtualizado').textContent = status;
+    } else {
+        document.getElementById('statusAtualizado').textContent = 'Ativo';
+    }
     
-    // Mostrar modal
-    document.getElementById('updateSuccessModal').style.display = 'flex';
+    // Mostrar modal com transição
+    const modal = document.getElementById('updateSuccessModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
     document.body.style.overflow = 'hidden';
 }
 
 // Função para fechar modal de sucesso de atualização
 window.closeUpdateSuccessModal = function() {
-    document.getElementById('updateSuccessModal').style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const modal = document.getElementById('updateSuccessModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
 }
 
 // Carregar perfis (mesma animação/fluxo da aba de Serviços)
