@@ -1134,5 +1134,43 @@
     <!-- Toast Container -->
     <div class="toast-container"></div>
     <script src="scripts/navigation.js"></script>
+    <script>
+        (function() {
+            function formatTelefoneValue(value) {
+                let v = String(value || '').replace(/\D/g, '').slice(0, 11);
+                if (v.length <= 2) return v;
+                if (v.length <= 6) return `(${v.slice(0,2)}) ${v.slice(2)}`;
+                if (v.length <= 10) return `(${v.slice(0,2)}) ${v.slice(2,6)}-${v.slice(6)}`;
+                return `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+            }
+
+            function attachTelefoneMask() {
+                const telInput = document.querySelector('input[name="telefone"]');
+                if (!telInput) return;
+                const handler = (e) => {
+                    const start = telInput.selectionStart;
+                    const end = telInput.selectionEnd;
+                    const oldLen = telInput.value.length;
+                    telInput.value = formatTelefoneValue(telInput.value);
+                    const newLen = telInput.value.length;
+                    const delta = newLen - oldLen;
+                    if (document.activeElement === telInput && start != null && end != null) {
+                        const pos = Math.max(0, start + delta);
+                        telInput.setSelectionRange(pos, pos);
+                    }
+                };
+                telInput.addEventListener('input', handler);
+                telInput.addEventListener('blur', handler);
+                // Formata valor inicial se houver
+                telInput.value = formatTelefoneValue(telInput.value);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', attachTelefoneMask);
+            } else {
+                attachTelefoneMask();
+            }
+        })();
+    </script>
 </body>
 </html> 
