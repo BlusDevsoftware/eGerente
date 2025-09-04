@@ -156,7 +156,7 @@ function openPerfilModal() {
     
     // Para novos perfis, NÃO preencher o código - deixar vazio para o backend gerar
     form.codigo.value = '';
-    form.codigo_perfil.value = '';
+    // Campo codigo_perfil foi removido do formulário
     // Renderiza matriz de permissões (modo de edição para novo perfil)
     renderPermissionsMatrix({}, true);
     modal.style.display = 'flex';
@@ -319,7 +319,7 @@ async function visualizarPerfil(codigo) {
         const form = document.getElementById('perfilForm');
         document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-eye"></i> Visualizar Perfil';
         form.codigo.value = perfil.codigo || '';
-        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        // Campo codigo_perfil removido; exibição do código não é mais necessária
         form.nome.value = perfil.nome || '';
         
         // Renderizar permissões marcadas no novo formato
@@ -359,7 +359,7 @@ async function editarPerfil(codigo) {
         const form = document.getElementById('perfilForm');
         document.getElementById('perfilModalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Perfil';
         form.codigo.value = perfil.codigo || '';
-        form.codigo_perfil.value = (perfil.codigo || '').toString().padStart(5, '0');
+        // Campo codigo_perfil removido; exibição do código não é mais necessária
         form.nome.value = perfil.nome || '';
         
         // Renderizar permissões marcadas no novo formato
