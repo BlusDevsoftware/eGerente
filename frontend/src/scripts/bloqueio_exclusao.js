@@ -114,7 +114,6 @@
             const safeId = encodeURIComponent(String(id || '').trim());
             await window.api.delete(`/${safeEntity}/${safeId}`);
             if (typeof onSuccess === 'function') onSuccess();
-            showMessage('Excluído com sucesso!', 'success');
             return { ok: true };
         } catch (error) {
             const status = (error && error.status) ?? (error && error.response && error.response.status);
