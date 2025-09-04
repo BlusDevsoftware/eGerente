@@ -399,8 +399,8 @@ async function excluirColaborador(codigo) {
             (details) => {
                 // Mensagem específica para FK comum em comissões
                 const msg = (details && details.message) || 'Não é possível excluir colaborador: existem lançamentos/comissões vinculados.';
-                if (typeof window.openDependencyBlockModal === 'function') {
-                    window.openDependencyBlockModal(msg, details || {});
+                if (window.bloqueioExclusao && typeof window.bloqueioExclusao.openDependencyBlockModal === 'function') {
+                    window.bloqueioExclusao.openDependencyBlockModal(msg, details || {});
                 } else {
                     mostrarToast(msg, 'error');
                 }
