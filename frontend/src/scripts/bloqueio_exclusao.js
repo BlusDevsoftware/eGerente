@@ -19,13 +19,11 @@
             const resp = await window.api.get(`/${entity}/${id}/dependencies`);
             return resp || { hasDependencies: false };
         } catch (error) {
-            // Comportamento: 404 => endpoint inexistente, tratar como sem dependências.
-            // Outros erros => não foi possível validar, bloquear por segurança.
+            // Qualquer falha na verificação passa a BLOQUEAR por segurança
             const status = (error && error.status) ?? (error && error.response && error.response.status);
-            if (status === 404) {
-                return { hasDependencies: false };
-            }
-            showMessage('Não foi possível validar vínculos. Tente novamente.', 'error');
+            const data = (error && error.data) ?? (error && error.response && error.response.data) ?? {};
+            const message = (data && (data.message || data.error)) || 'Não foi possível validar vínculos.';
+            showMessage(message, 'error');
             return { hasDependencies: true, error: true };
         }
     }

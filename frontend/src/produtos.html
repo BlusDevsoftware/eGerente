@@ -1177,11 +1177,12 @@
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
-                    await window.bloqueioExclusao.deleteWithCheck(
+                    const result = await window.bloqueioExclusao.deleteWithCheck(
                         'produtos',
                         codigoParaExcluir,
                         () => { closeDeleteModal(); carregarProdutos(); window.showDeleteSuccessModal(); }
                     );
+                    if (!result || result.blocked) return;
                 } catch (error) {
                     console.error('Erro ao excluir produto:', error);
                 } finally {
