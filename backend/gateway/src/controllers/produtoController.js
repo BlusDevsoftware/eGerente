@@ -111,18 +111,34 @@ const verificarDependenciasProduto = async (codigo) => {
         const codigoInt = parseInt(codigoStr, 10);
         const codigoPad = Number.isFinite(codigoInt) ? codigoInt.toString().padStart(5, '0') : codigoStr;
 
-        // Checa por ambos formatos no campo item_id (lista CSV de "id-descricao")
-        // ex.: "12-Produto", "00012-Produto"
-        const orFilter = `item_id.ilike.%${codigoStr}-% , item_id.ilike.%${codigoPad}-%`;
+        // Buscar o produto para obter o nome e montar o token exatamente como está salvo em item_id ("00008-NOME")
+        const { data: produto, error: errProd } = await supabase
+            .from('produtos')
+            .select('codigo, nome')
+            .eq('codigo', codigo)
+            .single();
+        if (errProd) throw errProd;
+        if (!produto) {
+            return { hasDependencies: false, counts: {}, titles: [] };
+        }
+        const token = `${codigoPad}-${produto.nome}`;
 
+        // Trazer candidatos por like amplo e filtrar em memória por token exato considerando CSV
         const { data, error } = await supabase
             .from('movimento_comissoes')
             .select('id, numero_titulo, item_id')
-            .or(orFilter);
+            .ilike('item_id', `%${codigoPad}-%`);
 
         if (error) throw error;
-        const movCount = Array.isArray(data) ? data.length : 0;
-        const titles = (Array.isArray(data) ? data : []).map(r => ({ id: r.id, numero_titulo: r.numero_titulo })).filter(t => t.id != null);
+        const rows = Array.isArray(data) ? data : [];
+        const rowsComToken = rows.filter(r => {
+            const list = String(r.item_id || '')
+                .split(',')
+                .map(s => s.trim());
+            return list.includes(token);
+        });
+        const movCount = rowsComToken.length;
+        const titles = rowsComToken.map(r => ({ id: r.id, numero_titulo: r.numero_titulo })).filter(t => t.id != null);
         const hasDependencies = movCount > 0;
         return {
             hasDependencies,
