@@ -102,92 +102,10 @@ const atualizarProduto = async (req, res) => {
     }
 };
 
-// Verificar dependências do produto em movimentações/títulos
-const verificarDependenciasProduto = async (codigo) => {
-    // Movimento de comissões mantém produtos no campo item_id como lista de "id-descricao"
-    // Ex.: "123-Produto A, 456-Produto B". Vamos buscar ocorrências do codigo seguido de '-'.
-    try {
-        const codigoStr = String(codigo || '').trim();
-        const codigoInt = parseInt(codigoStr, 10);
-        const codigoPad = Number.isFinite(codigoInt) ? codigoInt.toString().padStart(5, '0') : codigoStr;
-
-        // Buscar o produto para obter o nome e montar o token exatamente como está salvo em item_id ("00008-NOME")
-        const { data: produto, error: errProd } = await supabase
-            .from('produtos')
-            .select('codigo, nome')
-            .eq('codigo', codigo)
-            .single();
-        if (errProd) throw errProd;
-        if (!produto) {
-            return { hasDependencies: false, counts: {}, titles: [] };
-        }
-        const token = `${codigoPad}-${produto.nome}`;
-
-        // Trazer candidatos por like amplo e filtrar em memória por token exato considerando CSV
-        const { data, error } = await supabase
-            .from('movimento_comissoes')
-            .select('id, numero_titulo, item_id')
-            .ilike('item_id', `%${codigoPad}-%`);
-
-        if (error) throw error;
-        const rows = Array.isArray(data) ? data : [];
-        const rowsComToken = rows.filter(r => {
-            const list = String(r.item_id || '')
-                .split(',')
-                .map(s => s.trim());
-            return list.includes(token);
-        });
-        const movCount = rowsComToken.length;
-        const titles = rowsComToken.map(r => ({ id: r.id, numero_titulo: r.numero_titulo })).filter(t => t.id != null);
-        const hasDependencies = movCount > 0;
-        return {
-            hasDependencies,
-            counts: {
-                movimento_comissoes: movCount
-            },
-            titles,
-            message: hasDependencies
-                ? 'Não é possível excluir: o produto está vinculado a movimentações/títulos.'
-                : undefined
-        };
-    } catch (e) {
-        // Em caso de erro na verificação, retornar estado conservador para bloquear
-        return {
-            hasDependencies: true,
-            counts: {},
-            message: 'Não foi possível validar vínculos do produto.'
-        };
-    }
-};
-
-// Endpoint: obter dependências
-const obterDependenciasProduto = async (req, res) => {
-    try {
-        const { codigo } = req.params;
-        const deps = await verificarDependenciasProduto(codigo);
-        return res.json(deps);
-    } catch (error) {
-        console.error('Erro ao obter dependências do produto:', error);
-        return res.status(500).json({ error: 'Erro ao obter dependências do produto' });
-    }
-};
-
-// Excluir produto (bloqueia se houver vínculos)
+// Excluir produto (sem validação de vínculos no backend)
 const excluirProduto = async (req, res) => {
     try {
         const { codigo } = req.params;
-
-        // 1) Checar dependências
-        const deps = await verificarDependenciasProduto(codigo);
-        if (deps.hasDependencies) {
-            return res.status(409).json({
-                code: 'FOREIGN_KEY_VIOLATION',
-                message: deps.message || 'Não é possível excluir: existem vínculos.',
-                counts: deps.counts
-            });
-        }
-
-        // 2) Sem dependências: excluir
         const { error } = await supabase
             .from('produtos')
             .delete()
@@ -207,6 +125,5 @@ module.exports = {
     buscarProduto,
     criarProduto,
     atualizarProduto,
-    excluirProduto,
-    obterDependenciasProduto
+    excluirProduto
 }; 

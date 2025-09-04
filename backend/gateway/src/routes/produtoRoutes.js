@@ -5,8 +5,7 @@ const {
     buscarProduto,
     criarProduto,
     atualizarProduto,
-    excluirProduto,
-    obterDependenciasProduto
+    excluirProduto
 } = require('../controllers/produtoController');
 
 // Listar todos os produtos
@@ -24,7 +23,5 @@ router.put('/:codigo', atualizarProduto);
 // Excluir produto
 router.delete('/:codigo', excluirProduto);
 
-// Endpoint de dependências para bloqueio de exclusão
-router.get('/:codigo/dependencies', obterDependenciasProduto);
 
 module.exports = router; 
