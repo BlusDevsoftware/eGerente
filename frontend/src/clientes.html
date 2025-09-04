@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="scripts/config/api.js"></script>
+    <script src="scripts/bloqueio_exclusao.js"></script>
     <style>
         .modal {
             display: none;
@@ -1222,14 +1223,17 @@
             document.getElementById('confirmDeleteBtn').onclick = async function() {
                 if (!codigoParaExcluir) return;
                 try {
-                    await api.delete(`/clientes/${codigoParaExcluir}`);
-                    closeDeleteModal();
-                    carregarClientes();
+                    await window.bloqueioExclusao.deleteWithCheck(
+                        'clientes',
+                        codigoParaExcluir,
+                        () => { closeDeleteModal(); carregarClientes(); },
+                        (details) => { /* opcional: abrir modal explicando vínculos */ }
+                    );
                 } catch (error) {
                     console.error('Erro ao excluir cliente:', error);
-                    alert('Erro ao excluir cliente');
+                } finally {
+                    codigoParaExcluir = null;
                 }
-                codigoParaExcluir = null;
             };
         });
         // Fechar modal de sucesso quando clicar fora dele
