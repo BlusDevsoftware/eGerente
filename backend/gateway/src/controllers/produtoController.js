@@ -109,17 +109,19 @@ const verificarDependenciasProduto = async (codigo) => {
     try {
         const { data, error } = await supabase
             .from('movimento_comissoes')
-            .select('id, item_id')
+            .select('id, numero_titulo, item_id')
             .ilike('item_id', `%${codigo}-%`);
 
         if (error) throw error;
         const movCount = Array.isArray(data) ? data.length : 0;
+        const titles = (Array.isArray(data) ? data : []).map(r => ({ id: r.id, numero_titulo: r.numero_titulo })).filter(t => t.id != null);
         const hasDependencies = movCount > 0;
         return {
             hasDependencies,
             counts: {
                 movimento_comissoes: movCount
             },
+            titles,
             message: hasDependencies
                 ? 'Não é possível excluir: o produto está vinculado a movimentações/títulos.'
                 : undefined

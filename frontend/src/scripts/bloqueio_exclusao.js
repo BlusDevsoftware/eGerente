@@ -19,8 +19,12 @@
             const resp = await window.api.get(`/${entity}/${id}/dependencies`);
             return resp || { hasDependencies: false };
         } catch (error) {
-            // Qualquer falha na verificação passa a BLOQUEAR por segurança
+            // 404 (rota não existe) => tratar como sem dependências e seguir fluxo
             const status = (error && error.status) ?? (error && error.response && error.response.status);
+            if (status === 404) {
+                return { hasDependencies: false };
+            }
+            // Outras falhas => bloquear por segurança
             const data = (error && error.data) ?? (error && error.response && error.response.data) ?? {};
             const message = (data && (data.message || data.error)) || 'Não foi possível validar vínculos.';
             showMessage(message, 'error');
@@ -72,12 +76,22 @@
         msgEl.textContent = message || 'Não é possível concluir esta ação pois há vínculos.';
 
         const counts = details && details.counts;
+        const titles = details && details.titles;
         if (counts && typeof counts === 'object' && Object.keys(counts).length) {
             detEl.style.display = 'block';
-            const items = Object.entries(counts)
+            const countItems = Object.entries(counts)
                 .filter(([_, v]) => typeof v === 'number' && v > 0)
                 .map(([k, v]) => `<div style="margin:4px 0; color:#842029;"><strong>${v}</strong> vínculo(s) em: ${k}</div>`)
                 .join('');
+            const titlesList = Array.isArray(titles) && titles.length
+                ? `<div style="margin-top:8px; color:#842029;">
+                        <div><strong>Títulos relacionados:</strong></div>
+                        <div style="max-height:140px; overflow:auto; padding:6px 0 0 0;">
+                            ${titles.map(t => `<div style=\"margin:2px 0;\">#${t.id} ${t.numero_titulo || ''}</div>`).join('')}
+                        </div>
+                   </div>`
+                : '';
+            const items = `${countItems}${titlesList}`;
             detEl.innerHTML = items || '<div style="color:#842029;">Há vínculos associados.</div>';
         } else {
             detEl.style.display = 'none';
