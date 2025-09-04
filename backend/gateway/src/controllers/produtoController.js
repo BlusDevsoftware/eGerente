@@ -102,11 +102,66 @@ const atualizarProduto = async (req, res) => {
     }
 };
 
-// Excluir produto
+// Verificar dependências do produto em movimentações/títulos
+const verificarDependenciasProduto = async (codigo) => {
+    // Movimento de comissões mantém produtos no campo item_id como lista de "id-descricao"
+    // Ex.: "123-Produto A, 456-Produto B". Vamos buscar ocorrências do codigo seguido de '-'.
+    try {
+        const { data, error } = await supabase
+            .from('movimento_comissoes')
+            .select('id, item_id')
+            .ilike('item_id', `%${codigo}-%`);
+
+        if (error) throw error;
+        const movCount = Array.isArray(data) ? data.length : 0;
+        const hasDependencies = movCount > 0;
+        return {
+            hasDependencies,
+            counts: {
+                movimento_comissoes: movCount
+            },
+            message: hasDependencies
+                ? 'Não é possível excluir: o produto está vinculado a movimentações/títulos.'
+                : undefined
+        };
+    } catch (e) {
+        // Em caso de erro na verificação, retornar estado conservador para bloquear
+        return {
+            hasDependencies: true,
+            counts: {},
+            message: 'Não foi possível validar vínculos do produto.'
+        };
+    }
+};
+
+// Endpoint: obter dependências
+const obterDependenciasProduto = async (req, res) => {
+    try {
+        const { codigo } = req.params;
+        const deps = await verificarDependenciasProduto(codigo);
+        return res.json(deps);
+    } catch (error) {
+        console.error('Erro ao obter dependências do produto:', error);
+        return res.status(500).json({ error: 'Erro ao obter dependências do produto' });
+    }
+};
+
+// Excluir produto (bloqueia se houver vínculos)
 const excluirProduto = async (req, res) => {
     try {
         const { codigo } = req.params;
 
+        // 1) Checar dependências
+        const deps = await verificarDependenciasProduto(codigo);
+        if (deps.hasDependencies) {
+            return res.status(409).json({
+                code: 'FOREIGN_KEY_VIOLATION',
+                message: deps.message || 'Não é possível excluir: existem vínculos.',
+                counts: deps.counts
+            });
+        }
+
+        // 2) Sem dependências: excluir
         const { error } = await supabase
             .from('produtos')
             .delete()
@@ -126,5 +181,6 @@ module.exports = {
     buscarProduto,
     criarProduto,
     atualizarProduto,
-    excluirProduto
+    excluirProduto,
+    obterDependenciasProduto
 }; 

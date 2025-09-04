@@ -818,6 +818,26 @@
         </div>
     </div>
 
+    <!-- Modal de Sucesso - Exclusão -->
+    <div id="deleteSuccessModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #4CAF50; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-check-circle"></i> Produto Excluído!</h2>
+                <button class="close-modal" onclick="closeDeleteSuccessModal()" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 3em; color: #4CAF50; margin-bottom: 16px;"></i>
+                <div style="font-size: 1.1em; font-weight: 500; margin-bottom: 12px; color: #333;">Produto excluído com sucesso!</div>
+                <div style="font-size: 1em; color: #666; margin-bottom: 20px;">
+                    O registro foi removido do sistema.
+                </div>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn-secondary" onclick="closeDeleteSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         function formatarCodigo(codigo) {
             return String(codigo).padStart(5, '0');
@@ -1110,6 +1130,27 @@
             }, 300);
         }
 
+        // Função para mostrar modal de sucesso de exclusão
+        window.showDeleteSuccessModal = function() {
+            const modal = document.getElementById('deleteSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Função para fechar modal de sucesso de exclusão
+        window.closeDeleteSuccessModal = function() {
+            const modal = document.getElementById('deleteSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Mostrar spinner centralizado ao iniciar
@@ -1139,7 +1180,7 @@
                     await window.bloqueioExclusao.deleteWithCheck(
                         'produtos',
                         codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarProdutos(); }
+                        () => { closeDeleteModal(); carregarProdutos(); window.showDeleteSuccessModal(); }
                     );
                 } catch (error) {
                     console.error('Erro ao excluir produto:', error);
@@ -1159,6 +1200,10 @@
             if (event.target === updateModal) {
                 closeUpdateSuccessModal();
             }
+            const deleteModalSuccess = document.getElementById('deleteSuccessModal');
+            if (event.target === deleteModalSuccess) {
+                closeDeleteSuccessModal();
+            }
         });
 
         window.novoProduto = novoProduto;
@@ -1172,6 +1217,8 @@
         window.closeSuccessModal = closeSuccessModal;
         window.showUpdateSuccessModal = showUpdateSuccessModal;
         window.closeUpdateSuccessModal = closeUpdateSuccessModal;
+        window.showDeleteSuccessModal = showDeleteSuccessModal;
+        window.closeDeleteSuccessModal = closeDeleteSuccessModal;
     </script>
 </body>
 </html> 
