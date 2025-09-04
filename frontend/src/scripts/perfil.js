@@ -22,32 +22,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         marcarTodasContainer.appendChild(marcarTodasBtn);
         marcarTodasContainer.appendChild(desmarcarTodasBtn);
         c.appendChild(marcarTodasContainer);
-    }
-    
-    const iconByAction = {
-        ver: 'fa-eye',
-        criar: 'fa-plus',
-        editar: 'fa-pen',
-        excluir: 'fa-trash',
-        exportar: 'fa-file-export',
-        executar: 'fa-play'
-    };
-    const grupos = [
-        { titulo: 'Dashboard', acoes: ['ver'] },
-        { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
-        { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
-        { titulo: 'Comissões/Consulta', acoes: ['ver'] },
-        { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
-        { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
-        { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
-        { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
-        { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
-    ];
-    
+
         // Função para marcar todas as permissões
         marcarTodasBtn.addEventListener('click', () => {
             grupos.forEach((g, gi) => {
@@ -79,6 +54,31 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
             });
             mostrarToast('Todas as permissões foram desmarcadas!', 'success');
         });
+    }
+    
+    const iconByAction = {
+        ver: 'fa-eye',
+        criar: 'fa-plus',
+        editar: 'fa-pen',
+        excluir: 'fa-trash',
+        exportar: 'fa-file-export',
+        executar: 'fa-play'
+    };
+    const grupos = [
+        { titulo: 'Dashboard', acoes: ['ver'] },
+        { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
+        { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Comissões/Consulta', acoes: ['ver'] },
+        { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
+        { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
+        { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
+        { titulo: 'Configurações/Manutenção BD', acoes: ['ver','executar'] },
+        { titulo: 'Configurações/Sincronizar', acoes: ['ver','executar'] },
+    ];
     
     grupos.forEach((g, gi) => {
         const box = document.createElement('div');
