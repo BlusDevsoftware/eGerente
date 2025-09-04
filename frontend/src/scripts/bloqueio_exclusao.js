@@ -106,7 +106,11 @@
             showMessage('Excluído com sucesso!', 'success');
             return { ok: true };
         } catch (error) {
-            if (error && (error.status === 409 || error.status === 400)) {
+            const isFk500 = error && error.status === 500 && (
+                (error.data && (String(error.data.details || '').includes('violates foreign key constraint') || String(error.data.details || '').includes('chave estrangeira'))) ||
+                (error.data && /foreign key|chave estrangeira/i.test(String(error.data.error || '')))
+            );
+            if (error && (error.status === 409 || error.status === 400 || isFk500)) {
                 const details = error.data || {};
                 const msg = details.message || 'Não é possível excluir: existem vínculos.';
                 if (typeof onBlocked === 'function') {
