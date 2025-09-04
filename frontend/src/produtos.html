@@ -1063,14 +1063,23 @@
             document.getElementById('dataCadastro').textContent = dataAtual;
             
             // Mostrar modal
-            document.getElementById('successModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         // Função para fechar modal de sucesso
         window.closeSuccessModal = function() {
-            document.getElementById('successModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById('successModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         // Função para mostrar modal de sucesso de atualização
@@ -1081,14 +1090,23 @@
             document.getElementById('statusAtualizado').textContent = status || 'Ativo';
             
             // Mostrar modal
-            document.getElementById('updateSuccessModal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById('updateSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         // Função para fechar modal de sucesso de atualização
         window.closeUpdateSuccessModal = function() {
-            document.getElementById('updateSuccessModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById('updateSuccessModal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
