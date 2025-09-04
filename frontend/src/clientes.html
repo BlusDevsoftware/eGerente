@@ -1226,8 +1226,7 @@
                     await window.bloqueioExclusao.deleteWithCheck(
                         'clientes',
                         codigoParaExcluir,
-                        () => { closeDeleteModal(); carregarClientes(); },
-                        (details) => { /* opcional: abrir modal explicando vínculos */ }
+                        () => { closeDeleteModal(); carregarClientes(); }
                     );
                 } catch (error) {
                     console.error('Erro ao excluir cliente:', error);
