@@ -390,23 +390,29 @@ async function editarColaborador(codigo) {
 // Função para excluir colaborador
 async function excluirColaborador(codigo) {
     try {
-        // Garantir que o código seja uma string com 5 dígitos
         const codigoStr = codigo.toString().padStart(5, '0');
         console.log('Tentando excluir colaborador com código:', codigoStr);
-        
-        const response = await api.delete(`/colaboradores/${codigoStr}`);
-        console.log('Resposta da exclusão:', response);
-        
-        if (response && response.message) {
-            mostrarToast('Colaborador excluído com sucesso!', 'success');
-            closeDeleteModal();
-            carregarColaboradores();
-        } else {
-            throw new Error('Resposta inválida do servidor');
+        const result = await window.bloqueioExclusao.deleteWithCheck(
+            'colaboradores',
+            codigoStr,
+            () => { closeDeleteModal(); carregarColaboradores(); },
+            (details) => {
+                // Mensagem específica para FK comum em comissões
+                const msg = (details && details.message) || 'Não é possível excluir colaborador: existem lançamentos/comissões vinculados.';
+                if (typeof window.openDependencyBlockModal === 'function') {
+                    window.openDependencyBlockModal(msg, details || {});
+                } else {
+                    mostrarToast(msg, 'error');
+                }
+            }
+        );
+        if (!result.ok && !result.blocked) {
+            mostrarToast('Erro ao excluir colaborador', 'error');
         }
     } catch (error) {
         console.error('Erro ao excluir colaborador:', error);
-        mostrarToast('Erro ao excluir colaborador', 'error');
+        const backendMsg = error?.data?.message || 'Erro ao excluir colaborador';
+        mostrarToast(backendMsg, 'error');
     }
 }
 
