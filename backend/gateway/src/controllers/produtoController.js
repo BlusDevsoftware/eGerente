@@ -107,10 +107,18 @@ const verificarDependenciasProduto = async (codigo) => {
     // Movimento de comissões mantém produtos no campo item_id como lista de "id-descricao"
     // Ex.: "123-Produto A, 456-Produto B". Vamos buscar ocorrências do codigo seguido de '-'.
     try {
+        const codigoStr = String(codigo || '').trim();
+        const codigoInt = parseInt(codigoStr, 10);
+        const codigoPad = Number.isFinite(codigoInt) ? codigoInt.toString().padStart(5, '0') : codigoStr;
+
+        // Checa por ambos formatos no campo item_id (lista CSV de "id-descricao")
+        // ex.: "12-Produto", "00012-Produto"
+        const orFilter = `item_id.ilike.%${codigoStr}-% , item_id.ilike.%${codigoPad}-%`;
+
         const { data, error } = await supabase
             .from('movimento_comissoes')
             .select('id, numero_titulo, item_id')
-            .ilike('item_id', `%${codigo}-%`);
+            .or(orFilter);
 
         if (error) throw error;
         const movCount = Array.isArray(data) ? data.length : 0;
