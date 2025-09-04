@@ -2,6 +2,7 @@
 // Requer window.api disponível
 
 (function() {
+    const skipDependenciesFor = new Set(['perfis']);
     function showMessage(message, type) {
         try {
             if (typeof window.mostrarToast === 'function') {
@@ -15,6 +16,9 @@
     }
 
     async function checkDependencies(entity, id) {
+        if (skipDependenciesFor.has(String(entity))) {
+            return { hasDependencies: false };
+        }
         try {
             const resp = await window.api.get(`/${entity}/${id}/dependencies`);
             return resp || { hasDependencies: false };
