@@ -259,77 +259,83 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Scroll para o funil de vendas */
-        .funnel-container {
-            overflow-x: auto;
-            overflow-y: hidden;
-            position: relative;
-            background: white;
+        /* Layout do construtor de relatórios */
+        .builder-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .variables-panel {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .variables-panel h3 {
+            margin: 0 0 10px 0;
+            color: #1976D2;
+            font-size: 1.05em;
+        }
+
+        .variable-item {
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            background: #f7f9fc;
+            border: 1px solid #e3f2fd;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-top: 20px;
-            width: 100%;
-            max-width: 100%;
+            color: #1565c0;
+            font-weight: 600;
+            cursor: grab;
         }
 
-        .funnel-container canvas {
-            min-width: 800px;
-            width: 100%;
-            height: 400px !important;
-            display: block;
+        .variable-item:active { cursor: grabbing; }
+
+        .report-area {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
         }
 
-        /* Scroll personalizado */
-        .funnel-container::-webkit-scrollbar {
-            height: 12px;
-            width: 12px;
+        .drop-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 48px;
+            padding: 10px;
+            border: 2px dashed #90caf9;
+            border-radius: 8px;
+            background: #f4faff;
+            align-items: center;
         }
 
-        .funnel-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 6px;
-            border: 1px solid #ddd;
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 16px;
+            border: 1px solid #90caf9;
+            font-size: 0.9em;
+            font-weight: 600;
         }
 
-        .funnel-container::-webkit-scrollbar-thumb {
-            background: #1976D2;
-            border-radius: 6px;
-            border: 1px solid #1565C0;
+        .chip button {
+            background: transparent;
+            border: 0;
+            color: #1565c0;
+            cursor: pointer;
+            font-size: 14px;
         }
 
-        .funnel-container::-webkit-scrollbar-thumb:hover {
-            background: #1565C0;
-        }
+        .report-actions { display:flex; gap:8px; margin-top:12px; }
 
-        .funnel-container::-webkit-scrollbar-corner {
-            background: #f1f1f1;
-        }
-
-        /* Indicador de scroll */
-        .funnel-container::after {
-            content: '← Role para ver mais →';
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(25, 118, 210, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        /* Forçar scroll a aparecer */
-        .funnel-container {
-            scrollbar-width: thin;
-            scrollbar-color: #1976D2 #f1f1f1;
-        }
-
-        /* Garantir que o scroll seja visível */
-        .funnel-container:hover {
-            overflow-x: auto;
-        }
+        .report-actions .btn-secondary { height:32px; }
     </style>
 </head>
 <body>
@@ -381,7 +387,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" style="position: relative; height: 100vh; overflow: auto;">
         <!-- Header -->
         <div class="header">
             <div class="welcome-text">
@@ -405,68 +411,68 @@
             </div>
         </div>
 
-        <!-- Advanced Filters -->
-        <div class="advanced-filters" style="grid-template-columns: 1fr auto; align-items: end; gap: 12px;">
-            <div class="filter-group" style="display:grid; grid-template-columns: 1.1fr 1.1fr 0.5fr 1.3fr; gap: 12px; align-items: end;">
-                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
-                    <label style="color:#1976D2; font-weight:600;">Colaborador</label>
-                    <select id="filtroColaborador" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        <option value="">Selecionar</option>
-                        <option value="todos">Todos</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
-                    <label style="color:#1976D2; font-weight:600;">Tipo</label>
-                    <select id="filtroTipo" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        <option value="">Selecionar</option>
-                        <option value="produtos">Produtos</option>
-                        <option value="servicos">Serviços</option>
-                        <option value="ambos">Ambos</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
-                    <label style="color:#1976D2; font-weight:600;">Produto</label>
-                    <select id="filtroProduto" style="height:32px; line-height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        <option value="">Selecionar</option>
-                        <option value="todos">Todos</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+        <!-- Advanced Filters removidos e integrados ao builder -->
+
+        <!-- Report Builder -->
+        <div class="builder-container">
+            <aside class="variables-panel">
+                <h3>Variáveis</h3>
+                <div class="variable-item" draggable="true" data-field="data_geracao">Data de Geração</div>
+                <div class="variable-item" draggable="true" data-field="data_vencimento">Data de Vencimento</div>
+                <div class="variable-item" draggable="true" data-field="numero_titulo">Número do Título</div>
+                <div class="variable-item" draggable="true" data-field="colaborador">Colaborador</div>
+                <div class="variable-item" draggable="true" data-field="tipo">Tipo</div>
+                <div class="variable-item" draggable="true" data-field="produto">Produto</div>
+                <div class="variable-item" draggable="true" data-field="valor_venda">Valor da Venda</div>
+                <div class="variable-item" draggable="true" data-field="valor">Valor da Comissão</div>
+                <div class="variable-item" draggable="true" data-field="status">Status</div>
+
+                <h3 style="margin-top:16px;">Totalizadores</h3>
+                <div class="variable-item" draggable="true" data-total="total_valor_venda">Total Valor de Venda</div>
+                <div class="variable-item" draggable="true" data-total="total_comissao">Total Comissão</div>
+                <div class="variable-item" draggable="true" data-total="qtd_titulos">Quantidade de Títulos</div>
+                <div class="variable-item" draggable="true" data-total="qtd_produtos_distintos">Produtos Distintos</div>
+                <div class="variable-item" draggable="true" data-total="qtd_colaboradores_distintos">Colaboradores Distintos</div>
+                <div class="variable-item" draggable="true" data-total="total_pago">Total Pago</div>
+                <div class="variable-item" draggable="true" data-total="total_pendente">Total Pendente</div>
+            </aside>
+            <section class="report-area">
+                <h3 style="margin:0 0 10px 0; color:#1976D2;">Monte seu Relatório</h3>
+                <p style="margin:0 0 10px 0; color:#666;">Arraste as variáveis para as áreas abaixo para definir colunas do relatório.</p>
+
+                <div id="inline-filters" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin: 8px 0 14px 0;">
                     <label style="color:#1976D2; font-weight:600;">Período</label>
-                    <div style="display:flex; gap:6px; align-items:center; flex-wrap:nowrap; justify-content:flex-start; flex:1;">
-                        <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
-                        <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:140px;">
-                        <button id="btnDataGeracao" type="button" title="Filtrar por Data de Geração" style="height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;">Geração</button>
-                        <button id="btnDataVencimento" type="button" title="Filtrar por Data de Vencimento" style="height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;">Vencimento</button>
-                        <button id="btnLimparFiltros" class="btn-secondary" style="height:32px; width:120px; padding:0 12px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9em; background:#e9ecef; color:#1565c0; border:1px solid #cfd8dc;">
-                            <i class="fas fa-eraser" style="margin-right:6px;"></i>
-                            Limpar
-                        </button>
-                    </div>
+                    <input id="dataInicial" type="date" placeholder="Data Inicial" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:160px;">
+                    <input id="dataFinal" type="date" placeholder="Data Final" style="height:32px; padding:0 10px; border:1.5px solid #90caf9; border-radius:8px; background:#f4faff; color:#1565c0; font-size:0.9em; width:160px;">
+                    <button id="btnDataGeracao" type="button" title="Filtrar por Data de Geração" style="height:32px; padding:0 12px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;">Geração</button>
+                    <button id="btnDataVencimento" type="button" title="Filtrar por Data de Vencimento" style="height:32px; padding:0 12px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;">Vencimento</button>
+                    <button id="btnLimparFiltros" class="btn-secondary" style="height:32px; padding:0 12px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.9em; background:#e9ecef; color:#1565c0; border:1px solid #cfd8dc;">
+                        <i class="fas fa-eraser" style="margin-right:6px;"></i>
+                        Limpar
+                    </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Charts -->
-        <div class="charts-container">
-            <div class="chart-card">
-                <h3>Quantidade de Vendas por Produto</h3>
-                <canvas id="statusChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Vendas por Colaborador</h3>
-                <canvas id="collaboratorChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Evolução Mensal</h3>
-                <canvas id="monthlyChart"></canvas>
-            </div>
-        </div>
+                <label style="font-weight:600; color:#1565c0;">Campos Selecionados (colunas):</label>
+                <div id="dropFields" class="drop-zone" data-drop="fields"></div>
 
-        <!-- Funil de Vendas -->
-        <div class="funnel-container">
-            <h3 style="padding: 20px 20px 0 20px; margin: 0; color: #333;">Funil de Vendas</h3>
-            <canvas id="funnelChart"></canvas>
+                <label style="display:block; margin-top:12px; font-weight:600; color:#1565c0;">Totalizadores:</label>
+                <div id="dropTotals" class="drop-zone" data-drop="totals"></div>
+
+                <div class="report-actions">
+                    <button id="btnClearFields" class="btn-secondary"><i class="fas fa-eraser"></i>&nbsp;Limpar Seleção</button>
+                    <button id="btnExportCsv" class="btn-secondary"><i class="fas fa-file-export"></i>&nbsp;Exportar CSV</button>
+                    <button id="btnExportPdf" class="btn-secondary"><i class="fas fa-file-pdf"></i>&nbsp;Exportar PDF</button>
+                </div>
+
+                <div style="margin-top:16px; overflow:auto;">
+                    <table id="reportTable">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="totalsContainer" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-top:16px;"></div>
+            </section>
         </div>
     </div>
 
@@ -478,196 +484,7 @@
                 this.parentElement.classList.toggle('active');
             });
         });
-
-        // Quantidade de Vendas por Produto Chart
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        window.statusChart = new Chart(statusCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Quantidade de Vendas',
-                    data: [],
-                    backgroundColor: '#007bff'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) {
-                                return value + ' vendas';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Vendas por Colaborador Chart
-        const collaboratorCtx = document.getElementById('collaboratorChart').getContext('2d');
-        window.collaboratorChart = new Chart(collaboratorCtx, {
-            type: 'doughnut',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Quantidade de Vendas',
-                    data: [],
-                    backgroundColor: [
-                        '#FF6384',
-                        '#36A2EB',
-                        '#FFCE56',
-                        '#4BC0C0',
-                        '#9966FF',
-                        '#FF9F40',
-                        '#FF6384',
-                        '#C9CBCF',
-                        '#4BC0C0',
-                        '#FF6384'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed;
-                                return label + ': ' + value + ' vendas';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Monthly Chart
-        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-        window.monthlyChart = new Chart(monthlyCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Comissões (R$)',
-                    data: [],
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.1,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'R$ ' + value.toLocaleString('pt-BR');
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Funil de Vendas Chart
-        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
-        window.funnelChart = new Chart(funnelCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Valor Total (R$)',
-                    data: [],
-                    backgroundColor: [
-                        '#FF6B6B', // Vermelho - Leads
-                        '#4ECDC4', // Turquesa - Oportunidades
-                        '#45B7D1', // Azul - Propostas
-                        '#96CEB4', // Verde - Negociações
-                        '#FFEAA7', // Amarelo - Fechamentos
-                        '#DDA0DD'  // Roxo - Vendas Concluídas
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                layout: {
-                    padding: {
-                        right: 20
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed.x;
-                                return label + ': R$ ' + value.toLocaleString('pt-BR');
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return 'R$ ' + value.toLocaleString('pt-BR');
-                            },
-                            font: {
-                                size: 11
-                            }
-                        },
-                        grid: {
-                            display: true,
-                            color: 'rgba(0,0,0,0.1)'
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            font: {
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
+        
     </script>
 
     <script src="scripts/config/api.js"></script>

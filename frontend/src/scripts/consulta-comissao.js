@@ -3,6 +3,8 @@ class ConsultaComissao {
     constructor() {
         this.movimentos = [];
         this.colaboradores = [];
+        this.camposSelecionados = [];
+        this.totalizadoresSelecionados = [];
         this.filtros = {
             dataInicio: '',
             dataFim: '',
@@ -26,7 +28,8 @@ class ConsultaComissao {
             await this.carregarMovimentos();
             this.carregarProdutos();
             this.configurarEventos();
-            this.atualizarGraficos();
+            this.inicializarBuilder();
+            this.renderizarTabelaBuilder();
         } catch (error) {
             console.error('Erro ao inicializar consulta:', error);
             this.mostrarToast('Erro ao inicializar a página de consulta', 'error');
@@ -110,8 +113,9 @@ class ConsultaComissao {
         const filtroContainer = document.querySelector('.advanced-filters');
         if (filtroContainer) {
             filtroContainer.addEventListener('change', (e) => {
-                if (e.target.matches('#dataInicial, #dataFinal, #filtroColaborador, #filtroTipo, #filtroProduto')) {
+                if (e.target.matches('#dataInicial, #dataFinal')) {
                     this.aplicarFiltros();
+                    this.renderizarTabelaBuilder();
                 }
             });
         }
@@ -120,7 +124,7 @@ class ConsultaComissao {
         const btnLimpar = document.getElementById('btnLimparFiltros');
         if (btnLimpar) {
             btnLimpar.addEventListener('click', () => {
-                const ids = ['filtroColaborador','filtroTipo','filtroProduto','dataInicial','dataFinal'];
+                const ids = ['dataInicial','dataFinal'];
                 ids.forEach(id => { 
                     const el = document.getElementById(id); 
                     if (el) el.value=''; 
@@ -128,6 +132,7 @@ class ConsultaComissao {
                 this.modoFiltroData = 'geracao';
                 this.atualizarBotoesModo();
                 this.aplicarFiltros();
+                this.renderizarTabelaBuilder();
             });
         }
 
@@ -141,6 +146,7 @@ class ConsultaComissao {
                 this.modoFiltroData='geracao'; 
                 this.atualizarBotoesModo(); 
                 this.aplicarFiltros(); 
+                this.renderizarTabelaBuilder();
             });
         }
         
@@ -149,34 +155,30 @@ class ConsultaComissao {
                 this.modoFiltroData='vencimento'; 
                 this.atualizarBotoesModo(); 
                 this.aplicarFiltros(); 
+                this.renderizarTabelaBuilder();
             });
         }
         
         this.atualizarBotoesModo();
 
-        // Ações da tabela
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.view-btn')) {
-                const id = e.target.closest('tr').dataset.id;
-                this.visualizarMovimento(id);
-            } else if (e.target.closest('.edit-btn')) {
-                const id = e.target.closest('tr').dataset.id;
-                this.editarMovimento(id);
-            } else if (e.target.closest('.delete-btn')) {
-                const id = e.target.closest('tr').dataset.id;
-                this.excluirMovimento(id);
-            }
-        });
-
-        // Botões de exportação
-        const btnExportar = document.querySelector('button:has(.fa-file-export)');
-        if (btnExportar) {
-            btnExportar.addEventListener('click', () => this.exportarDados());
+        // Ações do builder
+        const btnClear = document.getElementById('btnClearFields');
+        if (btnClear) {
+            btnClear.addEventListener('click', () => {
+                this.camposSelecionados = [];
+                this.atualizarDropZone();
+                this.renderizarTabelaBuilder();
+            });
         }
 
-        const btnImprimir = document.querySelector('button:has(.fa-print)');
-        if (btnImprimir) {
-            btnImprimir.addEventListener('click', () => this.imprimirDados());
+        const btnExportCsv = document.getElementById('btnExportCsv');
+        if (btnExportCsv) {
+            btnExportCsv.addEventListener('click', () => this.exportarCSVBuilder());
+        }
+
+        const btnExportPdf = document.getElementById('btnExportPdf');
+        if (btnExportPdf) {
+            btnExportPdf.addEventListener('click', () => this.exportarPDFBuilder());
         }
     }
 
@@ -195,9 +197,9 @@ class ConsultaComissao {
     capturarFiltros() {
         this.filtros.dataInicio = document.getElementById('dataInicial')?.value || '';
         this.filtros.dataFim = document.getElementById('dataFinal')?.value || '';
-        this.filtros.colaborador = document.getElementById('filtroColaborador')?.value || '';
-        this.filtros.tipo = document.getElementById('filtroTipo')?.value || '';
-        this.filtros.produto = document.getElementById('filtroProduto')?.value || '';
+        this.filtros.colaborador = '';
+        this.filtros.tipo = '';
+        this.filtros.produto = '';
     }
 
     aplicarFiltros() {
@@ -219,95 +221,325 @@ class ConsultaComissao {
             });
         }
 
-        // Filtro por colaborador
-        if (this.filtros.colaborador && this.filtros.colaborador !== 'todos') {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                m.colaborador_id === this.filtros.colaborador
-            );
-        }
-
-        // Filtro por tipo
-        if (this.filtros.tipo) {
-            if (this.filtros.tipo === 'produtos') {
-                movimentosFiltrados = movimentosFiltrados.filter(m => 
-                    m.tipo === 'PRODUTO'
-                );
-            } else if (this.filtros.tipo === 'servicos') {
-                movimentosFiltrados = movimentosFiltrados.filter(m => 
-                    m.tipo === 'SERVICO'
-                );
-            }
-        }
-
-        // Filtro por produto
-        if (this.filtros.produto && this.filtros.produto !== 'todos') {
-            movimentosFiltrados = movimentosFiltrados.filter(m => {
-                if (!m.item_id) return false;
-                const itemIds = m.item_id.split(',');
-                return itemIds.some(itemId => {
-                    const parts = itemId.trim().split('-');
-                    if (parts.length >= 2) {
-                        const nomeProduto = parts.slice(1).join('-');
-                        return nomeProduto === this.filtros.produto;
-                    }
-                    return false;
-                });
-            });
-        }
+        // Filtros removidos: colaborador, tipo, produto (agora disponíveis como variáveis no builder)
 
         this.movimentosFiltrados = movimentosFiltrados;
         this.totalItens = movimentosFiltrados.length;
         this.paginaAtual = 1;
         
-        this.renderizarTabela();
-        this.atualizarGraficos();
+        this.renderizarTabelaBuilder();
         this.mostrarToast(`${movimentosFiltrados.length} movimentos encontrados`, 'info');
     }
 
-    renderizarTabela() {
-        const tbody = document.querySelector('table tbody');
-        if (!tbody) return;
-
-        const movimentos = this.movimentosFiltrados || this.movimentos;
-        const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
-        const fim = inicio + this.itensPorPagina;
-        const movimentosPagina = movimentos.slice(inicio, fim);
-
-        tbody.innerHTML = '';
-
-        if (movimentosPagina.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; color: #666;">
-                        Nenhum movimento encontrado
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        movimentosPagina.forEach(movimento => {
-            const colaborador = this.colaboradores.find(c => c.codigo === movimento.colaborador_id);
-            const row = document.createElement('tr');
-            row.dataset.id = movimento.id;
-            
-            row.innerHTML = `
-                <td>${this.formatarData(movimento.data_geracao)}</td>
-                <td>${colaborador?.nome || 'N/A'}</td>
-                <td>${movimento.tipo}</td>
-                <td>${this.formatarMoeda(movimento.valor_venda)}</td>
-                <td>${this.formatarMoeda(movimento.valor)}</td>
-                <td><span class="status ${this.getStatusClass(movimento.status)}">${movimento.status}</span></td>
-                <td>
-                    <button class="action-btn view-btn" title="Visualizar"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-btn" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete-btn" title="Excluir"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            tbody.appendChild(row);
+    inicializarBuilder() {
+        // Drag start
+        document.querySelectorAll('.variable-item').forEach(el => {
+            el.addEventListener('dragstart', (e) => {
+                const field = e.target.getAttribute('data-field');
+                const total = e.target.getAttribute('data-total');
+                if (field) {
+                    e.dataTransfer.setData('text/plain', field);
+                    e.dataTransfer.setData('text/total', '0');
+                }
+                if (total) {
+                    e.dataTransfer.setData('text/total', '1');
+                    e.dataTransfer.setData('text/total-key', total);
+                }
+            });
         });
 
-        this.renderizarPaginacao();
+        // Drop zone
+        const drop = document.getElementById('dropFields');
+        if (drop) {
+            drop.addEventListener('dragover', (e) => { e.preventDefault(); });
+            drop.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const isTotal = e.dataTransfer.getData('text/total') === '1';
+                if (isTotal) return; // evitar soltar totalizadores nas colunas
+                const field = e.dataTransfer.getData('text/plain');
+                if (field && !this.camposSelecionados.includes(field)) {
+                    this.camposSelecionados.push(field);
+                    this.atualizarDropZone();
+                    this.renderizarTabelaBuilder();
+                }
+            });
+        }
+
+        // Drop zone de totalizadores
+        const dropTotals = document.getElementById('dropTotals');
+        if (dropTotals) {
+            dropTotals.addEventListener('dragover', (e) => { e.preventDefault(); });
+            dropTotals.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const totalKey = e.dataTransfer.getData('text/total-key') || '';
+                if (totalKey && !this.totalizadoresSelecionados.includes(totalKey)) {
+                    this.totalizadoresSelecionados.push(totalKey);
+                    this.atualizarDropZone();
+                    this.renderizarTotalizadores();
+                }
+            });
+        }
+
+        this.atualizarDropZone();
+    }
+
+    atualizarDropZone() {
+        const drop = document.getElementById('dropFields');
+        const dropTotals = document.getElementById('dropTotals');
+        if (drop) {
+            drop.innerHTML = '';
+            if (this.camposSelecionados.length === 0) {
+                const hint = document.createElement('span');
+                hint.style.color = '#90caf9';
+                hint.textContent = 'Arraste campos aqui...';
+                drop.appendChild(hint);
+            } else {
+                this.camposSelecionados.forEach(field => {
+                    const chip = document.createElement('span');
+                    chip.className = 'chip';
+                    chip.innerHTML = `${this.obterLabelCampo(field)} <button title=\"Remover\">×</button>`;
+                    chip.querySelector('button').addEventListener('click', () => {
+                        this.camposSelecionados = this.camposSelecionados.filter(f => f !== field);
+                        this.atualizarDropZone();
+                        this.renderizarTabelaBuilder();
+                    });
+                    drop.appendChild(chip);
+                });
+            }
+        }
+        if (dropTotals) {
+            dropTotals.innerHTML = '';
+            if (this.totalizadoresSelecionados.length === 0) {
+                const hint = document.createElement('span');
+                hint.style.color = '#90caf9';
+                hint.textContent = 'Arraste totalizadores aqui...';
+                dropTotals.appendChild(hint);
+            } else {
+                this.totalizadoresSelecionados.forEach(key => {
+                    const chip = document.createElement('span');
+                    chip.className = 'chip';
+                    chip.innerHTML = `${this.obterLabelTotal(key)} <button title=\"Remover\">×</button>`;
+                    chip.querySelector('button').addEventListener('click', () => {
+                        this.totalizadoresSelecionados = this.totalizadoresSelecionados.filter(k => k !== key);
+                        this.atualizarDropZone();
+                        this.renderizarTotalizadores();
+                    });
+                    dropTotals.appendChild(chip);
+                });
+            }
+        }
+    }
+
+    obterLabelTotal(key) {
+        const map = {
+            total_valor_venda: 'Total Valor de Venda',
+            total_comissao: 'Total Comissão',
+            qtd_titulos: 'Quantidade de Títulos',
+            qtd_produtos_distintos: 'Produtos Distintos',
+            qtd_colaboradores_distintos: 'Colaboradores Distintos',
+            total_pago: 'Total Pago',
+            total_pendente: 'Total Pendente'
+        };
+        return map[key] || key;
+    }
+
+    renderizarTotalizadores() {
+        const container = document.getElementById('totalsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        const dados = this.movimentosFiltrados || this.movimentos;
+        const calc = {
+            total_valor_venda: () => dados.reduce((s, m) => s + Number(m.valor_venda || 0), 0),
+            total_comissao: () => dados.reduce((s, m) => s + Number(m.valor || 0), 0),
+            qtd_titulos: () => dados.length,
+            qtd_produtos_distintos: () => {
+                const set = new Set();
+                dados.forEach(m => {
+                    if (m.item_id) m.item_id.split(',').forEach(x => set.add(x.trim()));
+                });
+                return set.size;
+            },
+            qtd_colaboradores_distintos: () => {
+                const set = new Set(dados.map(m => m.colaborador_id));
+                return set.size;
+            },
+            total_pago: () => dados.filter(m => String(m.status||'').toLowerCase().includes('pago')).reduce((s,m)=> s + Number(m.valor || 0), 0),
+            total_pendente: () => dados.filter(m => String(m.status||'').toLowerCase().includes('pend')).reduce((s,m)=> s + Number(m.valor || 0), 0)
+        };
+        this.totalizadoresSelecionados.forEach(key => {
+            const valor = calc[key] ? calc[key]() : 0;
+            const card = document.createElement('div');
+            card.className = 'card';
+            const display = (typeof valor === 'number') ? (key.startsWith('total') ? this.formatarMoeda(valor) : valor) : valor;
+            card.innerHTML = `
+                <div class="card-icon" style="background:transparent; color:#1976D2;">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="card-info">
+                    <h3>${this.obterLabelTotal(key)}</h3>
+                    <p>${display}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    obterLabelCampo(field) {
+        const map = {
+            data_geracao: 'Data de Geração',
+            data_vencimento: 'Data de Vencimento',
+            numero_titulo: 'Número do Título',
+            colaborador: 'Colaborador',
+            tipo: 'Tipo',
+            produto: 'Produto',
+            valor_venda: 'Valor da Venda',
+            valor: 'Valor da Comissão',
+            status: 'Status'
+        };
+        return map[field] || field;
+    }
+
+    renderizarTabelaBuilder() {
+        const thead = document.querySelector('#reportTable thead');
+        const tbody = document.querySelector('#reportTable tbody');
+        if (!thead || !tbody) return;
+
+        // Cabeçalho
+        thead.innerHTML = '';
+        const trHead = document.createElement('tr');
+        this.camposSelecionados.forEach(field => {
+            const th = document.createElement('th');
+            th.textContent = this.obterLabelCampo(field);
+            trHead.appendChild(th);
+        });
+        thead.appendChild(trHead);
+
+        // Corpo
+        tbody.innerHTML = '';
+        const dados = this.movimentosFiltrados || this.movimentos;
+        dados.forEach(m => {
+            const tr = document.createElement('tr');
+            this.camposSelecionados.forEach(field => {
+                const td = document.createElement('td');
+                td.textContent = this.obterValorCampo(field, m);
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    obterValorCampo(field, m) {
+        switch (field) {
+            case 'data_geracao':
+                return m.data_geracao ? this.formatarData(m.data_geracao) : '';
+            case 'data_vencimento':
+                return m.data_vencimento ? this.formatarData(m.data_vencimento) : '';
+            case 'numero_titulo':
+                return m.numero_titulo || '';
+            case 'colaborador': {
+                const colab = this.colaboradores.find(c => c.codigo === m.colaborador_id);
+                return (colab && colab.nome) ? colab.nome : (m.colaborador_nome || '');
+            }
+            case 'tipo':
+                return m.tipo || '';
+            case 'produto': {
+                if (!m.item_id) return '';
+                const ids = m.item_id.split(',');
+                return ids.map(s => s.trim().split('-').slice(1).join('-')).filter(Boolean).join(', ');
+            }
+            case 'valor_venda':
+                return this.formatarMoeda(m.valor_venda || 0);
+            case 'valor':
+                return this.formatarMoeda(m.valor || 0);
+            case 'status':
+                return m.status || '';
+            default:
+                return '';
+        }
+    }
+
+    exportarCSVBuilder() {
+        const dados = this.movimentosFiltrados || this.movimentos;
+        if (!dados.length || !this.camposSelecionados.length) {
+            this.mostrarToast('Selecione alguns campos e aplique filtros antes de exportar.', 'info');
+            return;
+        }
+        const header = this.camposSelecionados.map(f => '"' + this.obterLabelCampo(f) + '"').join(',');
+        const rows = dados.map(m => this.camposSelecionados
+            .map(f => '"' + (this.obterValorCampo(f, m) || '').toString().replace(/"/g, '""') + '"')
+            .join(',')
+        );
+        const csv = [header, ...rows].join('\n');
+        this.downloadCSV(csv, 'relatorio_personalizado.csv');
+        this.mostrarToast('Relatório exportado com sucesso!', 'success');
+    }
+
+    exportarPDFBuilder() {
+        const dados = this.movimentosFiltrados || this.movimentos;
+        if (!dados.length || !this.camposSelecionados.length) {
+            this.mostrarToast('Selecione alguns campos e aplique filtros antes de exportar.', 'info');
+            return;
+        }
+        const janela = window.open('', '_blank');
+        const titulo = 'Relatório Personalizado';
+        const dataGeracao = new Date().toLocaleDateString('pt-BR');
+        const estilo = `
+            <style>
+                body { font-family: Arial, sans-serif; margin: 24px; }
+                h1 { color: #1976D2; margin-bottom: 6px; }
+                .meta { color: #666; margin-bottom: 16px; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+                th { background: #f7f9fc; }
+                .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 16px; }
+                .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; }
+                .card h3 { margin: 0 0 6px 0; font-size: 14px; color: #1976D2; }
+                .card p { margin: 0; font-weight: bold; }
+            </style>
+        `;
+        const header = this.camposSelecionados.map(f => `<th>${this.obterLabelCampo(f)}</th>`).join('');
+        const rows = dados.map(m => {
+            const tds = this.camposSelecionados.map(f => `<td>${this.obterValorCampo(f, m)}</td>`).join('');
+            return `<tr>${tds}</tr>`;
+        }).join('');
+
+        // Totalizadores selecionados
+        const dadosCalc = this.movimentosFiltrados || this.movimentos;
+        const calc = {
+            total_valor_venda: () => dadosCalc.reduce((s, m) => s + Number(m.valor_venda || 0), 0),
+            total_comissao: () => dadosCalc.reduce((s, m) => s + Number(m.valor || 0), 0),
+            qtd_titulos: () => dadosCalc.length,
+            qtd_produtos_distintos: () => { const set = new Set(); dadosCalc.forEach(m => { if (m.item_id) m.item_id.split(',').forEach(x => set.add(x.trim())); }); return set.size; },
+            qtd_colaboradores_distintos: () => { const set = new Set(dadosCalc.map(m => m.colaborador_id)); return set.size; },
+            total_pago: () => dadosCalc.filter(m => String(m.status||'').toLowerCase().includes('pago')).reduce((s,m)=> s + Number(m.valor || 0), 0),
+            total_pendente: () => dadosCalc.filter(m => String(m.status||'').toLowerCase().includes('pend')).reduce((s,m)=> s + Number(m.valor || 0), 0)
+        };
+        const totalsHtml = (this.totalizadoresSelecionados || []).map(key => {
+            const valor = calc[key] ? calc[key]() : 0;
+            const display = (typeof valor === 'number') ? (key.startsWith('total') ? this.formatarMoeda(valor) : valor) : valor;
+            return `<div class="card"><h3>${this.obterLabelTotal(key)}</h3><p>${display}</p></div>`;
+        }).join('');
+
+        const html = `
+            <html>
+            <head>
+                <title>${titulo}</title>
+                ${estilo}
+            </head>
+            <body>
+                <h1>${titulo}</h1>
+                <div class="meta">Gerado em: ${dataGeracao}</div>
+                <table>
+                    <thead><tr>${header}</tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div class="totals">${totalsHtml}</div>
+            </body>
+            </html>
+        `;
+        janela.document.write(html);
+        janela.document.close();
+        janela.print();
     }
 
     renderizarPaginacao() {
