@@ -124,11 +124,17 @@ async function criarColaborador(event) {
     };
 
     try {
-        await api.post('/colaboradores', colaborador);
+        const response = await api.post('/colaboradores', colaborador);
         carregarColaboradores();
         event.target.reset();
         closeModal();
-        showSuccessModal();
+        
+        // Mostrar modal de confirmação com senha temporária
+        if (response.data && response.data.senha_temporaria) {
+            mostrarModalConfirmacao(response.data);
+        } else {
+            showSuccessModal();
+        }
     } catch (error) {
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');

@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const bcrypt = require('bcrypt');
 
 // Listar todos os colaboradores
 const listarColaboradores = async (req, res) => {
@@ -53,10 +54,20 @@ const buscarColaborador = async (req, res) => {
     }
 };
 
+// Gerar senha temporária aleatória
+const gerarSenhaTemporaria = () => {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%';
+    let senha = '';
+    for (let i = 0; i < 8; i++) {
+        senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return senha;
+};
+
 // Criar novo colaborador
 const criarColaborador = async (req, res) => {
     try {
-        const { nome, email, telefone, cargo, data_admissao, status, perfil, foto } = req.body;
+        const { nome, email, telefone, cargo, data_admissao, status, perfil, foto, perfil_id } = req.body;
         
         // Adicionar departamento padrão se não fornecido
         const departamento = req.body.departamento || 'Geral';
@@ -72,6 +83,10 @@ const criarColaborador = async (req, res) => {
             ? ultimoColaborador[0].codigo + 1 
             : 1;
 
+        // Gerar senha temporária
+        const senhaTemporaria = gerarSenhaTemporaria();
+        const senhaHash = await bcrypt.hash(senhaTemporaria, 10);
+
         const { data, error } = await supabase
             .from('colaboradores')
             .insert([
@@ -83,9 +98,14 @@ const criarColaborador = async (req, res) => {
                     cargo,
                     departamento,
                     data_admissao,
-                    status,
+                    status: status || 'ativo',
                     perfil,
-                    foto: foto || null
+                    foto: foto || null,
+                    // Campos de autenticação
+                    senha_hash: senhaHash,
+                    perfil_id: perfil_id || 1, // Perfil padrão
+                    primeiro_acesso: true,
+                    senha_temporaria: true
                 }
             ])
             .select()
@@ -93,7 +113,11 @@ const criarColaborador = async (req, res) => {
 
         if (error) throw error;
 
-        res.status(201).json(data);
+        // Retornar dados do colaborador + senha temporária
+        res.status(201).json({
+            ...data,
+            senha_temporaria: senhaTemporaria // Senha temporária para o admin
+        });
     } catch (error) {
         console.error('Erro ao criar colaborador:', error);
         res.status(500).json({ error: 'Erro ao criar colaborador' });

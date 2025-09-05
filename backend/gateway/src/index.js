@@ -9,6 +9,7 @@ const clienteRoutes = require('./routes/clienteRoutes');
 const produtoRoutes = require('./routes/produtoRoutes');
 const servicoRoutes = require('./routes/servicoRoutes');
 const movimentoComissaoRoutes = require('./routes/movimentoComissaoRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Rotas
+app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/colaboradores', colaboradorRoutes);
 app.use('/api/clientes', clienteRoutes);

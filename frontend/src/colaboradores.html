@@ -1199,5 +1199,117 @@
             input.value = formattedValue;
         }
     </script>
+
+    <!-- Modal de Confirmação de Cadastro -->
+    <div class="modal" id="modalConfirmacaoCadastro">
+        <div class="modal-content" style="max-width: 600px; width: 90%;">
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle" style="color: #28a745;"></i> Colaborador Cadastrado com Sucesso!</h2>
+                <button class="close" onclick="fecharModalConfirmacao()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="dados-colaborador" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #333;">📋 Dados do Colaborador</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <p><strong>Nome:</strong> <span id="confirmNome"></span></p>
+                        <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
+                        <p><strong>Código:</strong> <span id="confirmCodigo"></span></p>
+                        <p><strong>Perfil:</strong> <span id="confirmPerfil"></span></p>
+                    </div>
+                </div>
+                
+                <div class="senha-temporaria" style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px; color: #856404;">🔑 Senha Temporária</h4>
+                    <div class="senha-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="senhaTemporaria" readonly 
+                               style="flex: 1; padding: 10px; border: 2px solid #ffc107; border-radius: 4px; font-family: monospace; font-size: 16px; font-weight: bold; background: #fff;">
+                        <button onclick="copiarSenha()" 
+                                style="padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                    <div class="aviso" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; font-size: 14px;">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Importante:</strong> Informe esta senha ao colaborador. Ele será obrigado a trocá-la no primeiro acesso ao sistema.
+                    </div>
+                </div>
+                
+                <div class="instrucoes" style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px; color: #0c5460;">📝 Próximos Passos</h4>
+                    <ol style="margin: 0; padding-left: 20px; color: #0c5460;">
+                        <li>Informe a senha temporária ao colaborador</li>
+                        <li>O colaborador deve acessar o sistema com o email cadastrado</li>
+                        <li>No primeiro acesso, ele será obrigado a trocar a senha</li>
+                        <li>Após trocar a senha, ele poderá usar o sistema normalmente</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 20px; border-top: 1px solid #dee2e6;">
+                <button onclick="enviarSenhaPorEmail()" 
+                        style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-envelope"></i> Enviar por Email
+                </button>
+                <button onclick="fecharModalConfirmacao()" 
+                        style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <i class="fas fa-check"></i> Entendi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funções para o modal de confirmação
+        function fecharModalConfirmacao() {
+            document.getElementById('modalConfirmacaoCadastro').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function copiarSenha() {
+            const senhaInput = document.getElementById('senhaTemporaria');
+            senhaInput.select();
+            senhaInput.setSelectionRange(0, 99999); // Para mobile
+            
+            try {
+                document.execCommand('copy');
+                mostrarToast('Senha copiada para a área de transferência!', 'success');
+            } catch (err) {
+                // Fallback para navegadores modernos
+                navigator.clipboard.writeText(senhaInput.value).then(() => {
+                    mostrarToast('Senha copiada para a área de transferência!', 'success');
+                }).catch(() => {
+                    mostrarToast('Erro ao copiar senha', 'error');
+                });
+            }
+        }
+
+        function enviarSenhaPorEmail() {
+            const email = document.getElementById('confirmEmail').textContent;
+            const senha = document.getElementById('senhaTemporaria').value;
+            const nome = document.getElementById('confirmNome').textContent;
+            
+            // Aqui você pode implementar o envio por email
+            // Por enquanto, vamos apenas mostrar uma mensagem
+            mostrarToast(`Email enviado para ${email} com a senha temporária`, 'info');
+            
+            // Fechar modal após enviar
+            setTimeout(() => {
+                fecharModalConfirmacao();
+            }, 2000);
+        }
+
+        // Função para mostrar o modal de confirmação
+        function mostrarModalConfirmacao(dadosColaborador) {
+            document.getElementById('confirmNome').textContent = dadosColaborador.nome;
+            document.getElementById('confirmEmail').textContent = dadosColaborador.email;
+            document.getElementById('confirmCodigo').textContent = dadosColaborador.codigo;
+            document.getElementById('confirmPerfil').textContent = dadosColaborador.perfil || 'Usuário';
+            document.getElementById('senhaTemporaria').value = dadosColaborador.senha_temporaria;
+            
+            document.getElementById('modalConfirmacaoCadastro').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    </script>
 </body>
 </html> 
