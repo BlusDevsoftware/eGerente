@@ -8,7 +8,7 @@ class ConsultaComissao {
             dataFim: '',
             colaborador: '',
             tipo: '',
-            status: '',
+            produto: '',
             valorMin: '',
             valorMax: ''
         };
@@ -20,10 +20,19 @@ class ConsultaComissao {
     }
 
     async init() {
-        await this.carregarColaboradores();
-        await this.carregarMovimentos();
-        this.configurarEventos();
-        this.atualizarGraficos();
+        this.mostrarSpinner();
+        try {
+            await this.carregarColaboradores();
+            await this.carregarMovimentos();
+            this.carregarProdutos();
+            this.configurarEventos();
+            this.atualizarGraficos();
+        } catch (error) {
+            console.error('Erro ao inicializar consulta:', error);
+            this.mostrarToast('Erro ao inicializar a página de consulta', 'error');
+        } finally {
+            this.ocultarSpinner();
+        }
     }
 
     async carregarColaboradores() {
@@ -38,9 +47,9 @@ class ConsultaComissao {
     }
 
     preencherSelectColaboradores() {
-        const select = document.querySelector('.filter-group:nth-child(2) select');
+        const select = document.getElementById('filtroColaborador');
         if (select) {
-            select.innerHTML = '<option value="">Todos</option>';
+            select.innerHTML = '<option value="">Selecionar</option><option value="todos">Todos</option>';
             this.colaboradores.forEach(colab => {
                 const option = document.createElement('option');
                 option.value = colab.codigo;
@@ -52,7 +61,6 @@ class ConsultaComissao {
 
     async carregarMovimentos() {
         try {
-            this.mostrarLoading(true);
             const movimentos = await window.api.get('/movimento_comissoes');
             this.movimentos = movimentos;
             this.totalItens = this.movimentos.length;
@@ -60,23 +68,91 @@ class ConsultaComissao {
         } catch (error) {
             console.error('Erro ao carregar movimentos:', error);
             this.mostrarToast('Erro ao carregar movimentos', 'error');
-        } finally {
-            this.mostrarLoading(false);
+        }
+    }
+
+    carregarProdutos() {
+        // Extrair produtos únicos dos movimentos
+        const produtosUnicos = new Set();
+        
+        this.movimentos.forEach(m => {
+            if (m.item_id) {
+                const itemIds = m.item_id.split(',');
+                itemIds.forEach(itemId => {
+                    const parts = itemId.trim().split('-');
+                    if (parts.length >= 2) {
+                        const nomeProduto = parts.slice(1).join('-');
+                        produtosUnicos.add(nomeProduto);
+                    }
+                });
+            }
+        });
+
+        // Preencher select de produtos
+        const select = document.getElementById('filtroProduto');
+        if (select) {
+            select.innerHTML = '<option value="">Selecionar</option><option value="todos">Todos</option>';
+            
+            // Ordenar produtos alfabeticamente
+            const produtosOrdenados = Array.from(produtosUnicos).sort();
+            
+            produtosOrdenados.forEach(produto => {
+                const option = document.createElement('option');
+                option.value = produto;
+                option.textContent = produto;
+                select.appendChild(option);
+            });
         }
     }
 
     configurarEventos() {
-        // Botão consultar
-        const btnConsultar = document.querySelector('.btn-primary');
-        if (btnConsultar) {
-            btnConsultar.addEventListener('click', () => this.aplicarFiltros());
+        // Filtros automáticos
+        const filtroContainer = document.querySelector('.advanced-filters');
+        if (filtroContainer) {
+            filtroContainer.addEventListener('change', (e) => {
+                if (e.target.matches('#dataInicial, #dataFinal, #filtroColaborador, #filtroTipo, #filtroProduto')) {
+                    this.aplicarFiltros();
+                }
+            });
         }
 
-        // Filtros
-        const inputs = document.querySelectorAll('.advanced-filters input, .advanced-filters select');
-        inputs.forEach(input => {
-            input.addEventListener('change', () => this.capturarFiltros());
-        });
+        // Botão limpar filtros
+        const btnLimpar = document.getElementById('btnLimparFiltros');
+        if (btnLimpar) {
+            btnLimpar.addEventListener('click', () => {
+                const ids = ['filtroColaborador','filtroTipo','filtroProduto','dataInicial','dataFinal'];
+                ids.forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if (el) el.value=''; 
+                });
+                this.modoFiltroData = 'geracao';
+                this.atualizarBotoesModo();
+                this.aplicarFiltros();
+            });
+        }
+
+        // Botões de modo de data
+        this.modoFiltroData = 'geracao';
+        const btnGeracao = document.getElementById('btnDataGeracao');
+        const btnVenc = document.getElementById('btnDataVencimento');
+        
+        if (btnGeracao) {
+            btnGeracao.addEventListener('click', () => { 
+                this.modoFiltroData='geracao'; 
+                this.atualizarBotoesModo(); 
+                this.aplicarFiltros(); 
+            });
+        }
+        
+        if (btnVenc) {
+            btnVenc.addEventListener('click', () => { 
+                this.modoFiltroData='vencimento'; 
+                this.atualizarBotoesModo(); 
+                this.aplicarFiltros(); 
+            });
+        }
+        
+        this.atualizarBotoesModo();
 
         // Ações da tabela
         document.addEventListener('click', (e) => {
@@ -104,23 +180,24 @@ class ConsultaComissao {
         }
     }
 
+    atualizarBotoesModo() {
+        const btnGeracao = document.getElementById('btnDataGeracao');
+        const btnVenc = document.getElementById('btnDataVencimento');
+        
+        if (btnGeracao && btnVenc) {
+            const ativo = 'height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#1976D2; color:#fff; font-size:0.9em; cursor:pointer;';
+            const inativo = 'height:32px; width:120px; padding:0 10px; border:1.5px solid #90caf9; border-radius:6px; background:#f4faff; color:#1565c0; font-size:0.9em; cursor:pointer;';
+            btnGeracao.setAttribute('style', this.modoFiltroData==='geracao' ? ativo : inativo);
+            btnVenc.setAttribute('style', this.modoFiltroData==='vencimento' ? ativo : inativo);
+        }
+    }
+
     capturarFiltros() {
-        const dataInputs = document.querySelectorAll('.date-range input');
-        this.filtros.dataInicio = dataInputs[0]?.value || '';
-        this.filtros.dataFim = dataInputs[1]?.value || '';
-        
-        const colaboradorSelect = document.querySelector('.filter-group:nth-child(2) select');
-        this.filtros.colaborador = colaboradorSelect?.value || '';
-        
-        const tipoSelect = document.querySelector('.filter-group:nth-child(3) select');
-        this.filtros.tipo = tipoSelect?.value || '';
-        
-        const statusSelect = document.querySelector('.filter-group:nth-child(4) select');
-        this.filtros.status = statusSelect?.value || '';
-        
-        const valorInputs = document.querySelectorAll('.value-range input');
-        this.filtros.valorMin = valorInputs[0]?.value || '';
-        this.filtros.valorMax = valorInputs[1]?.value || '';
+        this.filtros.dataInicio = document.getElementById('dataInicial')?.value || '';
+        this.filtros.dataFim = document.getElementById('dataFinal')?.value || '';
+        this.filtros.colaborador = document.getElementById('filtroColaborador')?.value || '';
+        this.filtros.tipo = document.getElementById('filtroTipo')?.value || '';
+        this.filtros.produto = document.getElementById('filtroProduto')?.value || '';
     }
 
     aplicarFiltros() {
@@ -130,18 +207,20 @@ class ConsultaComissao {
 
         // Filtro por data
         if (this.filtros.dataInicio) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                new Date(m.data_geracao) >= new Date(this.filtros.dataInicio)
-            );
+            movimentosFiltrados = movimentosFiltrados.filter(m => {
+                const base = this.modoFiltroData === 'vencimento' ? m.data_vencimento : m.data_geracao;
+                return base ? new Date(base) >= new Date(this.filtros.dataInicio) : true;
+            });
         }
         if (this.filtros.dataFim) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                new Date(m.data_geracao) <= new Date(this.filtros.dataFim)
-            );
+            movimentosFiltrados = movimentosFiltrados.filter(m => {
+                const base = this.modoFiltroData === 'vencimento' ? m.data_vencimento : m.data_geracao;
+                return base ? new Date(base) <= new Date(this.filtros.dataFim) : true;
+            });
         }
 
         // Filtro por colaborador
-        if (this.filtros.colaborador) {
+        if (this.filtros.colaborador && this.filtros.colaborador !== 'todos') {
             movimentosFiltrados = movimentosFiltrados.filter(m => 
                 m.colaborador_id === this.filtros.colaborador
             );
@@ -149,28 +228,31 @@ class ConsultaComissao {
 
         // Filtro por tipo
         if (this.filtros.tipo) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                m.tipo.toLowerCase() === this.filtros.tipo.toLowerCase()
-            );
+            if (this.filtros.tipo === 'produtos') {
+                movimentosFiltrados = movimentosFiltrados.filter(m => 
+                    m.tipo === 'PRODUTO'
+                );
+            } else if (this.filtros.tipo === 'servicos') {
+                movimentosFiltrados = movimentosFiltrados.filter(m => 
+                    m.tipo === 'SERVICO'
+                );
+            }
         }
 
-        // Filtro por status
-        if (this.filtros.status) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                m.status.toLowerCase() === this.filtros.status.toLowerCase()
-            );
-        }
-
-        // Filtro por valor
-        if (this.filtros.valorMin) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                parseFloat(m.valor) >= parseFloat(this.filtros.valorMin)
-            );
-        }
-        if (this.filtros.valorMax) {
-            movimentosFiltrados = movimentosFiltrados.filter(m => 
-                parseFloat(m.valor) <= parseFloat(this.filtros.valorMax)
-            );
+        // Filtro por produto
+        if (this.filtros.produto && this.filtros.produto !== 'todos') {
+            movimentosFiltrados = movimentosFiltrados.filter(m => {
+                if (!m.item_id) return false;
+                const itemIds = m.item_id.split(',');
+                return itemIds.some(itemId => {
+                    const parts = itemId.trim().split('-');
+                    if (parts.length >= 2) {
+                        const nomeProduto = parts.slice(1).join('-');
+                        return nomeProduto === this.filtros.produto;
+                    }
+                    return false;
+                });
+            });
         }
 
         this.movimentosFiltrados = movimentosFiltrados;
@@ -281,34 +363,68 @@ class ConsultaComissao {
         
         // Gráfico Mensal
         this.atualizarGraficoMensal(movimentos);
+        
+        // Funil de Vendas
+        this.atualizarGraficoFunil(movimentos);
     }
 
     atualizarGraficoStatus(movimentos) {
-        const statusCount = {};
+        // Agrupar por produto (usando item_id para extrair nome do produto)
+        const produtoVendas = {};
+        
         movimentos.forEach(m => {
-            statusCount[m.status] = (statusCount[m.status] || 0) + 1;
+            if (m.item_id) {
+                // Extrair nome do produto do item_id (formato: "00001-NOME_DO_PRODUTO")
+                const itemIds = m.item_id.split(',');
+                itemIds.forEach(itemId => {
+                    const parts = itemId.trim().split('-');
+                    if (parts.length >= 2) {
+                        const nomeProduto = parts.slice(1).join('-'); // Pega tudo após o primeiro hífen
+                        // Contar quantidade de vendas (não valor)
+                        produtoVendas[nomeProduto] = (produtoVendas[nomeProduto] || 0) + 1;
+                    }
+                });
+            }
         });
+
+        // Ordenar por quantidade e pegar top 10
+        const sortedProdutos = Object.entries(produtoVendas)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10);
+
+        const labels = sortedProdutos.map(([nome]) => nome);
+        const values = sortedProdutos.map(([, quantidade]) => quantidade);
 
         const ctx = document.getElementById('statusChart');
         if (ctx && window.statusChart) {
-            window.statusChart.data.datasets[0].data = Object.values(statusCount);
-            window.statusChart.data.labels = Object.keys(statusCount);
+            window.statusChart.data.labels = labels;
+            window.statusChart.data.datasets[0].data = values;
             window.statusChart.update();
         }
     }
 
     atualizarGraficoColaboradores(movimentos) {
-        const colaboradorTotals = {};
+        const colaboradorVendas = {};
+        
         movimentos.forEach(m => {
             const colab = this.colaboradores.find(c => c.codigo === m.colaborador_id);
             const nome = colab?.nome || 'N/A';
-            colaboradorTotals[nome] = (colaboradorTotals[nome] || 0) + parseFloat(m.valor);
+            // Contar quantidade de vendas (não valor)
+            colaboradorVendas[nome] = (colaboradorVendas[nome] || 0) + 1;
         });
+
+        // Ordenar por quantidade e pegar top 10
+        const sortedColaboradores = Object.entries(colaboradorVendas)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10);
+
+        const labels = sortedColaboradores.map(([nome]) => nome);
+        const values = sortedColaboradores.map(([, quantidade]) => quantidade);
 
         const ctx = document.getElementById('collaboratorChart');
         if (ctx && window.collaboratorChart) {
-            window.collaboratorChart.data.labels = Object.keys(colaboradorTotals);
-            window.collaboratorChart.data.datasets[0].data = Object.values(colaboradorTotals);
+            window.collaboratorChart.data.labels = labels;
+            window.collaboratorChart.data.datasets[0].data = values;
             window.collaboratorChart.update();
         }
     }
@@ -316,15 +432,82 @@ class ConsultaComissao {
     atualizarGraficoMensal(movimentos) {
         const monthlyTotals = {};
         movimentos.forEach(m => {
-            const mes = new Date(m.data_geracao).toLocaleDateString('pt-BR', { month: 'short' });
-            monthlyTotals[mes] = (monthlyTotals[mes] || 0) + parseFloat(m.valor);
+            const base = this.modoFiltroData === 'vencimento' ? m.data_vencimento : m.data_geracao;
+            if (!base) return;
+            const data = new Date(base);
+            const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+            const valor = Number(m.valor) || 0;
+            monthlyTotals[mesAno] = (monthlyTotals[mesAno] || 0) + valor;
         });
+
+        // Ordenar por data
+        const sortedEvolucao = Object.entries(monthlyTotals)
+            .sort(([a], [b]) => a.localeCompare(b));
+
+        const labels = sortedEvolucao.map(([mesAno]) => {
+            const [ano, mes] = mesAno.split('-');
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            return `${meses[parseInt(mes) - 1]}/${ano}`;
+        });
+        const values = sortedEvolucao.map(([, valor]) => valor);
 
         const ctx = document.getElementById('monthlyChart');
         if (ctx && window.monthlyChart) {
-            window.monthlyChart.data.labels = Object.keys(monthlyTotals);
-            window.monthlyChart.data.datasets[0].data = Object.values(monthlyTotals);
+            window.monthlyChart.data.labels = labels;
+            window.monthlyChart.data.datasets[0].data = values;
             window.monthlyChart.update();
+        }
+    }
+
+    atualizarGraficoFunil(movimentos) {
+        // Criar dados do funil de vendas baseado nos movimentos
+        const funilData = {
+            'Leads': 0,
+            'Oportunidades': 0,
+            'Propostas': 0,
+            'Negociações': 0,
+            'Fechamentos': 0,
+            'Vendas Concluídas': 0
+        };
+
+        // Analisar cada movimento para categorizar no funil
+        movimentos.forEach(m => {
+            const valorVenda = Number(m.valor_venda) || 0;
+            const status = m.status?.toLowerCase() || '';
+            
+            // Categorizar baseado no status e valor
+            if (status === 'pendente') {
+                if (valorVenda < 1000) {
+                    funilData['Leads'] += valorVenda;
+                } else if (valorVenda < 5000) {
+                    funilData['Oportunidades'] += valorVenda;
+                } else {
+                    funilData['Propostas'] += valorVenda;
+                }
+            } else if (status === 'pago') {
+                if (valorVenda < 2000) {
+                    funilData['Negociações'] += valorVenda;
+                } else if (valorVenda < 10000) {
+                    funilData['Fechamentos'] += valorVenda;
+                } else {
+                    funilData['Vendas Concluídas'] += valorVenda;
+                }
+            } else if (status === 'cancelado') {
+                // Movimentos cancelados não entram no funil
+                return;
+            }
+        });
+
+        // Preparar dados para o gráfico
+        const labels = Object.keys(funilData);
+        const values = Object.values(funilData);
+
+        // Atualizar o gráfico
+        const ctx = document.getElementById('funnelChart');
+        if (ctx && window.funnelChart) {
+            window.funnelChart.data.labels = labels;
+            window.funnelChart.data.datasets[0].data = values;
+            window.funnelChart.update();
         }
     }
 
@@ -605,6 +788,20 @@ class ConsultaComissao {
         printWindow.document.write(html);
         printWindow.document.close();
         printWindow.print();
+    }
+
+    mostrarSpinner() {
+        const spinner = document.getElementById('loader-consulta');
+        if (spinner) {
+            spinner.style.display = 'flex';
+        }
+    }
+
+    ocultarSpinner() {
+        const spinner = document.getElementById('loader-consulta');
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
     }
 
     mostrarLoading(mostrar) {
