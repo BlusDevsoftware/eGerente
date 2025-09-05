@@ -213,15 +213,60 @@
     <script src="scripts/navigation.js"></script>
     <script src="scripts/config/api.js"></script>
     <script>
+        // Verificação de autenticação
+        function verificarAutenticacao() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                console.log('🔒 Usuário não autenticado - redirecionando para login');
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            try {
+                const userData = JSON.parse(user);
+                console.log('✅ Usuário autenticado:', userData.nome);
+                return true;
+            } catch (error) {
+                console.error('❌ Erro ao verificar dados do usuário:', error);
+                limparDadosAutenticacao();
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+
+        // Função para limpar dados de autenticação
+        function limparDadosAutenticacao() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            console.log('🧹 Dados de autenticação limpos');
+        }
+
+        // Função para logout
+        function logout() {
+            limparDadosAutenticacao();
+            window.location.href = 'login.html';
+        }
+
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!verificarAutenticacao()) {
+                return; // Para a execução se não estiver autenticado
+            }
+            
+            // Continuar com a inicialização normal da página
+            console.log('🚀 Inicializando dashboard...');
+            inicializarDashboard();
+        });
+
         // Variáveis globais
         let comissoesChart, statusChart, vendasProdutoChart, topColaboradoresChart;
         let dashboardData = {};
 
         // Inicializar dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            inicializarDashboard();
+        function inicializarDashboard() {
             inicializarDragAndDrop();
-        });
 
         // Limpar gráficos apenas quando a página for fechada/recarregada
         window.addEventListener('beforeunload', function() {
