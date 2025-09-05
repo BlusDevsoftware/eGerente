@@ -228,7 +228,6 @@ class ConsultaComissao {
         this.paginaAtual = 1;
         
         this.renderizarTabelaBuilder();
-        this.mostrarToast(`${movimentosFiltrados.length} movimentos encontrados`, 'info');
     }
 
     inicializarBuilder() {
