@@ -32,6 +32,9 @@ class ConsultaComissao {
             if (response.ok) {
                 this.colaboradores = await response.json();
                 this.preencherSelectColaboradores();
+            } else {
+                console.error('Erro ao carregar colaboradores:', response.status);
+                this.mostrarToast('Erro ao carregar colaboradores', 'error');
             }
         } catch (error) {
             console.error('Erro ao carregar colaboradores:', error);
@@ -55,13 +58,14 @@ class ConsultaComissao {
     async carregarMovimentos() {
         try {
             this.mostrarLoading(true);
-            const response = await fetch('/api/movimento-comissoes');
+            const response = await fetch('/api/movimento_comissoes');
             if (response.ok) {
                 this.movimentos = await response.json();
                 this.totalItens = this.movimentos.length;
                 this.aplicarFiltros();
             } else {
-                throw new Error('Erro ao carregar movimentos');
+                console.error('Erro ao carregar movimentos:', response.status);
+                this.mostrarToast('Erro ao carregar movimentos', 'error');
             }
         } catch (error) {
             console.error('Erro ao carregar movimentos:', error);
@@ -336,7 +340,7 @@ class ConsultaComissao {
 
     async visualizarMovimento(id) {
         try {
-            const response = await fetch(`/api/movimento-comissoes/${id}`);
+            const response = await fetch(`/api/movimento_comissoes/${id}`);
             if (response.ok) {
                 const movimento = await response.json();
                 this.mostrarModalVisualizacao(movimento);
@@ -414,7 +418,7 @@ class ConsultaComissao {
 
     async editarMovimento(id) {
         try {
-            const response = await fetch(`/api/movimento-comissoes/${id}`);
+            const response = await fetch(`/api/movimento_comissoes/${id}`);
             if (response.ok) {
                 const movimento = await response.json();
                 this.mostrarModalEdicao(movimento);
@@ -484,7 +488,7 @@ class ConsultaComissao {
             // Converter valores numéricos
             if (dados.valor_pago) dados.valor_pago = parseFloat(dados.valor_pago);
             
-            const response = await fetch(`/api/movimento-comissoes/${id}`, {
+            const response = await fetch(`/api/movimento_comissoes/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -511,7 +515,7 @@ class ConsultaComissao {
             const movimento = this.movimentos.find(m => m.id === id);
             if (movimento) {
                 await deleteWithCheck(
-                    'movimento-comissoes',
+                    'movimento_comissoes',
                     id,
                     () => {
                         this.mostrarToast('Movimento excluído com sucesso!', 'success');
@@ -523,7 +527,7 @@ class ConsultaComissao {
             // Fallback para exclusão direta
             if (confirm('Tem certeza que deseja excluir este movimento?')) {
                 try {
-                    const response = await fetch(`/api/movimento-comissoes/${id}`, {
+                    const response = await fetch(`/api/movimento_comissoes/${id}`, {
                         method: 'DELETE'
                     });
 
