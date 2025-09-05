@@ -260,44 +260,53 @@
         }
 
         /* Scroll para o funil de vendas */
-        .chart-card {
+        .funnel-container {
             overflow-x: auto;
             overflow-y: hidden;
             position: relative;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            width: 100%;
+            max-width: 100%;
         }
 
-        .chart-card canvas {
-            min-width: 100%;
-            height: 400px !important;
-        }
-
-        /* Container específico para o funil */
-        #funnelChart {
+        .funnel-container canvas {
             min-width: 800px;
             width: 100%;
+            height: 400px !important;
+            display: block;
         }
 
         /* Scroll personalizado */
-        .chart-card::-webkit-scrollbar {
-            height: 8px;
+        .funnel-container::-webkit-scrollbar {
+            height: 12px;
+            width: 12px;
         }
 
-        .chart-card::-webkit-scrollbar-track {
+        .funnel-container::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 4px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
         }
 
-        .chart-card::-webkit-scrollbar-thumb {
+        .funnel-container::-webkit-scrollbar-thumb {
             background: #1976D2;
-            border-radius: 4px;
+            border-radius: 6px;
+            border: 1px solid #1565C0;
         }
 
-        .chart-card::-webkit-scrollbar-thumb:hover {
+        .funnel-container::-webkit-scrollbar-thumb:hover {
             background: #1565C0;
         }
 
+        .funnel-container::-webkit-scrollbar-corner {
+            background: #f1f1f1;
+        }
+
         /* Indicador de scroll */
-        .chart-card::after {
+        .funnel-container::after {
             content: '← Role para ver mais →';
             position: absolute;
             bottom: 10px;
@@ -309,6 +318,17 @@
             font-size: 12px;
             opacity: 0.7;
             pointer-events: none;
+        }
+
+        /* Forçar scroll a aparecer */
+        .funnel-container {
+            scrollbar-width: thin;
+            scrollbar-color: #1976D2 #f1f1f1;
+        }
+
+        /* Garantir que o scroll seja visível */
+        .funnel-container:hover {
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -444,8 +464,8 @@
         </div>
 
         <!-- Funil de Vendas -->
-        <div class="chart-card" style="margin-top: 20px;">
-            <h3>Funil de Vendas</h3>
+        <div class="funnel-container">
+            <h3 style="padding: 20px 20px 0 20px; margin: 0; color: #333;">Funil de Vendas</h3>
             <canvas id="funnelChart"></canvas>
         </div>
     </div>
