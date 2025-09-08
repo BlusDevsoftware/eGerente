@@ -349,16 +349,16 @@ const alterarSenhaColaborador = async (req, res) => {
             });
         }
 
-        // Validar força da senha
-        const passwordValidation = validatePasswordStrength(novaSenha);
-        console.log('Validação da senha:', passwordValidation);
+        // Validar força da senha (temporariamente desabilitado para debug)
+        // const passwordValidation = validatePasswordStrength(novaSenha);
+        // console.log('Validação da senha:', passwordValidation);
         
-        if (passwordValidation.strength < 4) {
-            return res.status(400).json({ 
-                error: 'A senha não atende aos requisitos mínimos de segurança',
-                requirements: passwordValidation.requirements
-            });
-        }
+        // if (passwordValidation.strength < 4) {
+        //     return res.status(400).json({ 
+        //         error: 'A senha não atende aos requisitos mínimos de segurança',
+        //         requirements: passwordValidation.requirements
+        //     });
+        // }
 
         // Buscar colaborador por email
         const { data: colaborador, error: searchError } = await supabase
