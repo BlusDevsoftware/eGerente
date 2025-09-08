@@ -341,6 +341,8 @@ const alterarSenhaColaborador = async (req, res) => {
     try {
         const { email, novaSenha } = req.body;
 
+        console.log('Alterando senha para:', { email, novaSenha: novaSenha ? '***' : 'undefined' });
+
         if (!email || !novaSenha) {
             return res.status(400).json({ 
                 error: 'Email e nova senha são obrigatórios' 
@@ -349,6 +351,8 @@ const alterarSenhaColaborador = async (req, res) => {
 
         // Validar força da senha
         const passwordValidation = validatePasswordStrength(novaSenha);
+        console.log('Validação da senha:', passwordValidation);
+        
         if (passwordValidation.strength < 4) {
             return res.status(400).json({ 
                 error: 'A senha não atende aos requisitos mínimos de segurança',
@@ -362,6 +366,8 @@ const alterarSenhaColaborador = async (req, res) => {
             .select('*')
             .eq('email', email)
             .single();
+
+        console.log('Colaborador encontrado:', colaborador ? 'Sim' : 'Não', searchError);
 
         if (searchError || !colaborador) {
             return res.status(404).json({ 
@@ -386,6 +392,8 @@ const alterarSenhaColaborador = async (req, res) => {
             .eq('email', email)
             .select()
             .single();
+
+        console.log('Resultado da atualização:', { data, error });
 
         if (error) {
             throw error;
