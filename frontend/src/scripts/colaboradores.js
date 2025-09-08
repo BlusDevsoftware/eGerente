@@ -597,6 +597,14 @@ function aplicarFiltros() {
 // Carregar colaboradores quando a página carregar
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Verificar autenticação antes de carregar a página
+        if (window.authGuard) {
+            const isAuthenticated = await window.authGuard.checkAuthentication();
+            if (!isAuthenticated) {
+                return; // Redirecionará para login automaticamente
+            }
+        }
+        
         // Mostrar spinner centralizado ao iniciar
         mostrarSpinner();
         

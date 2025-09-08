@@ -280,7 +280,13 @@
                     // Login normal
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = 'index.html';
+                    
+                    // Redirecionar para página salva ou dashboard
+                    if (window.authGuard) {
+                        window.authGuard.redirectAfterLogin();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                 } else {
                     const errorData = await response.json();
                     errorMessage.textContent = errorData.message || 'Credenciais inválidas';
@@ -369,7 +375,13 @@
                                 const data = await loginResponse.json();
                                 localStorage.setItem('token', data.token);
                                 localStorage.setItem('user', JSON.stringify(data.user));
-                                window.location.href = 'index.html';
+                                
+                                // Redirecionar para página salva ou dashboard
+                                if (window.authGuard) {
+                                    window.authGuard.redirectAfterLogin();
+                                } else {
+                                    window.location.href = 'index.html';
+                                }
                             } else {
                                 // Se falhar o login automático, voltar para tela de login
                                 switchToLogin();

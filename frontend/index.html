@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eGerente - Gestor de Comissões</title>
+    <link rel="icon" type="image/png" href="src/assets/images/logo2.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-container {
+            text-align: center;
+            color: white;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .logo img {
+            width: 60px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo">
+            <img src="src/assets/images/logo2.png" alt="eGerente Logo">
+        </div>
+        <div class="spinner"></div>
+        <div class="loading-text">Carregando sistema...</div>
+    </div>
+
+    <!-- Auth Guard - Proteção de Rotas -->
+    <script src="js/auth-guard.js"></script>
+    <script>
+        // Verificar autenticação e redirecionar
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Verificar se o usuário está autenticado
+                if (window.authGuard) {
+                    const isAuthenticated = await window.authGuard.checkAuthentication();
+                    if (isAuthenticated) {
+                        // Usuário autenticado, redirecionar para dashboard
+                        window.location.href = 'src/index.html';
+                    } else {
+                        // Usuário não autenticado, redirecionar para login
+                        window.location.href = 'src/login.html';
+                    }
+                } else {
+                    // Fallback: redirecionar para login
+                    window.location.href = 'src/login.html';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                // Em caso de erro, redirecionar para login
+                window.location.href = 'src/login.html';
+            }
+        });
+    </script>
+</body>
+</html>
