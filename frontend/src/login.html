@@ -226,15 +226,12 @@
 
         // Verificar se já está logado ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar se o usuário já está autenticado
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
+            // Limpar dados de autenticação para forçar login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            sessionStorage.clear();
             
-            if (token && user) {
-                // Usuário já está logado, redirecionar para dashboard
-                window.location.href = 'index.html';
-                return;
-            }
+            console.log('🔐 Dados de autenticação limpos, usuário deve fazer login');
 
             // Event listener para validação de senha em tempo real
             const novaSenhaInput = document.getElementById('novaSenha');

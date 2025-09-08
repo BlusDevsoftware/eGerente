@@ -222,16 +222,34 @@
 
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', async function() {
-            // Verificar autenticação antes de carregar o dashboard
-            if (window.authGuard) {
-                const isAuthenticated = await window.authGuard.checkAuthentication();
-                if (!isAuthenticated) {
-                    return; // Redirecionará para login automaticamente
-                }
+            // Verificar autenticação de forma mais rigorosa
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (!token || !user) {
+                console.log('🔐 Usuário não autenticado, redirecionando para login');
+                window.location.replace('login.html');
+                return;
             }
             
-            inicializarDashboard();
-            inicializarDragAndDrop();
+            try {
+                // Verificar se o token é válido
+                const userData = JSON.parse(user);
+                if (!userData || !userData.email) {
+                    console.log('🔐 Dados de usuário inválidos, redirecionando para login');
+                    localStorage.clear();
+                    window.location.replace('login.html');
+                    return;
+                }
+                
+                console.log('🔐 Usuário autenticado:', userData.email);
+                inicializarDashboard();
+                inicializarDragAndDrop();
+            } catch (error) {
+                console.error('🔐 Erro ao verificar autenticação:', error);
+                localStorage.clear();
+                window.location.replace('login.html');
+            }
         });
 
         // Limpar gráficos apenas quando a página for fechada/recarregada

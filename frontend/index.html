@@ -70,10 +70,16 @@
     </div>
 
     <script>
-        // Redirecionar diretamente para o login
+        // Limpar dados de autenticação e redirecionar para login
         document.addEventListener('DOMContentLoaded', function() {
-            // Sempre redirecionar para a tela de login primeiro
-            window.location.href = 'src/login.html';
+            // Limpar todos os dados de autenticação
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            console.log('🔐 Sistema iniciado - redirecionando para login');
+            
+            // Redirecionar para a tela de login
+            window.location.replace('src/login.html');
         });
     </script>
 </body>
