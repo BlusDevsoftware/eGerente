@@ -68,7 +68,7 @@ class AuthGuard {
     async validateToken() {
         try {
             const token = localStorage.getItem(this.TOKEN_KEY);
-            const response = await fetch('https://auth-api-e-gerente.vercel.app/api/auth/verify', {
+            const response = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros/colaboradores/verify', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

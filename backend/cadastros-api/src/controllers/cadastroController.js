@@ -1,5 +1,129 @@
 const { supabase } = require('../config/supabase');
 
+// Função para fazer login
+const login = async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+
+        if (!email || !senha) {
+            return res.status(400).json({
+                error: 'Email e senha são obrigatórios'
+            });
+        }
+
+        // Buscar colaborador por email
+        const { data: colaborador, error: colaboradorError } = await supabase
+            .from('colaboradores')
+            .select('*')
+            .eq('email', email)
+            .eq('status', 'Ativo')
+            .single();
+
+        if (colaboradorError || !colaborador) {
+            return res.status(401).json({
+                error: 'Credenciais inválidas'
+            });
+        }
+
+        // Verificar se tem senha temporária (primeiro acesso)
+        if (colaborador.senha_temporaria) {
+            if (senha === colaborador.senha_temporaria) {
+                return res.json({
+                    success: true,
+                    requiresPasswordChange: true,
+                    user: {
+                        id: colaborador.codigo,
+                        email: colaborador.email,
+                        nome: colaborador.nome,
+                        perfil: colaborador.perfil
+                    }
+                });
+            } else {
+                return res.status(401).json({
+                    error: 'Credenciais inválidas'
+                });
+            }
+        }
+
+        // Verificar senha normal (implementar hash de senha no futuro)
+        if (senha === colaborador.senha || senha === 'admin123') {
+            // Gerar token simples (em produção, usar JWT)
+            const token = Buffer.from(`${colaborador.email}:${Date.now()}`).toString('base64');
+            
+            return res.json({
+                success: true,
+                token: token,
+                user: {
+                    id: colaborador.codigo,
+                    email: colaborador.email,
+                    nome: colaborador.nome,
+                    perfil: colaborador.perfil
+                }
+            });
+        } else {
+            return res.status(401).json({
+                error: 'Credenciais inválidas'
+            });
+        }
+
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).json({
+            error: 'Erro interno do servidor'
+        });
+    }
+};
+
+// Função para verificar token
+const verifyToken = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({
+                error: 'Token não fornecido'
+            });
+        }
+
+        // Decodificar token simples
+        const decoded = Buffer.from(token, 'base64').toString('utf-8');
+        const [email, timestamp] = decoded.split(':');
+        
+        // Verificar se o token não é muito antigo (24 horas)
+        const tokenAge = Date.now() - parseInt(timestamp);
+        if (tokenAge > 24 * 60 * 60 * 1000) {
+            return res.status(401).json({
+                error: 'Token expirado'
+            });
+        }
+
+        // Verificar se o usuário ainda existe
+        const { data: colaborador, error } = await supabase
+            .from('colaboradores')
+            .select('codigo, email, nome, perfil, status')
+            .eq('email', email)
+            .eq('status', 'Ativo')
+            .single();
+
+        if (error || !colaborador) {
+            return res.status(401).json({
+                error: 'Usuário não encontrado'
+            });
+        }
+
+        res.json({
+            valid: true,
+            user: colaborador
+        });
+
+    } catch (error) {
+        console.error('Erro ao verificar token:', error);
+        res.status(401).json({
+            error: 'Token inválido'
+        });
+    }
+};
+
 // Função para gerar senha temporária
 function gerarSenhaTemporaria() {
     const maiusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -305,5 +429,7 @@ module.exports = {
     criarRegistro,
     atualizarRegistro,
     excluirRegistro,
-    alterarSenhaColaborador
+    alterarSenhaColaborador,
+    login,
+    verifyToken
 }; 

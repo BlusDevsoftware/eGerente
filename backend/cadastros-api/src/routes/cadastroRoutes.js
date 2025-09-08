@@ -12,4 +12,8 @@ router.delete('/:tabela/:codigo', cadastroController.excluirRegistro);
 // Rota específica para alterar senha de colaborador
 router.post('/colaboradores/change-password', cadastroController.alterarSenhaColaborador);
 
+// Rotas de autenticação
+router.post('/colaboradores/login', cadastroController.login);
+router.post('/colaboradores/verify', cadastroController.verifyToken);
+
 module.exports = router; 
