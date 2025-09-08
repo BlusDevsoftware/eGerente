@@ -124,11 +124,11 @@ async function criarColaborador(event) {
     };
 
     try {
-        await api.post('/colaboradores', colaborador);
+        const response = await api.post('/colaboradores', colaborador);
         carregarColaboradores();
         event.target.reset();
         closeModal();
-        showSuccessModal();
+        showSuccessModal(response.senha_temporaria);
     } catch (error) {
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');

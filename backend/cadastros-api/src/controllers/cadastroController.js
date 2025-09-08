@@ -1,5 +1,26 @@
 const { supabase } = require('../config/supabase');
 
+// Função para gerar senha temporária
+function gerarSenhaTemporaria() {
+    const maiusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const minusculas = 'abcdefghijklmnopqrstuvwxyz';
+    const numeros = '0123456789';
+    const especiais = '!@#$%&*';
+    
+    let senha = '';
+    
+    // Adicionar 2 caracteres de cada tipo
+    for (let i = 0; i < 2; i++) {
+        senha += maiusculas.charAt(Math.floor(Math.random() * maiusculas.length));
+        senha += minusculas.charAt(Math.floor(Math.random() * minusculas.length));
+        senha += numeros.charAt(Math.floor(Math.random() * numeros.length));
+        senha += especiais.charAt(Math.floor(Math.random() * especiais.length));
+    }
+    
+    // Embaralhar a senha
+    return senha.split('').sort(() => Math.random() - 0.5).join('');
+}
+
 // Função genérica para listar registros
 const listarRegistros = async (req, res) => {
     try {
@@ -78,7 +99,7 @@ const criarRegistro = async (req, res) => {
             codigo: novoCodigo
         };
 
-        // Se for a tabela colaboradores, adicionar departamento padrão e tratar usuario_vinculado
+        // Se for a tabela colaboradores, adicionar departamento padrão, tratar usuario_vinculado e gerar senha temporária
         if (tabela === 'colaboradores') {
             dadosParaInserir.departamento = 'Geral';
             
@@ -88,6 +109,10 @@ const criarRegistro = async (req, res) => {
             } else if (dadosParaInserir.usuario_vinculado) {
                 dadosParaInserir.usuario_vinculado = parseInt(dadosParaInserir.usuario_vinculado);
             }
+            
+            // Gerar senha temporária (8 caracteres: 2 maiúsculas + 2 minúsculas + 2 números + 2 especiais)
+            const senhaTemporaria = gerarSenhaTemporaria();
+            dadosParaInserir.senha_temporaria = senhaTemporaria;
         }
 
         const { data, error } = await supabase

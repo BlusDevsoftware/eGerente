@@ -85,10 +85,19 @@
         }
 
         // Função para mostrar modal de sucesso
-        window.showSuccessModal = function() {
+        window.showSuccessModal = function(senhaTemporaria) {
             // Preencher data de cadastro
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             document.getElementById('dataCadastro').textContent = dataAtual;
+            
+            // Exibir senha temporária se fornecida
+            const senhaElement = document.getElementById('senhaTemporaria');
+            if (senhaTemporaria && senhaElement) {
+                senhaElement.textContent = senhaTemporaria;
+                document.getElementById('senhaContainer').style.display = 'block';
+            } else {
+                document.getElementById('senhaContainer').style.display = 'none';
+            }
             
             // Mostrar modal
             document.getElementById('successModal').style.display = 'flex';
@@ -1097,7 +1106,21 @@
                 <div style="background: #f5faff; border: 1px solid #e3f2fd; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left;">
                     <div style="margin-bottom: 8px;"><strong>Status:</strong> Ativo</div>
                     <div style="margin-bottom: 8px;"><strong>Data de Cadastro:</strong> <span id="dataCadastro"></span></div>
-                    <div><strong>Sistema:</strong> eGerente</div>
+                    <div style="margin-bottom: 8px;"><strong>Sistema:</strong> eGerente</div>
+                </div>
+                
+                <!-- Container da senha temporária -->
+                <div id="senhaContainer" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left; display: none;">
+                    <div style="margin-bottom: 8px; color: #856404; font-weight: 600;">
+                        <i class="fas fa-key" style="margin-right: 8px;"></i>Senha Temporária Gerada
+                    </div>
+                    <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; color: #333; text-align: center; letter-spacing: 2px;">
+                        <span id="senhaTemporaria"></span>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 12px; color: #856404;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>
+                        Anote esta senha! Ela será necessária para o primeiro acesso do colaborador.
+                    </div>
                 </div>
                 <div style="display: flex; justify-content: center; gap: 12px;">
                     <button class="btn-secondary" onclick="closeSuccessModal()" style="padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Fechar</button>
