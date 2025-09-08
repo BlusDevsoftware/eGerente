@@ -85,18 +85,21 @@
         }
 
         // Função para mostrar modal de sucesso
-        window.showSuccessModal = function(senhaTemporaria) {
+        window.showSuccessModal = function(senhaTemporaria, emailColaborador) {
             // Preencher data de cadastro
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             document.getElementById('dataCadastro').textContent = dataAtual;
             
-            // Exibir senha temporária se fornecida
+            // Exibir credenciais se fornecidas
             const senhaElement = document.getElementById('senhaTemporaria');
-            if (senhaTemporaria && senhaElement) {
+            const loginElement = document.getElementById('loginColaborador');
+            
+            if (senhaTemporaria && senhaElement && emailColaborador && loginElement) {
                 senhaElement.textContent = senhaTemporaria;
-                document.getElementById('senhaContainer').style.display = 'block';
+                loginElement.textContent = emailColaborador;
+                document.getElementById('credenciaisContainer').style.display = 'block';
             } else {
-                document.getElementById('senhaContainer').style.display = 'none';
+                document.getElementById('credenciaisContainer').style.display = 'none';
             }
             
             // Mostrar modal
@@ -1109,17 +1112,35 @@
                     <div style="margin-bottom: 8px;"><strong>Sistema:</strong> eGerente</div>
                 </div>
                 
-                <!-- Container da senha temporária -->
-                <div id="senhaContainer" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left; display: none;">
-                    <div style="margin-bottom: 8px; color: #856404; font-weight: 600;">
-                        <i class="fas fa-key" style="margin-right: 8px;"></i>Senha Temporária Gerada
+                <!-- Container das credenciais de acesso -->
+                <div id="credenciaisContainer" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: left; display: none;">
+                    <div style="margin-bottom: 12px; color: #856404; font-weight: 600;">
+                        <i class="fas fa-user-lock" style="margin-right: 8px;"></i>Credenciais de Acesso Geradas
                     </div>
-                    <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 12px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; color: #333; text-align: center; letter-spacing: 2px;">
-                        <span id="senhaTemporaria"></span>
+                    
+                    <!-- Login (Email) -->
+                    <div style="margin-bottom: 12px;">
+                        <div style="margin-bottom: 4px; color: #856404; font-weight: 500; font-size: 14px;">
+                            <i class="fas fa-envelope" style="margin-right: 6px;"></i>Login (Email):
+                        </div>
+                        <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 10px; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; color: #333; text-align: center;">
+                            <span id="loginColaborador"></span>
+                        </div>
                     </div>
+                    
+                    <!-- Senha Temporária -->
+                    <div style="margin-bottom: 12px;">
+                        <div style="margin-bottom: 4px; color: #856404; font-weight: 500; font-size: 14px;">
+                            <i class="fas fa-key" style="margin-right: 6px;"></i>Senha Temporária:
+                        </div>
+                        <div style="background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 10px; font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; color: #333; text-align: center; letter-spacing: 2px;">
+                            <span id="senhaTemporaria"></span>
+                        </div>
+                    </div>
+                    
                     <div style="margin-top: 8px; font-size: 12px; color: #856404;">
                         <i class="fas fa-exclamation-triangle" style="margin-right: 4px;"></i>
-                        Anote esta senha! Ela será necessária para o primeiro acesso do colaborador.
+                        Anote estas credenciais! Elas serão necessárias para o primeiro acesso do colaborador.
                     </div>
                 </div>
                 <div style="display: flex; justify-content: center; gap: 12px;">

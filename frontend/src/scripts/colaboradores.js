@@ -128,7 +128,7 @@ async function criarColaborador(event) {
         carregarColaboradores();
         event.target.reset();
         closeModal();
-        showSuccessModal(response.senha_temporaria);
+        showSuccessModal(response.senha_temporaria, colaborador.email);
     } catch (error) {
         if (error.data?.details?.includes('colaboradores_email_key')) {
             mostrarToast('Este email já está cadastrado para outro colaborador.', 'error');
