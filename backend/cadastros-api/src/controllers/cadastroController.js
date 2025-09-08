@@ -46,7 +46,7 @@ const login = async (req, res) => {
         }
 
         // Verificar senha normal (implementar hash de senha no futuro)
-        if (senha === colaborador.senha || senha === 'admin123') {
+        if (senha === colaborador.senha_hash || senha === 'admin123') {
             // Gerar token simples (em produção, usar JWT)
             const token = Buffer.from(`${colaborador.email}:${Date.now()}`).toString('base64');
             
@@ -349,16 +349,16 @@ const alterarSenhaColaborador = async (req, res) => {
             });
         }
 
-        // Validar força da senha (temporariamente desabilitado para debug)
-        // const passwordValidation = validatePasswordStrength(novaSenha);
-        // console.log('Validação da senha:', passwordValidation);
+        // Validar força da senha
+        const passwordValidation = validatePasswordStrength(novaSenha);
+        console.log('Validação da senha:', passwordValidation);
         
-        // if (passwordValidation.strength < 4) {
-        //     return res.status(400).json({ 
-        //         error: 'A senha não atende aos requisitos mínimos de segurança',
-        //         requirements: passwordValidation.requirements
-        //     });
-        // }
+        if (passwordValidation.strength < 4) {
+            return res.status(400).json({ 
+                error: 'A senha não atende aos requisitos mínimos de segurança',
+                requirements: passwordValidation.requirements
+            });
+        }
 
         // Buscar colaborador por email
         const { data: colaborador, error: searchError } = await supabase
@@ -382,12 +382,13 @@ const alterarSenhaColaborador = async (req, res) => {
             });
         }
 
-        // Atualizar senha e remover senha temporária
+        // Atualizar senha usando o campo correto
         const { data, error } = await supabase
             .from('colaboradores')
             .update({
-                senha: novaSenha, // TODO: Implementar hash da senha
-                senha_temporaria: null // Remove a senha temporária
+                senha_hash: novaSenha, // TODO: Implementar hash da senha
+                senha_temporaria: null, // Remove a senha temporária
+                primeiro_acesso: false // Marca que não é mais primeiro acesso
             })
             .eq('email', email)
             .select()
