@@ -32,6 +32,10 @@ app.use('/api/produtos', produtoRoutes);
 app.use('/api/servicos', servicoRoutes);
 app.use('/api/movimento_comissoes', movimentoComissaoRoutes);
 
+// Rotas de autenticação
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
 // Configuração dos serviços
 const services = {
     clientes: {
