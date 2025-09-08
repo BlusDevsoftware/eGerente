@@ -29,21 +29,9 @@ function applyAuthProtection() {
 
     // Verificar autenticação quando a página carregar
     document.addEventListener('DOMContentLoaded', async function() {
-        console.log('🔐 Verificando autenticação...');
-        
-        // Forçar verificação de autenticação
-        if (window.authGuard) {
-            const isAuthenticated = await window.authGuard.checkAuthentication();
-            console.log('🔐 Resultado da verificação:', isAuthenticated);
-            
-            if (!isAuthenticated) {
-                console.log('🔐 Usuário não autenticado, redirecionando...');
-                return; // Redirecionará para login automaticamente
-            }
-            
-            console.log('🔐 Usuário autenticado, carregando página...');
-        } else {
-            console.error('🔐 AuthGuard não encontrado!');
+        const isAuthenticated = await window.authGuard.checkAuthentication();
+        if (!isAuthenticated) {
+            return; // Redirecionará para login automaticamente
         }
 
         // Atualizar informações do usuário na interface

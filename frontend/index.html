@@ -69,31 +69,11 @@
         <div class="loading-text">Carregando sistema...</div>
     </div>
 
-    <!-- Auth Guard - Proteção de Rotas -->
-    <script src="js/auth-guard.js"></script>
     <script>
-        // Verificar autenticação e redirecionar
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                // Verificar se o usuário está autenticado
-                if (window.authGuard) {
-                    const isAuthenticated = await window.authGuard.checkAuthentication();
-                    if (isAuthenticated) {
-                        // Usuário autenticado, redirecionar para dashboard
-                        window.location.href = 'src/index.html';
-                    } else {
-                        // Usuário não autenticado, redirecionar para login
-                        window.location.href = 'src/login.html';
-                    }
-                } else {
-                    // Fallback: redirecionar para login
-                    window.location.href = 'src/login.html';
-                }
-            } catch (error) {
-                console.error('Erro ao verificar autenticação:', error);
-                // Em caso de erro, redirecionar para login
-                window.location.href = 'src/login.html';
-            }
+        // Redirecionar diretamente para o login
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sempre redirecionar para a tela de login primeiro
+            window.location.href = 'src/login.html';
         });
     </script>
 </body>

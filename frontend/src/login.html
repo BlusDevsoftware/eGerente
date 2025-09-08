@@ -224,8 +224,19 @@
             subheader.textContent = 'Preencha os dados do login para acessar';
         }
 
-        // Event listener para validação de senha em tempo real
+        // Verificar se já está logado ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se o usuário já está autenticado
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (token && user) {
+                // Usuário já está logado, redirecionar para dashboard
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Event listener para validação de senha em tempo real
             const novaSenhaInput = document.getElementById('novaSenha');
             if (novaSenhaInput) {
                 novaSenhaInput.addEventListener('input', function() {
@@ -281,12 +292,8 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Redirecionar para página salva ou dashboard
-                    if (window.authGuard) {
-                        window.authGuard.redirectAfterLogin();
-                    } else {
-                        window.location.href = 'index.html';
-                    }
+                    // Redirecionar para dashboard
+                    window.location.href = 'index.html';
                 } else {
                     const errorData = await response.json();
                     errorMessage.textContent = errorData.message || 'Credenciais inválidas';
@@ -376,12 +383,8 @@
                                 localStorage.setItem('token', data.token);
                                 localStorage.setItem('user', JSON.stringify(data.user));
                                 
-                                // Redirecionar para página salva ou dashboard
-                                if (window.authGuard) {
-                                    window.authGuard.redirectAfterLogin();
-                                } else {
-                                    window.location.href = 'index.html';
-                                }
+                                // Redirecionar para dashboard
+                                window.location.href = 'index.html';
                             } else {
                                 // Se falhar o login automático, voltar para tela de login
                                 switchToLogin();

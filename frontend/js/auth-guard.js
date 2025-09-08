@@ -22,27 +22,7 @@ class AuthGuard {
     // Verifica se a página atual é protegida (não é login)
     isProtectedPage() {
         const currentPage = window.location.pathname.split('/').pop();
-        const currentPath = window.location.pathname;
-        
-        // Páginas que NÃO precisam de autenticação
-        const publicPages = [
-            'login.html',
-            'index.html', // Página principal de redirecionamento
-            ''
-        ];
-        
-        // Se estiver na raiz ou em index.html principal, não é protegida
-        if (currentPath === '/' || currentPath === '/index.html' || currentPage === 'index.html') {
-            return false;
-        }
-        
-        // Se contém 'src/' na URL, é uma página protegida
-        if (currentPath.includes('/src/')) {
-            return true;
-        }
-        
-        // Verificar se não é uma página pública
-        return !publicPages.includes(currentPage);
+        return currentPage !== this.LOGIN_PAGE && currentPage !== '' && currentPage !== 'index.html';
     }
 
     // Verifica se o usuário está autenticado
@@ -107,12 +87,11 @@ class AuthGuard {
     redirectToLogin() {
         // Salvar a página atual para redirecionar após login
         const currentPage = window.location.pathname;
-        if (currentPage !== `/${this.LOGIN_PAGE}` && !currentPage.includes('login.html')) {
+        if (currentPage !== `/${this.LOGIN_PAGE}`) {
             sessionStorage.setItem('redirectAfterLogin', currentPage);
         }
         
-        // Redirecionar para login
-        window.location.href = 'src/login.html';
+        window.location.href = this.LOGIN_PAGE;
     }
 
     // Logout do usuário
@@ -151,11 +130,11 @@ class AuthGuard {
     // Redireciona para a página salva após login
     redirectAfterLogin() {
         const savedPage = sessionStorage.getItem('redirectAfterLogin');
-        if (savedPage && savedPage !== `/${this.LOGIN_PAGE}` && !savedPage.includes('login.html')) {
+        if (savedPage && savedPage !== `/${this.LOGIN_PAGE}`) {
             sessionStorage.removeItem('redirectAfterLogin');
             window.location.href = savedPage;
         } else {
-            window.location.href = 'src/index.html';
+            window.location.href = 'index.html';
         }
     }
 
