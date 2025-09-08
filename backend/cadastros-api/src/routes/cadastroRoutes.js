@@ -9,4 +9,7 @@ router.post('/:tabela', cadastroController.criarRegistro);
 router.put('/:tabela/:codigo', cadastroController.atualizarRegistro);
 router.delete('/:tabela/:codigo', cadastroController.excluirRegistro);
 
+// Rota específica para alterar senha de colaborador
+router.post('/colaboradores/change-password', cadastroController.alterarSenhaColaborador);
+
 module.exports = router; 

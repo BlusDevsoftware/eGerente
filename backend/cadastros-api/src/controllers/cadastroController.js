@@ -212,10 +212,98 @@ const excluirRegistro = async (req, res) => {
     }
 };
 
+// Função para alterar senha de colaborador
+const alterarSenhaColaborador = async (req, res) => {
+    try {
+        const { email, novaSenha } = req.body;
+
+        if (!email || !novaSenha) {
+            return res.status(400).json({ 
+                error: 'Email e nova senha são obrigatórios' 
+            });
+        }
+
+        // Validar força da senha
+        const passwordValidation = validatePasswordStrength(novaSenha);
+        if (passwordValidation.strength < 4) {
+            return res.status(400).json({ 
+                error: 'A senha não atende aos requisitos mínimos de segurança',
+                requirements: passwordValidation.requirements
+            });
+        }
+
+        // Buscar colaborador por email
+        const { data: colaborador, error: searchError } = await supabase
+            .from('colaboradores')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (searchError || !colaborador) {
+            return res.status(404).json({ 
+                error: 'Colaborador não encontrado' 
+            });
+        }
+
+        // Verificar se tem senha temporária (primeiro acesso)
+        if (!colaborador.senha_temporaria) {
+            return res.status(400).json({ 
+                error: 'Este colaborador já alterou sua senha anteriormente' 
+            });
+        }
+
+        // Atualizar senha e remover senha temporária
+        const { data, error } = await supabase
+            .from('colaboradores')
+            .update({
+                senha: novaSenha, // TODO: Implementar hash da senha
+                senha_temporaria: null // Remove a senha temporária
+            })
+            .eq('email', email)
+            .select()
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        res.json({ 
+            message: 'Senha alterada com sucesso',
+            colaborador: {
+                codigo: data.codigo,
+                nome: data.nome,
+                email: data.email
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao alterar senha do colaborador:', error);
+        res.status(500).json({ 
+            error: 'Erro ao alterar senha do colaborador',
+            details: error.message 
+        });
+    }
+};
+
+// Função para validar força da senha (mesma lógica do frontend)
+function validatePasswordStrength(password) {
+    const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[!@#$%&*]/.test(password)
+    };
+    
+    const strength = Object.values(requirements).filter(Boolean).length;
+    return { requirements, strength };
+}
+
 module.exports = {
     listarRegistros,
     buscarRegistro,
     criarRegistro,
     atualizarRegistro,
-    excluirRegistro
+    excluirRegistro,
+    alterarSenhaColaborador
 }; 
