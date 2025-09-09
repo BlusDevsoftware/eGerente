@@ -29,6 +29,9 @@ function applyAuthProtection() {
 
     // Verificar autenticação quando a página carregar
     document.addEventListener('DOMContentLoaded', async function() {
+        // Vincular/logout novamente após DOM pronto
+        bindGlobalLogoutHandler();
+        addLogoutButton();
         const isAuthenticated = await window.authGuard.checkAuthentication();
         if (!isAuthenticated) {
             return; // Redirecionará para login automaticamente
@@ -76,6 +79,19 @@ function addLogoutButton() {
             logout();
         });
     }
+}
+
+// Delegação global para capturar cliques em qualquer botão/link de logout
+function bindGlobalLogoutHandler() {
+    if (bindGlobalLogoutHandler._bound) return;
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('[data-logout], .logout-button, .logout-button a');
+        if (target) {
+            e.preventDefault();
+            logout();
+        }
+    });
+    bindGlobalLogoutHandler._bound = true;
 }
 
 // Função para fazer logout
