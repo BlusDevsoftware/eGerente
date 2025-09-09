@@ -27,8 +27,8 @@ class AuthGuard {
 
     // Verifica se o usuário está autenticado
     isAuthenticated() {
-        const token = localStorage.getItem(this.TOKEN_KEY);
-        const user = localStorage.getItem(this.USER_KEY);
+        const token = sessionStorage.getItem(this.TOKEN_KEY);
+        const user = sessionStorage.getItem(this.USER_KEY);
         
         if (!token || !user) {
             return false;
@@ -67,7 +67,7 @@ class AuthGuard {
     // Valida o token no servidor (opcional)
     async validateToken() {
         try {
-            const token = localStorage.getItem(this.TOKEN_KEY);
+            const token = sessionStorage.getItem(this.TOKEN_KEY);
             const response = await fetch('https://e-gerente-backend-cadastros-api.vercel.app/api/cadastros/colaboradores/verify', {
                 method: 'POST',
                 headers: {
@@ -96,15 +96,15 @@ class AuthGuard {
 
     // Logout do usuário
     logout() {
-        localStorage.removeItem(this.TOKEN_KEY);
-        localStorage.removeItem(this.USER_KEY);
+        sessionStorage.removeItem(this.TOKEN_KEY);
+        sessionStorage.removeItem(this.USER_KEY);
         sessionStorage.removeItem('redirectAfterLogin');
     }
 
     // Obtém dados do usuário logado
     getCurrentUser() {
         try {
-            const userData = localStorage.getItem(this.USER_KEY);
+            const userData = sessionStorage.getItem(this.USER_KEY);
             return userData ? JSON.parse(userData) : null;
         } catch (error) {
             console.error('Erro ao obter dados do usuário:', error);
@@ -114,7 +114,7 @@ class AuthGuard {
 
     // Obtém o token de autenticação
     getToken() {
-        return localStorage.getItem(this.TOKEN_KEY);
+        return sessionStorage.getItem(this.TOKEN_KEY);
     }
 
     // Verifica se o usuário tem permissão para acessar uma página

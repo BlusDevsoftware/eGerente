@@ -285,9 +285,9 @@
                         return;
                     }
                     
-                    // Login normal
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Login normal (sessão apenas)
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
                     
                     // Redirecionar para dashboard
                     window.location.href = 'index.html';
@@ -377,8 +377,8 @@
                             
                             if (loginResponse.ok) {
                                 const data = await loginResponse.json();
-                                localStorage.setItem('token', data.token);
-                                localStorage.setItem('user', JSON.stringify(data.user));
+                                sessionStorage.setItem('token', data.token);
+                                sessionStorage.setItem('user', JSON.stringify(data.user));
                                 
                                 // Redirecionar para dashboard
                                 window.location.href = 'index.html';
