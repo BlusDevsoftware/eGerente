@@ -14,7 +14,8 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto; /* permite rolagem quando o conteúdo for maior */
 }
 
 /* Formas decorativas */
@@ -68,7 +69,8 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     width: 1000px;
-    height: 600px;
+    min-height: 600px; /* altura mínima para layout padrão */
+    height: auto; /* expande conforme conteúdo (evita corte do modal) */
     position: relative;
     z-index: 1;
     overflow: hidden;
