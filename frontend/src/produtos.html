@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Comissões - Produtos</title>
+    <style>html{visibility:hidden}</style>
+    <script>
+        (function(){
+            var token = sessionStorage.getItem('token');
+            if(!token){
+                window.location.replace('login.html');
+            } else {
+                document.documentElement.style.visibility = 'visible';
+            }
+        })();
+    </script>
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/login.css">
