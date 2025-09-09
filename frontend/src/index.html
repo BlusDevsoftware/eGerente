@@ -260,6 +260,11 @@
                 }
                 
                 console.log('🔐 Usuário autenticado:', userData.email);
+                // Atualizar saudação com nome do usuário logado
+                const welcomeEl = document.querySelector('.welcome-text h1');
+                if (welcomeEl) {
+                    welcomeEl.textContent = `Bem-vindo, ${userData.nome || userData.email}`;
+                }
                 inicializarDashboard();
                 inicializarDragAndDrop();
             } catch (error) {
