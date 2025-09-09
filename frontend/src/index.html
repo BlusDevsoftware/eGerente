@@ -10,8 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Auth Guard - Proteção de Rotas -->
-    <script src="../js/auth-guard.js"></script>
-    <script src="../js/apply-auth-protection.js"></script>
+    <script src="/js/auth-guard.js"></script>
+    <script src="/js/apply-auth-protection.js"></script>
     
     <style>
         /* Spinner de carregamento */
@@ -223,8 +223,8 @@
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', async function() {
             // Verificar autenticação de forma mais rigorosa
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
+            const token = sessionStorage.getItem('token');
+            const user = sessionStorage.getItem('user');
             
             if (!token || !user) {
                 console.log('🔐 Usuário não autenticado, redirecionando para login');
@@ -237,7 +237,7 @@
                 const userData = JSON.parse(user);
                 if (!userData || !userData.email) {
                     console.log('🔐 Dados de usuário inválidos, redirecionando para login');
-                    localStorage.clear();
+                    sessionStorage.clear();
                     window.location.replace('login.html');
                     return;
                 }
@@ -247,7 +247,7 @@
                 inicializarDragAndDrop();
             } catch (error) {
                 console.error('🔐 Erro ao verificar autenticação:', error);
-                localStorage.clear();
+                sessionStorage.clear();
                 window.location.replace('login.html');
             }
         });
