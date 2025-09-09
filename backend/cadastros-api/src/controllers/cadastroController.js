@@ -25,6 +25,36 @@ const login = async (req, res) => {
             });
         }
 
+        // Carregar permissões do perfil
+        let perfilPermissoes = {};
+        try {
+            const perfilCodigo = colaborador.perfil; // ex.: '00002'
+            if (perfilCodigo) {
+                const { data: perfilData, error: perfilError } = await supabase
+                    .from('perfis')
+                    .select('*')
+                    .eq('codigo', perfilCodigo)
+                    .single();
+                if (!perfilError && perfilData) {
+                    // Montar objeto de permissões a partir das colunas booleanas *_ver|*_criar|*_editar|*_excluir|*_exportar|*_executar
+                    const permissoesObj = {};
+                    Object.keys(perfilData).forEach((key) => {
+                        const value = perfilData[key];
+                        if (typeof value === 'boolean') {
+                            permissoesObj[key] = value;
+                        }
+                    });
+                    // Caso exista um JSONB 'permissoes', mesclar (prioridade para colunas explícitas)
+                    if (perfilData.permissoes && typeof perfilData.permissoes === 'object') {
+                        Object.assign(permissoesObj, perfilData.permissoes || {});
+                    }
+                    perfilPermissoes = permissoesObj;
+                }
+            }
+        } catch (_) {
+            // Ignorar erro de permissões, seguir com objeto vazio
+        }
+
         // Verificar se tem senha temporária (primeiro acesso)
         if (colaborador.senha_temporaria) {
             if (senha === colaborador.senha_temporaria) {
@@ -35,7 +65,8 @@ const login = async (req, res) => {
                         id: colaborador.codigo,
                         email: colaborador.email,
                         nome: colaborador.nome,
-                        perfil: colaborador.perfil
+                        perfil: colaborador.perfil,
+                        permissoes: perfilPermissoes
                     }
                 });
             } else {
@@ -57,7 +88,8 @@ const login = async (req, res) => {
                     id: colaborador.codigo,
                     email: colaborador.email,
                     nome: colaborador.nome,
-                    perfil: colaborador.perfil
+                    perfil: colaborador.perfil,
+                    permissoes: perfilPermissoes
                 }
             });
         } else {

@@ -118,13 +118,23 @@ class AuthGuard {
     }
 
     // Verifica se o usuário tem permissão para acessar uma página
-    hasPermission(page) {
+    hasPermission(flagOrSection, action) {
         const user = this.getCurrentUser();
         if (!user) return false;
+        const perms = user.permissoes || {};
 
-        // Implementar lógica de permissões baseada no perfil do usuário
-        // Por enquanto, todos os usuários autenticados têm acesso
-        return true;
+        // Modo 1: flag direta igual à coluna (ex.: 'cadastros_colaboradores_ver')
+        if (typeof flagOrSection === 'string' && !action) {
+            return Boolean(perms[flagOrSection]);
+        }
+
+        // Modo 2: seção + ação -> monta chave 'secao_acao' (ex.: 'cadastros_colaboradores', 'ver')
+        if (typeof flagOrSection === 'string' && typeof action === 'string') {
+            const key = `${flagOrSection}_${action}`;
+            return Boolean(perms[key]);
+        }
+
+        return false;
     }
 
     // Redireciona para a página salva após login
