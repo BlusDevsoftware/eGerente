@@ -122,7 +122,7 @@
             </li>
         </ul>
         <div class="logout-button">
-            <a href="index.html"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+            <a href="login.html" id="logout-link"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
         </div>
     </div>
 
@@ -222,6 +222,23 @@
 
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', async function() {
+            // Logout handler
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    try {
+                        if (window.authGuard && typeof window.authGuard.logout === 'function') {
+                            window.authGuard.logout();
+                        } else {
+                            sessionStorage.clear();
+                        }
+                    } finally {
+                        window.location.replace('login.html');
+                    }
+                });
+            }
+
             // Verificar autenticação de forma mais rigorosa
             const token = sessionStorage.getItem('token');
             const user = sessionStorage.getItem('user');
