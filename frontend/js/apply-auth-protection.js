@@ -42,12 +42,17 @@ function applyAuthProtection() {
 // Função para adicionar botão de logout
 function addLogoutButton() {
     // Procurar por botão de logout existente
-    const existingLogout = document.querySelector('.logout-button, [data-logout]');
+    const existingLogout = document.querySelector('.logout-button, .logout-button a, [data-logout]');
     if (existingLogout) {
-        existingLogout.addEventListener('click', function(e) {
+        const bindTarget = existingLogout.matches('a') ? existingLogout : (existingLogout.querySelector('a') || existingLogout);
+        bindTarget.addEventListener('click', function(e) {
             e.preventDefault();
             logout();
         });
+        // Garantir destino padrão
+        if (bindTarget.tagName === 'A') {
+            bindTarget.setAttribute('href', 'login.html');
+        }
         return;
     }
 
@@ -57,7 +62,7 @@ function addLogoutButton() {
         const logoutButton = document.createElement('div');
         logoutButton.className = 'logout-button';
         logoutButton.innerHTML = `
-            <a href="#" data-logout>
+            <a href="login.html" data-logout>
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
             </a>
@@ -65,7 +70,8 @@ function addLogoutButton() {
         
         sidebar.appendChild(logoutButton);
         
-        logoutButton.addEventListener('click', function(e) {
+        const link = logoutButton.querySelector('a');
+        link.addEventListener('click', function(e) {
             e.preventDefault();
             logout();
         });
@@ -75,13 +81,16 @@ function addLogoutButton() {
 // Função para fazer logout
 function logout() {
     if (confirm('Tem certeza que deseja sair do sistema?')) {
-        if (window.authGuard) {
-            window.authGuard.logout();
-        } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+        try {
+            if (window.authGuard && typeof window.authGuard.logout === 'function') {
+                window.authGuard.logout();
+            } else {
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+            }
+        } finally {
+            window.location.replace('login.html');
         }
-        window.location.href = 'login.html';
     }
 }
 
