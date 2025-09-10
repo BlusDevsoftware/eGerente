@@ -11,31 +11,54 @@ function applyAuthProtection() {
 
     addLogoutButton();
 
+    function addPermGuardStyle() {
+        let s = document.getElementById('perm-guard-style');
+        if (!s) {
+            s = document.createElement('style');
+            s.id = 'perm-guard-style';
+            s.textContent = `
+                .sidebar, .nav-menu { visibility: hidden; }
+            `;
+            document.head.appendChild(s);
+        }
+    }
+
+    function removePermGuardStyle() {
+        const s = document.getElementById('perm-guard-style');
+        if (s && s.parentNode) s.parentNode.removeChild(s);
+    }
+
     document.addEventListener('DOMContentLoaded', async function() {
         bindGlobalLogoutHandler();
         addLogoutButton();
 
+        // Evitar flash: ocultar apenas o menu até aplicar permissões
+        addPermGuardStyle();
+
         // Se por algum motivo o authGuard não estiver pronto, não mantenha a página oculta
         if (!window.authGuard) {
+            removePermGuardStyle();
             try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
             return;
         }
 
-        const ok = await window.authGuard.checkAuthentication();
-        if (!ok) {
-            // O próprio guard fará o redirect; evite tela branca
-            try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
-            return;
-        }
+        // 1) Aplicar imediatamente com base no usuário do storage (elimina flash)
         updateUserInfo();
         try { applyPermissionsToUI(); } catch(_) {}
-        const required = getRequiredPermissionForCurrentPage();
-        if (required && !window.authGuard.hasPermission(required)) {
-            const target = findFirstAllowedPage();
-            window.location.replace(target || 'login.html');
-            return;
-        }
+        removePermGuardStyle();
         try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
+
+        // 2) Validar token em background; se inválido, redireciona
+        try {
+            const ok = await window.authGuard.checkAuthentication();
+            if (!ok) return;
+            const required = getRequiredPermissionForCurrentPage();
+            if (required && !window.authGuard.hasPermission(required)) {
+                const target = findFirstAllowedPage();
+                window.location.replace(target || 'login.html');
+                return;
+            }
+        } catch(_) {}
     });
 }
 
