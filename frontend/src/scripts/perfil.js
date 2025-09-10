@@ -70,6 +70,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         { titulo: 'Cadastros/Clientes', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Cadastros/Produtos', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
+        { titulo: 'Cadastros/Perfis', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
         { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comissões/Consulta', acoes: ['ver'] },
@@ -142,6 +143,43 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
 }
 
 // Funções de Modal de Perfil
+function sectionKeyToTitle(sectionKey) {
+    const map = {
+        'dashboard': 'Dashboard',
+        'cadastros_colaboradores': 'Cadastros/Colaboradores',
+        'cadastros_clientes': 'Cadastros/Clientes',
+        'cadastros_produtos': 'Cadastros/Produtos',
+        'cadastros_servicos': 'Cadastros/Serviços',
+        'cadastros_perfis': 'Cadastros/Perfis',
+        'comissoes_lancar': 'Comissões/Lançar',
+        'comissoes_movimento': 'Comissões/Movimento',
+        'comissoes_consulta': 'Comissões/Consulta',
+        'relatorios_recebimento': 'Relatórios/Recebimento',
+        'relatorios_conferencia': 'Relatórios/Conferência',
+        'relatorios_dinamico': 'Relatórios/Dinâmico',
+        'configuracoes_manutencao': 'Configurações/Manutenção BD',
+        'configuracoes_sincronizar': 'Configurações/Sincronizar'
+    };
+    return map[sectionKey] || sectionKey;
+}
+
+function buildPermissionsMapFromProfile(profileObj) {
+    const mapa = {};
+    Object.keys(profileObj).forEach(key => {
+        if (typeof profileObj[key] !== 'boolean') return;
+        const lastUnderscore = key.lastIndexOf('_');
+        if (lastUnderscore <= 0) return;
+        const sectionKey = key.substring(0, lastUnderscore); // e.g., cadastros_colaboradores
+        const action = key.substring(lastUnderscore + 1);    // e.g., ver/editar
+        if (!['ver','criar','editar','excluir','exportar','executar'].includes(action)) return;
+        const title = sectionKeyToTitle(sectionKey);
+        if (!mapa[title]) mapa[title] = [];
+        if (profileObj[key] === true) {
+            mapa[title].push(action);
+        }
+    });
+    return mapa;
+}
 function openPerfilModal() {
     const modal = document.getElementById('perfilModal');
     if (!modal) {
@@ -323,16 +361,7 @@ async function visualizarPerfil(codigo) {
         form.nome.value = perfil.nome || '';
         
         // Renderizar permissões marcadas no novo formato
-        const mapa = {};
-        Object.keys(perfil).forEach(key => {
-            if (key.includes('_') && typeof perfil[key] === 'boolean') {
-                const [secao, acao] = key.split('_', 2);
-                if (!mapa[secao]) mapa[secao] = [];
-                if (perfil[key] === true) {
-                    mapa[secao].push(acao);
-                }
-            }
-        });
+        const mapa = buildPermissionsMapFromProfile(perfil);
         
         renderPermissionsMatrix(mapa, false); // Modo de visualização - sem botões
         // Desabilitar campos
@@ -363,16 +392,7 @@ async function editarPerfil(codigo) {
         form.nome.value = perfil.nome || '';
         
         // Renderizar permissões marcadas no novo formato
-        const mapa = {};
-        Object.keys(perfil).forEach(key => {
-            if (key.includes('_') && typeof perfil[key] === 'boolean') {
-                const [secao, acao] = key.split('_', 2);
-                if (!mapa[secao]) mapa[secao] = [];
-                if (perfil[key] === true) {
-                    mapa[secao].push(acao);
-                }
-            }
-        });
+        const mapa = buildPermissionsMapFromProfile(perfil);
         
         renderPermissionsMatrix(mapa, true); // Modo de edição - com botões
         // Habilitar campos
@@ -676,6 +696,12 @@ async function salvarPerfil(e) {
     permissoes.cadastros_servicos_criar = permissoesMapa['Cadastros/Serviços']?.includes('criar') || false;
     permissoes.cadastros_servicos_editar = permissoesMapa['Cadastros/Serviços']?.includes('editar') || false;
     permissoes.cadastros_servicos_excluir = permissoesMapa['Cadastros/Serviços']?.includes('excluir') || false;
+    
+    // Cadastros/Perfis
+    permissoes.cadastros_perfis_ver = permissoesMapa['Cadastros/Perfis']?.includes('ver') || false;
+    permissoes.cadastros_perfis_criar = permissoesMapa['Cadastros/Perfis']?.includes('criar') || false;
+    permissoes.cadastros_perfis_editar = permissoesMapa['Cadastros/Perfis']?.includes('editar') || false;
+    permissoes.cadastros_perfis_excluir = permissoesMapa['Cadastros/Perfis']?.includes('excluir') || false;
     
     // Comissões/Lançar
     permissoes.comissoes_lancar_ver = permissoesMapa['Comissões/Lançar']?.includes('ver') || false;
