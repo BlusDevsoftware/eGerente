@@ -112,11 +112,11 @@ class AuthGuard {
         if (!user) return false;
         const perms = user.permissoes || {};
         if (typeof flagOrSection === 'string' && !action) {
-            return Boolean(perms[flagOrSection]);
+            return perms[flagOrSection] === true;
         }
         if (typeof flagOrSection === 'string' && typeof action === 'string') {
             const key = `${flagOrSection}_${action}`;
-            return Boolean(perms[key]);
+            return perms[key] === true;
         }
         return false;
     }
