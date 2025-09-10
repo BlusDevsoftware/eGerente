@@ -88,6 +88,7 @@ function applyPermissionsToUI() {
     if (!user || !user.permissoes) return;
     const can = (flag) => window.authGuard.hasPermission(flag);
     const menuMap = [
+        { selector: 'a[href="index.html"]', flag: 'dashboard_ver' },
         { selector: 'a[href="colaboradores.html"]', flag: 'cadastros_colaboradores_ver' },
         { selector: 'a[href="clientes.html"]', flag: 'cadastros_clientes_ver' },
         { selector: 'a[href="produtos.html"]', flag: 'cadastros_produtos_ver' },
@@ -101,9 +102,30 @@ function applyPermissionsToUI() {
         { selector: 'a[href="manutencao-bd.html"]', flag: 'configuracoes_manutencao_ver' },
         { selector: 'a[href="sincronizar.html"]', flag: 'configuracoes_sincronizar_ver' },
     ];
+    // 1) Esconder itens sem permissão
     menuMap.forEach(({ selector, flag }) => {
         const el = document.querySelector(selector);
-        if (el && !can(flag)) { const li = el.closest('li') || el; li.style.display = 'none'; }
+        if (el && !can(flag)) {
+            const li = el.closest('li') || el;
+            li.style.display = 'none';
+        }
+    });
+
+    // 2) Esconder grupos de menu (has-submenu) sem nenhum item visível
+    const groups = document.querySelectorAll('.has-submenu');
+    groups.forEach(group => {
+        const submenu = group.querySelector('.submenu');
+        if (!submenu) return;
+        const childLinks = Array.from(submenu.querySelectorAll('a'));
+        const hasVisibleChild = childLinks.some(a => {
+            const li = a.closest('li') || a;
+            return li && li.style.display !== 'none';
+        });
+        if (!hasVisibleChild) {
+            group.style.display = 'none';
+        } else {
+            group.style.display = '';
+        }
     });
 }
 

@@ -242,6 +242,30 @@
             }
         });
 
+        // Mapeamento de permissões para páginas
+        function getFirstAllowedPage(permissoes) {
+            if (!permissoes || typeof permissoes !== 'object') return 'index.html';
+            const order = [
+                { url: 'index.html', flag: 'dashboard_ver' },
+                { url: 'colaboradores.html', flag: 'cadastros_colaboradores_ver' },
+                { url: 'clientes.html', flag: 'cadastros_clientes_ver' },
+                { url: 'produtos.html', flag: 'cadastros_produtos_ver' },
+                { url: 'servicos.html', flag: 'cadastros_servicos_ver' },
+                { url: 'lancar-comissao.html', flag: 'comissoes_lancar_ver' },
+                { url: 'movimento-comissao.html', flag: 'comissoes_movimento_ver' },
+                { url: 'consulta-comissao.html', flag: 'comissoes_consulta_ver' },
+                { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
+                { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
+                { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
+                { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
+                { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
+            ];
+            for (const item of order) {
+                if (permissoes[item.flag]) return item.url;
+            }
+            return 'index.html';
+        }
+
         // Form submission - Login Normal
         document.querySelector('.login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -289,8 +313,9 @@
                     sessionStorage.setItem('token', data.token);
                     sessionStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Redirecionar para dashboard
-                    window.location.href = 'index.html';
+                    // Redirecionar para primeira página permitida
+                    const target = getFirstAllowedPage(data.user && data.user.permissoes);
+                    window.location.href = target;
                 } else {
                     const errorData = await response.json();
                     errorMessage.textContent = errorData.message || 'Credenciais inválidas';
@@ -380,8 +405,9 @@
                                 sessionStorage.setItem('token', data.token);
                                 sessionStorage.setItem('user', JSON.stringify(data.user));
                                 
-                                // Redirecionar para dashboard
-                                window.location.href = 'index.html';
+                                // Redirecionar para primeira página permitida
+                                const target = getFirstAllowedPage(data.user && data.user.permissoes);
+                                window.location.href = target;
                             } else {
                                 // Se falhar o login automático, voltar para tela de login
                                 switchToLogin();
