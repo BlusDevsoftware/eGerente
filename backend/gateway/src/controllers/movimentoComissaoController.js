@@ -3,11 +3,24 @@ const supabase = require('../config/supabase');
 // Listar todos os movimentos de comissão
 const listarMovimentos = async (req, res) => {
     try {
-        const { data, error } = await supabase
+        // Verificar se o usuário tem permissão para ver todos os títulos
+        const user = req.user; // Assumindo que o middleware de auth já populou req.user
+        const podeVerTodosTitulos = user?.permissoes?.comissoes_visualizar_todos_titulos === true;
+        
+        let query = supabase
             .from('movimento_comissoes')
-            .select('*')
-            .order('id', { ascending: true });
+            .select('*');
+        
+        // Se não pode ver todos os títulos, filtrar apenas os seus
+        if (!podeVerTodosTitulos && user?.codigo) {
+            query = query.eq('colaborador_id', user.codigo);
+        }
+        
+        const { data, error } = await query.order('id', { ascending: true });
+        
         if (error) throw error;
+        
+        console.log(`📊 Movimentos retornados: ${data?.length || 0} (usuário: ${user?.email}, podeVerTodos: ${podeVerTodosTitulos})`);
         res.json(data);
     } catch (error) {
         console.error('Erro ao listar movimentos:', error);

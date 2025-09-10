@@ -164,9 +164,33 @@ async function verifyToken(req, res) {
             });
         }
 
+        // Buscar permissões do perfil do usuário
+        let permissoes = {};
+        try {
+            const { data: perfil, error: perfilError } = await supabase
+                .from('perfis')
+                .select('*')
+                .eq('codigo', colaborador.perfil)
+                .single();
+
+            if (!perfilError && perfil) {
+                // Extrair apenas as permissões (campos booleanos)
+                Object.keys(perfil).forEach(key => {
+                    if (typeof perfil[key] === 'boolean') {
+                        permissoes[key] = perfil[key];
+                    }
+                });
+            }
+        } catch (permError) {
+            console.warn('Erro ao buscar permissões do perfil:', permError);
+        }
+
         res.json({
             valid: true,
-            user: colaborador
+            user: {
+                ...colaborador,
+                permissoes: permissoes
+            }
         });
 
     } catch (error) {

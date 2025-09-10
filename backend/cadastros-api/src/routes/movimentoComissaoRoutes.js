@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const movimentoComissaoController = require('../controllers/movimentoComissaoController');
+const { authenticateUser } = require('../middleware/auth');
 
 // Rotas para movimento de comissões
-router.get('/movimento_comissoes', movimentoComissaoController.listarMovimentos);
+router.get('/movimento_comissoes', authenticateUser, movimentoComissaoController.listarMovimentos);
 router.post('/movimento_comissoes', movimentoComissaoController.criarMovimento);
 // NOVO: aglutinação de títulos (deve vir antes das rotas com parâmetros)
 router.post('/movimento_comissoes/aglutinar', movimentoComissaoController.aglutinarTitulos);
