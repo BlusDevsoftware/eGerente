@@ -1,12 +1,6 @@
 /** Proteção de autenticação e permissões (cópia para /src/scripts) */
 
 function applyAuthProtection() {
-    // Não oculte a página antes de garantir que o authGuard exista e o DOM esteja pronto
-    if (!window.authGuard) {
-        // Se o guard ainda não estiver disponível, garanta que a página fique visível
-        try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
-    }
-
     const originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
         if (window.authGuard && window.authGuard.getToken()) {
@@ -18,9 +12,6 @@ function applyAuthProtection() {
     addLogoutButton();
 
     document.addEventListener('DOMContentLoaded', async function() {
-        // A partir daqui podemos ocultar a página até validar o acesso
-        try { document.documentElement.style.visibility = 'hidden'; } catch(_) {}
-
         bindGlobalLogoutHandler();
         addLogoutButton();
 
