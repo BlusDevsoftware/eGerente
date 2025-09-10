@@ -42,6 +42,9 @@ function applyAuthProtection() {
             return;
         }
 
+        // 0) Aplicar classes CSS de permissão no <html> (CSS-first)
+        try { addPermissionClassesFromSession(); } catch(_) {}
+
         // 1) Aplicar imediatamente com base no usuário do storage (elimina flash)
         updateUserInfo();
         try { applyPermissionsToUI(); } catch(_) {}
@@ -149,6 +152,18 @@ function applyPermissionsToUI() {
             group.style.display = 'none';
         } else {
             group.style.display = '';
+        }
+    });
+}
+
+function addPermissionClassesFromSession() {
+    const user = (window.authGuard && window.authGuard.getCurrentUser && window.authGuard.getCurrentUser())
+        || (function(){ try { return JSON.parse(sessionStorage.getItem('user') || 'null'); } catch(_) { return null; } })();
+    if (!user || !user.permissoes) return;
+    const html = document.documentElement;
+    Object.keys(user.permissoes).forEach(function(key){
+        if (user.permissoes[key] === true) {
+            html.classList.add('perm-' + key);
         }
     });
 }
