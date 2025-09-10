@@ -1,8 +1,11 @@
 /** Proteção de autenticação e permissões (cópia para /src/scripts) */
 
 function applyAuthProtection() {
-    try { document.documentElement.style.visibility = 'hidden'; } catch(_) {}
-    if (!window.authGuard) return;
+    // Não oculte a página antes de garantir que o authGuard exista e o DOM esteja pronto
+    if (!window.authGuard) {
+        // Se o guard ainda não estiver disponível, garanta que a página fique visível
+        try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
+    }
 
     const originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
@@ -15,10 +18,24 @@ function applyAuthProtection() {
     addLogoutButton();
 
     document.addEventListener('DOMContentLoaded', async function() {
+        // A partir daqui podemos ocultar a página até validar o acesso
+        try { document.documentElement.style.visibility = 'hidden'; } catch(_) {}
+
         bindGlobalLogoutHandler();
         addLogoutButton();
+
+        // Se por algum motivo o authGuard não estiver pronto, não mantenha a página oculta
+        if (!window.authGuard) {
+            try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
+            return;
+        }
+
         const ok = await window.authGuard.checkAuthentication();
-        if (!ok) return;
+        if (!ok) {
+            // O próprio guard fará o redirect; evite tela branca
+            try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
+            return;
+        }
         updateUserInfo();
         try { applyPermissionsToUI(); } catch(_) {}
         const required = getRequiredPermissionForCurrentPage();
