@@ -5,6 +5,7 @@ const { authenticateUser } = require('../middleware/auth');
 
 // Rotas para movimento de comissões
 router.get('/movimento_comissoes', authenticateUser, movimentoComissaoController.listarMovimentos);
+router.get('/movimento_comissoes/todos', movimentoComissaoController.listarMovimentosTodos); // Sem filtro por colaborador
 router.post('/movimento_comissoes', movimentoComissaoController.criarMovimento);
 // NOVO: aglutinação de títulos (deve vir antes das rotas com parâmetros)
 router.post('/movimento_comissoes/aglutinar', movimentoComissaoController.aglutinarTitulos);

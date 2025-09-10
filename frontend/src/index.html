@@ -380,7 +380,7 @@
                 const colaboradores = await window.api.get('/colaboradores');
 
                 // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes');
+                const comissoes = await window.api.get('/movimento_comissoes/todos');
 
                 // Calcular dados dos colaboradores
                 const totalColaboradores = colaboradores.length;
@@ -539,7 +539,7 @@
         async function buscarComissoesReais() {
             try {
                 // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes');
+                const comissoes = await window.api.get('/movimento_comissoes/todos');
 
                 // Buscar colaboradores para mapear nomes usando a mesma API da aba movimento de comissões
                 const colaboradores = await window.api.get('/colaboradores');
@@ -767,7 +767,7 @@
         async function buscarDadosGraficos() {
             try {
                 // Buscar movimentos de comissões usando a mesma API da aba movimento de comissões
-                const comissoes = await window.api.get('/movimento_comissoes');
+                const comissoes = await window.api.get('/movimento_comissoes/todos');
 
                 // Calcular dados de evolução (últimos 6 meses)
                 const evolucao = calcularEvolucaoComissoes(comissoes);

@@ -5,6 +5,7 @@ const { authenticateUser } = require('../middleware/auth');
 
 // Rotas para movimento de comissões
 router.get('/', authenticateUser, movimentoComissaoController.listarMovimentos);
+router.get('/todos', movimentoComissaoController.listarMovimentosTodos); // Sem filtro por colaborador
 router.get('/simular-proximo-numero', movimentoComissaoController.simularProximoNumeroBase);
 router.get('/:id', movimentoComissaoController.buscarMovimento);
 router.get('/:id/produtos', movimentoComissaoController.buscarProdutosTitulo);

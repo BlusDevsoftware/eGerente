@@ -273,8 +273,24 @@ const uploadComprovante = async (req, res) => {
     }
 };
 
+// Listar todos os movimentos de comissão (sem filtro por colaborador - para Dashboard)
+const listarMovimentosTodos = async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('movimento_comissoes')
+            .select('*')
+            .order('id', { ascending: true });
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao listar todos os movimentos:', error);
+        res.status(500).json({ error: 'Erro ao listar todos os movimentos' });
+    }
+};
+
 module.exports = {
     listarMovimentos,
+    listarMovimentosTodos,
     buscarMovimento,
     criarMovimento,
     atualizarMovimento,
