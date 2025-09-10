@@ -11,33 +11,6 @@ function applyAuthProtection() {
 
     addLogoutButton();
 
-    function injectMenuSnapshotIfAny() {
-        try {
-            const cached = sessionStorage.getItem('allowedMenuHTML');
-            if (!cached) return;
-            const nav = document.querySelector('.nav-menu');
-            if (!nav) return;
-            // Substituir apenas o conteúdo interno para evitar perder handlers do container
-            nav.innerHTML = cached;
-            // Garantir que grupos ocultos mantenham display correto
-            document.querySelectorAll('.has-submenu').forEach(group => {
-                const submenu = group.querySelector('.submenu');
-                if (!submenu) return;
-                const hasVisible = Array.from(submenu.querySelectorAll('li')).some(li => li.style.display !== 'none');
-                group.style.display = hasVisible ? '' : 'none';
-            });
-        } catch(_) {}
-    }
-
-    function snapshotMenu() {
-        try {
-            const nav = document.querySelector('.nav-menu');
-            if (!nav) return;
-            // Salvar somente o HTML interno dos itens já filtrados
-            sessionStorage.setItem('allowedMenuHTML', nav.innerHTML);
-        } catch(_) {}
-    }
-
     function addPermGuardStyle() {
         let s = document.getElementById('perm-guard-style');
         if (!s) {
@@ -62,9 +35,6 @@ function applyAuthProtection() {
         // Evitar flash: ocultar apenas o menu até aplicar permissões
         addPermGuardStyle();
 
-        // Se já existe um snapshot de menu permitido, injete imediatamente
-        injectMenuSnapshotIfAny();
-
         // Se por algum motivo o authGuard não estiver pronto, não mantenha a página oculta
         if (!window.authGuard) {
             removePermGuardStyle();
@@ -75,8 +45,6 @@ function applyAuthProtection() {
         // 1) Aplicar imediatamente com base no usuário do storage (elimina flash)
         updateUserInfo();
         try { applyPermissionsToUI(); } catch(_) {}
-        // Após aplicar permissões, gere/atualize o snapshot do menu para as próximas páginas
-        snapshotMenu();
         removePermGuardStyle();
         try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
 
