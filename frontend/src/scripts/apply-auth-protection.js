@@ -31,6 +31,9 @@ function applyAuthProtection() {
     document.addEventListener('DOMContentLoaded', async function() {
         bindGlobalLogoutHandler();
         addLogoutButton();
+        
+        // Adicionar modal de logout se não existir
+        addLogoutModal();
 
         // Evitar flash: ocultar apenas o menu até aplicar permissões
         addPermGuardStyle();
@@ -75,6 +78,67 @@ function addLogoutButton() {
     }
 }
 
+function addLogoutModal() {
+    // Verificar se o modal já existe
+    if (document.getElementById('logoutModal')) {
+        return;
+    }
+
+    // Criar o modal
+    const modalHTML = `
+        <!-- Modal de Confirmação de Saída -->
+        <div id="logoutModal" class="logout-modal">
+            <div class="logout-modal-content">
+                <div class="logout-modal-header">
+                    <h2><i class="fas fa-sign-out-alt"></i> Confirmar Saída</h2>
+                    <button class="logout-close-btn" onclick="closeLogoutModal()">&times;</button>
+                </div>
+                <div class="logout-modal-body">
+                    <div class="logout-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="logout-message">
+                        Tem certeza que deseja sair do sistema?
+                    </div>
+                    <div class="logout-warning">
+                        Você será redirecionado para a tela de login.
+                    </div>
+                </div>
+                <div class="logout-modal-actions">
+                    <button class="logout-btn-cancel" onclick="closeLogoutModal()">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="logout-btn-confirm" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Adicionar o modal ao final do body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Adicionar event listeners
+    const modal = document.getElementById('logoutModal');
+    
+    // Fechar modal ao clicar fora
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeLogoutModal();
+        }
+    });
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'flex') {
+            closeLogoutModal();
+        }
+    });
+}
+
 function bindGlobalLogoutHandler() {
     if (bindGlobalLogoutHandler._bound) return;
     document.addEventListener('click', function(e) {
@@ -85,17 +149,39 @@ function bindGlobalLogoutHandler() {
 }
 
 function logout() {
-    if (confirm('Tem certeza que deseja sair do sistema?')) {
-        try {
-            if (window.authGuard && typeof window.authGuard.logout === 'function') {
-                window.authGuard.logout();
-            } else {
-                sessionStorage.removeItem('token');
-                sessionStorage.removeItem('user');
-            }
-        } finally {
-            window.location.replace('login.html');
+    showLogoutModal();
+}
+
+function showLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+}
+
+function confirmLogout() {
+    try {
+        if (window.authGuard && typeof window.authGuard.logout === 'function') {
+            window.authGuard.logout();
+        } else {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
         }
+    } finally {
+        window.location.replace('login.html');
     }
 }
 

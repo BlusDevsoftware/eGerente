@@ -221,22 +221,7 @@
 
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', async function() {
-            // Logout handler
-            const logoutLink = document.getElementById('logout-link');
-            if (logoutLink) {
-                logoutLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    try {
-                        if (window.authGuard && typeof window.authGuard.logout === 'function') {
-                            window.authGuard.logout();
-                        } else {
-                            sessionStorage.clear();
-                        }
-                    } finally {
-                        window.location.replace('login.html');
-                    }
-                });
-            }
+            // Logout handler será gerenciado pelo apply-auth-protection.js
 
             // Verificar autenticação de forma mais rigorosa
             const token = sessionStorage.getItem('token');
@@ -1177,5 +1162,36 @@
             }, 3000);
         }
     </script>
+
+    <!-- Modal de Confirmação de Saída -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-header">
+                <h2><i class="fas fa-sign-out-alt"></i> Confirmar Saída</h2>
+                <button class="logout-close-btn" onclick="closeLogoutModal()">&times;</button>
+            </div>
+            <div class="logout-modal-body">
+                <div class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="logout-message">
+                    Tem certeza que deseja sair do sistema?
+                </div>
+                <div class="logout-warning">
+                    Você será redirecionado para a tela de login.
+                </div>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="logout-btn-cancel" onclick="closeLogoutModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="logout-btn-confirm" onclick="confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html> 
