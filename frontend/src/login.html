@@ -315,7 +315,7 @@
                     
                     // Redirecionar para primeira página permitida
                     const target = getFirstAllowedPage(data.user && data.user.permissoes);
-                    setTimeout(() => { window.location.href = target; }, 150);
+                    setTimeout(() => { window.location.href = target; }, 250);
                 } else {
                     const errorData = await response.json();
                     errorMessage.textContent = errorData.message || 'Credenciais inválidas';
@@ -407,7 +407,7 @@
                                 
                                 // Redirecionar para primeira página permitida
                                 const target = getFirstAllowedPage(data.user && data.user.permissoes);
-                                setTimeout(() => { window.location.href = target; }, 150);
+                                setTimeout(() => { window.location.href = target; }, 250);
                             } else {
                                 // Se falhar o login automático, voltar para tela de login
                                 switchToLogin();
