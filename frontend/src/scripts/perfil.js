@@ -64,6 +64,11 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         exportar: 'fa-file-export',
         executar: 'fa-play'
     };
+    
+    // Ícone especial para "Visualizar Todos os Títulos"
+    const iconByTitle = {
+        'Comissões/Visualizar Todos os Títulos': 'fa-globe'
+    };
     const grupos = [
         { titulo: 'Dashboard', acoes: ['ver'] },
         { titulo: 'Cadastros/Colaboradores', acoes: ['ver','criar','editar','excluir'] },
@@ -74,6 +79,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
         { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comissões/Consulta', acoes: ['ver'] },
+        { titulo: 'Comissões/Visualizar Todos os Títulos', acoes: ['ver'] },
         { titulo: 'Relatórios/Recebimento', acoes: ['ver','exportar'] },
         { titulo: 'Relatórios/Conferência', acoes: ['ver','exportar'] },
         { titulo: 'Relatórios/Dinâmico', acoes: ['ver','exportar'] },
@@ -86,7 +92,8 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         box.className = 'perm-group';
         const title = document.createElement('div');
         title.className = 'perm-title';
-        title.innerHTML = `<i class="fas fa-folder"></i> ${g.titulo}`;
+        const icon = iconByTitle[g.titulo] || 'fa-folder';
+        title.innerHTML = `<i class="fas ${icon}"></i> ${g.titulo}`;
         const row = document.createElement('div');
         row.className = 'perm-actions';
         g.acoes.forEach(acao => {
@@ -154,6 +161,7 @@ function sectionKeyToTitle(sectionKey) {
         'comissoes_lancar': 'Comissões/Lançar',
         'comissoes_movimento': 'Comissões/Movimento',
         'comissoes_consulta': 'Comissões/Consulta',
+        'comissoes_visualizar_todos_titulos': 'Comissões/Visualizar Todos os Títulos',
         'relatorios_recebimento': 'Relatórios/Recebimento',
         'relatorios_conferencia': 'Relatórios/Conferência',
         'relatorios_dinamico': 'Relatórios/Dinâmico',
@@ -715,6 +723,9 @@ async function salvarPerfil(e) {
     
     // Comissões/Consulta
     permissoes.comissoes_consulta_ver = permissoesMapa['Comissões/Consulta']?.includes('ver') || false;
+    
+    // Comissões/Visualizar Todos os Títulos
+    permissoes.comissoes_visualizar_todos_titulos = permissoesMapa['Comissões/Visualizar Todos os Títulos']?.includes('ver') || false;
     
     // Relatórios/Recebimento
     permissoes.relatorios_recebimento_ver = permissoesMapa['Relatórios/Recebimento']?.includes('ver') || false;

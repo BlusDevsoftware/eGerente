@@ -481,6 +481,24 @@
             font-weight: 500;
             text-align: center;
         }
+        
+        /* Estilo especial para a permissão "Visualizar Todos os Títulos" */
+        .perm-group:has(.perm-title:contains("Visualizar Todos os Títulos")) {
+            border: 2px solid #ff9800;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+        
+        .perm-group:has(.perm-title:contains("Visualizar Todos os Títulos")) .perm-title {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .perm-group:has(.perm-title:contains("Visualizar Todos os Títulos")) .perm-title i {
+            color: #fff;
+        }
 
         /* Scroll personalizado para a tabela completa */
         .table-scroll {
