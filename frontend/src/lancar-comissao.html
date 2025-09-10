@@ -12,6 +12,55 @@
     <script src="scripts/config/api.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <style>
+        /* Spinner de carregamento - Padrão do sistema */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loader-overlay-lancar {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 8px;
+        }
+
+        .spinner-main {
+            border: 8px solid #e3f2fd;
+            border-top: 8px solid #1976D2;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #1976D2;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+    </style>
+    <script>
+        // Funções para controlar o spinner centralizado
+        function mostrarSpinner() {
+            document.getElementById('loader-lancar').style.display = 'flex';
+        }
+        
+        function ocultarSpinner() {
+            document.getElementById('loader-lancar').style.display = 'none';
+        }
+    </script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -63,6 +112,12 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Spinner de Carregamento -->
+        <div id="loader-lancar" class="loader-overlay-lancar">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando dados...</div>
+        </div>
+        
         <!-- Header -->
         <div class="header">
             <div class="welcome-text">
@@ -1547,6 +1602,9 @@
             };
 
             document.addEventListener('DOMContentLoaded', async function() {
+                // Mostrar spinner no início do carregamento
+                mostrarSpinner();
+                
                 choicesItem = new Choices(selectItem, {
                     removeItemButton: true,
                     placeholder: true,
@@ -1593,6 +1651,9 @@
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
                     choicesItem.setChoices([{ value: '', label: 'Erro ao carregar', disabled: true }]);
+                } finally {
+                    // Ocultar spinner após carregamento (sucesso ou erro)
+                    ocultarSpinner();
                 }
 
                 const btnSugere = document.getElementById('btnSugereValorVenda');
