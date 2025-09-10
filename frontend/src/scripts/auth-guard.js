@@ -2,6 +2,24 @@
  * Sistema de Proteção de Rotas - Auth Guard (cópia para /src/scripts)
  */
 
+// Early redirect to avoid any flash before login
+(function earlyAuthRedirect(){
+    try {
+        var LOGIN_PAGE = 'login.html';
+        var currentPage = window.location.pathname.split('/').pop();
+        // Treat every page except login as protected for the early guard
+        var isProtected = currentPage !== LOGIN_PAGE;
+        if (isProtected) {
+            var hasToken = !!sessionStorage.getItem('token');
+            var hasUser = !!sessionStorage.getItem('user');
+            if (!hasToken || !hasUser) {
+                // Use replace to avoid creating a back entry
+                window.location.replace(LOGIN_PAGE);
+            }
+        }
+    } catch(_) {}
+})();
+
 class AuthGuard {
     constructor() {
         this.LOGIN_PAGE = 'login.html';
@@ -18,7 +36,8 @@ class AuthGuard {
 
     isProtectedPage() {
         const currentPage = window.location.pathname.split('/').pop();
-        return currentPage !== this.LOGIN_PAGE && currentPage !== '' && currentPage !== 'index.html';
+        // Protect all pages except the login page
+        return currentPage !== this.LOGIN_PAGE;
     }
 
     isAuthenticated() {
