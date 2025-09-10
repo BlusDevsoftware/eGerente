@@ -5,6 +5,8 @@
 
 // Função para aplicar proteção de autenticação
 function applyAuthProtection() {
+    // Oculta o conteúdo até validar autenticação e permissão
+    try { document.documentElement.style.visibility = 'hidden'; } catch(_) {}
     // Verificar se o AuthGuard está disponível
     if (!window.authGuard) {
         console.error('AuthGuard não encontrado. Certifique-se de incluir auth-guard.js antes deste script.');
@@ -41,6 +43,18 @@ function applyAuthProtection() {
         updateUserInfo();
         // Aplicar permissões na UI
         try { applyPermissionsToUI(); } catch (_) {}
+
+        // Checar se o usuário tem permissão para a página atual
+        const required = getRequiredPermissionForCurrentPage();
+        if (required && !window.authGuard.hasPermission(required)) {
+            // Redirecionar para a primeira página permitida
+            const target = findFirstAllowedPage();
+            window.location.replace(target || 'login.html');
+            return;
+        }
+
+        // Exibir conteúdo após validações
+        try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
     });
 }
 
@@ -163,6 +177,50 @@ function applyPermissionsToUI() {
             li.style.display = 'none';
         }
     });
+}
+
+// Mapeia página -> flag de permissão necessária
+function getRequiredPermissionForCurrentPage() {
+    const file = (location.pathname.split('/').pop() || '').toLowerCase();
+    const map = {
+        'index.html': 'dashboard_ver',
+        'colaboradores.html': 'cadastros_colaboradores_ver',
+        'clientes.html': 'cadastros_clientes_ver',
+        'produtos.html': 'cadastros_produtos_ver',
+        'servicos.html': 'cadastros_servicos_ver',
+        'lancar-comissao.html': 'comissoes_lancar_ver',
+        'movimento-comissao.html': 'comissoes_movimento_ver',
+        'consulta-comissao.html': 'comissoes_consulta_ver',
+        'recebimento.html': 'relatorios_recebimento_ver',
+        'conferencia.html': 'relatorios_conferencia_ver',
+        'dinamico.html': 'relatorios_dinamico_ver',
+        'manutencao-bd.html': 'configuracoes_manutencao_ver',
+        'sincronizar.html': 'configuracoes_sincronizar_ver'
+    };
+    return map[file];
+}
+
+// Encontra primeira página do menu que o usuário tem permissão para ver
+function findFirstAllowedPage() {
+    const candidates = [
+        { url: 'index.html', flag: 'dashboard_ver' },
+        { url: 'colaboradores.html', flag: 'cadastros_colaboradores_ver' },
+        { url: 'clientes.html', flag: 'cadastros_clientes_ver' },
+        { url: 'produtos.html', flag: 'cadastros_produtos_ver' },
+        { url: 'servicos.html', flag: 'cadastros_servicos_ver' },
+        { url: 'lancar-comissao.html', flag: 'comissoes_lancar_ver' },
+        { url: 'movimento-comissao.html', flag: 'comissoes_movimento_ver' },
+        { url: 'consulta-comissao.html', flag: 'comissoes_consulta_ver' },
+        { url: 'recebimento.html', flag: 'relatorios_recebimento_ver' },
+        { url: 'conferencia.html', flag: 'relatorios_conferencia_ver' },
+        { url: 'dinamico.html', flag: 'relatorios_dinamico_ver' },
+        { url: 'manutencao-bd.html', flag: 'configuracoes_manutencao_ver' },
+        { url: 'sincronizar.html', flag: 'configuracoes_sincronizar_ver' }
+    ];
+    for (const c of candidates) {
+        if (window.authGuard.hasPermission(c.flag)) return c.url;
+    }
+    return null;
 }
 
 // Aplicar proteção automaticamente
