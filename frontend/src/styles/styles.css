@@ -1102,6 +1102,10 @@ textarea {
     width: calc(100% - 40px);
 }
 
+/* Permissões específicas para a aba Perfil (CSS-first) */
+.nav-menu a[data-perm="cadastros_perfis_ver"] { display: none; }
+.perm-cadastros_perfis_ver .nav-menu a[data-perm="cadastros_perfis_ver"] { display: flex; }
+
 .logout-button a {
     display: flex;
     align-items: center;
