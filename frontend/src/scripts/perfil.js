@@ -173,8 +173,23 @@ function sectionKeyToTitle(sectionKey) {
 
 function buildPermissionsMapFromProfile(profileObj) {
     const mapa = {};
+    console.log('🔍 DEBUG - buildPermissionsMapFromProfile - profileObj:', profileObj);
+    
     Object.keys(profileObj).forEach(key => {
         if (typeof profileObj[key] !== 'boolean') return;
+        
+        // Tratamento especial para comissoes_visualizar_todos_titulos
+        if (key === 'comissoes_visualizar_todos_titulos') {
+            console.log('🔍 DEBUG - Encontrou comissoes_visualizar_todos_titulos:', profileObj[key]);
+            const title = 'Comissões/Visualizar Todos os Títulos';
+            if (!mapa[title]) mapa[title] = [];
+            if (profileObj[key] === true) {
+                mapa[title].push('ver');
+                console.log('🔍 DEBUG - Adicionou ver para Comissões/Visualizar Todos os Títulos');
+            }
+            return;
+        }
+        
         const lastUnderscore = key.lastIndexOf('_');
         if (lastUnderscore <= 0) return;
         const sectionKey = key.substring(0, lastUnderscore); // e.g., cadastros_colaboradores
@@ -186,6 +201,8 @@ function buildPermissionsMapFromProfile(profileObj) {
             mapa[title].push(action);
         }
     });
+    
+    console.log('🔍 DEBUG - buildPermissionsMapFromProfile - mapa final:', mapa);
     return mapa;
 }
 function openPerfilModal() {
