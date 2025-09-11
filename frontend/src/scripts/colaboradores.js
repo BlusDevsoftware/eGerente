@@ -337,6 +337,49 @@ async function editarColaborador(codigo) {
         const actions = form.querySelector('.form-actions');
         if (actions) {
             actions.style.display = 'flex';
+            // Adicionar botão de resetar senha se ainda não existir
+            if (!actions.querySelector('#btnResetSenha')) {
+                const btnReset = document.createElement('button');
+                btnReset.type = 'button';
+                btnReset.id = 'btnResetSenha';
+                btnReset.className = 'btn-secondary';
+                btnReset.innerHTML = '<i class="fas fa-key"></i> Resetar Senha';
+                btnReset.style.marginRight = 'auto';
+                btnReset.addEventListener('click', async () => {
+                    try {
+                        const confirmar = await window.Swal?.fire ? await Swal.fire({
+                            title: 'Resetar senha?',
+                            text: 'Uma nova senha temporária será gerada para este colaborador.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sim, resetar',
+                            cancelButtonText: 'Cancelar'
+                        }).then(r => r.isConfirmed) : confirm('Gerar nova senha temporária para este colaborador?');
+                        if (!confirmar) return;
+
+                        const resp = await api.post(`/colaboradores/${codigo}/reset-senha`, {});
+                        const email = resp.email || colaborador.email;
+                        const senhaTemp = resp.senha_temporaria;
+
+                        // Mostrar modal de sucesso reutilizando o existente
+                        if (window.showSuccessModal) {
+                            showSuccessModal(senhaTemp, email);
+                        } else if (window.Swal?.fire) {
+                            await Swal.fire({
+                                title: 'Senha resetada!',
+                                html: `<div style="text-align:left">Email: <b>${email}</b><br>Senha temporária: <b>${senhaTemp}</b></div>`,
+                                icon: 'success'
+                            });
+                        } else {
+                            alert(`Senha temporária: ${senhaTemp}`);
+                        }
+                    } catch (err) {
+                        console.error('Erro ao resetar senha:', err);
+                        mostrarToast('Erro ao resetar senha', 'error');
+                    }
+                });
+                actions.prepend(btnReset);
+            }
         }
 
         // Mostrar o modal

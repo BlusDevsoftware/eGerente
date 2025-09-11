@@ -163,3 +163,45 @@ module.exports = {
     atualizarColaborador,
     excluirColaborador
 }; 
+
+// Resetar senha do colaborador (gera senha temporária)
+async function resetSenhaColaborador(req, res) {
+    try {
+        const { codigo } = req.params;
+
+        // Verificar existência do colaborador
+        const { data: usuario, error: findErr } = await supabase
+            .from('colaboradores')
+            .select('codigo, email, nome, status')
+            .eq('codigo', codigo)
+            .single();
+
+        if (findErr || !usuario) {
+            return res.status(404).json({ error: 'Colaborador não encontrado' });
+        }
+
+        // Gerar senha temporária (8 caracteres alfanuméricos)
+        const senhaTemporaria = Math.random().toString(36).slice(-8).toUpperCase();
+
+        // Atualizar no banco
+        const { data, error } = await supabase
+            .from('colaboradores')
+            .update({ senha_temporaria: senhaTemporaria })
+            .eq('codigo', codigo)
+            .select('codigo, email')
+            .single();
+
+        if (error) throw error;
+
+        return res.json({
+            message: 'Senha temporária gerada com sucesso',
+            email: data.email,
+            senha_temporaria: senhaTemporaria
+        });
+    } catch (error) {
+        console.error('Erro ao resetar senha do colaborador:', error);
+        res.status(500).json({ error: 'Erro ao resetar senha do colaborador' });
+    }
+}
+
+module.exports.resetSenhaColaborador = resetSenhaColaborador;
