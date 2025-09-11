@@ -20,7 +20,7 @@ async function login(req, res) {
         // Buscar colaborador por email
         const { data: colaborador, error: colaboradorError } = await supabase
             .from('colaboradores')
-            .select('*')
+            .select('codigo, email, nome, perfil, status, cargo, departamento, telefone, data_admissao, foto, senha, senha_temporaria')
             .eq('email', email)
             .eq('status', 'Ativo')
             .single();
@@ -41,7 +41,13 @@ async function login(req, res) {
                         id: colaborador.codigo,
                         email: colaborador.email,
                         nome: colaborador.nome,
-                        perfil: colaborador.perfil
+                        perfil: colaborador.perfil,
+                        cargo: colaborador.cargo,
+                        departamento: colaborador.departamento,
+                        telefone: colaborador.telefone,
+                        data_admissao: colaborador.data_admissao,
+                        foto: colaborador.foto,
+                        status: colaborador.status
                     }
                 });
             } else {
@@ -63,7 +69,13 @@ async function login(req, res) {
                     id: colaborador.codigo,
                     email: colaborador.email,
                     nome: colaborador.nome,
-                    perfil: colaborador.perfil
+                    perfil: colaborador.perfil,
+                    cargo: colaborador.cargo,
+                    departamento: colaborador.departamento,
+                    telefone: colaborador.telefone,
+                    data_admissao: colaborador.data_admissao,
+                    foto: colaborador.foto,
+                    status: colaborador.status
                 }
             });
         } else {
@@ -153,7 +165,7 @@ async function verifyToken(req, res) {
         // Verificar se o usuário ainda existe
         const { data: colaborador, error } = await supabase
             .from('colaboradores')
-            .select('codigo, email, nome, perfil, status')
+            .select('codigo, email, nome, perfil, status, cargo, departamento, telefone, data_admissao, foto')
             .eq('email', email)
             .eq('status', 'Ativo')
             .single();

@@ -329,6 +329,10 @@ body {
 .user-avatar {
     width: 40px;
     height: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
     border-radius: 50%;
     background-color: #007bff;
     display: flex;
@@ -336,7 +340,20 @@ body {
     justify-content: center;
     color: white;
     font-weight: 600;
-    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.user-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 /* Dashboard Cards */
@@ -2374,6 +2391,188 @@ tr:hover {
     cursor: pointer;
     padding: 5px;
     transition: color 0.3s;
+}
+
+/* Modal de dados do usuário */
+.user-profile-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.user-profile-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-profile-content {
+    background: white;
+    border-radius: 15px;
+    padding: 0;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease;
+}
+
+.user-profile-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px 15px 0 0;
+    text-align: center;
+    position: relative;
+}
+
+.user-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.user-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-profile-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.user-profile-email {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.user-profile-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.user-profile-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-profile-body {
+    padding: 25px;
+}
+
+.user-profile-info {
+    margin-bottom: 20px;
+}
+
+.user-profile-info h4 {
+    color: #2d3436;
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.user-profile-info h4 i {
+    margin-right: 10px;
+    color: #007bff;
+    width: 20px;
+}
+
+.user-profile-info p {
+    color: #636e72;
+    font-size: 14px;
+    margin: 5px 0;
+    padding-left: 30px;
+}
+
+.user-profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.user-profile-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.user-profile-btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+}
+
+.user-profile-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.user-profile-btn-secondary {
+    background: #f8f9fa;
+    color: #636e72;
+    border: 1px solid #dee2e6;
+}
+
+.user-profile-btn-secondary:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .logout-close-btn:hover {

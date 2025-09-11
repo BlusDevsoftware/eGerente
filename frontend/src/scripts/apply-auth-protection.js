@@ -195,6 +195,9 @@ function updateUserInfo() {
         if (element.tagName === 'H1') element.textContent = `Bem-vindo, ${user.nome || user.email}`;
         else element.textContent = user.nome || user.email;
     });
+
+    // Atualizar avatar do usuário com foto
+    updateUserAvatar(user);
 }
 
 function applyPermissionsToUI() {
@@ -296,6 +299,179 @@ function findFirstAllowedPage() {
     for (const c of candidates) { if (window.authGuard.hasPermission(c.flag)) return c.url; }
     return null;
 }
+
+// Função para atualizar avatar do usuário
+function updateUserAvatar(user) {
+    const userAvatarElements = document.querySelectorAll('.user-avatar');
+    userAvatarElements.forEach(element => {
+        // Limpar conteúdo anterior
+        element.innerHTML = '';
+        
+        if (user.foto) {
+            // Se tem foto, mostrar imagem
+            const img = document.createElement('img');
+            img.src = user.foto;
+            img.alt = user.nome || 'Usuário';
+            img.onerror = function() {
+                // Se a imagem falhar ao carregar, mostrar inicial
+                element.innerHTML = user.nome ? user.nome.charAt(0).toUpperCase() : 'U';
+            };
+            element.appendChild(img);
+        } else {
+            // Se não tem foto, mostrar inicial
+            element.textContent = user.nome ? user.nome.charAt(0).toUpperCase() : 'U';
+        }
+        
+        // Adicionar evento de clique
+        element.addEventListener('click', function() {
+            showUserProfileModal(user);
+        });
+    });
+}
+
+// Função para mostrar modal de perfil do usuário
+function showUserProfileModal(user) {
+    // Criar modal se não existir
+    let modal = document.getElementById('userProfileModal');
+    if (!modal) {
+        modal = createUserProfileModal();
+    }
+    
+    // Atualizar dados do modal
+    updateUserProfileModal(modal, user);
+    
+    // Mostrar modal
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+    document.body.style.overflow = 'hidden';
+}
+
+// Função para criar o modal de perfil
+function createUserProfileModal() {
+    const modalHTML = `
+        <div id="userProfileModal" class="user-profile-modal">
+            <div class="user-profile-content">
+                <div class="user-profile-header">
+                    <button class="user-profile-close" onclick="closeUserProfileModal()">&times;</button>
+                    <div class="user-profile-avatar" id="profileAvatar"></div>
+                    <div class="user-profile-name" id="profileName"></div>
+                    <div class="user-profile-email" id="profileEmail"></div>
+                </div>
+                <div class="user-profile-body">
+                    <div class="user-profile-info">
+                        <h4><i class="fas fa-user"></i> Informações Pessoais</h4>
+                        <p id="profileCargo"></p>
+                        <p id="profileDepartamento"></p>
+                        <p id="profileTelefone"></p>
+                    </div>
+                    <div class="user-profile-info">
+                        <h4><i class="fas fa-calendar"></i> Data de Admissão</h4>
+                        <p id="profileDataAdmissao"></p>
+                    </div>
+                    <div class="user-profile-info">
+                        <h4><i class="fas fa-shield-alt"></i> Status</h4>
+                        <p id="profileStatus"></p>
+                    </div>
+                    <div class="user-profile-actions">
+                        <button class="user-profile-btn user-profile-btn-secondary" onclick="closeUserProfileModal()">
+                            <i class="fas fa-times"></i>
+                            Fechar
+                        </button>
+                        <button class="user-profile-btn user-profile-btn-primary" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Adicionar event listeners
+    const modal = document.getElementById('userProfileModal');
+    
+    // Fechar modal ao clicar fora
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeUserProfileModal();
+        }
+    });
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'flex') {
+            closeUserProfileModal();
+        }
+    });
+    
+    return modal;
+}
+
+// Função para atualizar dados do modal
+function updateUserProfileModal(modal, user) {
+    const avatar = modal.querySelector('#profileAvatar');
+    const name = modal.querySelector('#profileName');
+    const email = modal.querySelector('#profileEmail');
+    const cargo = modal.querySelector('#profileCargo');
+    const departamento = modal.querySelector('#profileDepartamento');
+    const telefone = modal.querySelector('#profileTelefone');
+    const dataAdmissao = modal.querySelector('#profileDataAdmissao');
+    const status = modal.querySelector('#profileStatus');
+    
+    // Avatar
+    avatar.innerHTML = '';
+    if (user.foto) {
+        const img = document.createElement('img');
+        img.src = user.foto;
+        img.alt = user.nome || 'Usuário';
+        img.onerror = function() {
+            avatar.textContent = user.nome ? user.nome.charAt(0).toUpperCase() : 'U';
+        };
+        avatar.appendChild(img);
+    } else {
+        avatar.textContent = user.nome ? user.nome.charAt(0).toUpperCase() : 'U';
+    }
+    
+    // Dados básicos
+    name.textContent = user.nome || 'Usuário';
+    email.textContent = user.email || 'Não informado';
+    
+    // Informações do colaborador
+    cargo.textContent = user.cargo ? `Cargo: ${user.cargo}` : 'Cargo: Não informado';
+    departamento.textContent = user.departamento ? `Departamento: ${user.departamento}` : 'Departamento: Não informado';
+    telefone.textContent = user.telefone ? `Telefone: ${user.telefone}` : 'Telefone: Não informado';
+    
+    // Data de admissão
+    if (user.data_admissao) {
+        const data = new Date(user.data_admissao);
+        dataAdmissao.textContent = data.toLocaleDateString('pt-BR');
+    } else {
+        dataAdmissao.textContent = 'Não informado';
+    }
+    
+    // Status
+    const statusText = user.status === 'ativo' ? 'Ativo' : 'Inativo';
+    const statusClass = user.status === 'ativo' ? 'color: #28a745; font-weight: 600;' : 'color: #dc3545; font-weight: 600;';
+    status.innerHTML = `<span style="${statusClass}">${statusText}</span>`;
+}
+
+// Função para fechar modal de perfil
+function closeUserProfileModal() {
+    const modal = document.getElementById('userProfileModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+}
+
+// Tornar funções globais
+window.showUserProfileModal = showUserProfileModal;
+window.closeUserProfileModal = closeUserProfileModal;
 
 applyAuthProtection();
 
