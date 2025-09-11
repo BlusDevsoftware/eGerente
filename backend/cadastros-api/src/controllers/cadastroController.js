@@ -177,6 +177,45 @@ function gerarSenhaTemporaria() {
     return senha.split('').sort(() => Math.random() - 0.5).join('');
 }
 
+// Resetar senha do colaborador por código (gera senha temporária)
+const resetSenhaColaboradorPorCodigo = async (req, res) => {
+    try {
+        const { codigo } = req.params;
+        const codigoStr = codigo.toString().padStart(5, '0');
+
+        // Verificar existência do colaborador
+        const { data: usuario, error: findErr } = await supabase
+            .from('colaboradores')
+            .select('codigo, email, nome, status')
+            .eq('codigo', codigoStr)
+            .single();
+
+        if (findErr || !usuario) {
+            return res.status(404).json({ error: 'Colaborador não encontrado' });
+        }
+
+        const senhaTemporaria = gerarSenhaTemporaria();
+
+        const { data, error } = await supabase
+            .from('colaboradores')
+            .update({ senha_temporaria: senhaTemporaria })
+            .eq('codigo', codigoStr)
+            .select('codigo, email')
+            .single();
+
+        if (error) throw error;
+
+        return res.json({
+            message: 'Senha temporária gerada com sucesso',
+            email: data.email,
+            senha_temporaria: senhaTemporaria
+        });
+    } catch (error) {
+        console.error('Erro ao resetar senha do colaborador (cadastros-api):', error);
+        res.status(500).json({ error: 'Erro ao resetar senha do colaborador' });
+    }
+};
+
 // Função genérica para listar registros
 const listarRegistros = async (req, res) => {
     try {
@@ -471,6 +510,7 @@ module.exports = {
     atualizarRegistro,
     excluirRegistro,
     alterarSenhaColaborador,
+    resetSenhaColaboradorPorCodigo,
     login,
     verifyToken
 }; 
