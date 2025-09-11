@@ -198,7 +198,11 @@ const resetSenhaColaboradorPorCodigo = async (req, res) => {
 
         const { data, error } = await supabase
             .from('colaboradores')
-            .update({ senha_temporaria: senhaTemporaria })
+            .update({ 
+                senha_temporaria: senhaTemporaria,
+                senha_hash: null,
+                primeiro_acesso: true
+            })
             .eq('codigo', codigoStr)
             .select('codigo, email')
             .single();

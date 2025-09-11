@@ -186,7 +186,11 @@ async function resetSenhaColaborador(req, res) {
         // Atualizar no banco
         const { data, error } = await supabase
             .from('colaboradores')
-            .update({ senha_temporaria: senhaTemporaria })
+            .update({ 
+                senha_temporaria: senhaTemporaria,
+                senha_hash: null,
+                primeiro_acesso: true
+            })
             .eq('codigo', codigo)
             .select('codigo, email')
             .single();
