@@ -1188,6 +1188,24 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação de Reset de Senha -->
+    <div id="resetConfirmModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 4000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 480px; width: 96%; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0;">
+            <div class="modal-header" style="padding: 24px 36px 0 36px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="margin: 0; font-size: 1.3em; color: #E65100; display: flex; align-items: center; gap: 10px; font-weight: 700;"><i class="fas fa-key"></i> Confirmar Reset de Senha</h2>
+                <button class="close-modal" id="resetCancelBtn" style="background: none; border: none; font-size: 1.5em; color: #666; cursor: pointer; padding: 5px; transition: color 0.3s;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 36px 24px 36px;">
+                <div style="font-size: 1em; color: #555; margin-bottom: 16px;">Para confirmar o reset de senha, digite <b>CONFIRMO</b> no campo abaixo.</div>
+                <input id="resetConfirmInput" type="text" placeholder="CONFIRMO" style="width:100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+                <div style="display:flex; justify-content: flex-end; gap: 12px; margin-top: 18px;">
+                    <button class="btn-secondary" id="resetCancelBtn2">Cancelar</button>
+                    <button class="btn-primary" id="resetConfirmBtn"><i class="fas fa-check"></i> Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container"></div>
     <script src="scripts/navigation.js"></script>

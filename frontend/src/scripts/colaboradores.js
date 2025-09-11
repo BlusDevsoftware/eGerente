@@ -348,28 +348,51 @@ async function editarColaborador(codigo) {
                 btnReset.addEventListener('click', async () => {
                     try {
                         console.log('[RESET] Click reset for codigo:', codigo);
-                        let autorizado = false;
-                        if (window.Swal && Swal.fire) {
-                            const result = await Swal.fire({
-                                title: 'Confirmar reset de senha',
-                                html: 'Digite <b>CONFIRMO</b> para confirmar o reset de senha.',
-                                input: 'text',
-                                inputPlaceholder: 'CONFIRMO',
-                                showCancelButton: true,
-                                confirmButtonText: 'Confirmar',
-                                cancelButtonText: 'Cancelar',
-                                inputValidator: (value) => {
-                                    if (value !== 'CONFIRMO') {
-                                        return 'Você precisa digitar CONFIRMO (maiúsculas)';
-                                    }
+                        // Abrir modal padrão do sistema
+                        const modal = document.getElementById('resetConfirmModal');
+                        const input = document.getElementById('resetConfirmInput');
+                        const btnOk = document.getElementById('resetConfirmBtn');
+                        const btnCancel = document.getElementById('resetCancelBtn');
+                        const btnCancel2 = document.getElementById('resetCancelBtn2');
+
+                        if (!modal || !input || !btnOk) {
+                            console.error('Modal de confirmação de reset não encontrado');
+                            return;
+                        }
+
+                        modal.style.display = 'flex';
+                        input.value = '';
+                        input.focus();
+
+                        const closeModal = () => { modal.style.display = 'none'; };
+                        const onCancel = () => { closeModal(); };
+
+                        // Encerrar possíveis listeners antigos
+                        btnOk.replaceWith(btnOk.cloneNode(true));
+                        const newOk = document.getElementById('resetConfirmBtn');
+                        btnCancel && btnCancel.replaceWith(btnCancel.cloneNode(true));
+                        btnCancel2 && btnCancel2.replaceWith(btnCancel2.cloneNode(true));
+                        const newCancel = document.getElementById('resetCancelBtn');
+                        const newCancel2 = document.getElementById('resetCancelBtn2');
+
+                        newCancel && newCancel.addEventListener('click', onCancel);
+                        newCancel2 && newCancel2.addEventListener('click', onCancel);
+
+                        await new Promise((resolve, reject) => {
+                            newOk.addEventListener('click', () => {
+                                if (input.value === 'CONFIRMO') {
+                                    resolve(true);
+                                } else {
+                                    try { mostrarToast('Você precisa digitar CONFIRMO (maiúsculas).', 'error'); } catch(_) {}
                                 }
                             });
-                            autorizado = result.isConfirmed && result.value === 'CONFIRMO';
-                        } else {
-                            const value = prompt('Digite CONFIRMO para resetar a senha do colaborador:');
-                            autorizado = (value === 'CONFIRMO');
-                        }
-                        if (!autorizado) return;
+                            // Fechar ao ESC
+                            const onKey = (e) => { if (e.key === 'Escape') { closeModal(); reject(new Error('cancelado')); } };
+                            modal.addEventListener('keydown', onKey, { once: true });
+                        }).catch(() => false);
+
+                        closeModal();
+                        if (input.value !== 'CONFIRMO') return;
 
                         // feedback visual
                         btnReset.disabled = true;
