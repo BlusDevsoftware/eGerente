@@ -347,35 +347,53 @@ async function editarColaborador(codigo) {
                 btnReset.style.marginRight = 'auto';
                 btnReset.addEventListener('click', async () => {
                     try {
-                        const confirmar = await window.Swal?.fire ? await Swal.fire({
+                        console.log('[RESET] Click reset for codigo:', codigo);
+                        const confirmar = await (window.Swal && Swal.fire ? Swal.fire({
                             title: 'Resetar senha?',
                             text: 'Uma nova senha temporária será gerada para este colaborador.',
                             icon: 'warning',
                             showCancelButton: true,
                             confirmButtonText: 'Sim, resetar',
                             cancelButtonText: 'Cancelar'
-                        }).then(r => r.isConfirmed) : confirm('Gerar nova senha temporária para este colaborador?');
+                        }).then(r => r.isConfirmed) : Promise.resolve(confirm('Gerar nova senha temporária para este colaborador?')));
                         if (!confirmar) return;
 
-                        const resp = await api.post(`/colaboradores/${codigo}/reset-senha`, {});
-                        const email = resp.email || colaborador.email;
-                        const senhaTemp = resp.senha_temporaria;
+                        // feedback visual
+                        btnReset.disabled = true;
+                        const oldLabel = btnReset.innerHTML;
+                        btnReset.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
 
-                        // Mostrar modal de sucesso reutilizando o existente
+                        const endpoint = `/colaboradores/${codigo}/reset-senha`;
+                        console.log('[RESET] POST', endpoint);
+                        const resp = await api.post(endpoint, {});
+                        console.log('[RESET] Response:', resp);
+                        const email = (resp && resp.email) || colaborador.email;
+                        const senhaTemp = resp && resp.senha_temporaria;
+
+                        if (!senhaTemp) {
+                            throw { message: 'Resposta sem senha_temporaria', data: resp };
+                        }
+
                         if (window.showSuccessModal) {
                             showSuccessModal(senhaTemp, email);
-                        } else if (window.Swal?.fire) {
+                        } else if (window.Swal && Swal.fire) {
                             await Swal.fire({
                                 title: 'Senha resetada!',
-                                html: `<div style="text-align:left">Email: <b>${email}</b><br>Senha temporária: <b>${senhaTemp}</b></div>`,
+                                html: `<div style=\"text-align:left\">Email: <b>${email}</b><br>Senha temporária: <b>${senhaTemp}</b></div>`,
                                 icon: 'success'
                             });
                         } else {
                             alert(`Senha temporária: ${senhaTemp}`);
                         }
+                        try { mostrarToast('Senha temporária gerada com sucesso', 'success'); } catch(_) {}
+                        btnReset.innerHTML = oldLabel;
+                        btnReset.disabled = false;
                     } catch (err) {
-                        console.error('Erro ao resetar senha:', err);
-                        mostrarToast('Erro ao resetar senha', 'error');
+                        console.error('[RESET] Erro ao resetar senha:', err);
+                        const msg = (err && err.data && (err.data.error || err.data.message)) || err.message || 'Erro ao resetar senha';
+                        try { mostrarToast(msg, 'error'); } catch(_) {}
+                        btnReset.disabled = false;
+                        btnReset.innerHTML = '<i class="fas fa-key"></i> Resetar Senha';
                     }
                 });
                 actions.prepend(btnReset);
