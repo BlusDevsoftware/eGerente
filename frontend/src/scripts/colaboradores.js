@@ -348,15 +348,28 @@ async function editarColaborador(codigo) {
                 btnReset.addEventListener('click', async () => {
                     try {
                         console.log('[RESET] Click reset for codigo:', codigo);
-                        const confirmar = await (window.Swal && Swal.fire ? Swal.fire({
-                            title: 'Resetar senha?',
-                            text: 'Uma nova senha temporária será gerada para este colaborador.',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Sim, resetar',
-                            cancelButtonText: 'Cancelar'
-                        }).then(r => r.isConfirmed) : Promise.resolve(confirm('Gerar nova senha temporária para este colaborador?')));
-                        if (!confirmar) return;
+                        let autorizado = false;
+                        if (window.Swal && Swal.fire) {
+                            const result = await Swal.fire({
+                                title: 'Confirmar reset de senha',
+                                html: 'Digite <b>CONFIRMO</b> para confirmar o reset de senha.',
+                                input: 'text',
+                                inputPlaceholder: 'CONFIRMO',
+                                showCancelButton: true,
+                                confirmButtonText: 'Confirmar',
+                                cancelButtonText: 'Cancelar',
+                                inputValidator: (value) => {
+                                    if (value !== 'CONFIRMO') {
+                                        return 'Você precisa digitar CONFIRMO (maiúsculas)';
+                                    }
+                                }
+                            });
+                            autorizado = result.isConfirmed && result.value === 'CONFIRMO';
+                        } else {
+                            const value = prompt('Digite CONFIRMO para resetar a senha do colaborador:');
+                            autorizado = (value === 'CONFIRMO');
+                        }
+                        if (!autorizado) return;
 
                         // feedback visual
                         btnReset.disabled = true;
