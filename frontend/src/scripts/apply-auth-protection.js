@@ -54,10 +54,6 @@ function applyAuthProtection() {
         removePermGuardStyle();
         try { document.documentElement.style.visibility = 'visible'; } catch(_) {}
 
-        // 1.1) Aplicar zoom global padrão (90%) após autenticação
-        try {
-            applyGlobalZoom(0.9);
-        } catch(_) {}
 
         // 2) Validar token em background; se inválido, redireciona
         try {
@@ -73,28 +69,6 @@ function applyAuthProtection() {
     });
 }
 
-// Aplica zoom global com fallback para navegadores que não suportam 'zoom'
-function applyGlobalZoom(factor) {
-    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-    const html = document.documentElement;
-    const body = document.body;
-
-    if (!isFirefox) {
-        body.style.zoom = String(factor);
-        // Limpar possíveis fallbacks anteriores
-        html.style.transform = '';
-        html.style.transformOrigin = '';
-        html.style.width = '';
-        return;
-    }
-
-    // Fallback Firefox: usar transform scale no html
-    const scale = factor;
-    html.style.transform = `scale(${scale})`;
-    html.style.transformOrigin = '0 0';
-    // Compensar a redução para evitar barras de rolagem horizontais
-    html.style.width = `${(1/scale)*100}%`;
-}
 
 function addLogoutButton() {
     const existingLogout = document.querySelector('.logout-button, .logout-button a, [data-logout]');
