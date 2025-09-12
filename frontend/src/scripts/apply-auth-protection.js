@@ -358,20 +358,6 @@ function createUserProfileModal() {
                     <div class="user-profile-email" id="profileEmail"></div>
                 </div>
                 <div class="user-profile-body">
-                    <div class="user-profile-info">
-                        <h4><i class="fas fa-user"></i> Informações Pessoais</h4>
-                        <p id="profileCargo"></p>
-                        <p id="profileDepartamento"></p>
-                        <p id="profileTelefone"></p>
-                    </div>
-                    <div class="user-profile-info">
-                        <h4><i class="fas fa-calendar"></i> Data de Admissão</h4>
-                        <p id="profileDataAdmissao"></p>
-                    </div>
-                    <div class="user-profile-info">
-                        <h4><i class="fas fa-shield-alt"></i> Status</h4>
-                        <p id="profileStatus"></p>
-                    </div>
                     <div class="user-profile-actions">
                         <button class="user-profile-btn user-profile-btn-secondary" onclick="closeUserProfileModal()">
                             <i class="fas fa-times"></i>
@@ -414,11 +400,6 @@ function updateUserProfileModal(modal, user) {
     const avatar = modal.querySelector('#profileAvatar');
     const name = modal.querySelector('#profileName');
     const email = modal.querySelector('#profileEmail');
-    const cargo = modal.querySelector('#profileCargo');
-    const departamento = modal.querySelector('#profileDepartamento');
-    const telefone = modal.querySelector('#profileTelefone');
-    const dataAdmissao = modal.querySelector('#profileDataAdmissao');
-    const status = modal.querySelector('#profileStatus');
     
     // Avatar
     avatar.innerHTML = '';
@@ -437,24 +418,6 @@ function updateUserProfileModal(modal, user) {
     // Dados básicos
     name.textContent = user.nome || 'Usuário';
     email.textContent = user.email || 'Não informado';
-    
-    // Informações do colaborador
-    cargo.textContent = user.cargo ? `Cargo: ${user.cargo}` : 'Cargo: Não informado';
-    departamento.textContent = user.departamento ? `Departamento: ${user.departamento}` : 'Departamento: Não informado';
-    telefone.textContent = user.telefone ? `Telefone: ${user.telefone}` : 'Telefone: Não informado';
-    
-    // Data de admissão
-    if (user.data_admissao) {
-        const data = new Date(user.data_admissao);
-        dataAdmissao.textContent = data.toLocaleDateString('pt-BR');
-    } else {
-        dataAdmissao.textContent = 'Não informado';
-    }
-    
-    // Status
-    const statusText = user.status === 'ativo' ? 'Ativo' : 'Inativo';
-    const statusClass = user.status === 'ativo' ? 'color: #28a745; font-weight: 600;' : 'color: #dc3545; font-weight: 600;';
-    status.innerHTML = `<span style="${statusClass}">${statusText}</span>`;
 }
 
 // Função para fechar modal de perfil
