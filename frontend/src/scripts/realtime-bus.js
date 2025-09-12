@@ -19,15 +19,21 @@
   }
 
   function initClient() {
+    console.log('[realtime-bus] Inicializando cliente...');
+    console.log('[realtime-bus] REALTIME_CONFIG:', window.REALTIME_CONFIG);
+    
     if (!window.REALTIME_CONFIG || !window.REALTIME_CONFIG.url || !window.REALTIME_CONFIG.anonKey) {
-      console.warn('[realtime-bus] REALTIME_CONFIG ausente. Defina SUPABASE_URL e SUPABASE_ANON_KEY.');
+      console.error('[realtime-bus] REALTIME_CONFIG ausente. Defina SUPABASE_URL e SUPABASE_ANON_KEY.');
       return null;
     }
     if (!window.supabase || !window.supabase.createClient) {
-      console.warn('[realtime-bus] supabase-js não encontrado. Inclua a CDN antes deste script.');
+      console.error('[realtime-bus] supabase-js não encontrado. Inclua a CDN antes deste script.');
       return null;
     }
+    
+    console.log('[realtime-bus] Criando cliente Supabase...');
     state.supabase = window.supabase.createClient(window.REALTIME_CONFIG.url, window.REALTIME_CONFIG.anonKey);
+    console.log('[realtime-bus] Cliente criado:', state.supabase);
     return state.supabase;
   }
 
