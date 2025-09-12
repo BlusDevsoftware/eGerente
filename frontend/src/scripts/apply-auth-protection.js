@@ -363,7 +363,7 @@ function createUserProfileModal() {
                             <i class="fas fa-times"></i>
                             Fechar
                         </button>
-                        <button class="user-profile-btn user-profile-btn-primary" onclick="logout()">
+                        <button class="user-profile-btn user-profile-btn-primary" onclick="logoutFromProfile()">
                             <i class="fas fa-sign-out-alt"></i>
                             Sair
                         </button>
@@ -430,9 +430,22 @@ function closeUserProfileModal() {
     }
 }
 
+// Função para fazer logout a partir do modal de perfil
+function logoutFromProfile() {
+    // Fechar modal de perfil primeiro
+    closeUserProfileModal();
+    
+    // Aguardar um pouco para garantir que o modal fechou
+    setTimeout(() => {
+        // Abrir modal de logout
+        logout();
+    }, 100);
+}
+
 // Tornar funções globais
 window.showUserProfileModal = showUserProfileModal;
 window.closeUserProfileModal = closeUserProfileModal;
+window.logoutFromProfile = logoutFromProfile;
 
 applyAuthProtection();
 
