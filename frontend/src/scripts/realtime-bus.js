@@ -64,8 +64,16 @@
 
   window.realtimeBus = { subscribeTable, subscribeTables };
 
-  // Auto-subscribe padrões
-  subscribeTables(DEFAULT_TABLES);
+  // Auto-subscribe padrões quando DOM estiver pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[realtime-bus] DOM carregado, iniciando assinaturas...');
+      subscribeTables(DEFAULT_TABLES);
+    });
+  } else {
+    console.log('[realtime-bus] DOM já carregado, iniciando assinaturas...');
+    subscribeTables(DEFAULT_TABLES);
+  }
 })();
 
 

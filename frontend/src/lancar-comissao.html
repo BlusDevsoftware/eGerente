@@ -8,74 +8,9 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-      // Configuração inline para teste
-      window.SUPABASE_URL = 'https://hnxjjsiwptkybhwspmvd.supabase.co';
-      window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueGpqc2l3cHRreWJod3NwbXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NzM4MTUsImV4cCI6MjA2NDU0OTgxNX0.C85U2IAaA_OKH1_JCGBagWDQfaIG1FxH_zZupuV8HV4';
-      window.REALTIME_CONFIG = {
-        url: window.SUPABASE_URL,
-        anonKey: window.SUPABASE_ANON_KEY
-      };
-      console.log('[TESTE] Configuração carregada:', window.REALTIME_CONFIG);
-    </script>
-    <script>
-      // Realtime Bus inline para teste
-      (function realtimeBus(){
-        if (window.realtimeBus) return;
-        console.log('[TESTE] Inicializando realtime bus...');
-        
-        const DEFAULT_TABLES = ['movimento_comissoes','colaboradores','clientes','produtos','servicos'];
-        const state = { supabase: null, channels: new Map(), connected: false };
-        
-        function dispatch(name, detail) {
-          try { window.dispatchEvent(new CustomEvent(name, { detail })); } catch (e) { /* noop */ }
-        }
-        
-        function initClient() {
-          console.log('[TESTE] Inicializando cliente Supabase...');
-          if (!window.REALTIME_CONFIG || !window.REALTIME_CONFIG.url || !window.REALTIME_CONFIG.anonKey) {
-            console.error('[TESTE] REALTIME_CONFIG ausente');
-            return null;
-          }
-          if (!window.supabase || !window.supabase.createClient) {
-            console.error('[TESTE] supabase-js não encontrado');
-            return null;
-          }
-          
-          state.supabase = window.supabase.createClient(window.REALTIME_CONFIG.url, window.REALTIME_CONFIG.anonKey);
-          console.log('[TESTE] Cliente criado:', state.supabase);
-          return state.supabase;
-        }
-        
-        function subscribeTable(table) {
-          if (state.channels.has(table)) return state.channels.get(table);
-          if (!state.supabase && !initClient()) return null;
-          
-          console.log(`[TESTE] Assinando tabela: ${table}`);
-          const channel = state.supabase
-            .channel(`${table}-changes`)
-            .on('postgres_changes', { event: '*', schema: 'public', table }, (payload) => {
-              console.log(`[TESTE] Evento recebido para ${table}:`, payload);
-              dispatch(`db:${table}`, payload);
-            })
-            .subscribe((status) => {
-              console.log(`[TESTE] Status da conexão para ${table}:`, status);
-              state.connected = status === 'SUBSCRIBED';
-            });
-          
-          state.channels.set(table, channel);
-          return channel;
-        }
-        
-        function subscribeTables(tables) {
-          (tables || DEFAULT_TABLES).forEach(subscribeTable);
-        }
-        
-        window.realtimeBus = { subscribeTable, subscribeTables };
-        subscribeTables(DEFAULT_TABLES);
-        console.log('[TESTE] Realtime bus inicializado');
-      })();
-    </script>
+    <script src="scripts/config/realtime-config.js"></script>
+    <script src="scripts/realtime-bus.js"></script>
+    <script src="scripts/realtime-global.js"></script>
     <script src="scripts/auth-guard.js"></script>
     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>

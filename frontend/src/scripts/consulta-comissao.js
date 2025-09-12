@@ -1099,6 +1099,7 @@ class ConsultaComissao {
         };
         return classes[status.toLowerCase()] || 'pending';
     }
+
 }
 
 // Inicializar quando a página carregar
