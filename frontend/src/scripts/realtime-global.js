@@ -52,6 +52,16 @@
           console.error('[realtime-global] Erro ao atualizar dashboard:', e);
         }
       }
+      
+      // Se estiver na página de recebimento, recarregar dados
+      if (typeof carregarTitulos === 'function') {
+        console.log('[realtime-global] Atualizando página de recebimento...');
+        try {
+          await carregarTitulos();
+        } catch (e) {
+          console.error('[realtime-global] Erro ao atualizar recebimento:', e);
+        }
+      }
     });
     
     // Listener para colaboradores - atualiza selects e listas
