@@ -48,10 +48,25 @@
         console.log(`[realtime-bus] Evento recebido para ${table}:`, payload);
         dispatch(`db:${table}`, payload);
       })
-      .subscribe((status) => {
+      .subscribe((status, err) => {
         console.log(`[realtime-bus] Status da conexão para ${table}:`, status);
+        if (err) {
+          console.error(`[realtime-bus] Erro na conexão para ${table}:`, err);
+        }
+        
         state.connected = status === 'SUBSCRIBED';
-        dispatch('realtime:status', { connected: state.connected, table });
+        dispatch('realtime:status', { connected: state.connected, table, status, error: err });
+        
+        // Se houver erro, tentar reconectar após um delay
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.log(`[realtime-bus] Tentando reconectar ${table} em 5 segundos...`);
+          setTimeout(() => {
+            if (state.channels.has(table)) {
+              state.channels.delete(table);
+              subscribeTable(table);
+            }
+          }, 5000);
+        }
       });
 
     state.channels.set(table, channel);

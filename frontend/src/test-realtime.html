@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Realtime</title>
+</head>
+<body>
+    <h1>Teste de Conexão Realtime</h1>
+    <div id="status">Conectando...</div>
+    <div id="events"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/config/realtime-config.js"></script>
+    <script>
+        console.log('=== TESTE REALTIME ===');
+        console.log('REALTIME_CONFIG:', window.REALTIME_CONFIG);
+        
+        if (!window.REALTIME_CONFIG) {
+            document.getElementById('status').innerHTML = 'ERRO: REALTIME_CONFIG não encontrado';
+            document.getElementById('status').style.color = 'red';
+        } else {
+            const supabase = window.supabase.createClient(
+                window.REALTIME_CONFIG.url, 
+                window.REALTIME_CONFIG.anonKey
+            );
+            
+            console.log('Cliente Supabase criado:', supabase);
+            
+            // Testar conexão com uma tabela
+            const channel = supabase
+                .channel('test-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'colaboradores' }, 
+                    (payload) => {
+                        console.log('Evento recebido:', payload);
+                        document.getElementById('events').innerHTML += 
+                            '<div>Evento: ' + JSON.stringify(payload) + '</div>';
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('Status da conexão:', status);
+                    document.getElementById('status').innerHTML = 'Status: ' + status;
+                    
+                    if (status === 'SUBSCRIBED') {
+                        document.getElementById('status').style.color = 'green';
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        document.getElementById('status').style.color = 'red';
+                    } else {
+                        document.getElementById('status').style.color = 'orange';
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
