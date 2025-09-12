@@ -424,13 +424,9 @@ function updateUserProfileModal(modal, user) {
 function closeUserProfileModal() {
     const modal = document.getElementById('userProfileModal');
     if (modal) {
-        modal.classList.add('closing');
+        modal.style.display = 'none';
         modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-            modal.classList.remove('closing');
-            document.body.style.overflow = 'auto';
-        }, 300);
+        document.body.style.overflow = 'auto';
     }
 }
 

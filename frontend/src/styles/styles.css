@@ -2413,10 +2413,6 @@ tr:hover {
     animation: fadeIn 0.3s ease;
 }
 
-.user-profile-modal.closing {
-    animation: fadeOut 0.3s ease;
-}
-
 .user-profile-content {
     background: white;
     border-radius: 15px;
@@ -2427,10 +2423,6 @@ tr:hover {
     overflow-y: auto;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     animation: slideUp 0.3s ease;
-}
-
-.user-profile-modal.closing .user-profile-content {
-    animation: slideDown 0.3s ease;
 }
 
 .user-profile-header {
@@ -2572,11 +2564,6 @@ tr:hover {
     to { opacity: 1; }
 }
 
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -2585,17 +2572,6 @@ tr:hover {
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(30px);
     }
 }
 
