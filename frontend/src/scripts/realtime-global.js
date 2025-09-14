@@ -81,6 +81,13 @@
       // Atualizar selects de colaboradores
       updateSelects('colaborador', 'colaboradores');
       
+      // Forçar recarregamento da página de colaboradores se estiver aberta
+      if (window.location.pathname.includes('colaboradores.html')) {
+        console.log('[realtime-global] Recarregando página de colaboradores...');
+        window.location.reload();
+        return;
+      }
+      
       // Atualizar páginas que dependem de colaboradores
       if (typeof consultaComissao !== 'undefined' && consultaComissao) {
         try {
@@ -94,6 +101,15 @@
           console.error('[realtime-global] Erro ao atualizar colaboradores na consulta:', e);
         }
       }
+      
+      // Atualizar lançamento de comissão se estiver aberto
+      if (window.location.pathname.includes('lancar-comissao.html')) {
+        console.log('[realtime-global] Atualizando selects na página de lançamento...');
+        // Recarregar selects de colaboradores na página de lançamento
+        if (typeof carregarColaboradores === 'function') {
+          await carregarColaboradores();
+        }
+      }
     });
     
     // Listener para clientes - atualiza selects e listas
@@ -102,6 +118,13 @@
       
       // Atualizar selects de clientes
       updateSelects('cliente', 'clientes');
+      
+      // Forçar recarregamento da página de clientes se estiver aberta
+      if (window.location.pathname.includes('clientes.html')) {
+        console.log('[realtime-global] Recarregando página de clientes...');
+        window.location.reload();
+        return;
+      }
       
       // Atualizar páginas que dependem de clientes
       if (typeof consultaComissao !== 'undefined' && consultaComissao) {
@@ -113,6 +136,14 @@
           console.error('[realtime-global] Erro ao atualizar clientes na consulta:', e);
         }
       }
+      
+      // Atualizar lançamento de comissão se estiver aberto
+      if (window.location.pathname.includes('lancar-comissao.html')) {
+        console.log('[realtime-global] Atualizando selects na página de lançamento...');
+        if (typeof carregarClientes === 'function') {
+          await carregarClientes();
+        }
+      }
     });
     
     // Listener para produtos - atualiza selects e listas
@@ -121,6 +152,13 @@
       
       // Atualizar selects de produtos
       updateSelects('produto', 'produtos');
+      
+      // Forçar recarregamento da página de produtos se estiver aberta
+      if (window.location.pathname.includes('produtos.html')) {
+        console.log('[realtime-global] Recarregando página de produtos...');
+        window.location.reload();
+        return;
+      }
       
       // Atualizar páginas que dependem de produtos
       if (typeof consultaComissao !== 'undefined' && consultaComissao) {
@@ -132,6 +170,14 @@
           console.error('[realtime-global] Erro ao atualizar produtos na consulta:', e);
         }
       }
+      
+      // Atualizar lançamento de comissão se estiver aberto
+      if (window.location.pathname.includes('lancar-comissao.html')) {
+        console.log('[realtime-global] Atualizando selects na página de lançamento...');
+        if (typeof carregarProdutos === 'function') {
+          await carregarProdutos();
+        }
+      }
     });
     
     // Listener para serviços - atualiza selects e listas
@@ -141,6 +187,13 @@
       // Atualizar selects de serviços
       updateSelects('servico', 'servicos');
       
+      // Forçar recarregamento da página de serviços se estiver aberta
+      if (window.location.pathname.includes('servicos.html')) {
+        console.log('[realtime-global] Recarregando página de serviços...');
+        window.location.reload();
+        return;
+      }
+      
       // Atualizar páginas que dependem de serviços
       if (typeof consultaComissao !== 'undefined' && consultaComissao) {
         try {
@@ -149,6 +202,14 @@
           }
         } catch (e) {
           console.error('[realtime-global] Erro ao atualizar serviços na consulta:', e);
+        }
+      }
+      
+      // Atualizar lançamento de comissão se estiver aberto
+      if (window.location.pathname.includes('lancar-comissao.html')) {
+        console.log('[realtime-global] Atualizando selects na página de lançamento...');
+        if (typeof carregarServicos === 'function') {
+          await carregarServicos();
         }
       }
     });
