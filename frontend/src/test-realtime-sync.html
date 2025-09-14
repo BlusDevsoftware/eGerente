@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Sincronização Realtime</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        #events { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        .event { margin: 5px 0; padding: 5px; background: #f8f9fa; border-left: 3px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Teste de Sincronização Realtime</h1>
+    
+    <div id="status" class="status info">Inicializando...</div>
+    
+    <h2>📊 Status das Conexões</h2>
+    <div id="connections"></div>
+    
+    <h2>📝 Eventos Recebidos</h2>
+    <div id="events"></div>
+    
+    <h2>🧪 Testes</h2>
+    <button onclick="testConnection()">Testar Conexão</button>
+    <button onclick="clearEvents()">Limpar Eventos</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/config/realtime-config.js"></script>
+    <script src="scripts/realtime-bus.js"></script>
+    <script src="scripts/realtime-global.js"></script>
+    
+    <script>
+        let eventCount = 0;
+        const statusDiv = document.getElementById('status');
+        const connectionsDiv = document.getElementById('connections');
+        const eventsDiv = document.getElementById('events');
+        
+        function updateStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function addEvent(event) {
+            eventCount++;
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            eventDiv.innerHTML = `
+                <strong>#${eventCount}</strong> - ${new Date().toLocaleTimeString()}<br>
+                <strong>Tipo:</strong> ${event.type}<br>
+                <strong>Dados:</strong> <pre>${JSON.stringify(event.detail, null, 2)}</pre>
+            `;
+            eventsDiv.appendChild(eventDiv);
+            eventsDiv.scrollTop = eventsDiv.scrollHeight;
+        }
+        
+        function testConnection() {
+            updateStatus('Testando conexão...', 'info');
+            
+            if (!window.realtimeBus) {
+                updateStatus('❌ Realtime Bus não encontrado', 'error');
+                return;
+            }
+            
+            if (!window.realtimeBus.isConnected()) {
+                updateStatus('⚠️ Realtime não conectado', 'warning');
+                return;
+            }
+            
+            updateStatus('✅ Realtime conectado e funcionando', 'success');
+        }
+        
+        function clearEvents() {
+            eventsDiv.innerHTML = '';
+            eventCount = 0;
+        }
+        
+        // Listeners para eventos do Realtime
+        window.addEventListener('realtime:status', (ev) => {
+            const { connected, table, status } = ev.detail;
+            console.log(`Status ${table}: ${status} (conectado: ${connected})`);
+            
+            // Atualizar status das conexões
+            let existingDiv = document.getElementById(`conn-${table}`);
+            if (!existingDiv) {
+                existingDiv = document.createElement('div');
+                existingDiv.id = `conn-${table}`;
+                existingDiv.className = 'status';
+                connectionsDiv.appendChild(existingDiv);
+            }
+            
+            existingDiv.textContent = `${table}: ${status} ${connected ? '✅' : '❌'}`;
+            existingDiv.className = `status ${connected ? 'success' : 'error'}`;
+            
+            addEvent(ev);
+        });
+        
+        window.addEventListener('realtime:data', (ev) => {
+            console.log('Dados recebidos:', ev.detail);
+            addEvent(ev);
+        });
+        
+        window.addEventListener('realtime:error', (ev) => {
+            console.error('Erro no realtime:', ev.detail);
+            addEvent(ev);
+        });
+        
+        // Listeners para eventos de dados
+        ['movimento_comissoes', 'colaboradores', 'clientes', 'produtos', 'servicos'].forEach(table => {
+            window.addEventListener(`db:${table}`, (ev) => {
+                console.log(`Evento ${table}:`, ev.detail);
+                addEvent(ev);
+            });
+        });
+        
+        // Aguardar inicialização
+        setTimeout(() => {
+            if (window.realtimeBus) {
+                updateStatus('✅ Sistema de sincronização carregado', 'success');
+                testConnection();
+            } else {
+                updateStatus('❌ Erro ao carregar sistema de sincronização', 'error');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
