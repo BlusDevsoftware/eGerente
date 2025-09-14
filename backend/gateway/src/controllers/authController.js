@@ -17,7 +17,28 @@ async function login(req, res) {
             });
         }
 
-        // Buscar colaborador por email
+        // Buscar colaborador por email (primeiro verificar se existe)
+        const { data: colaboradorExists, error: existsError } = await supabase
+            .from('colaboradores')
+            .select('codigo, email, nome, status')
+            .eq('email', email)
+            .single();
+
+        if (existsError || !colaboradorExists) {
+            return res.status(401).json({
+                error: 'Credenciais inválidas'
+            });
+        }
+
+        // Verificar se o colaborador está ativo
+        if (colaboradorExists.status !== 'Ativo') {
+            return res.status(403).json({
+                error: 'Acesso negado: Colaborador inativo',
+                details: 'Entre em contato com o administrador para reativar sua conta'
+            });
+        }
+
+        // Buscar dados completos do colaborador ativo
         const { data: colaborador, error: colaboradorError } = await supabase
             .from('colaboradores')
             .select('codigo, email, nome, perfil, status, cargo, departamento, telefone, data_admissao, foto, senha, senha_temporaria')

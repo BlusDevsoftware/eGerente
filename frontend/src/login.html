@@ -318,7 +318,22 @@
                     setTimeout(() => { window.location.href = target; }, 250);
                 } else {
                     const errorData = await response.json();
-                    errorMessage.textContent = errorData.message || 'Credenciais inválidas';
+                    
+                    // Tratamento específico para colaborador inativo
+                    if (response.status === 403 && errorData.error && errorData.error.includes('inativo')) {
+                        errorMessage.innerHTML = `
+                            <i class="fas fa-user-slash"></i>
+                            <strong>Acesso Negado</strong><br>
+                            ${errorData.error}<br>
+                            <small>${errorData.details || 'Entre em contato com o administrador'}</small>
+                        `;
+                        errorMessage.style.background = '#f8d7da';
+                        errorMessage.style.borderColor = '#f5c6cb';
+                        errorMessage.style.color = '#721c24';
+                    } else {
+                        errorMessage.textContent = errorData.message || errorData.error || 'Credenciais inválidas';
+                    }
+                    
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
