@@ -81,10 +81,10 @@
       // Atualizar selects de colaboradores
       updateSelects('colaborador', 'colaboradores');
       
-      // Forçar recarregamento da página de colaboradores se estiver aberta
+      // Página de colaboradores - atualização seletiva (não recarrega)
       if (window.location.pathname.includes('colaboradores.html')) {
-        console.log('[realtime-global] Recarregando página de colaboradores...');
-        window.location.reload();
+        console.log('[realtime-global] Atualizando página de colaboradores seletivamente...');
+        await updateColaboradoresPage();
         return;
       }
       
@@ -119,10 +119,10 @@
       // Atualizar selects de clientes
       updateSelects('cliente', 'clientes');
       
-      // Forçar recarregamento da página de clientes se estiver aberta
+      // Página de clientes - atualização seletiva (não recarrega)
       if (window.location.pathname.includes('clientes.html')) {
-        console.log('[realtime-global] Recarregando página de clientes...');
-        window.location.reload();
+        console.log('[realtime-global] Atualizando página de clientes seletivamente...');
+        await updateClientesPage();
         return;
       }
       
@@ -153,10 +153,10 @@
       // Atualizar selects de produtos
       updateSelects('produto', 'produtos');
       
-      // Forçar recarregamento da página de produtos se estiver aberta
+      // Página de produtos - atualização seletiva (não recarrega)
       if (window.location.pathname.includes('produtos.html')) {
-        console.log('[realtime-global] Recarregando página de produtos...');
-        window.location.reload();
+        console.log('[realtime-global] Atualizando página de produtos seletivamente...');
+        await updateProdutosPage();
         return;
       }
       
@@ -187,10 +187,10 @@
       // Atualizar selects de serviços
       updateSelects('servico', 'servicos');
       
-      // Forçar recarregamento da página de serviços se estiver aberta
+      // Página de serviços - atualização seletiva (não recarrega)
       if (window.location.pathname.includes('servicos.html')) {
-        console.log('[realtime-global] Recarregando página de serviços...');
-        window.location.reload();
+        console.log('[realtime-global] Atualizando página de serviços seletivamente...');
+        await updateServicosPage();
         return;
       }
       
@@ -251,6 +251,83 @@
         }
       }
     });
+  }
+  
+  // Funções de atualização seletiva para páginas de cadastro
+  async function updateColaboradoresPage() {
+    console.log('[realtime-global] Atualizando página de colaboradores seletivamente...');
+    try {
+      // Recarregar dados dos colaboradores sem recarregar a página
+      if (typeof carregarColaboradores === 'function') {
+        await carregarColaboradores();
+        console.log('[realtime-global] ✅ Dados de colaboradores atualizados');
+      }
+      
+      // Atualizar tabela se existir
+      if (typeof renderizarTabelaColaboradores === 'function') {
+        renderizarTabelaColaboradores();
+        console.log('[realtime-global] ✅ Tabela de colaboradores atualizada');
+      }
+    } catch (e) {
+      console.error('[realtime-global] Erro ao atualizar página de colaboradores:', e);
+    }
+  }
+  
+  async function updateClientesPage() {
+    console.log('[realtime-global] Atualizando página de clientes seletivamente...');
+    try {
+      // Recarregar dados dos clientes sem recarregar a página
+      if (typeof carregarClientes === 'function') {
+        await carregarClientes();
+        console.log('[realtime-global] ✅ Dados de clientes atualizados');
+      }
+      
+      // Atualizar tabela se existir
+      if (typeof renderizarTabelaClientes === 'function') {
+        renderizarTabelaClientes();
+        console.log('[realtime-global] ✅ Tabela de clientes atualizada');
+      }
+    } catch (e) {
+      console.error('[realtime-global] Erro ao atualizar página de clientes:', e);
+    }
+  }
+  
+  async function updateProdutosPage() {
+    console.log('[realtime-global] Atualizando página de produtos seletivamente...');
+    try {
+      // Recarregar dados dos produtos sem recarregar a página
+      if (typeof carregarProdutos === 'function') {
+        await carregarProdutos();
+        console.log('[realtime-global] ✅ Dados de produtos atualizados');
+      }
+      
+      // Atualizar tabela se existir
+      if (typeof renderizarTabelaProdutos === 'function') {
+        renderizarTabelaProdutos();
+        console.log('[realtime-global] ✅ Tabela de produtos atualizada');
+      }
+    } catch (e) {
+      console.error('[realtime-global] Erro ao atualizar página de produtos:', e);
+    }
+  }
+  
+  async function updateServicosPage() {
+    console.log('[realtime-global] Atualizando página de serviços seletivamente...');
+    try {
+      // Recarregar dados dos serviços sem recarregar a página
+      if (typeof carregarServicos === 'function') {
+        await carregarServicos();
+        console.log('[realtime-global] ✅ Dados de serviços atualizados');
+      }
+      
+      // Atualizar tabela se existir
+      if (typeof renderizarTabelaServicos === 'function') {
+        renderizarTabelaServicos();
+        console.log('[realtime-global] ✅ Tabela de serviços atualizada');
+      }
+    } catch (e) {
+      console.error('[realtime-global] Erro ao atualizar página de serviços:', e);
+    }
   }
   
   // Inicializar quando DOM estiver pronto
