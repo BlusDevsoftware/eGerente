@@ -1705,20 +1705,21 @@
 
             let timeoutFormatMoeda = null;
             const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
+            // Entrada: não formata, apenas recalcula valores dependentes
             campoValorVenda.addEventListener('input', function(e) {
-                clearTimeout(timeoutFormatMoeda);
-                let valor = this.value.replace(/[^\d,]/g, '').replace(',', '.');
-                if (valor) {
-                    valor = parseFloat(valor);
-                    if (!isNaN(valor)) {
-                        timeoutFormatMoeda = setTimeout(() => {
-                            this.value = formatarMoedaBR(valor);
-                        }, 400);
-                    }
-                }
+                if (timeoutFormatMoeda) { clearTimeout(timeoutFormatMoeda); timeoutFormatMoeda = null; }
                 document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
                     calcularValorReceberUnico(input);
                 });
+            });
+            // Formatar apenas ao sair do campo, reduzindo erros durante a digitação
+            campoValorVenda.addEventListener('blur', function() {
+                let valor = this.value ? this.value.toString() : '';
+                valor = valor.replace(/[^\d,]/g, '').replace(',', '.');
+                const num = parseFloat(valor);
+                if (!isNaN(num)) {
+                    this.value = formatarMoedaBR(num);
+                }
             });
 
             const formUnico = document.getElementById('formUnico');
