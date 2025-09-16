@@ -441,6 +441,11 @@
             flex: 1 1 auto;
         }
 
+        /* Expandir tabela quando ocultar totalizadores */
+        .table-scroll.expanded {
+            max-height: 92vh;
+        }
+
         .table-scroll table {
             width: 100%;
             border-collapse: collapse;
@@ -677,7 +682,7 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="dashboard-cards">
+        <div class="dashboard-cards" id="dashboardCards">
             <div class="card clickable" id="cardTotalRecebido" onclick="filtrarPorCard('PAGO')">
                 <div class="card-header">
                     <h3>Total Recebido</h3>
@@ -800,6 +805,10 @@
                 <button class="btn-filter btn-secondary" onclick="alternarVisualizacao(this)" style="padding: 6px 12px; font-size: 0.85em;">
                     <i class="fas fa-list"></i>
                     Ver Tabela
+                </button>
+                <button id="toggleTotaisBtnReceb" class="btn-filter btn-secondary" style="padding: 6px 12px; font-size: 0.85em; border-color:#1976D2; color:#1976D2;">
+                    <i class="fas fa-chart-pie"></i>
+                    Ocultar totais
                 </button>
                 <select id="statusAgrupar" onchange="aplicarAgrupamento()" style="border: 1.5px solid #90caf9; border-radius: 8px; background: #f4faff; color: #1565c0; padding: 5px 10px; font-size: 0.85em;">
                     <option value="">Sem agrupamento</option>
@@ -1970,6 +1979,32 @@
                 ajustarBarraInferior();
                 sincronizarAlturaConteudo();
             }, 50);
+
+            // Botão para mostrar/ocultar totalizadores e expandir área de conteúdo
+            (function initToggleTotaisReceb(){
+                const btn = document.getElementById('toggleTotaisBtnReceb');
+                const cards = document.getElementById('dashboardCards');
+                const tableContainer = document.querySelector('.table-scroll');
+                const gridContainer = document.querySelector('.titulos-grid-container');
+                if (!btn || !cards) return;
+
+                let totaisVisiveis = true;
+                btn.addEventListener('click', function(){
+                    totaisVisiveis = !totaisVisiveis;
+                    if (totaisVisiveis) {
+                        cards.style.display = '';
+                        if (tableContainer) tableContainer.classList.remove('expanded');
+                        btn.innerHTML = '<i class="fas fa-chart-pie"></i> Ocultar totais';
+                    } else {
+                        cards.style.display = 'none';
+                        if (tableContainer) tableContainer.classList.add('expanded');
+                        btn.innerHTML = '<i class="fas fa-chart-pie"></i> Mostrar totais';
+                    }
+                    // Recalcular alturas após a alteração
+                    requestAnimationFrame(sincronizarAlturaConteudo);
+                    setTimeout(sincronizarAlturaConteudo, 60);
+                });
+            })();
         });
 
         // Atualizar dados a cada 5 minutos
