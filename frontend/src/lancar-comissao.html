@@ -1737,6 +1737,20 @@
                 const campoValorVenda = form.querySelector('input[name="valor_venda"]');
                 campoValorVenda.value = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
                 
+                // Validação: soma de percentuais dos colaboradores não pode exceder 100%
+                try {
+                    const blocos = Array.from(document.querySelectorAll('.colaborador-bloco'));
+                    const somaPercentuais = blocos.reduce((acc, bloco) => {
+                        const p = parseFloat((bloco.querySelector('input[name="percentual[]"]')?.value || '0').replace(',', '.')) || 0;
+                        return acc + p;
+                    }, 0);
+                    if (somaPercentuais > 100.0001) {
+                        if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                        alert('A soma dos percentuais dos colaboradores não pode ultrapassar 100%.');
+                        return;
+                    }
+                } catch(_) {}
+
                 // Validar se há pelo menos um colaborador
                 const colaboradores = document.querySelectorAll('.colaborador-bloco');
                 if (colaboradores.length === 0) {
@@ -1855,6 +1869,35 @@
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
                     return;
                 }
+
+                // Validação: por linha e por agrupamento (cliente + colaborador) a soma de % não pode exceder 100%
+                try {
+                    // 1) Cada linha individual deve ter percentual <= 100
+                    for (const linha of linhas) {
+                        const perc = parseFloat((linha.querySelector('input[name="percentual[]"]').value || '0').replace(',', '.')) || 0;
+                        if (perc > 100.0001) {
+                            if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                            alert('Há linha com percentual superior a 100%. Ajuste os valores.');
+                            return;
+                        }
+                    }
+                    // 2) Soma de percentuais por (cliente+colaborador)
+                    const somaPorGrupo = new Map();
+                    linhas.forEach(linha => {
+                        const cliente = (linha.querySelector('select[name="cliente[]"]').value || '').trim();
+                        const colaborador = (linha.querySelector('select[name="colaborador[]"]').value || '').trim();
+                        const key = `${cliente}::${colaborador}`;
+                        const perc = parseFloat((linha.querySelector('input[name="percentual[]"]').value || '0').replace(',', '.')) || 0;
+                        const atual = somaPorGrupo.get(key) || 0;
+                        somaPorGrupo.set(key, atual + perc);
+                    });
+                    const invalido = Array.from(somaPorGrupo.entries()).find(([, total]) => total > 100.0001);
+                    if (invalido) {
+                        if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                        alert('A soma dos percentuais por cliente/colaborador não pode ultrapassar 100%.');
+                        return;
+                    }
+                } catch(_) {}
 
                 // Buscar o último numero_titulo existente GLOBAL
                 let ultimoNumero = 0;
