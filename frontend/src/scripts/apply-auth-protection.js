@@ -3,8 +3,22 @@
 function applyAuthProtection() {
     const originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
-        if (window.authGuard && window.authGuard.getToken()) {
-            options.headers = { ...options.headers, ...window.authGuard.getAuthHeaders() };
+        try {
+            const u = typeof url === 'string' ? new URL(url, window.location.origin) : url;
+            const isSupabase = typeof u === 'object' && /supabase\.co$/i.test(u.hostname);
+            const hasAuthHeader = !!(options && options.headers && (options.headers.Authorization || options.headers.authorization));
+
+            // Não injeta Authorization do app em chamadas ao Supabase
+            if (!isSupabase && !hasAuthHeader && window.authGuard && window.authGuard.getToken) {
+                const headersFromAuth = window.authGuard.getAuthHeaders ? window.authGuard.getAuthHeaders() : {};
+                options.headers = { ...options.headers, ...headersFromAuth };
+            }
+        } catch (_) {
+            // Se a URL não puder ser analisada, aplica header apenas se ainda não houver Authorization
+            if (!options?.headers?.Authorization && !options?.headers?.authorization && window.authGuard && window.authGuard.getToken) {
+                const headersFromAuth = window.authGuard.getAuthHeaders ? window.authGuard.getAuthHeaders() : {};
+                options.headers = { ...options.headers, ...headersFromAuth };
+            }
         }
         return originalFetch(url, options);
     };
