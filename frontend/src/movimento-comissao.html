@@ -26,6 +26,10 @@
             margin-bottom: 16px;
             padding-bottom: 24px;
         }
+        /* Expandir tabela quando ocultar totalizadores */
+        .table-scroll.expanded {
+            max-height: 92vh;
+        }
         .table-scroll table {
             width: 100%;
             border-collapse: collapse;
@@ -724,7 +728,7 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="dashboard-cards">
+        <div class="dashboard-cards" id="dashboardCards">
             <div class="card">
                 <div class="card-header">
                     <h3>Total Comissões</h3>
@@ -824,6 +828,9 @@
                 <button class="btn-aglutinar" style="background: #ff9800; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;">Aglutinar Títulos</button>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="toggleTotaisBtn" title="Mostrar/ocultar totais" style="background:#e3f2fd; color:#1976D2; border:1.5px solid #1976D2; border-radius:6px; padding:8px 14px; font-weight:600; cursor:pointer;">
+                    Ocultar totais
+                </button>
                 <span style="font-weight: 600; color: #1976D2;">Exibir</span>
                 <select id="selectPorPagina" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid #2196F3; color: #1976D2; font-weight: 600; font-size: 1em; outline: none;">
                     <option value="10">10</option>
@@ -2692,6 +2699,30 @@
             atualizarTabelaComFiltros();
         });
         window.addEventListener('DOMContentLoaded', carregarComissoes);
+
+        // Botão para ocultar/mostrar cards totalizadores e expandir tabela
+        (function initToggleTotais(){
+            const btn = document.getElementById('toggleTotaisBtn');
+            const cards = document.getElementById('dashboardCards');
+            const tableScroll = document.querySelector('.table-scroll');
+            if (!btn || !cards || !tableScroll) return;
+
+            // Estado inicial: cards visíveis
+            let totaisVisiveis = true;
+
+            btn.addEventListener('click', function(){
+                totaisVisiveis = !totaisVisiveis;
+                if (totaisVisiveis) {
+                    cards.style.display = '';
+                    tableScroll.classList.remove('expanded');
+                    btn.textContent = 'Ocultar totais';
+                } else {
+                    cards.style.display = 'none';
+                    tableScroll.classList.add('expanded');
+                    btn.textContent = 'Mostrar totais';
+                }
+            });
+        })();
 
 
         // Variáveis globais para os modais (não duplicar - estão no arquivo modais-movimento.html)
