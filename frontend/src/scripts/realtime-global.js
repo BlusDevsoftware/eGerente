@@ -4,6 +4,80 @@
   
   let isInitialized = false;
   
+  // Centro simples de notificações (badge no sino + toast)
+  const NotificationCenter = (function(){
+    function getCurrentUser(){
+      try { return window.authGuard?.getCurrentUser?.(); } catch(_) { return null; }
+    }
+    function storageKey(){
+      const user = getCurrentUser();
+      return user ? `notifications:${user.codigo}` : null;
+    }
+    function readList(){
+      try {
+        const key = storageKey();
+        if (!key) return [];
+        return JSON.parse(localStorage.getItem(key) || '[]');
+      } catch(_) { return []; }
+    }
+    function writeList(list){
+      const key = storageKey();
+      if (!key) return;
+      try { localStorage.setItem(key, JSON.stringify(list)); } catch(_) {}
+      updateBadge();
+    }
+    function add(notification){
+      const list = readList();
+      list.unshift({ id: Date.now(), read: false, createdAt: new Date().toISOString(), ...notification });
+      writeList(list);
+      showToast(notification);
+    }
+    function countUnread(){ return readList().filter(n => !n.read).length; }
+    function updateBadge(){
+      const badge = document.querySelector('.notifications .badge');
+      if (!badge) return;
+      const c = countUnread();
+      badge.textContent = String(c);
+      badge.style.display = c > 0 ? '' : 'none';
+    }
+    function markAllRead(){
+      const list = readList().map(n => ({ ...n, read: true }));
+      writeList(list);
+    }
+    function showToast(n){
+      try {
+        const containerId = 'notification-toast-container';
+        let container = document.getElementById(containerId);
+        if (!container) {
+          container = document.createElement('div');
+          container.id = containerId;
+          container.style.position = 'fixed';
+          container.style.bottom = '20px';
+          container.style.right = '20px';
+          container.style.zIndex = '5000';
+          container.style.display = 'flex';
+          container.style.flexDirection = 'column';
+          container.style.gap = '8px';
+          document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.style.cssText = 'background:#fff;border:1px solid #e3f2fd;border-radius:10px;box-shadow:0 4px 16px rgba(33,150,243,0.15);padding:10px 12px;min-width:240px;max-width:360px;display:flex;gap:8px;align-items:flex-start;';
+        toast.innerHTML = `
+          <i class="fas fa-bell" style="color:#1976D2;margin-top:2px;"></i>
+          <div style="flex:1;">
+            <div style="font-weight:700;color:#1976D2;font-size:0.95em;">${n.title || 'Notificação'}</div>
+            <div style="color:#333;font-size:0.9em;">${n.message || ''}</div>
+          </div>
+          <button title="Fechar" style="background:none;border:none;color:#666;cursor:pointer;font-size:1.1em;">&times;</button>
+        `;
+        toast.querySelector('button[title="Fechar"]').onclick = () => toast.remove();
+        container.appendChild(toast);
+        setTimeout(() => { try { toast.remove(); } catch(_) {} }, 5000);
+      } catch(_) {}
+    }
+    return { add, updateBadge, markAllRead };
+  })();
+  
   function waitForRealtime() {
     if (window.realtimeBus) {
       console.log('[realtime-global] Realtime bus encontrado, configurando listeners...');
@@ -23,6 +97,22 @@
     // Listener para movimento_comissoes - atualiza páginas que exibem comissões
     window.addEventListener('db:movimento_comissoes', async (ev) => {
       console.log('[realtime-global] Evento movimento_comissoes recebido:', ev.detail);
+      try {
+        const payload = ev.detail || {};
+        const eventType = payload.eventType || payload.type || payload.action;
+        const dataNew = payload.new || payload.record || (payload.data && payload.data.new) || null;
+        const currentUser = window.authGuard?.getCurrentUser?.();
+        if (eventType === 'INSERT' && dataNew && currentUser && String(dataNew.colaborador_id) === String(currentUser.codigo)) {
+          NotificationCenter.add({
+            type: 'titulo_lancado',
+            title: 'Novo título lançado',
+            message: `Título ${dataNew.numero_titulo || ''} disponível para você.`,
+            data: { id: dataNew.id, numero_titulo: dataNew.numero_titulo }
+          });
+        }
+      } catch (e) {
+        console.warn('[realtime-global] Falha ao processar notificação de novo título:', e);
+      }
       
       // Atualizar página de consulta de comissões
       if (typeof consultaComissao !== 'undefined' && consultaComissao) {
@@ -74,7 +164,7 @@
       }
     });
     
-    // Listener para colaboradores - atualiza selects e listas
+    // Listener para colaboradores - atualiza selects e listas 
     window.addEventListener('db:colaboradores', async (ev) => {
       console.log('[realtime-global] Evento colaboradores recebido:', ev.detail);
       
@@ -333,7 +423,9 @@
   // Inicializar quando DOM estiver pronto
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', waitForRealtime);
+    document.addEventListener('DOMContentLoaded', () => { try { NotificationCenter.updateBadge(); } catch(_) {} });
   } else {
     waitForRealtime();
+    try { NotificationCenter.updateBadge(); } catch(_) {}
   }
 })();
