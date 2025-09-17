@@ -1537,12 +1537,8 @@
 
             function calcularValorReceberUnico(input) {
                 const bloco = input.closest('.colaborador-bloco');
-                // Sanitiza e limita a 2 casas decimais e faixa 0..100, respeitando o restante disponível
-                const todosPercentuais = Array.from(document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]'));
-                const somaOutros = todosPercentuais
-                    .filter(el => el !== input)
-                    .reduce((acc, el) => acc + (parseFloat((el.value || '0').replace(',', '.')) || 0), 0);
-                const maxPermitido = Math.max(0, 100 - somaOutros);
+                // Sanitiza e limita a 2 casas decimais e faixa 0..100 por campo
+                const maxPermitido = 100;
                 let raw = (input.value || '').replace(/[^\d,\.]/g, '');
                 // Converte todos pontos para vírgula (teclado numérico/EN)
                 raw = raw.replace(/\./g, ',');
