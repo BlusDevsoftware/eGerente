@@ -1788,6 +1788,14 @@
                 // Formatar valor da venda antes de salvar
                 const campoValorVenda = form.querySelector('input[name="valor_venda"]');
                 campoValorVenda.value = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
+                // Bloquear se valor da venda for 0 ou inválido
+                const valorVendaNumber = parseFloat(campoValorVenda.value);
+                if (!valorVendaNumber || valorVendaNumber <= 0) {
+                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                    alert('Informe um Valor da Venda válido (maior que 0).');
+                    try { form.querySelector('input[name="valor_venda"]').focus(); } catch(_) {}
+                    return;
+                }
                 
                 // Validação: soma de percentuais dos colaboradores não pode exceder 100%
                 try {
@@ -1920,6 +1928,17 @@
                     alert('Adicione pelo menos uma linha antes de salvar.');
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
                     return;
+                }
+                // Bloquear se alguma linha tiver Valor Venda inválido/0
+                for (const linha of linhas) {
+                    const vv = linha.querySelector('input[name="valor_venda[]"]');
+                    const num = parseFloat((vv && vv.value) ? vv.value : '0');
+                    if (!num || num <= 0) {
+                        if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                        alert('Há linha com Valor da Venda inválido (deve ser > 0).');
+                        try { vv && vv.focus(); } catch(_) {}
+                        return;
+                    }
                 }
 
                 // Validação: por linha e por agrupamento (cliente + colaborador) a soma de % não pode exceder 100%
