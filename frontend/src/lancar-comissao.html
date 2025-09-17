@@ -1791,11 +1791,9 @@
                 const form = event.target;
                 const formData = new FormData(form);
                 
-                // Formatar valor da venda antes de salvar 
+                // Validar Valor da Venda sem alterar o campo exibido
                 const campoValorVenda = form.querySelector('input[name="valor_venda"]');
-                campoValorVenda.value = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
-                // Bloquear se valor da venda for 0 ou inválido
-                const valorVendaNumber = parseFloat(campoValorVenda.value);
+                const valorVendaNumber = extrairNumeroBR(campoValorVenda.value);
                 if (!valorVendaNumber || valorVendaNumber <= 0) {
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
                     if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Informe um Valor da Venda válido (maior que 0).');
@@ -1895,7 +1893,7 @@
                                 colaborador_id: colaboradorSelect.value,
                                 item_id: item_id,
                                 tipo: formData.get('tipo'),
-                                valor_venda: parseFloat(formData.get('valor_venda').replace(/[^\d,]/g, '').replace(',', '.')),
+                                valor_venda: extrairNumeroBR(formData.get('valor_venda')),
                                 percentual_comissao: parseFloat(percentualInput.value),
                                 valor: parseFloat(valorReceberInput.value) / qtdParcelas,
                                 data_geracao: dataGeracao,
