@@ -980,6 +980,13 @@
           document.getElementById('modalSuccess').style.display = 'flex';
           document.getElementById('modalSuccessMsg').textContent = msg || 'Títulos gerados com sucesso!';
         }
+        function mostrarModalFeedbackAviso(msg) {
+          const modal = document.getElementById('modalFeedback');
+          document.getElementById('modalLoading').style.display = 'none';
+          document.getElementById('modalSuccess').style.display = 'flex';
+          document.getElementById('modalSuccessMsg').textContent = msg || 'Atenção';
+          modal.style.display = 'flex';
+        }
         function fecharModalFeedback() {
           document.getElementById('modalFeedback').style.display = 'none';
         }
@@ -1791,7 +1798,7 @@
                 const valorVendaNumber = parseFloat(campoValorVenda.value);
                 if (!valorVendaNumber || valorVendaNumber <= 0) {
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
-                    alert('Informe um Valor da Venda válido (maior que 0).');
+                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Informe um Valor da Venda válido (maior que 0).');
                     try { form.querySelector('input[name="valor_venda"]').focus(); } catch(_) {}
                     return;
                 }
@@ -1802,7 +1809,7 @@
                 const todosVencPreenchidos = vencimentos.length > 0 && vencimentos.every(inp => inp.value && inp.value.trim() !== '');
                 if (!foiSimulado || !todosVencPreenchidos) {
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
-                    alert('Simule os títulos e informe as datas de vencimento antes de salvar.');
+                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Simule os títulos e informe as datas de vencimento antes de salvar.');
                     try { document.querySelector('.simulacao-titulos').scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
                     return;
                 }
