@@ -1385,8 +1385,10 @@
                 const tr = input.closest('tr');
                 const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
                 const percEl = tr.querySelector('input[name="percentual[]"]');
-                // Sanitiza e limita a 2 casas decimais e faixa 0..100
-                let raw = (percEl.value || '').replace(/[^\d,]/g, '');
+                // Sanitiza: aceita ponto e converte para vírgula; limita a 2 casas e 0..100
+                let raw = (percEl.value || '').replace(/[^\d,\.]/g, '');
+                // Converte todos pontos para vírgula (teclado numérico/EN)
+                raw = raw.replace(/\./g, ',');
                 const firstComma = raw.indexOf(',');
                 if (firstComma !== -1) {
                     const intPart = raw.slice(0, firstComma).replace(/,/g, '');
@@ -1537,8 +1539,9 @@
                     .filter(el => el !== input)
                     .reduce((acc, el) => acc + (parseFloat((el.value || '0').replace(',', '.')) || 0), 0);
                 const maxPermitido = Math.max(0, 100 - somaOutros);
-
-                let raw = (input.value || '').replace(/[^\d,]/g, '');
+                let raw = (input.value || '').replace(/[^\d,\.]/g, '');
+                // Converte todos pontos para vírgula (teclado numérico/EN)
+                raw = raw.replace(/\./g, ',');
                 const firstComma = raw.indexOf(',');
                 if (firstComma !== -1) {
                     const intPart = raw.slice(0, firstComma).replace(/,/g, '');
