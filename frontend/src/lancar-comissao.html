@@ -1391,13 +1391,17 @@
                 raw = raw.replace(/\./g, ',');
                 const firstComma = raw.indexOf(',');
                 if (firstComma !== -1) {
-                    const intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    let intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    if (intPart === '') intPart = '0';
                     let decPart = raw.slice(firstComma + 1).replace(/,/g, '');
                     decPart = decPart.slice(0, 2);
-                    raw = intPart + (decPart.length ? (',' + decPart) : '');
+                    raw = intPart + (decPart.length ? (',' + decPart) : ',');
                 } else {
                     raw = raw.replace(/,/g, '');
                 }
+                // Se inteiro excede 100, força 100
+                const rawInt = raw.split(',')[0];
+                if (rawInt && parseInt(rawInt, 10) > 100) raw = '100';
                 percEl.value = raw;
                 let percentual = parseFloat(raw.replace(',', '.'));
                 if (isNaN(percentual)) percentual = 0;
@@ -1544,13 +1548,17 @@
                 raw = raw.replace(/\./g, ',');
                 const firstComma = raw.indexOf(',');
                 if (firstComma !== -1) {
-                    const intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    let intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    if (intPart === '') intPart = '0';
                     let decPart = raw.slice(firstComma + 1).replace(/,/g, '');
                     decPart = decPart.slice(0, 2);
-                    raw = intPart + (decPart.length ? (',' + decPart) : '');
+                    raw = intPart + (decPart.length ? (',' + decPart) : ',');
                 } else {
                     raw = raw.replace(/,/g, '');
                 }
+                // Se inteiro excede 100, força 100
+                const rawInt = raw.split(',')[0];
+                if (rawInt && parseInt(rawInt, 10) > 100) raw = '100';
                 let p = parseFloat(raw.replace(',', '.'));
                 if (isNaN(p)) p = 0;
                 const used = Math.min(maxPermitido, Math.max(0, p));
