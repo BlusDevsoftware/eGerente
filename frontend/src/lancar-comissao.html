@@ -1128,7 +1128,7 @@
                     <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
                     <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" pattern="^\d+(,\d{0,2})?$" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
                     <td class="acao-multiplos">
                         <div class="acoes-multiplos-wrapper">
@@ -1489,7 +1489,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-percent"></i> % Comissão</label>
-                            <input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" pattern="^\d+(,\d{0,2})?$" oninput="calcularValorReceberUnico(this)">
+                            <input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" oninput="calcularValorReceberUnico(this)">
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-coins"></i> Valor a Receber</label>
