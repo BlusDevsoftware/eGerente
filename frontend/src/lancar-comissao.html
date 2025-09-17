@@ -1483,7 +1483,7 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-percent"></i> % Comissão</label>
-                            <input type="number" name="percentual[]" step="0.01" min="0" max="100" required oninput="calcularValorReceberUnico(this)">
+                            <input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" oninput="calcularValorReceberUnico(this)">
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-coins"></i> Valor a Receber</label>
@@ -1531,12 +1531,37 @@
 
             function calcularValorReceberUnico(input) {
                 const bloco = input.closest('.colaborador-bloco');
-                const percentual = parseFloat(input.value) || 0;
+                // Sanitiza e limita a 2 casas decimais e faixa 0..100, respeitando o restante disponível
+                const todosPercentuais = Array.from(document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]'));
+                const somaOutros = todosPercentuais
+                    .filter(el => el !== input)
+                    .reduce((acc, el) => acc + (parseFloat((el.value || '0').replace(',', '.')) || 0), 0);
+                const maxPermitido = Math.max(0, 100 - somaOutros);
+
+                let raw = (input.value || '').replace(/[^\d,]/g, '');
+                const firstComma = raw.indexOf(',');
+                if (firstComma !== -1) {
+                    const intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    let decPart = raw.slice(firstComma + 1).replace(/,/g, '');
+                    decPart = decPart.slice(0, 2);
+                    raw = intPart + (decPart.length ? (',' + decPart) : '');
+                } else {
+                    raw = raw.replace(/,/g, '');
+                }
+                let p = parseFloat(raw.replace(',', '.'));
+                if (isNaN(p)) p = 0;
+                const used = Math.min(maxPermitido, Math.max(0, p));
+                if (used !== p) {
+                    input.value = String(Math.round(used * 100) / 100).replace('.', ',');
+                } else {
+                    input.value = raw;
+                }
+
                 const form = document.getElementById('formUnico');
                 const campoValorVenda = form.querySelector('input[name="valor_venda"]');
                 const valorVenda = extrairNumeroBR(campoValorVenda.value);
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
-                valorReceber.value = (valorVenda * percentual / 100).toFixed(2);
+                valorReceber.value = (valorVenda * used / 100).toFixed(2);
             }
 
             function toggleParcelado(btn) {
