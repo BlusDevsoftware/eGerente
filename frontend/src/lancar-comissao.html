@@ -1018,14 +1018,32 @@
                 }
             }
 
+            function getItemPrimaryId(item) {
+                const id = (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico));
+                return id !== undefined && id !== null ? String(id) : '';
+            }
+            function getItemName(item) {
+                return (item && (item.nome ?? item.descricao ?? item.nome_servico ?? item.nomeProduto ?? item.nomeServico)) || 'Item';
+            }
+            function getItemPrice(item) {
+                const price = (item && (item.preco ?? item.valor ?? item.preco_venda ?? item.precoServico ?? item.preco_servico));
+                return Number(price) || 0;
+            }
+
             function preencherItens(tipo) {
                 choicesItem.enable();
-                let lista = tipo === 'produto' ? produtos : servicos;
-                const choices = lista.map(item => ({
-                    value: item.codigo,
-                    label: `${item.codigo.padStart(5, '0')} - ${item.nome}`,
-                    customProperties: { preco: item.preco || 0 }
-                }));
+                const lista = tipo === 'produto' ? produtos : servicos;
+                const choices = lista.map(item => {
+                    const id = getItemPrimaryId(item);
+                    const name = getItemName(item);
+                    const codigoStr = String(item && (item.codigo ?? item.id ?? ''));
+                    const codigoPadded = codigoStr ? codigoStr.padStart(5, '0') : '';
+                    return {
+                        value: id,
+                        label: `${codigoPadded}${codigoPadded ? ' - ' : ''}${name}`,
+                        customProperties: { preco: getItemPrice(item) }
+                    };
+                });
                 choicesItem.setChoices(choices, 'value', 'label', true);
             }
             
@@ -1040,9 +1058,9 @@
                 const valoresSelecionados = choicesItem.getValue(true);
                 const todosItens = [...produtos, ...servicos];
                 valoresSelecionados.forEach(val => {
-                    const item = todosItens.find(i => i.codigo === val);
+                    const item = todosItens.find(i => getItemPrimaryId(i) === String(val));
                     if (item) {
-                        soma += Number(item.preco) || 0;
+                        soma += getItemPrice(item);
                     }
                 });
                 const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
@@ -1576,6 +1594,13 @@
                 const valorVenda = extrairNumeroBR(campoValorVenda.value);
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
                 valorReceber.value = (valorVenda * used / 100).toFixed(2);
+                
+                // Invalidar simulação do bloco se percentual foi alterado após simulação
+                if (bloco && bloco.dataset.simulado === 'true') {
+                    bloco.dataset.simulado = 'false';
+                    const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
+                    if (simulacaoDiv) simulacaoDiv.style.display = 'none';
+                }
             }
 
             function toggleParcelado(btn) {
@@ -1647,9 +1672,8 @@
                 }
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
-                // Marca formulário como simulado
-                const formUnicoEl = document.getElementById('formUnico');
-                if (formUnicoEl) formUnicoEl.dataset.simulado = 'true';
+                // Marca bloco como simulado
+                if (bloco) bloco.dataset.simulado = 'true';
                 // Restaurar eventos para intervalo e datas
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
@@ -1801,15 +1825,21 @@
                     return;
                 }
 
-                // Exigir simulação e datas de vencimento preenchidas
-                const foiSimulado = form.dataset.simulado === 'true';
-                const vencimentos = Array.from(document.querySelectorAll('.simulacao-tabela .simulacao-vencimento-parcela'));
-                const todosVencPreenchidos = vencimentos.length > 0 && vencimentos.every(inp => inp.value && inp.value.trim() !== '');
-                if (!foiSimulado || !todosVencPreenchidos) {
-                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
-                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Simule os títulos e informe as datas de vencimento antes de salvar.');
-                    try { document.querySelector('.simulacao-titulos').scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
-                    return;
+                // Exigir simulação e datas de vencimento preenchidas por bloco
+                const blocosUnico = Array.from(document.querySelectorAll('.colaborador-bloco'));
+                for (const bloco of blocosUnico) {
+                    const simulado = bloco.dataset.simulado === 'true';
+                    const vencimentosBloco = Array.from(bloco.querySelectorAll('.simulacao-tabela .simulacao-vencimento-parcela'));
+                    const vencOk = vencimentosBloco.length > 0 && vencimentosBloco.every(inp => inp.value && inp.value.trim() !== '');
+                    if (!simulado || !vencOk) {
+                        if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                        const msg = !simulado ?
+                            'Simule os títulos deste colaborador e informe as datas de vencimento antes de salvar.' :
+                            'Após alterar o percentual deste colaborador, é necessário simular novamente os títulos.';
+                        if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso(msg);
+                        try { (bloco.querySelector('.simulacao-titulos') || document.querySelector('.simulacao-titulos')).scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
+                        return;
+                    }
                 }
                 
                 // Validação: soma de percentuais dos colaboradores não pode exceder 100%
