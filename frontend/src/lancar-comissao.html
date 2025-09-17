@@ -1640,6 +1640,9 @@
                 }
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
+                // Marca formulário como simulado
+                const formUnicoEl = document.getElementById('formUnico');
+                if (formUnicoEl) formUnicoEl.dataset.simulado = 'true';
                 // Restaurar eventos para intervalo e datas
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
                 const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
@@ -1781,7 +1784,7 @@
                 const form = event.target;
                 const formData = new FormData(form);
                 
-                // Formatar valor da venda antes de salvar
+                // Formatar valor da venda antes de salvar 
                 const campoValorVenda = form.querySelector('input[name="valor_venda"]');
                 campoValorVenda.value = campoValorVenda.value.replace(/[^\d,]/g, '').replace(',', '.');
                 // Bloquear se valor da venda for 0 ou inválido
@@ -1790,6 +1793,17 @@
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
                     alert('Informe um Valor da Venda válido (maior que 0).');
                     try { form.querySelector('input[name="valor_venda"]').focus(); } catch(_) {}
+                    return;
+                }
+
+                // Exigir simulação e datas de vencimento preenchidas
+                const foiSimulado = form.dataset.simulado === 'true';
+                const vencimentos = Array.from(document.querySelectorAll('.simulacao-tabela .simulacao-vencimento-parcela'));
+                const todosVencPreenchidos = vencimentos.length > 0 && vencimentos.every(inp => inp.value && inp.value.trim() !== '');
+                if (!foiSimulado || !todosVencPreenchidos) {
+                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                    alert('Simule os títulos e informe as datas de vencimento antes de salvar.');
+                    try { document.querySelector('.simulacao-titulos').scrollIntoView({behavior:'smooth', block:'center'}); } catch(_) {}
                     return;
                 }
                 
