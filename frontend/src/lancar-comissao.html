@@ -1128,7 +1128,7 @@
                     <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
                     <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="number" name="percentual[]" step="0.01" min="0" max="100" required placeholder="0.00" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
+                    <td><input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
                     <td class="acao-multiplos">
                         <div class="acoes-multiplos-wrapper">
@@ -1384,13 +1384,28 @@
             function calcularComissaoMultiplo(input, idx) {
                 const tr = input.closest('tr');
                 const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
-                const percentual = parseFloat(tr.querySelector('input[name="percentual[]"]').value) || 0;
+                const percEl = tr.querySelector('input[name="percentual[]"]');
+                // Sanitiza e limita a 2 casas decimais e faixa 0..100
+                let raw = (percEl.value || '').replace(/[^\d,]/g, '');
+                const firstComma = raw.indexOf(',');
+                if (firstComma !== -1) {
+                    const intPart = raw.slice(0, firstComma).replace(/,/g, '');
+                    let decPart = raw.slice(firstComma + 1).replace(/,/g, '');
+                    decPart = decPart.slice(0, 2);
+                    raw = intPart + (decPart.length ? (',' + decPart) : '');
+                } else {
+                    raw = raw.replace(/,/g, '');
+                }
+                percEl.value = raw;
+                let percentual = parseFloat(raw.replace(',', '.'));
+                if (isNaN(percentual)) percentual = 0;
+                const used = Math.min(100, Math.max(0, percentual));
+                if (used !== percentual) {
+                    percEl.value = String(Math.round(used * 100) / 100).replace('.', ',');
+                }
                 const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
-                
-                const valorComissao = (valorVenda * percentual / 100);
+                const valorComissao = (valorVenda * used / 100);
                 valorComissaoInput.value = valorComissao.toFixed(2);
-                
-                // Atualizar resumo
                 atualizarResumoMultiplo();
             }
             
