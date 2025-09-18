@@ -371,6 +371,7 @@
                 margin-bottom: 16px;
                 max-height: calc(100vh - 300px); /* Altura máxima para ocupar toda a tela */
                 overflow-y: auto;
+                position: relative; /* Criar contexto de empilhamento */
             }
             .table-multiplos table {
                 width: 100%;
@@ -860,11 +861,8 @@
             
             /* Fix z-index for Choices dropdowns */
             .table-multiplos .choices__list--dropdown {
-                z-index: 9999 !important;
-                position: absolute !important;
-                top: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
+                z-index: 99999 !important;
+                position: fixed !important;
                 background: #fff !important;
                 border: 1px solid #ddd !important;
                 border-radius: 4px !important;
@@ -873,7 +871,11 @@
                 overflow-y: auto !important;
             }
             .table-multiplos .choices.is-open {
-                z-index: 9999 !important;
+                z-index: 99999 !important;
+            }
+            .table-multiplos .choices {
+                position: relative !important;
+                z-index: 1 !important;
             }
             
             /* Responsividade para telas menores */
