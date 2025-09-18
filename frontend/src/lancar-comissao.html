@@ -211,10 +211,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="form-actions">
-                        <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar Todos</button>
-                    </div>
                 </form>
             </div>
         </div>
@@ -240,6 +236,9 @@
                 </button>
                 <button type="button" class="btn-secondary" onclick="limparTodasLinhas()" style="padding: 6px 12px; font-size: 0.85em;">
                     <i class="fas fa-trash-alt"></i> Limpar Todas
+                </button>
+                <button type="reset" form="formMultiplo" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-times"></i> Cancelar
                 </button>
                 <button type="submit" form="formMultiplo" class="btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
                     <i class="fas fa-save"></i> Salvar Todos
@@ -857,6 +856,24 @@
                 text-overflow: ellipsis !important;
                 max-width: 100% !important;
                 display: block !important;
+            }
+            
+            /* Fix z-index for Choices dropdowns */
+            .table-multiplos .choices__list--dropdown {
+                z-index: 9999 !important;
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: #fff !important;
+                border: 1px solid #ddd !important;
+                border-radius: 4px !important;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+                max-height: 200px !important;
+                overflow-y: auto !important;
+            }
+            .table-multiplos .choices.is-open {
+                z-index: 9999 !important;
             }
             
             /* Responsividade para telas menores */
