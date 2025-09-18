@@ -210,24 +210,6 @@
                                 <!-- Linhas dinâmicas -->
                             </tbody>
                         </table>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 16px;">
-                            <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()"><i class="fas fa-plus"></i> Adicionar Linha</button>
-                            <button type="button" class="btn-secondary" onclick="limparTodasLinhas()"><i class="fas fa-trash-alt"></i> Limpar Todas</button>
-                        </div>
-                    </div>
-                    <div class="resumo-multiplo" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
-                        <h4 style="margin: 0 0 10px 0; color: #495057;"><i class="fas fa-chart-bar"></i> Resumo</h4>
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                            <div>
-                                <strong>Total de Linhas:</strong> <span id="totalLinhas">0</span>
-                            </div>
-                            <div>
-                                <strong>Valor Total das Vendas:</strong> <span id="valorTotalVendas">R$ 0,00</span>
-                            </div>
-                            <div>
-                                <strong>Valor Total das Comissões:</strong> <span id="valorTotalComissoes">R$ 0,00</span>
-                            </div>
-                        </div>
                     </div>
                     <div class="form-actions">
                         <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
@@ -236,6 +218,35 @@
                 </form>
             </div>
         </div>
+        
+        <!-- Barra Inferior Fixa para Múltiplos Lançamentos -->
+        <div id="barraInferiorMultiplo" class="filters-container" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd; display: none;">
+            <div style="display:flex; gap:8px; align-items:center;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div>
+                        <strong>Total de Linhas:</strong> <span id="totalLinhas">0</span>
+                    </div>
+                    <div>
+                        <strong>Valor Total das Vendas:</strong> <span id="valorTotalVendas">R$ 0,00</span>
+                    </div>
+                    <div>
+                        <strong>Valor Total das Comissões:</strong> <span id="valorTotalComissoes">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-plus"></i> Adicionar Linha
+                </button>
+                <button type="button" class="btn-secondary" onclick="limparTodasLinhas()" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-trash-alt"></i> Limpar Todas
+                </button>
+                <button type="submit" form="formMultiplo" class="btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
+                    <i class="fas fa-save"></i> Salvar Todos
+                </button>
+            </div>
+        </div>
+        
         <style>
             .tabs-comissao {
                 display: flex;
@@ -271,6 +282,7 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.07);
                 padding: 32px 24px;
                 margin-bottom: 32px;
+                padding-bottom: 100px; /* Espaço para a barra inferior fixa */
             }
             .form-row {
                 display: flex;
@@ -358,6 +370,8 @@
                 overflow-x: auto;
                 width: 100%;
                 margin-bottom: 16px;
+                max-height: calc(100vh - 300px); /* Altura máxima para ocupar toda a tela */
+                overflow-y: auto;
             }
             .table-multiplos table {
                 width: 100%;
@@ -1007,17 +1021,43 @@
             function mostrarTabComissao(tab) {
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Esconder barra inferior por padrão
+                const barraInferior = document.getElementById('barraInferiorMultiplo');
+                if (barraInferior) {
+                    barraInferior.style.display = 'none';
+                }
+                
                 if (tab === 'unico') {
                     document.getElementById('tabUnico').classList.add('active');
                     document.getElementById('tabUnicoContent').classList.add('active');
                 } else if (tab === 'multiplo') {
                     document.getElementById('tabMultiplo').classList.add('active');
                     document.getElementById('tabMultiploContent').classList.add('active');
+                    
+                    // Mostrar barra inferior para múltiplos
+                    if (barraInferior) {
+                        barraInferior.style.display = 'flex';
+                        ajustarBarraInferiorMultiplo();
+                    }
+                    
                     const tbody = document.getElementById('linhasMultiplo');
                     if (tbody.children.length === 0) {
                         adicionarLinhaMultiplo();
                     }
                 }
+            }
+            
+            function ajustarBarraInferiorMultiplo() {
+                const barra = document.getElementById('barraInferiorMultiplo');
+                if (!barra) return;
+                
+                const sidebar = document.querySelector('.sidebar');
+                const sidebarWidth = sidebar ? sidebar.offsetWidth : 250;
+                const windowWidth = window.innerWidth;
+                
+                barra.style.left = sidebarWidth + 'px';
+                barra.style.width = (windowWidth - sidebarWidth - 48) + 'px'; // 48px para margens
             }
 
             function getItemPrimaryId(item) {
@@ -1718,6 +1758,11 @@
             document.addEventListener('DOMContentLoaded', async function() {
                 // Mostrar spinner no início do carregamento
                 mostrarSpinner();
+                
+                // Event listener para redimensionamento da janela
+                window.addEventListener('resize', function() {
+                    ajustarBarraInferiorMultiplo();
+                });
                 
                 choicesItem = new Choices(selectItem, {
                     removeItemButton: true,
