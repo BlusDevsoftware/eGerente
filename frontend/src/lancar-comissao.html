@@ -218,7 +218,7 @@
         </div>
         
         <!-- Barra Inferior Fixa para Múltiplos Lançamentos -->
-        <div id="barraInferiorMultiplo" class="filters-container" style="display: none;">
+        <div id="barraInferiorMultiplo" class="filters-container" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd; display: none;">
             <div style="display:flex; gap:8px; align-items:center;">
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <div>
@@ -254,18 +254,7 @@
                 gap: 8px;
                 margin-bottom: 24px;
             }
-            /* Barra inferior da aba múltiplos no fluxo, como movimento */
-            #barraInferiorMultiplo.filters-container {
-                position: static;
-                bottom: auto;
-                left: auto;
-                right: auto;
-                margin: 8px 0 0 0;
-                border-top: 1.5px solid #e3f2fd;
-                border-radius: 10px 10px 0 0;
-                justify-content: space-between;
-                z-index: 1;
-            }
+            /* Barra inferior fixa igual ao Recebimento/Movimento (estilos aplicados inline) */
             .tab-btn {
                 background: #f5f5f5;
                 color: #333;
