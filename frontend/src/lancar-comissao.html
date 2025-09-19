@@ -282,8 +282,23 @@
                 border-radius: 8px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.07);
                 padding: 32px 24px;
-                margin-bottom: 32px;
+                margin-bottom: 0;
                 padding-bottom: 100px; /* Espaço para a barra inferior fixa */
+            }
+            /* Layout de altura total para a aba de múltiplos */
+            #tabMultiploContent .form-comissao {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+            }
+            #tabMultiploContent .table-multiplos {
+                flex: 1 1 auto;
+                margin-bottom: 0;
+            }
+            #tabMultiploContent .table-multiplos-wrapper {
+                max-height: calc(100vh - 240px);
+                overflow-y: auto;
+                overflow-x: auto;
             }
             .form-row {
                 display: flex;
@@ -380,6 +395,11 @@
                 min-width: 1000px;
                 border-collapse: collapse;
             }
+.table-multiplos thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
 .table-multiplos th, .table-multiplos td {
     border: 1px solid #e9ecef;
     padding: 4px 4px;
