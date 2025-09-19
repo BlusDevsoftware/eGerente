@@ -292,12 +292,12 @@
                 flex-direction: column;
                 gap: 0;
                 /* Ocupar a altura útil da página deixando espaço para a barra inferior */
-                min-height: calc(100vh - 300px); /* aumenta altura útil para reduzir o vão */
-                padding-bottom: 40px; /* espaço justo para a barra fixa */
+                min-height: calc(100vh - 360px); /* volta a uma altura menor para não empurrar a barra */
+                padding-bottom: 72px; /* reserva segura para não ficar atrás da barra */
             }
             #tabMultiploContent .table-multiplos {
                 flex: 1 1 auto;
-                margin-bottom: 4px; /* mínimo acima da barra */
+                margin-bottom: 12px; /* espaço acima da barra para respirar */
             }
             #tabMultiploContent .table-multiplos-wrapper {
                 max-height: none;
