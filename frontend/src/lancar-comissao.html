@@ -292,8 +292,8 @@
                 flex-direction: column;
                 gap: 0;
                 /* Ocupar a altura útil da página deixando espaço para a barra inferior */
-                min-height: calc(100vh - 360px); /* volta a uma altura menor para não empurrar a barra */
-                padding-bottom: 40px; /* reserva mínima para a barra fixa */
+                min-height: calc(100vh - 200px); /* altura adequada considerando header + barra */
+                padding-bottom: 100px; /* espaço para barra (60px altura + 20px bottom + 20px margem) */
             }
             #tabMultiploContent .table-multiplos {
                 flex: 1 1 auto;
