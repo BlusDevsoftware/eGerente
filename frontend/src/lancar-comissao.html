@@ -290,15 +290,16 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0;
+                /* Ocupar a altura útil da página deixando espaço para a barra inferior */
+                min-height: calc(100vh - 160px);
             }
             #tabMultiploContent .table-multiplos {
                 flex: 1 1 auto;
                 margin-bottom: 0;
             }
             #tabMultiploContent .table-multiplos-wrapper {
-                max-height: calc(100vh - 240px);
-                overflow-y: auto;
-                overflow-x: auto;
+                max-height: none;
+                overflow: visible;
             }
             .form-row {
                 display: flex;
