@@ -292,10 +292,11 @@
                 gap: 0;
                 /* Ocupar a altura útil da página deixando espaço para a barra inferior */
                 min-height: calc(100vh - 160px);
+                padding-bottom: 160px; /* Evita sobreposição com a barra inferior fixa */
             }
             #tabMultiploContent .table-multiplos {
                 flex: 1 1 auto;
-                margin-bottom: 0;
+                margin-bottom: 24px; /* cria espaçamento visual acima da barra */
             }
             #tabMultiploContent .table-multiplos-wrapper {
                 max-height: none;
