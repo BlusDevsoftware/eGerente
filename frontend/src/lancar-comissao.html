@@ -1102,7 +1102,20 @@
                 }
             }
             
-            function ajustarBarraInferiorMultiplo() { /* layout estático, nenhum ajuste necessário */ }
+            function ajustarBarraInferiorMultiplo() {
+                try {
+                    const barra = document.getElementById('barraInferiorMultiplo');
+                    if (!barra) return;
+                    const sidebar = document.querySelector('.sidebar');
+                    const sidebarWidth = sidebar ? sidebar.offsetWidth : 250;
+                    const marginX = 24; // mesmo padding lateral do layout
+                    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                    // Posicionar ao lado da sidebar e ocupar a largura restante (com margens)
+                    barra.style.left = sidebarWidth + 'px';
+                    const available = viewportWidth - sidebarWidth - (marginX * 2);
+                    barra.style.width = (available > 0 ? available : 0) + 'px';
+                } catch (_) {}
+            }
 
             function getItemPrimaryId(item) {
                 const id = (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico));
@@ -1804,9 +1817,9 @@
                 mostrarSpinner();
                 
                 // Event listener para redimensionamento da janela
-                window.addEventListener('resize', function() {
-                    ajustarBarraInferiorMultiplo();
-                });
+                window.addEventListener('resize', ajustarBarraInferiorMultiplo);
+                // Ajuste inicial de posição/largura da barra fixa
+                ajustarBarraInferiorMultiplo();
                 
                 choicesItem = new Choices(selectItem, {
                     removeItemButton: true,
