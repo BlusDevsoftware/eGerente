@@ -336,16 +336,16 @@
             .form-group select {
                 width: 100%;
                 padding: 10px;
-                border: 1px solid #ddd;
+                border: 1px solid #cfd8dc; /* cinza padrão */
                 border-radius: 4px;
                 font-size: 14px;
-                transition: border-color 0.3s;
+                transition: border-color 0.2s, box-shadow 0.2s;
             }
             .form-group input:focus,
             .form-group select:focus {
                 border-color: #2196F3;
                 outline: none;
-                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.12);
             }
             /* Remover destaque azul apenas na aba de múltiplos (sobrepõe regras globais) */
             #tabMultiploContent .form-group input:focus,
@@ -446,17 +446,17 @@
 /* Harmonizar borda/altura entre inputs e Choices (Descrição, Valores e %) */
 .table-multiplos td input,
 .table-multiplos td .choices__inner {
-    border: 1px solid #2196F3; /* azul igual ao Choices */
+    border: 1px solid #cfd8dc; /* cinza padrão */
     border-radius: 6px; /* curvatura do Choices */
 }
 .table-multiplos td input:focus,
 .table-multiplos td input:focus-visible,
 .table-multiplos td select:focus,
 .table-multiplos td select:focus-visible {
-    border-color: #cfd8dc !important; /* remover destaque azul */
+    border-color: #2196F3 !important; /* azul no foco */
     border-width: 1px !important;
     outline: none !important;
-    box-shadow: none !important;
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
     appearance: none;
     -webkit-appearance: none;
 }
@@ -464,8 +464,8 @@
 .table-multiplos td .choices:focus .choices__inner,
 .table-multiplos td .choices__inner:focus,
 .table-multiplos td .choices__inner:focus-visible {
-    border-color: #cfd8dc !important; /* remover destaque azul */
-    box-shadow: none !important;
+    border-color: #2196F3 !important; /* azul no foco */
+    box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
 }
 .table-multiplos td .choices__inner { display: flex; align-items: center; }
 /* Fixar largura apenas da coluna Produto/Serviço (4ª coluna) */
@@ -776,7 +776,7 @@
             }
             /* Ajuste visual do campo descrição na tabela múltiplos lançamentos */
             .table-multiplos input.input-descricao {
-                border: 1px solid #2196F3 !important;
+                border: 1px solid #cfd8dc !important;
                 border-radius: 6px !important; /* igual ao Choices */
                 background: #fff !important;
                 color: #333 !important;
@@ -789,9 +789,9 @@
                 padding-bottom: 0 !important;
             }
             .table-multiplos input.input-descricao:focus {
-                border-color: #cfd8dc !important;
+                border-color: #2196F3 !important;
                 outline: none !important;
-                box-shadow: none !important;
+                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.12) !important;
             }
             .table-multiplos .btn-multiplos-acao {
                 width: 80px;
