@@ -401,6 +401,10 @@
                 margin-bottom: 16px;
                 position: relative; /* Criar contexto de empilhamento */
             }
+            /* Evitar crescimento de colunas por textos longos */
+            .table-multiplos table {
+                table-layout: fixed;
+            }
             .table-multiplos-wrapper {
                 width: 100%;
             }
@@ -965,6 +969,19 @@
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 max-width: 100% !important;
+                display: block !important;
+            }
+            /* Fixar altura do campo selecionado e truncar o texto no single-select */
+            .table-multiplos .choices__inner {
+                height: 34px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            .table-multiplos .choices__list--single .choices__item {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                width: 100% !important;
                 display: block !important;
             }
             
