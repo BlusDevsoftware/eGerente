@@ -1376,7 +1376,6 @@
                     placeholder: true,
                     placeholderValue: 'Selecione o tipo primeiro',
                     removeItemButton: false,
-                    maxItemCount: 1,
                     shouldSort: false,
                     duplicateItemsAllowed: false
                 });
@@ -1551,11 +1550,9 @@
                         itemSelectText: '',
                         placeholder: true,
                         placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...',
-                        removeItemButton: true,
-                        maxItemCount: -1,
+                        removeItemButton: false,
                         shouldSort: false,
                         duplicateItemsAllowed: false
-                        // Removido: multiple: true
                     });
                     // Adicionar evento para atualizar valor da venda quando item for selecionado
                     itemSelect.addEventListener('change', function() {
