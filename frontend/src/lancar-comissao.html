@@ -11,8 +11,8 @@
     <script src="scripts/config/realtime-config.js"></script>
     <script src="scripts/realtime-bus.js"></script>
     <script src="scripts/realtime-global.js"></script>
-    <script src="scripts/auth-guard.js"></script>
-    <script src="scripts/apply-auth-protection.js"></script>
+     <script src="scripts/auth-guard.js"></script>
+     <script src="scripts/apply-auth-protection.js"></script>
     <script src="scripts/config/api.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
@@ -292,17 +292,18 @@
                 flex-direction: column;
                 gap: 0;
                 /* Ocupar a altura útil da página deixando espaço para a barra inferior */
-                min-height: calc(100vh - 180px); /* altura considerando header + barra */
-                padding-bottom: 0px; /* sem padding extra */
+                min-height: calc(100vh - 335px); /* diminuir o container */
+                padding-bottom: 16px; /* pequeno respiro */
                 margin-bottom: 0px; /* sem margem extra */
             }
             #tabMultiploContent .table-multiplos {
-                flex: 1 1 auto;
+                flex: 0 0 auto; /* não deixar o container crescer com muitas linhas */
                 margin-bottom: 0px; /* sem margem extra */
             }
             #tabMultiploContent .table-multiplos-wrapper {
-                max-height: none;
-                overflow: visible;
+                height: calc(100vh - 420px); /* container menor com rolagem */
+                overflow-y: auto; /* rolagem vertical interna */
+                overflow-x: auto; /* rolagem horizontal se necessário */
             }
             .form-row {
                 display: flex;
@@ -345,6 +346,15 @@
                 border-color: #2196F3;
                 outline: none;
                 box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+            }
+            /* Remover destaque azul apenas na aba de múltiplos (sobrepõe regras globais) */
+            #tabMultiploContent .form-group input:focus,
+            #tabMultiploContent .form-group input:focus-visible,
+            #tabMultiploContent .form-group select:focus,
+            #tabMultiploContent .form-group select:focus-visible {
+                border-color: #cfd8dc !important;
+                outline: none !important;
+                box-shadow: none !important;
             }
             .form-group input[readonly] {
                 background-color: #f5f5f5;
@@ -402,7 +412,9 @@
 .table-multiplos thead th {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 2; /* manter header acima do conteúdo */
+    background: #f7f7f8; /* garantir fundo sólido ao fixar */
+    box-shadow: 0 2px 0 rgba(0,0,0,0.03);
             }
 .table-multiplos th, .table-multiplos td {
     border: 1px solid #e9ecef;
@@ -420,6 +432,51 @@
                 vertical-align: middle;
     min-height: 38px;
     height: 38px;
+            }
+.table-multiplos td * { box-sizing: border-box; }
+.table-multiplos td input,
+.table-multiplos td select { width: 100%; height: 40px; padding: 6px 8px; }
+.table-multiplos td .choices { width: 100%; }
+.table-multiplos td .choices__inner { min-height: 40px; height: 40px; padding: 6px 8px; border-radius: 6px; }
+.table-multiplos td .choices__list--single .choices__item { padding: 4px 0; }
+.table-multiplos td .btn-primary,
+.table-multiplos td .btn-secondary { padding: 6px 8px; font-size: 12px; }
+/* Harmonizar borda/altura entre inputs e Choices (Descrição, Valores e %) */
+.table-multiplos td input,
+.table-multiplos td .choices__inner {
+    border: 1px solid #2196F3; /* azul igual ao Choices */
+    border-radius: 6px; /* curvatura do Choices */
+}
+.table-multiplos td input:focus,
+.table-multiplos td input:focus-visible,
+.table-multiplos td select:focus,
+.table-multiplos td select:focus-visible {
+    border-color: #cfd8dc !important; /* remover destaque azul */
+    border-width: 1px !important;
+    outline: none !important;
+    box-shadow: none !important;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.table-multiplos td .choices.is-focused .choices__inner,
+.table-multiplos td .choices:focus .choices__inner,
+.table-multiplos td .choices__inner:focus,
+.table-multiplos td .choices__inner:focus-visible {
+    border-color: #cfd8dc !important; /* remover destaque azul */
+    box-shadow: none !important;
+}
+.table-multiplos td .choices__inner { display: flex; align-items: center; }
+/* Fixar largura apenas da coluna Produto/Serviço (4ª coluna) */
+.table-multiplos thead th:nth-child(4),
+.table-multiplos tbody td:nth-child(4) {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+}
+/* Garantir que o componente interno não altere a largura da coluna */
+.table-multiplos tbody td:nth-child(4) .choices,
+.table-multiplos tbody td:nth-child(4) select {
+    width: 100% !important;
             }
 .table-multiplos td:last-child {
     min-height: 38px;
@@ -515,8 +572,8 @@
                 font-size: 1.15em;
             }
             .valor-venda-destaque-input:focus {
-                box-shadow: 0 6px 24px rgba(251,192,45,0.28);
-                border-color: #ffb300;
+                box-shadow: none;
+                border-color: #cfd8dc;
             }
             .simulacao-titulos input[type='date'] {
                 border: 1.5px solid #90caf9;
@@ -694,15 +751,15 @@
                 max-width: 110px !important;
                 box-sizing: border-box;
                 text-align: center;
-                border: 2px solid #2196F3 !important;
-                border-radius: 8px !important;
+                border: 1px solid #2196F3 !important;
+                border-radius: 6px !important; /* igual ao Choices */
                 background: #fff !important;
-                color: #1565c0 !important;
+                color: #333 !important;
                 font-size: 14px !important;
-                transition: border-color 0.3s, box-shadow 0.3s;
-                box-shadow: 0 2px 8px rgba(33,150,243,0.07) !important;
-                height: 49.22px !important;
-                line-height: 49.22px !important;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                box-shadow: none !important;
+                height: 40px !important; /* padronizado */
+                line-height: 40px !important;
                 padding-top: 0 !important;
                 padding-bottom: 0 !important;
             }
@@ -711,33 +768,33 @@
             .table-multiplos input.input-valor:focus,
             .table-multiplos input.input-percentual:focus,
             .table-multiplos input.input-comissao:focus {
-                border-color: #1976D2 !important;
+                border-color: #cfd8dc !important;
                 outline: none !important;
-                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13) !important;
+                box-shadow: none !important;
             }
             /* Ajuste visual do campo descrição na tabela múltiplos lançamentos */
             .table-multiplos input.input-descricao {
-                border: 2px solid #2196F3 !important;
-                border-radius: 8px !important;
+                border: 1px solid #2196F3 !important;
+                border-radius: 6px !important; /* igual ao Choices */
                 background: #fff !important;
-                color: #1565c0 !important;
+                color: #333 !important;
                 font-size: 14px !important;
-                transition: border-color 0.3s, box-shadow 0.3s;
-                box-shadow: 0 2px 8px rgba(33,150,243,0.07) !important;
-                height: 49.22px !important;
-                line-height: 49.22px !important;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                box-shadow: none !important;
+                height: 40px !important; /* padronizado */
+                line-height: 40px !important;
                 padding-top: 0 !important;
                 padding-bottom: 0 !important;
             }
             .table-multiplos input.input-descricao:focus {
-                border-color: #1976D2 !important;
+                border-color: #cfd8dc !important;
                 outline: none !important;
-                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.13) !important;
+                box-shadow: none !important;
             }
             .table-multiplos .btn-multiplos-acao {
-                width: 110px;
-                min-width: 110px;
-                max-width: 110px;
+                width: 80px;
+                min-width: 80px;
+                max-width: 80px;
                 box-sizing: border-box;
                 margin-top: 0 !important;
                 margin-bottom: 0 !important;
@@ -778,6 +835,11 @@
             }
             .simulacao-titulos-multiplo .intervalo-vencimento-select {
                 color: #222 !important;
+                width: 140px !important; /* diminuir largura do seletor de intervalo */
+                min-width: 120px !important;
+                max-width: 180px !important;
+                height: 40px !important; /* padronizar altura com os demais */
+                line-height: 40px !important;
             }
             /* CSS para botões flutuantes ao lado da linha múltiplos lançamentos */
             .botoes-flutuantes-multiplos {
@@ -1105,14 +1167,14 @@
             
             function ajustarBarraInferiorMultiplo() {
                 try {
-                    const barra = document.getElementById('barraInferiorMultiplo');
-                    if (!barra) return;
-                    const sidebar = document.querySelector('.sidebar');
-                    const sidebarWidth = sidebar ? sidebar.offsetWidth : 250;
-                    const marginX = 24; // mesmo padding lateral do layout
+                const barra = document.getElementById('barraInferiorMultiplo');
+                if (!barra) return;
+                const sidebar = document.querySelector('.sidebar');
+                const sidebarWidth = sidebar ? sidebar.offsetWidth : 250;
+                    const marginX = 21; // mesmo padding do container principal
                     const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-                    // Posicionar ao lado da sidebar e ocupar a largura restante (com margens)
-                    barra.style.left = sidebarWidth + 'px';
+                    // Posicionar ao lado da sidebar e ocupar a largura restante (alinhado com o container)
+                barra.style.left = sidebarWidth + 'px';
                     const available = viewportWidth - sidebarWidth - (marginX * 2);
                     barra.style.width = (available > 0 ? available : 0) + 'px';
                 } catch (_) {}
@@ -1820,7 +1882,7 @@
                 // Event listener para redimensionamento da janela
                 window.addEventListener('resize', ajustarBarraInferiorMultiplo);
                 // Ajuste inicial de posição/largura da barra fixa
-                ajustarBarraInferiorMultiplo();
+                    ajustarBarraInferiorMultiplo();
                 
                 choicesItem = new Choices(selectItem, {
                     removeItemButton: true,
