@@ -983,6 +983,41 @@
                 max-width: 100% !important;
                 display: block !important;
             }
+            /* Fixar tamanho SOMENTE dos campos Cliente (coluna 1) e Colaborador (coluna 2) */
+            .table-multiplos thead th:nth-child(1),
+            .table-multiplos tbody td:nth-child(1),
+            .table-multiplos thead th:nth-child(2),
+            .table-multiplos tbody td:nth-child(2) {
+                width: 200px !important;
+                max-width: 200px !important;
+                min-width: 200px !important;
+            }
+            .table-multiplos tbody td:nth-child(1) .choices,
+            .table-multiplos tbody td:nth-child(2) .choices,
+            .table-multiplos tbody td:nth-child(1) select,
+            .table-multiplos tbody td:nth-child(2) select {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .table-multiplos tbody td:nth-child(1) .choices__inner,
+            .table-multiplos tbody td:nth-child(2) .choices__inner {
+                width: 100% !important;
+                min-height: 40px !important;
+                height: 40px !important;
+                display: flex !important;
+                align-items: center !important;
+                overflow: hidden !important;
+            }
+            .table-multiplos tbody td:nth-child(1) .choices__list--single .choices__item,
+            .table-multiplos tbody td:nth-child(2) .choices__list--single .choices__item,
+            .table-multiplos tbody td:nth-child(1) .choices__placeholder,
+            .table-multiplos tbody td:nth-child(2) .choices__placeholder {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                width: 100% !important;
+                display: block !important;
+            }
             
             /* Use global Choices styles for table-multiplos */
             .table-multiplos .choices {
