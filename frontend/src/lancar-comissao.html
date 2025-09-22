@@ -1326,7 +1326,7 @@
                             <input type="hidden" name="tipo[]" value="">
                         </div>
                     </td>
-                    <td><select name="item[]" required disabled class="input-item"><option value="">Selecione o tipo primeiro</option></select></td>
+                    <td><select name="item[]" required disabled class="input-item"><option value="" disabled selected hidden>Selecione o tipo primeiro</option></select></td>
                     <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição" class="input-descricao"></td>
                     <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
                     <td><input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
@@ -1408,7 +1408,7 @@
                         selectElement.choicesInstance.destroy();
                         selectElement.choicesInstance = null;
                     }
-                    selectElement.innerHTML = '<option value="">Selecione...</option>';
+                    selectElement.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
                     if (window.clientes && window.clientes.length > 0) {
                         window.clientes.forEach(cliente => {
                             const option = document.createElement('option');
@@ -1421,7 +1421,8 @@
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione...'
+                        placeholderValue: 'Selecione...',
+                        shouldSort: false
                     });
                 }
                 // ... existing code ...
@@ -1520,20 +1521,21 @@
                     itemSelect.choicesInstance = null;
                 }
                 if (!tipo) {
-                    itemSelect.innerHTML = '<option value="">Selecione o tipo primeiro</option>';
+                    itemSelect.innerHTML = '<option value="" disabled selected hidden>Selecione o tipo primeiro</option>';
                     // Aplica Choices.js para manter padrão visual
                     itemSelect.choicesInstance = new Choices(itemSelect, {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione o tipo primeiro'
+                        placeholderValue: 'Selecione o tipo primeiro',
+                        shouldSort: false
                     });
                     return;
                 }
                 // Carregar produtos ou serviços baseado no tipo selecionado
                 let lista = tipo === 'produto' ? produtos : servicos;
                 if (lista && lista.length > 0) {
-                    itemSelect.innerHTML = '<option value="">Selecione u' + (tipo === 'produto' ? 'produto' : 'serviço') + '...</option>';
+                    itemSelect.innerHTML = '<option value="" disabled selected hidden>Selecione u' + (tipo === 'produto' ? 'produto' : 'serviço') + '...</option>';
                     lista.forEach(item => {
                         const option = document.createElement('option');
                         option.value = item.codigo;
