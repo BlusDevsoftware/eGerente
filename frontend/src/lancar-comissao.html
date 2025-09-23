@@ -449,23 +449,40 @@
     border: 1px solid #cfd8dc; /* cinza padrão */
     border-radius: 6px; /* curvatura do Choices */
 }
-.table-multiplos td input:focus,
-.table-multiplos td input:focus-visible,
-.table-multiplos td select:focus,
-.table-multiplos td select:focus-visible {
-    border-color: #2196F3 !important; /* azul no foco */
-    border-width: 1px !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
-    appearance: none;
-    -webkit-appearance: none;
+.table-multiplos td input {
+    border-color: #cfd8dc !important;
 }
+.table-multiplos td .choices .choices__inner {
+    border-color: #cfd8dc !important;
+}
+/* Garantir cinza (não foco) para cliente, colaborador e produto/serviço */
+.table-multiplos td .choices.input-cliente .choices__inner,
+.table-multiplos td .choices.input-colaborador .choices__inner,
+.table-multiplos tbody td:nth-child(4) .choices .choices__inner {
+    border-color: #cfd8dc !important;
+}
+            .table-multiplos td input:focus,
+            .table-multiplos td input:focus-visible,
+            .table-multiplos td select:focus,
+            .table-multiplos td select:focus-visible {
+                border-color: #2196F3 !important; /* azul no foco */
+                border-width: 1px !important;
+                outline: none !important;
+                box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
 .table-multiplos td .choices.is-focused .choices__inner,
 .table-multiplos td .choices:focus .choices__inner,
 .table-multiplos td .choices__inner:focus,
 .table-multiplos td .choices__inner:focus-visible {
     border-color: #2196F3 !important; /* azul no foco */
     box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
+}
+/* Quando não tiver foco/aberto, manter cinza nas Choices */
+.table-multiplos td .choices:not(.is-focused):not(.is-open) .choices__inner {
+    border-color: #cfd8dc !important;
+    box-shadow: none !important;
 }
 .table-multiplos td .choices__inner { display: flex; align-items: center; }
 /* Fixar largura apenas da coluna Produto/Serviço (4ª coluna) */
