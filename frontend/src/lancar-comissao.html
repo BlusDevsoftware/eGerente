@@ -1360,6 +1360,12 @@
                         noChoicesText: 'Sem opções',
                         addItems: true
                     });
+                    // Evita aparência de foco inicial (borda azul) no Choices de colaborador
+                    setTimeout(() => {
+                        const wrapper = selectElement.closest('.choices');
+                        if (wrapper) wrapper.classList.remove('is-focused', 'is-open');
+                        selectElement.blur();
+                    }, 0);
                     // Remover a opção placeholder do dropdown para não ser selecionável
                     const removePlaceholderOption = () => {
                         const pl = selectElement.querySelector('option[value=""]');
@@ -1441,6 +1447,11 @@
                     shouldSort: false,
                     duplicateItemsAllowed: false
                 });
+                setTimeout(() => {
+                    const wrap = selectItem.closest('.choices');
+                    if (wrap) wrap.classList.remove('is-focused', 'is-open');
+                    selectItem.blur();
+                }, 0);
                 // Se valores foram passados (duplicação), preencher os campos
                 if (valores) {
                     tr.querySelector('input[name="descricao[]"]').value = valores.descricao || '';
