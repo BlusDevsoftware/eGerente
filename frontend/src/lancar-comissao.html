@@ -439,7 +439,7 @@
 /* exceção: não expandir o select de intervalo */
 .table-multiplos td select.intervalo-vencimento-select { width: auto !important; }
 .table-multiplos td .choices { width: 100%; }
-.table-multiplos td .choices__inner { min-height: 40px; height: 40px; padding: 6px 8px; border-radius: 6px; }
+            .table-multiplos td .choices__inner { min-height: 40px; height: 40px; padding: 6px 8px; border-radius: 6px; border: 1px solid #cfd8dc; }
 .table-multiplos td .choices__list--single .choices__item { padding: 4px 0; }
 .table-multiplos td .btn-primary,
 .table-multiplos td .btn-secondary { padding: 6px 8px; font-size: 12px; }
@@ -472,11 +472,9 @@
                 appearance: none;
                 -webkit-appearance: none;
             }
-.table-multiplos td .choices.is-focused .choices__inner,
-.table-multiplos td .choices:focus .choices__inner,
-.table-multiplos td .choices__inner:focus,
-.table-multiplos td .choices__inner:focus-visible {
-    border-color: #2196F3 !important; /* azul no foco */
+.table-multiplos td .choices:focus-within .choices__inner,
+.table-multiplos td .choices.is-open .choices__inner {
+    border-color: #2196F3 !important; /* azul no foco/aberto */
     box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
 }
 /* Quando não tiver foco/aberto, manter cinza nas Choices */
@@ -1907,7 +1905,7 @@
                 }
                 html += '</table>';
                 if (qtd > 1) {
-                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #2196F3; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
                 }
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
@@ -2456,7 +2454,7 @@
                 }
                 html += '</table>';
                 if (qtd > 1) {
-                    html += `<tr class='linha-intervalo-vencimento'><td colspan='5' style='text-align:left;'><div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label><select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #2196F3; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div></td></tr>`;
+                    html += `<tr class='linha-intervalo-vencimento'><td colspan='5' style='text-align:left;'><div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label><select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div></td></tr>`;
                 }
                 simulacaoDiv.innerHTML = html;
                 trSimulacao.style.display = '';
