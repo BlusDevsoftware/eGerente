@@ -1407,10 +1407,7 @@
                 // Mostrar spinner no início do carregamento
                 mostrarSpinner();
                 
-                // Event listener para redimensionamento da janela
-                window.addEventListener('resize', ajustarBarraInferiorMultiplo);
-                // Ajuste inicial de posição/largura da barra fixa
-                    ajustarBarraInferiorMultiplo();
+                // Removido ajuste de barra inferior (múltiplos)
                 
                 choicesItem = new Choices(selectItem, {
                     removeItemButton: true,
