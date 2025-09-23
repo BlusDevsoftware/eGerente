@@ -684,7 +684,8 @@
             <li class="has-submenu">
                 <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar (Comercial)</span></a></li>
+                    <li><a href="lancar-multcomissao.html"><i class="fas fa-layer-group"></i><span>Lançar (Múltiplos)</span></a></li>
                     <li><a href="movimento-comissao.html" class="active"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
                     <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
                 </ul>
@@ -2723,8 +2724,6 @@
                 }
             });
         })();
-
-
         // Variáveis globais para os modais (não duplicar - estão no arquivo modais-movimento.html)
         // let tituloParaExcluir = null;
         // let tituloParaCancelarBaixa = null; // Removido - já declarado no arquivo de modais
@@ -3057,7 +3056,6 @@
                 fecharModalConfirmCancelarBaixa();
             }
         }
-
         function mostrarModalConfirmacaoExclusao(titulosParciais, tituloOriginal) {
             console.log('mostrarModalConfirmacaoExclusao chamada com:', { titulosParciais, tituloOriginal });
             console.log('mapaColaboradores disponível:', mapaColaboradores);
@@ -3531,7 +3529,6 @@
                 btnOkSucessoCancelarBaixa.addEventListener('click', fecharModalSucessoCancelarBaixa);
             }
         });
-
         function mostrarModalTituloPagoNaoPodeExcluir(titulo) {
           // Criar ou atualizar o modal dinamicamente
           let modal = document.getElementById('modalTituloPagoNaoPodeExcluir');
@@ -4001,7 +3998,6 @@ if (btnOkSucessoEdicao) btnOkSucessoEdicao.onclick = fecharModalSucessoEdicao;
             }
         });
 </script>
-
 <!-- Modal de Baixa Múltipla Melhorado -->
 <div id="modalBaixaMultipla" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.18); z-index: 3000; align-items: center; justify-content: center;">
   <div class="modal-content" style="background: #fff; border-radius: 16px; max-width: 1200px; width: 98vw; min-width: 340px; box-shadow: 0 8px 32px rgba(33,150,243,0.13); padding: 0; max-height: 90vh; display: flex; flex-direction: column;">
@@ -4494,12 +4490,10 @@ function atualizarProgressoBaixaMultipla(percentual, texto) {
     </div>
   </div>
 </div>
-
 <script>
 // ... existing code ...
 let baixaParcialDiferenca = 0;
 let baixaParcialConfirmada = false;
-// let tituloOriginalBaixa = null; // Removido - já declarado acima
 
 // Função para fechar o modal de confirmação de baixa parcial
 function fecharModalConfirmBaixaParcial() {
