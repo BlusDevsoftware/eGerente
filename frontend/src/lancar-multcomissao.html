@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Comissões - Múltiplos Lançamentos</title>
+    <link rel="icon" type="image/png" href="assets/images/logo2.png">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="scripts/config/realtime-config.js"></script>
+    <script src="scripts/realtime-bus.js"></script>
+    <script src="scripts/realtime-global.js"></script>
+    <script src="scripts/config/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <style>
+        @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+        .loader-overlay-multi{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);z-index:10;justify-content:center;align-items:center;flex-direction:column;border-radius:8px}
+        .spinner-main{border:8px solid #e3f2fd;border-top:8px solid #1976D2;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite}
+        .loading-text{margin-top:20px;color:#1976D2;font-size:1.1rem;font-weight:500;text-align:center}
+        .form-comissao{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:32px 24px;margin-bottom:0;padding-bottom:100px}
+        .table-multiplos{width:100%;margin-bottom:16px;position:relative}
+        .table-multiplos table{width:100%;min-width:1000px;border-collapse:collapse}
+        .table-multiplos thead th{position:sticky;top:0;z-index:2;background:#f7f7f8;box-shadow:0 2px 0 rgba(0,0,0,0.03)}
+        .table-multiplos th,.table-multiplos td{border:1px solid #e9ecef;padding:4px 4px;text-align:center;font-size:12px}
+        .table-multiplos td{background:#fff;vertical-align:middle;min-height:38px;height:38px}
+        .table-multiplos td input,.table-multiplos td select{width:100%;height:40px;padding:6px 8px}
+        .table-multiplos td .choices__inner{min-height:40px;height:40px;padding:6px 8px;border-radius:6px;border:1px solid #cfd8dc}
+        .table-multiplos td .btn-primary,.table-multiplos td .btn-secondary{padding:6px 8px;font-size:12px}
+        .btn-primary{background-color:#2196F3;color:#fff;border:none;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+        .btn-primary:hover{background-color:#1976D2}
+        .btn-secondary{background-color:#f5f5f5;color:#333;border:1px solid #ddd;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+        .btn-secondary:hover{background-color:#e0e0e0}
+        .btn-duplicar{background-color:#2196F3;color:#fff;border:none;margin-right:4px}
+        .btn-duplicar:hover{background-color:#1976D2}
+        .btn-deletar{background-color:#e53935;color:#fff;border:none}
+        .btn-deletar:hover{background-color:#b71c1c}
+        #barraInferiorMultiplo{position:fixed;bottom:20px;left:250px;z-index:1000;background:#fff;border-top:1px solid #e3f2fd;justify-content:space-between;padding:8px 24px;box-shadow:0 -2px 10px rgba(0,0,0,0.1);height:60px;box-sizing:border-box;margin:0 24px;border-radius:10px;border:1px solid #e3f2fd;display:flex}
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo" style="display:flex;align-items:center;justify-content:center;padding:15px 0;">
+            <img src="assets/images/logo2.png" alt="BlueDev Logo" style="height:2.5em;margin-right:10px;">
+            <h1><span class="orange">e-</span><span class="highlight">Gerente</span></h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li class="has-submenu">
+                <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
+                <ul class="submenu">
+                    <li><a href="lancar-comissao.html"><i class="fas fa-plus-circle"></i><span>Lançar (Comercial)</span></a></li>
+                    <li><a href="lancar-multcomissao.html" class="active"><i class="fas fa-layer-group"></i><span>Lançar (Múltiplos)</span></a></li>
+                    <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
+                    <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="logout-button">
+            <a href="login.html" data-logout><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="loader-multi" class="loader-overlay-multi">
+            <div class="spinner-main"></div>
+            <div class="loading-text">Carregando dados...</div>
+        </div>
+
+        <div class="header">
+            <div class="welcome-text">
+                <h1>Múltiplos Lançamentos</h1>
+                <p>Registre várias comissões ao mesmo tempo</p>
+            </div>
+            <div class="user-info">
+                <div class="notifications"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <form id="formMultiplo" class="form-comissao">
+                <div class="table-multiplos">
+                    <div class="table-multiplos-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:200px;min-width:180px;">Cliente</th>
+                                    <th style="width:200px;min-width:180px;">Colaborador</th>
+                                    <th style="width:100px;min-width:80px;">Tipo</th>
+                                    <th style="width:150px;min-width:120px;">Produto/Serviço</th>
+                                    <th style="width:120px;min-width:100px;">Descrição</th>
+                                    <th style="width:100px;min-width:80px;">Valor Venda</th>
+                                    <th style="width:80px;min-width:70px;">% Comissão</th>
+                                    <th style="width:100px;min-width:80px;">Valor Comissão</th>
+                                    <th style="width:120px;min-width:100px;">Ações</th>
+                                    <th style="width:80px;min-width:70px;">Duplicar/Excluir</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linhasMultiplo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="barraInferiorMultiplo" class="filters-container" style="display:flex;">
+            <div style="display:flex;gap:20px;align-items:center;">
+                <div><strong>Total de Linhas:</strong> <span id="totalLinhas">0</span></div>
+                <div><strong>Valor Total das Vendas:</strong> <span id="valorTotalVendas">R$ 0,00</span></div>
+                <div><strong>Valor Total das Comissões:</strong> <span id="valorTotalComissoes">R$ 0,00</span></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()"><i class="fas fa-plus"></i> Adicionar Linha</button>
+                <button type="button" class="btn-secondary" onclick="limparTodasLinhas()"><i class="fas fa-trash-alt"></i> Limpar Todas</button>
+                <button type="reset" form="formMultiplo" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                <button type="submit" form="formMultiplo" class="btn-primary"><i class="fas fa-save"></i> Salvar Todos</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/navigation.js"></script>
+    <script>
+        function formatarMoedaBR(valor){return Number(valor).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+        function extrairNumeroBR(valor){if(!valor) return 0; const n=String(valor).replace(/[^0-9,.-]/g,'').replace(/\.(?=.*\.)/g,'').replace(',','.'); return parseFloat(n)||0}
+        let produtos=[], servicos=[]; let colaboradoresCache=null, colaboradoresCallbacks=[];
+        async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
+        function preencherSelectColaborador(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; buscarColaboradores().then(colabs=>{ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; colabs.forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.nome; select.appendChild(o)}); select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }) }
+        function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{const o=document.createElement('option'); o.value=c.id; o.textContent=c.nome; select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }
+        function getItemPrimaryId(item){ return (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico)) }
+        function getItemName(item){ return (item && (item.nome ?? item.descricao ?? item.nome_servico ?? item.nomeProduto ?? item.nomeServico)) || 'Item'}
+        function getItemPrice(item){ const price=(item && (item.preco ?? item.valor ?? item.preco_venda ?? item.precoServico ?? item.preco_servico)); const parsed=parseFloat(price); return isNaN(parsed)?0:parsed }
+
+        function atualizarResumoMultiplo(){ const linhas=document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)'); let totalVendas=0,totalComissoes=0; linhas.forEach(tr=>{ totalVendas+=parseFloat(tr.querySelector('input[name="valor_venda[]"]').value)||0; totalComissoes+=parseFloat(tr.querySelector('input[name="valor_comissao[]"]').value)||0 }); document.getElementById('totalLinhas').textContent=linhas.length.toString(); document.getElementById('valorTotalVendas').textContent=formatarMoedaBR(totalVendas); document.getElementById('valorTotalComissoes').textContent=formatarMoedaBR(totalComissoes) }
+
+        function calcularComissaoMultiplo(input, idx){ const tr=input.closest('tr'); const valorVenda=parseFloat(tr.querySelector('input[name="valor_venda[]"]').value)||0; const percentualStr=tr.querySelector('input[name="percentual[]"]').value||'0'; const percentualNumber=percentualStr.replace(/\./g,'').replace(',','.'); const used=parseFloat(percentualNumber)||0; const valorComissaoInput=tr.querySelector('input[name="valor_comissao[]"]').value= (valorVenda*used/100).toFixed(2); atualizarResumoMultiplo() }
+
+        function atualizarTipoMultiplo(select, idx){ let td,itemSelect,tipo; if(select.tagName==='SELECT'){ td=select.closest('td'); itemSelect=td.parentElement.querySelector('select[name="item[]"]'); tipo=select.value } else { td=select.parentElement().nextElementSibling; itemSelect=td.querySelector('select[name="item[]"]'); tipo=select.value }
+            const inputValor=td.parentElement.querySelector('input[name="valor_venda[]"]'); itemSelect.disabled=true; if(itemSelect.choicesInstance){itemSelect.choicesInstance.destroy(); itemSelect.choicesInstance=null}
+            if(!tipo){ itemSelect.innerHTML='<option value="" disabled selected hidden>Selecione o tipo primeiro</option>'; itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:''}); return }
+            let source = tipo==='produto'? produtos : servicos; const choices = (source||[]).map(it=>({value:String(getItemPrimaryId(it)), label:getItemName(it), customProperties:{valor:getItemPrice(it)}}));
+            itemSelect.innerHTML=''; choices.forEach(c=>{ const o=document.createElement('option'); o.value=c.value; o.textContent=c.label; o.dataset.valor=c.customProperties.valor; itemSelect.appendChild(o) }); itemSelect.disabled=false; itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:''});
+            itemSelect.addEventListener('change',function(){ const selectedOptions=Array.from(this.selectedOptions).filter(opt=>opt.value); if(selectedOptions.length===1){ const val=parseFloat(selectedOptions[0].dataset.valor||'0'); if(val>0){ inputValor.value=val.toFixed(2); calcularComissaoMultiplo(inputValor, idx) } } }) }
+
+        function toggleTipoMultiplo(btn, idx){ const container=btn.parentElement; const buttons=container.querySelectorAll('.btn-tipo'); buttons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const tipo=btn.dataset.tipo; container.querySelector('input[name="tipo[]"]').value=tipo; const tr=btn.closest('tr'); atualizarTipoMultiplo({ value: tipo, parentElement: ()=>btn.closest('td'), closest: tr.closest.bind(tr) }, idx) }
+
+        function verificarColaboradorDuplicadoMultiplo(select){ const tr=select.closest('tr'); const selects=tr.querySelectorAll('select[name="colaborador[]"]'); const valores=[...selects].map(s=>s.value).filter(Boolean); const temDup= new Set(valores).size!==valores.length; if(temDup){ alert('Colaborador já selecionado nesta linha.'); select.value=''; if(select.choicesInstance){select.choicesInstance.setChoiceByValue('')} select.dispatchEvent(new Event('change')) } }
+
+        function adicionarLinhaMultiplo(valores=null){ const tbody=document.getElementById('linhasMultiplo'); const idx=tbody.children.length; const tr=document.createElement('tr'); tr.innerHTML=`
+            <td style=\"width:200px;min-width:180px;\"><select name=\"cliente[]\" required class=\"input-cliente\" style=\"width:100%;min-width:180px;\"></select></td>
+            <td style=\"width:200px;min-width:180px;\"><select name=\"colaborador[]\" required class=\"input-colaborador\" style=\"width:100%;min-width:180px;\"></select></td>
+            <td>
+                <div class=\"tipo-toggle-multiplo\" style=\"display:flex;gap:6px;justify-content:center;\">
+                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"produto\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-box\"></i> Produto</button>
+                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"servico\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-cogs\"></i> Serviço</button>
+                    <input type=\"hidden\" name=\"tipo[]\" value=\"\">
+                </div>
+            </td>
+            <td><select name=\"item[]\" required disabled class=\"input-item\"><option value=\"\" disabled selected hidden>Selecione o tipo primeiro</option></select></td>
+            <td><input type=\"text\" name=\"descricao[]\" maxlength=\"100\" placeholder=\"Descrição\" class=\"input-descricao\"></td>
+            <td><input type=\"number\" name=\"valor_venda[]\" step=\"0.01\" min=\"0\" required placeholder=\"0.00\" class=\"input-valor\" oninput=\"calcularComissaoMultiplo(this, ${idx})\"></td>
+            <td><input type=\"text\" name=\"percentual[]\" required placeholder=\"0,00\" inputmode=\"decimal\" class=\"input-percentual\" oninput=\"calcularComissaoMultiplo(this, ${idx})\"></td>
+            <td><input type=\"number\" name=\"valor_comissao[]\" step=\"0.01\" min=\"0\" readonly placeholder=\"0.00\" class=\"input-comissao\"></td>
+            <td class=\"acao-multiplos\">
+                <div class=\"acoes-multiplos-wrapper\" style=\"display:flex;gap:6px;align-items:center;justify-content:center;\">
+                    <div class=\"group-parcelado\" style=\"display:flex;gap:6px;align-items:center;\">
+                        <label style=\"font-size:0.95em;\"><i class='fas fa-receipt'></i></label>
+                        <input type='checkbox' class='checkbox-parcelado'>
+                    </div>
+                    <div class=\"group-parcelas\" style=\"display:none;gap:6px;align-items:center;\">
+                        <label style=\"font-size:0.95em;\"><i class='fas fa-list-ol'></i></label>
+                        <input type='number' min='1' class='input-parcelas' style='width:60px;'>
+                    </div>
+                    <div class=\"group-valor-parcela\">
+                        <label style=\"font-size:0.95em;\"><i class='fas fa-money-bill-wave'></i></label>
+                        <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                    </div>
+                    <button type=\"button\" class=\"btn-simular btn-secondary\" style=\"height:32px;\">Simular</button>
+                </div>
+            </td>
+            <td class=\"duplicar-excluir-multiplos\" style=\"text-align:center;vertical-align:middle;\">
+                <button type=\"button\" class=\"btn-duplicar btn-multiplos-acao\" title=\"Duplicar linha\" onclick=\"duplicarLinhaMultiplo(this)\"><i class=\"fas fa-copy\"></i></button>
+                <button type=\"button\" class=\"btn-deletar btn-multiplos-acao\" title=\"Excluir linha\" onclick=\"excluirLinhaMultiplo(this)\"><i class=\"fas fa-trash\"></i></button>
+            </td>`;
+            tbody.appendChild(tr);
+            const selectCliente=tr.querySelector('select[name="cliente[]"]'); preencherSelectClienteMultiplo(selectCliente);
+            const selectColaborador=tr.querySelector('select[name="colaborador[]"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this) })
+            const selectItem=tr.querySelector('select[name="item[]"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''});
+            const chkParcelado=tr.querySelector('.checkbox-parcelado'); const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorVenda=tr.querySelector('input[name="valor_venda[]"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela');
+            chkParcelado.addEventListener('change',()=>{ grpParcelas.style.display=chkParcelado.checked?'flex':'none'; if(!chkParcelado.checked){ inputParcelas.value=''; inputValorParcela.value='' } });
+            function atualizarValorParcela(){ const v=parseFloat(inputValorVenda.value)||0; const p=parseInt(inputParcelas.value)||0; inputValorParcela.value=(v>0 && p>0)? (v/p).toFixed(2) : '' }
+            inputParcelas.addEventListener('input', atualizarValorParcela); inputValorVenda.addEventListener('input', atualizarValorParcela);
+            const btnSimular=tr.querySelector('.btn-simular'); btnSimular.addEventListener('click', ()=>{ alert('Simulação de títulos por linha ainda não implementada nesta página.'); });
+            if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo="${valores.tipo}"]`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name="descricao[]"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name="valor_venda[]"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name="percentual[]"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name="valor_comissao[]"]').value=valores.valor_comissao } }
+            atualizarResumoMultiplo()
+        }
+
+        function duplicarLinhaMultiplo(btn){ const tr=btn.closest('tr'); const valores={ cliente: tr.querySelector('select[name="cliente[]"]').value, colaborador: tr.querySelector('select[name="colaborador[]"]').value, tipo: tr.querySelector('input[name="tipo[]"]').value, item: tr.querySelector('select[name="item[]"]').value, descricao: tr.querySelector('input[name="descricao[]"]').value, valor_venda: tr.querySelector('input[name="valor_venda[]"]').value, percentual: tr.querySelector('input[name="percentual[]"]').value, valor_comissao: tr.querySelector('input[name="valor_comissao[]"]').value }; adicionarLinhaMultiplo(valores) }
+        function excluirLinhaMultiplo(btn){ const tr=btn.closest('tr'); const trSim=tr.nextElementSibling; tr.remove(); if(trSim && trSim.classList.contains('linha-simulacao-multiplo')) trSim.remove(); atualizarResumoMultiplo() }
+        function limparTodasLinhas(){ document.getElementById('linhasMultiplo').innerHTML=''; atualizarResumoMultiplo() }
+
+        async function salvarComissoesMultiplas(event){ event.preventDefault(); const form=event.target; const linhas=document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)'); if(linhas.length===0){ alert('Adicione pelo menos uma linha antes de salvar.'); return }
+            let proximoNumeroTitulo=1; try{ const ultimos=await window.api.get('/movimento_comissoes?order=numero_titulo.desc&limit=1'); if(ultimos && ultimos.length>0){ proximoNumeroTitulo=(parseInt(ultimos[0].numero_titulo)||0)+1 } }catch(e){ console.error(e) }
+            const listaComissoes=[]; linhas.forEach(tr=>{ const clienteId=tr.querySelector('select[name="cliente[]"]').value; const colaboradorId=tr.querySelector('select[name="colaborador[]"]').value; const tipo=tr.querySelector('input[name="tipo[]"]').value; const itemId=tr.querySelector('select[name="item[]"]').value; const descricao=tr.querySelector('input[name="descricao[]"]').value||null; const valorVenda=parseFloat(tr.querySelector('input[name="valor_venda[]"]').value)||0; const percentualStr=tr.querySelector('input[name="percentual[]"]').value||'0'; const percentual=parseFloat(percentualStr.replace(/\./g,'').replace(',','.'))||0; const valorComissao=parseFloat(tr.querySelector('input[name="valor_comissao[]"]').value)||0; if(!clienteId||!colaboradorId||!tipo||!itemId||!(valorVenda>0)){ return }
+                const numeroTitulo=String(proximoNumeroTitulo++).padStart(6,'0');
+                listaComissoes.push({ cliente_id: clienteId, colaborador_id: colaboradorId, tipo, item_id: itemId, descricao, valor_venda: valorVenda, percentual_comissao: percentual, valor_comissao: valorComissao, numero_titulo: numeroTitulo }) });
+            if(listaComissoes.length===0){ alert('Preencha os dados obrigatórios das linhas.'); return }
+            try{ await window.api.post('/movimento_comissoes', listaComissoes); alert('Comissões salvas com sucesso!'); form.reset(); document.getElementById('linhasMultiplo').innerHTML=''; atualizarResumoMultiplo() }catch(e){ console.error(e); alert('Erro ao salvar comissões. Tente novamente.') }
+        }
+
+        document.getElementById('formMultiplo').addEventListener('submit', salvarComissoesMultiplas);
+
+        document.addEventListener('DOMContentLoaded', async function(){ try{ document.getElementById('loader-multi').style.display='flex' }catch(_){}
+            try{ window.clientes=await api.get('/clientes'); produtos=await api.get('/produtos'); servicos=await api.get('/servicos') }catch(e){ console.error('Falha ao carregar dados iniciais:', e) }
+            adicionarLinhaMultiplo(); atualizarResumoMultiplo(); try{ document.getElementById('loader-multi').style.display='none' }catch(_){}
+        })
+    </script>
+</body>
+</html>

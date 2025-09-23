@@ -88,7 +88,8 @@
             <li class="has-submenu">
                 <a href="#" class="submenu-trigger"><i class="fas fa-hand-holding-usd"></i><span>Comissões</span><i class="fas fa-chevron-down submenu-icon"></i></a>
                 <ul class="submenu">
-                    <li><a href="lancar-comissao.html" class="active"><i class="fas fa-plus-circle"></i><span>Lançar</span></a></li>
+                    <li><a href="lancar-comissao.html" class="active"><i class="fas fa-plus-circle"></i><span>Lançar (Comercial)</span></a></li>
+                    <li><a href="lancar-multcomissao.html"><i class="fas fa-layer-group"></i><span>Lançar (Múltiplos)</span></a></li>
                     <li><a href="movimento-comissao.html"><i class="fas fa-exchange-alt"></i><span>Movimento</span></a></li>
                     <li><a href="consulta-comissao.html"><i class="fas fa-search"></i><span>Consulta</span></a></li>
                 </ul>
@@ -141,7 +142,6 @@
         <div class="content">
             <div class="tabs-comissao">
                 <button id="tabUnico" class="tab-btn active" onclick="mostrarTabComissao('unico')">Lançamento Comercial</button>
-                <button id="tabMultiplo" class="tab-btn" onclick="mostrarTabComissao('multiplo')">Múltiplos Lançamentos</button>
             </div>
             <div id="tabUnicoContent" class="tab-content active">
                 <form id="formUnico" class="form-comissao">
@@ -184,69 +184,11 @@
                         <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar Comissão</button>
                     </div>
                 </form>
-            </div>
-            <div id="tabMultiploContent" class="tab-content">
-                <form id="formMultiplo" class="form-comissao">
-                    <div class="form-row">
-                        <!-- Remover campo de cliente do topo -->
-                    </div>
-                    <div class="table-multiplos">
-                        <div class="table-multiplos-wrapper">
-                            <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 200px; min-width: 180px;">Cliente</th>
-                                    <th style="width: 200px; min-width: 180px;">Colaborador</th>
-                                    <th style="width: 100px; min-width: 80px;">Tipo</th>
-                                    <th style="width: 150px; min-width: 120px;">Produto/Serviço</th>
-                                    <th style="width: 120px; min-width: 100px;">Descrição</th>
-                                    <th style="width: 100px; min-width: 80px;">Valor Venda</th>
-                                    <th style="width: 80px; min-width: 70px;">% Comissão</th>
-                                    <th style="width: 100px; min-width: 80px;">Valor Comissão</th>
-                                    <th style="width: 120px; min-width: 100px;">Ações</th>
-                                    <th style="width: 80px; min-width: 70px;">Duplicar/Excluir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="linhasMultiplo">
-                                <!-- Linhas dinâmicas -->
-                            </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </form>
-            </div>
         </div>
         
-        <!-- Barra Inferior Fixa para Múltiplos Lançamentos -->
-        <div id="barraInferiorMultiplo" class="filters-container" style="position: fixed; bottom: 20px; left: 250px; z-index: 1000; background: #fff; border-top: 1px solid #e3f2fd; justify-content: space-between; padding: 8px 24px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); height: 60px; box-sizing: border-box; margin: 0 24px; border-radius: 10px; border: 1px solid #e3f2fd; display: none;">
-            <div style="display:flex; gap:8px; align-items:center;">
-                <div style="display: flex; gap: 20px; align-items: center;">
-                    <div>
-                        <strong>Total de Linhas:</strong> <span id="totalLinhas">0</span>
-                    </div>
-                    <div>
-                        <strong>Valor Total das Vendas:</strong> <span id="valorTotalVendas">R$ 0,00</span>
-                    </div>
-                    <div>
-                        <strong>Valor Total das Comissões:</strong> <span id="valorTotalComissoes">R$ 0,00</span>
-                    </div>
-                </div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <button type="button" class="btn-primary" onclick="adicionarLinhaMultiplo()" style="padding: 6px 12px; font-size: 0.85em;">
-                    <i class="fas fa-plus"></i> Adicionar Linha
-                </button>
-                <button type="button" class="btn-secondary" onclick="limparTodasLinhas()" style="padding: 6px 12px; font-size: 0.85em;">
-                    <i class="fas fa-trash-alt"></i> Limpar Todas
-                </button>
-                <button type="reset" form="formMultiplo" class="btn-secondary" style="padding: 6px 12px; font-size: 0.85em;">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button type="submit" form="formMultiplo" class="btn-primary" style="padding: 6px 12px; font-size: 0.85em;">
-                    <i class="fas fa-save"></i> Salvar Todos
-                </button>
-            </div>
         </div>
+        
+        
         
         <style>
             .tabs-comissao {
@@ -286,25 +228,7 @@
                 margin-bottom: 0;
                 padding-bottom: 100px; /* Espaço para a barra inferior fixa */
             }
-            /* Layout de altura total para a aba de múltiplos */
-            #tabMultiploContent .form-comissao {
-                display: flex;
-                flex-direction: column;
-                gap: 0;
-                /* Ocupar a altura útil da página deixando espaço para a barra inferior */
-                min-height: calc(100vh - 335px); /* diminuir o container */
-                padding-bottom: 16px; /* pequeno respiro */
-                margin-bottom: 0px; /* sem margem extra */
-            }
-            #tabMultiploContent .table-multiplos {
-                flex: 0 0 auto; /* não deixar o container crescer com muitas linhas */
-                margin-bottom: 0px; /* sem margem extra */
-            }
-            #tabMultiploContent .table-multiplos-wrapper {
-                height: calc(100vh - 420px); /* container menor com rolagem */
-                overflow-y: auto; /* rolagem vertical interna */
-                overflow-x: auto; /* rolagem horizontal se necessário */
-            }
+            
             .form-row {
                 display: flex;
                 gap: 20px;
@@ -347,15 +271,7 @@
                 outline: none;
                 box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.12);
             }
-            /* Remover destaque azul apenas na aba de múltiplos (sobrepõe regras globais) */
-            #tabMultiploContent .form-group input:focus,
-            #tabMultiploContent .form-group input:focus-visible,
-            #tabMultiploContent .form-group select:focus,
-            #tabMultiploContent .form-group select:focus-visible {
-                border-color: #cfd8dc !important;
-                outline: none !important;
-                box-shadow: none !important;
-            }
+            
             .form-group input[readonly] {
                 background-color: #f5f5f5;
                 cursor: not-allowed;
@@ -396,113 +312,7 @@
             .btn-secondary:hover {
                 background-color: #e0e0e0;
             }
-            .table-multiplos {
-                width: 100%;
-                margin-bottom: 16px;
-                position: relative; /* Criar contexto de empilhamento */
-            }
-            .table-multiplos-wrapper {
-                width: 100%;
-            }
-            .table-multiplos table {
-                width: 100%;
-                min-width: 1000px;
-                border-collapse: collapse;
-            }
-.table-multiplos thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2; /* manter header acima do conteúdo */
-    background: #f7f7f8; /* garantir fundo sólido ao fixar */
-    box-shadow: 0 2px 0 rgba(0,0,0,0.03);
-            }
-.table-multiplos th, .table-multiplos td {
-    border: 1px solid #e9ecef;
-    padding: 4px 4px;
-    text-align: center;
-    font-size: 12px;
-}
-.table-multiplos th {
-    background: #f7f7f8;
-                color: #333;
-                font-weight: 600;
-            }
-.table-multiplos td {
-                background: #fff;
-                vertical-align: middle;
-    min-height: 38px;
-    height: 38px;
-            }
-.table-multiplos td * { box-sizing: border-box; }
-.table-multiplos td input,
-.table-multiplos td select { width: 100%; height: 40px; padding: 6px 8px; }
-/* exceção: não expandir o select de intervalo */
-.table-multiplos td select.intervalo-vencimento-select { width: auto !important; }
-.table-multiplos td .choices { width: 100%; }
-            .table-multiplos td .choices__inner { min-height: 40px; height: 40px; padding: 6px 8px; border-radius: 6px; border: 1px solid #cfd8dc; }
-.table-multiplos td .choices__list--single .choices__item { padding: 4px 0; }
-.table-multiplos td .btn-primary,
-.table-multiplos td .btn-secondary { padding: 6px 8px; font-size: 12px; }
-/* Harmonizar borda/altura entre inputs e Choices (Descrição, Valores e %) */
-.table-multiplos td input,
-.table-multiplos td .choices__inner {
-    border: 1px solid #cfd8dc; /* cinza padrão */
-    border-radius: 6px; /* curvatura do Choices */
-}
-.table-multiplos td input {
-    border-color: #cfd8dc !important;
-}
-.table-multiplos td .choices .choices__inner {
-    border-color: #cfd8dc !important;
-}
-/* Garantir cinza (não foco) para cliente, colaborador e produto/serviço */
-.table-multiplos td .choices.input-cliente .choices__inner,
-.table-multiplos td .choices.input-colaborador .choices__inner,
-.table-multiplos tbody td:nth-child(4) .choices .choices__inner {
-    border-color: #cfd8dc !important;
-}
-            .table-multiplos td input:focus,
-            .table-multiplos td input:focus-visible,
-            .table-multiplos td select:focus,
-            .table-multiplos td select:focus-visible {
-                border-color: #2196F3 !important; /* azul no foco */
-                border-width: 1px !important;
-                outline: none !important;
-                box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
-                appearance: none;
-                -webkit-appearance: none;
-            }
-.table-multiplos td .choices:focus-within .choices__inner,
-.table-multiplos td .choices.is-open .choices__inner {
-    border-color: #2196F3 !important; /* azul no foco/aberto */
-    box-shadow: 0 0 0 2px rgba(33,150,243,0.12) !important;
-}
-/* Quando não tiver foco/aberto, manter cinza nas Choices */
-.table-multiplos td .choices:not(.is-focused):not(.is-open) .choices__inner {
-    border-color: #cfd8dc !important;
-    box-shadow: none !important;
-}
-.table-multiplos td .choices__inner { display: flex; align-items: center; }
-/* Fixar largura apenas da coluna Produto/Serviço (4ª coluna) */
-.table-multiplos thead th:nth-child(4),
-.table-multiplos tbody td:nth-child(4) {
-    width: 240px;
-    min-width: 240px;
-    max-width: 240px;
-}
-/* Garantir que o componente interno não altere a largura da coluna */
-.table-multiplos tbody td:nth-child(4) .choices,
-.table-multiplos tbody td:nth-child(4) select {
-    width: 100% !important;
-            }
-.table-multiplos td:last-child {
-    min-height: 38px;
-    height: 38px;
-                vertical-align: middle;
-            }
-            .table-multiplos .btn-primary {
-                margin-top: 8px;
-            }
+            
             @keyframes fadeIn {
                 from { opacity: 0; }
                 to { opacity: 1; }
@@ -1198,49 +1008,12 @@
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
             function mostrarTabComissao(tab) {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                
-                // Esconder barra inferior por padrão
-                const barraInferior = document.getElementById('barraInferiorMultiplo');
-                if (barraInferior) {
-                    barraInferior.style.display = 'none';
-                }
-                
-                if (tab === 'unico') {
-                    document.getElementById('tabUnico').classList.add('active');
-                    document.getElementById('tabUnicoContent').classList.add('active');
-                } else if (tab === 'multiplo') {
-                    document.getElementById('tabMultiplo').classList.add('active');
-                    document.getElementById('tabMultiploContent').classList.add('active');
-                    
-                    // Mostrar barra inferior para múltiplos
-                    if (barraInferior) {
-                        barraInferior.style.display = 'flex';
-                        ajustarBarraInferiorMultiplo();
-                    }
-                    
-                    const tbody = document.getElementById('linhasMultiplo');
-                    if (tbody.children.length === 0) {
-                        adicionarLinhaMultiplo();
-                    }
-                }
+                // Com a remoção da aba de múltiplos, sempre mantém a aba única ativa
+                document.getElementById('tabUnico')?.classList.add('active');
+                document.getElementById('tabUnicoContent')?.classList.add('active');
             }
             
-            function ajustarBarraInferiorMultiplo() {
-                try {
-                const barra = document.getElementById('barraInferiorMultiplo');
-                if (!barra) return;
-                const sidebar = document.querySelector('.sidebar');
-                const sidebarWidth = sidebar ? sidebar.offsetWidth : 250;
-                    const marginX = 21; // mesmo padding do container principal
-                    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-                    // Posicionar ao lado da sidebar e ocupar a largura restante (alinhado com o container)
-                barra.style.left = sidebarWidth + 'px';
-                    const available = viewportWidth - sidebarWidth - (marginX * 2);
-                    barra.style.width = (available > 0 ? available : 0) + 'px';
-                } catch (_) {}
-            }
+            // ajustador da barra inferior de múltiplos removido
 
             function getItemPrimaryId(item) {
                 const id = (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico));
@@ -1375,338 +1148,7 @@
                 });
             }
 
-            let numeroTituloPaiMultiplo = 1;
-
-            function adicionarLinhaMultiplo(valores = null) {
-                const tbody = document.getElementById('linhasMultiplo');
-                const idx = tbody.children.length;
-                const numeroPai = numeroTituloPaiMultiplo.toString().padStart(6, '0');
-                numeroTituloPaiMultiplo++;
-                const tr = document.createElement('tr');
-                tr.setAttribute('data-numero-pai', numeroPai);
-                tr.innerHTML = `
-                    <td style="width: 200px; min-width: 180px;"><select name="cliente[]" required class="input-cliente" style="width: 100%; min-width:180px;"></select></td>
-                    <td style="width: 200px; min-width: 180px;"><select name="colaborador[]" required class="input-colaborador" style="width: 100%; min-width:180px;"></select></td>
-                    <td>
-                        <div class="tipo-toggle-multiplo" style="display:flex; gap:6px; justify-content:center;">
-                            <button type="button" class="btn-tipo" data-tipo="produto" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-box"></i> Produto</button>
-                            <button type="button" class="btn-tipo" data-tipo="servico" onclick="toggleTipoMultiplo(this, ${idx})"><i class="fas fa-cogs"></i> Serviço</button>
-                            <input type="hidden" name="tipo[]" value="">
-                        </div>
-                    </td>
-                    <td><select name="item[]" required disabled class="input-item"><option value="" disabled selected hidden>Selecione o tipo primeiro</option></select></td>
-                    <td><input type="text" name="descricao[]" maxlength="100" placeholder="Descrição" class="input-descricao"></td>
-                    <td><input type="number" name="valor_venda[]" step="0.01" min="0" required placeholder="0.00" class="input-valor" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" class="input-percentual" oninput="calcularComissaoMultiplo(this, ${idx})"></td>
-                    <td><input type="number" name="valor_comissao[]" step="0.01" min="0" readonly placeholder="0.00" class="input-comissao"></td>
-                    <td class="acao-multiplos">
-                        <div class="acoes-multiplos-wrapper">
-                            <div class="acoes-multiplos-botoes" style="display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;">
-                                <button type="button" class="btn-parcelado btn-multiplos-acao" onclick="toggleParceladoMultiploLinha(this)">Parcelado</button>
-                                <button type="button" class="btn-simular btn-multiplos-acao" onclick="simularTitulosMultiploLinha(this)">Simular</button>
-                            </div>
-                            <div class="acoes-multiplos-parcelas" style="display:none;">
-                                <div class="group-parcelas">
-                                    <label style="font-size:0.95em;"><i class='fas fa-list-ol'></i></label>
-                                    <input type='number' min='2' step='1' class='input-qtd-parcelas' style='width:60px;margin-left:2px;' oninput='atualizaValorParcelaMultiplo(this)'>
-                                </div>
-                                <div class="group-valor-parcela">
-                                    <label style="font-size:0.95em;"><i class='fas fa-money-bill-wave'></i></label>
-                                    <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="duplicar-excluir-multiplos" style="text-align:center;vertical-align:middle;">
-                        <button type="button" class="btn-duplicar btn-multiplos-acao" title="Duplicar linha" onclick="duplicarLinhaMultiplo(this)"><i class="fas fa-copy"></i></button>
-                        <button type="button" class="btn-deletar btn-multiplos-acao" title="Excluir linha" onclick="excluirLinhaMultiplo(this)"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-                // Adiciona linha para simulação (abaixo)
-                const trSimulacao = document.createElement('tr');
-                trSimulacao.className = 'linha-simulacao-multiplo';
-                trSimulacao.style.display = 'none';
-                trSimulacao.innerHTML = `<td colspan="9"><div class="simulacao-titulos-multiplo"></div></td>`;
-                tbody.appendChild(trSimulacao);
-                // Preencher colaborador (layout fixo, carrega opções depois)
-                const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
-                preencherSelectColaborador(selectColaborador);
-                // Inicializar Choices.js no campo Produto/Serviço ao criar a linha
-                const selectItem = tr.querySelector('select[name="item[]"]');
-                if (selectItem.choicesInstance) {
-                    selectItem.choicesInstance.destroy();
-                    selectItem.choicesInstance = null;
-                }
-                selectItem.choicesInstance = new Choices(selectItem, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: 'Selecione o tipo primeiro',
-                    removeItemButton: false,
-                    shouldSort: false,
-                    duplicateItemsAllowed: false
-                });
-                setTimeout(() => {
-                    const wrap = selectItem.closest('.choices');
-                    if (wrap) wrap.classList.remove('is-focused', 'is-open');
-                    selectItem.blur();
-                }, 0);
-                // Se valores foram passados (duplicação), preencher os campos
-                if (valores) {
-                    tr.querySelector('input[name="descricao[]"]').value = valores.descricao || '';
-                    tr.querySelector('input[name="valor_venda[]"]').value = valores.valor_venda || '';
-                    tr.querySelector('input[name="percentual[]"]').value = valores.percentual || '';
-                    tr.querySelector('input[name="valor_comissao[]"]').value = valores.valor_comissao || '';
-                    // Preencher selects após carregamento
-                    setTimeout(() => {
-                        if (valores.colaborador) selectColaborador.value = valores.colaborador;
-                        if (valores.tipo) {
-                            const tipoBtn = tr.querySelector(`.btn-tipo[data-tipo='${valores.tipo}']`);
-                            if (tipoBtn) tipoBtn.click();
-                        }
-                        setTimeout(() => {
-                            if (valores.item) {
-                                const selectItem = tr.querySelector('select[name="item[]"]');
-                                selectItem.value = valores.item;
-                            }
-                        }, 200);
-                    }, 200);
-                }
-                atualizarResumoMultiplo();
-                // Adicione esta função no <script> principal, junto das outras funções auxiliares:
-                function preencherSelectClienteMultiplo(selectElement) {
-                    if (selectElement.choicesInstance) {
-                        selectElement.choicesInstance.destroy();
-                        selectElement.choicesInstance = null;
-                    }
-                    selectElement.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
-                    if (window.clientes && window.clientes.length > 0) {
-                        window.clientes.forEach(cliente => {
-                            const option = document.createElement('option');
-                            option.value = cliente.id || cliente.codigo;
-                            option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
-                            selectElement.appendChild(option);
-                        });
-                    }
-                    selectElement.choicesInstance = new Choices(selectElement, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Selecione...',
-                        shouldSort: false
-                    });
-                }
-                // ... existing code ...
-                // Dentro da função adicionarLinhaMultiplo, logo após criar a linha (tr):
-                // ... existing code ...
-                const selectCliente = tr.querySelector('select[name="cliente[]"]');
-                preencherSelectClienteMultiplo(selectCliente);
-                // ... existing code ...
-                // Adiciona verificação de colaborador duplicado nas linhas de múltiplos lançamentos
-                function verificarColaboradorDuplicadoMultiplo(select) {
-                    const valorSelecionado = select.value;
-                    if (!valorSelecionado) return;
-                    const todosSelects = Array.from(document.querySelectorAll('select[name="colaborador[]"]'));
-                    const repetidos = todosSelects.filter(s => s !== select && s.value === valorSelecionado);
-                    if (repetidos.length > 0) {
-                        mostrarModalAlerta('Colaborador já informado no lançamento');
-                        select.value = '';
-                        // Se estiver usando Choices.js, atualizar Choices também
-                        if (select.choicesInstance) {
-                            select.choicesInstance.setChoiceByValue('');
-                        }
-                    }
-                }
-                // Adiciona o evento ao criar cada linha de múltiplos lançamentos
-                const originalAdicionarLinhaMultiplo = adicionarLinhaMultiplo;
-                adicionarLinhaMultiplo = function(valores = null) {
-                    originalAdicionarLinhaMultiplo(valores);
-                    // Após adicionar a linha, adiciona o evento de verificação
-                    const tbody = document.getElementById('linhasMultiplo');
-                    const tr = tbody.querySelector('tr:last-of-type');
-                    const selectColaborador = tr.querySelector('select[name="colaborador[]"]');
-                    if (selectColaborador) {
-                        selectColaborador.addEventListener('change', function() {
-                            verificarColaboradorDuplicadoMultiplo(this);
-                        });
-                    }
-                };
-            }
-
-            function duplicarLinhaMultiplo(btn) {
-                const tr = btn.closest('tr');
-                const valores = {
-                    colaborador: tr.querySelector('select[name="colaborador[]"]').value,
-                    tipo: tr.querySelector('input[name="tipo[]"]').value,
-                    item: tr.querySelector('select[name="item[]"]').value,
-                    descricao: tr.querySelector('input[name="descricao[]"]').value,
-                    valor_venda: tr.querySelector('input[name="valor_venda[]"]').value,
-                    percentual: tr.querySelector('input[name="percentual[]"]').value,
-                    valor_comissao: tr.querySelector('input[name="valor_comissao[]"]').value
-                };
-                adicionarLinhaMultiplo(valores);
-            }
-
-            function excluirLinhaMultiplo(btn) {
-                const tr = btn.closest('tr');
-                const trSimulacao = tr.nextElementSibling;
-                tr.remove();
-                if (trSimulacao && trSimulacao.classList.contains('linha-simulacao-multiplo')) {
-                    trSimulacao.remove();
-                }
-                atualizarResumoMultiplo();
-            }
-
-            // Função toggle dos botões de tipo na tabela múltiplos
-            function toggleTipoMultiplo(btn, idx) {
-                const container = btn.parentElement;
-                const buttons = container.querySelectorAll('.btn-tipo');
-                buttons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const tipo = btn.getAttribute('data-tipo');
-                container.querySelector('input[name="tipo[]"]').value = tipo;
-                // Atualizar select de itens
-                const tr = btn.closest('tr');
-                atualizarTipoMultiplo({ value: tipo, parentElement: () => btn.closest('td'), closest: tr.closest.bind(tr) }, idx);
-            }
-
-            function atualizarTipoMultiplo(select, idx) {
-                // Suporte para chamada via botão (objeto customizado)
-                let td, itemSelect, tipo;
-                if (select instanceof HTMLElement || (select && select.tagName)) {
-                    td = select.parentElement.nextElementSibling;
-                    itemSelect = td.querySelector('select[name="item[]"]');
-                    tipo = select.value;
-                } else {
-                    // chamada via toggleTipoMultiplo
-                    td = select.parentElement().nextElementSibling;
-                    itemSelect = td.querySelector('select[name="item[]"]');
-                    tipo = select.value;
-                }
-                // Limpar e desabilitar o select de itens
-                itemSelect.innerHTML = '<option value="">Carregando...</option>';
-                itemSelect.disabled = true;
-                // Destroi Choices anterior se existir
-                if (itemSelect.choicesInstance) {
-                    itemSelect.choicesInstance.destroy();
-                    itemSelect.choicesInstance = null;
-                }
-                if (!tipo) {
-                    itemSelect.innerHTML = '<option value="" disabled selected hidden>Selecione o tipo primeiro</option>';
-                    // Aplica Choices.js para manter padrão visual
-                    itemSelect.choicesInstance = new Choices(itemSelect, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Selecione o tipo primeiro',
-                        shouldSort: false
-                    });
-                    return;
-                }
-                // Carregar produtos ou serviços baseado no tipo selecionado
-                let lista = tipo === 'produto' ? produtos : servicos;
-                if (lista && lista.length > 0) {
-                    itemSelect.innerHTML = '<option value="" disabled selected hidden>Selecione u' + (tipo === 'produto' ? 'produto' : 'serviço') + '...</option>';
-                    lista.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.codigo;
-                        option.textContent = `${item.codigo.padStart(5, '0')} - ${item.nome}`;
-                        option.setAttribute('data-preco', item.preco || 0);
-                        itemSelect.appendChild(option);
-                    });
-                    // Habilitar o select de itens
-                    itemSelect.disabled = false;
-                    // Aplicar Choices.js no select de itens
-                    itemSelect.choicesInstance = new Choices(itemSelect, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Selecione um ' + (tipo === 'produto' ? 'produto' : 'serviço') + '...',
-                        removeItemButton: false,
-                        shouldSort: false,
-                        duplicateItemsAllowed: false
-                    });
-                    // Adicionar evento para atualizar valor da venda quando item for selecionado
-                    itemSelect.addEventListener('change', function() {
-                        const selectedOptions = Array.from(this.selectedOptions).filter(opt => opt.value);
-                        let soma = 0;
-                        selectedOptions.forEach(opt => {
-                            soma += parseFloat(opt.getAttribute('data-preco')) || 0;
-                        });
-                        const valorVendaInput = td.parentElement.querySelector('input[name="valor_venda[]"]');
-                        valorVendaInput.value = soma.toFixed(2);
-                        // Recalcular comissão se houver percentual
-                        const percentualInput = td.parentElement.querySelector('input[name="percentual[]"]');
-                        if (percentualInput.value) {
-                            calcularComissaoMultiplo(percentualInput, idx);
-                        }
-                    });
-                } else {
-                    itemSelect.innerHTML = '<option value="">Nenhum ' + (tipo === 'produto' ? 'produto' : 'serviço') + ' encontrado</option>';
-                    // Aplica Choices.js para manter padrão visual
-                    itemSelect.choicesInstance = new Choices(itemSelect, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Nenhum ' + (tipo === 'produto' ? 'produto' : 'serviço') + ' encontrado'
-                    });
-                }
-            }
-
-            function calcularComissaoMultiplo(input, idx) {
-                const tr = input.closest('tr');
-                const valorVenda = parseFloat(tr.querySelector('input[name="valor_venda[]"]').value) || 0;
-                const percEl = tr.querySelector('input[name="percentual[]"]');
-                // Sanitiza: aceita ponto e converte para vírgula; limita a 2 casas e 0..100
-                let raw = (percEl.value || '').replace(/[^\d,\.]/g, '');
-                // Converte todos pontos para vírgula (teclado numérico/EN)
-                raw = raw.replace(/\./g, ',');
-                const firstComma = raw.indexOf(',');
-                if (firstComma !== -1) {
-                    let intPart = raw.slice(0, firstComma).replace(/,/g, '');
-                    if (intPart === '') intPart = '0';
-                    let decPart = raw.slice(firstComma + 1).replace(/,/g, '');
-                    decPart = decPart.slice(0, 2);
-                    raw = intPart + (decPart.length ? (',' + decPart) : ',');
-                } else {
-                    raw = raw.replace(/,/g, '');
-                }
-                // Se inteiro excede 100, força 100
-                const rawInt = raw.split(',')[0];
-                if (rawInt && parseInt(rawInt, 10) > 100) raw = '100';
-                percEl.value = raw;
-                let percentual = parseFloat(raw.replace(',', '.'));
-                if (isNaN(percentual)) percentual = 0;
-                const used = Math.min(100, Math.max(0, percentual));
-                if (used !== percentual) {
-                    percEl.value = String(Math.round(used * 100) / 100).replace('.', ',');
-                }
-                const valorComissaoInput = tr.querySelector('input[name="valor_comissao[]"]');
-                const valorComissao = (valorVenda * used / 100);
-                valorComissaoInput.value = valorComissao.toFixed(2);
-                atualizarResumoMultiplo();
-            }
-            
-            function atualizarResumoMultiplo() {
-                const linhas = document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)');
-                let totalVendas = 0;
-                let totalComissoes = 0;
-                
-                linhas.forEach(linha => {
-                    const inputValorVenda = linha.querySelector('input[name="valor_venda[]"]');
-                    const inputValorComissao = linha.querySelector('input[name="valor_comissao[]"]');
-                    const valorVenda = inputValorVenda ? parseFloat(inputValorVenda.value) || 0 : 0;
-                    const valorComissao = inputValorComissao ? parseFloat(inputValorComissao.value) || 0 : 0;
-                    
-                    totalVendas += valorVenda;
-                    totalComissoes += valorComissao;
-                });
-                
-                document.getElementById('totalLinhas').textContent = linhas.length;
-                document.getElementById('valorTotalVendas').textContent = formatarMoedaBR(totalVendas);
-                document.getElementById('valorTotalComissoes').textContent = formatarMoedaBR(totalComissoes);
-            }
+            // múltiplos: blocos e funções removidos
 
             let numeroTituloPai = 1;
             
@@ -2399,9 +1841,6 @@
                     alert('Erro ao salvar comissão. Tente novamente.');
                 }
             }
-            
-            // Adicionar evento de submit ao formulário múltiplo
-            document.getElementById('formMultiplo').addEventListener('submit', salvarComissoesMultiplas);
 
             // Função para alternar exibição dos campos de parcelas e valor da parcela na linha de múltiplos lançamentos
             function toggleParceladoMultiploLinha(btn) {
@@ -2540,5 +1979,29 @@
     </div>
 
     <script src="scripts/navigation.js"></script>
+    <script>
+    // Ativar aba de múltiplos quando acessar com hash #multi
+    document.addEventListener('DOMContentLoaded', function() {
+        if (location.hash === '#multi') {
+            try {
+                if (typeof mostrarTabComissao === 'function') {
+                    mostrarTabComissao('multiplo');
+                } else {
+                    // fallback: alterna classes manualmente
+                    const tabUnicoBtn = document.getElementById('tabUnico');
+                    const tabMultiploBtn = document.getElementById('tabMultiplo');
+                    const unico = document.getElementById('tabUnicoContent');
+                    const multiplo = document.getElementById('tabMultiploContent');
+                    tabUnicoBtn && tabUnicoBtn.classList.remove('active');
+                    tabMultiploBtn && tabMultiploBtn.classList.add('active');
+                    unico && unico.classList.remove('active');
+                    multiplo && multiplo.classList.add('active');
+                    const barra = document.getElementById('barraInferiorMultiplo');
+                    if (barra) barra.style.display = 'flex';
+                }
+            } catch (e) { /* noop */ }
+        }
+    });
+    </script>
 </body>
 </html>  
