@@ -724,6 +724,20 @@ textarea[readonly] {
     box-shadow: 0 10px 24px rgba(2,6,23,0.12) !important;
 }
 
+/* Truncar texto longo nos Choices (sem quebrar linha) */
+.table-multiplos .choices__inner,
+.table-multiplos .choices__item--selectable {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-multiplos .choices__list--dropdown .choices__item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Ações na Tabela */
 .btn-action {
     background: none;
