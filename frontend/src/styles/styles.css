@@ -662,6 +662,68 @@ textarea {
     font-weight: 500;
 }
 
+/* Global: campos com fundo cinza padrão (inputs, selects, textareas, Choices) */
+input,
+select,
+textarea {
+    background: #f8f9fa;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    background: #f8f9fa;
+}
+
+input[readonly],
+select[readonly],
+textarea[readonly] {
+    background: #f8f9fa;
+}
+
+/* Choices.js containers */
+.choices,
+.choices__inner {
+    background: #f8f9fa;
+}
+
+.choices.is-open .choices__inner,
+.choices.is-disabled .choices__inner {
+    background: #f8f9fa;
+}
+
+/* Choices: remover borda/realce azul da barra de pesquisa interna */
+.choices__list--dropdown .choices__input,
+.choices__input,
+.choices__input--cloned {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: #f8f9fa !important;
+}
+
+.choices__list--dropdown .choices__input:focus,
+.choices__input:focus,
+.choices__input--cloned:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Choices: realce azul ao focar, igual aos inputs */
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+    border-color: #2196F3 !important;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15) !important;
+}
+
+/* Choices: espaçamento entre o campo e a lista (dropdown não colado) */
+.choices__list--dropdown {
+    margin-top: 5px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 24px rgba(2,6,23,0.12) !important;
+}
+
 /* Ações na Tabela */
 .btn-action {
     background: none;
@@ -1989,10 +2051,10 @@ tr:hover {
 .form-group input.input-descricao:focus,
 .form-group input.input-descricao:-webkit-autofill,
 .form-group input.input-descricao:-webkit-autofill:focus {
-    background: #fff !important;
+    background: #f8f9fa !important;
     color: #333 !important;
-    box-shadow: 0 0 0 1000px #fff inset !important;
-    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+    -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset !important;
     transition: background-color 5000s ease-in-out 0s;
 }
 
