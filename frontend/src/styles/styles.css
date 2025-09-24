@@ -738,6 +738,19 @@ textarea[readonly] {
     text-overflow: ellipsis;
 }
 
+/* Impedir que o campo Choices aumente a largura do TD */
+.table-multiplos td .choices {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+}
+
+.table-multiplos td .choices__list--single {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Ações na Tabela */
 .btn-action {
     background: none;
