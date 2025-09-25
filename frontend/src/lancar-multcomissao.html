@@ -79,6 +79,18 @@
         .checkbox-parcelado{width:16px;height:16px}
         .input-parcelas{border-radius:8px}
         .input-valor-parcela{border-radius:8px;background:#eef6ff;color:#0f172a}
+        /* Modal de lançamento */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:9999}
+        .modal-card{width:min(420px,92vw);background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:20px;text-align:center}
+        .modal-title{font-size:1.15rem;font-weight:700;margin-bottom:8px}
+        .modal-sub{color:#555;font-size:.95rem;margin-bottom:14px}
+        .spinner{width:42px;height:42px;border:4px solid #e8ecf4;border-top-color:#4f46e5;border-radius:50%;margin:10px auto 16px;animation:spin .9s linear infinite}
+        .progressbar{width:100%;height:8px;background:#eef2f7;border-radius:999px;overflow:hidden;margin:10px 0 4px}
+        .progressbar>div{height:100%;width:0%;background:linear-gradient(90deg,#4f46e5,#22c55e);transition:width .25s ease}
+        .modal-actions{margin-top:14px;display:flex;gap:10px;justify-content:center}
+        .btn-modal{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+        .btn-ok{background:#22c55e;color:#fff}
+        .btn-error{background:#ef4444;color:#fff}
     </style>
 </head>
 <body>
@@ -185,6 +197,18 @@
                 <button type="submit" form="formMultiplo" class="btn-primary"><i class="fas fa-save"></i> Salvar Todos</button>
             </div>
         </div>
+        <!-- Modal Lançamento -->
+        <div id="modalLancamento" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalLancamentoTitulo">
+            <div class="modal-card">
+                <div id="modalLancamentoTitulo" class="modal-title">Lançando títulos...</div>
+                <div id="modalLancamentoSub" class="modal-sub">Preparando envios</div>
+                <div class="spinner" id="modalLancamentoSpinner"></div>
+                <div class="progressbar"><div id="modalLancamentoBar"></div></div>
+                <div class="modal-actions" id="modalLancamentoActions" style="display:none">
+                    <button type="button" class="btn-modal btn-ok" id="btnModalOk">OK</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="scripts/navigation.js"></script>
@@ -209,6 +233,67 @@
             try{ if (localStorage.getItem('usuarioLogado')) return localStorage.getItem('usuarioLogado') }catch(_){ }
             return 'admin';
         }
+        // Modal helpers
+        function abrirModalLancamento(total){
+            try{
+                const m=document.getElementById('modalLancamento');
+                const t=document.getElementById('modalLancamentoTitulo');
+                const s=document.getElementById('modalLancamentoSub');
+                const bar=document.getElementById('modalLancamentoBar');
+                const sp=document.getElementById('modalLancamentoSpinner');
+                const act=document.getElementById('modalLancamentoActions');
+                m.style.display='flex';
+                t.textContent='Lançando títulos...';
+                s.textContent=`Iniciando (0 de ${total})`;
+                bar.style.width='0%';
+                sp.style.display='block';
+                act.style.display='none';
+                const ok=document.getElementById('btnModalOk');
+                ok.classList.remove('btn-error');
+                ok.classList.add('btn-ok');
+            }catch(_){}
+        }
+        function atualizarModalLancamento(processados,total){
+            try{
+                const s=document.getElementById('modalLancamentoSub');
+                const bar=document.getElementById('modalLancamentoBar');
+                const pct=Math.max(0,Math.min(100, Math.round((processados/Math.max(1,total))*100)));
+                s.textContent=`Processando (${processados} de ${total})`;
+                bar.style.width=pct+'%';
+            }catch(_){}
+        }
+        function finalizarModalLancamentoSucesso(qtd){
+            try{
+                const t=document.getElementById('modalLancamentoTitulo');
+                const s=document.getElementById('modalLancamentoSub');
+                const sp=document.getElementById('modalLancamentoSpinner');
+                const act=document.getElementById('modalLancamentoActions');
+                const bar=document.getElementById('modalLancamentoBar');
+                t.textContent='Títulos lançados com sucesso!';
+                s.textContent=`${qtd} título(s) gerados e salvos.`;
+                sp.style.display='none';
+                bar.style.width='100%';
+                act.style.display='flex';
+            }catch(_){}
+        }
+        function finalizarModalLancamentoErro(msg){
+            try{
+                const t=document.getElementById('modalLancamentoTitulo');
+                const s=document.getElementById('modalLancamentoSub');
+                const sp=document.getElementById('modalLancamentoSpinner');
+                const act=document.getElementById('modalLancamentoActions');
+                const ok=document.getElementById('btnModalOk');
+                const bar=document.getElementById('modalLancamentoBar');
+                t.textContent='Falha ao lançar títulos';
+                s.textContent= msg || 'Tente novamente.';
+                sp.style.display='none';
+                bar.style.width='0%';
+                act.style.display='flex';
+                ok.classList.remove('btn-ok');
+                ok.classList.add('btn-error');
+            }catch(_){}
+        }
+        (function bindModalOk(){ try{ document.getElementById('btnModalOk').addEventListener('click', ()=>{ try{ document.getElementById('modalLancamento').style.display='none' }catch(_){ } }) }catch(_){ } })();
         async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
         function preencherSelectColaborador(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; buscarColaboradores().then(colabs=>{ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; colabs.forEach(c=>{const o=document.createElement('option'); const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? ''); o.value=String(codigo); o.textContent=c.nome||c.descricao||String(codigo); select.appendChild(o)}); select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }) }
         function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const o=document.createElement('option'); o.value=codigoStr; o.textContent=c.nome||codigoStr; select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }
@@ -564,19 +649,25 @@
             
             if (listaComissoes.length === 0) {
                 const msg = motivos.length ? motivos.join('\n') : 'Preencha os dados obrigatórios das linhas.';
-                alert(msg);
+                finalizarModalLancamentoErro(msg);
                 return;
             }
-            
+            // Mostrar modal e progresso
+            abrirModalLancamento(listaComissoes.length);
+            let contador=0; let total=listaComissoes.length; let timer=null;
             try {
+                timer=setInterval(()=>{ if(contador < total-1){ contador++; atualizarModalLancamento(contador,total) } }, 200);
                 await window.api.post('/movimento_comissoes', listaComissoes);
-                alert(`Comissões salvas com sucesso (${listaComissoes.length} título(s))!`);
+                atualizarModalLancamento(total,total);
+                finalizarModalLancamentoSucesso(total);
                 form.reset();
                 document.getElementById('linhasMultiplo').innerHTML = '';
                 atualizarResumoMultiplo();
             } catch(e) {
                 console.error(e);
-                alert(e?.data?.details || 'Erro ao salvar comissões. Tente novamente.');
+                finalizarModalLancamentoErro(e?.data?.details || 'Erro ao salvar comissões. Tente novamente.');
+            } finally {
+                if(timer){ clearInterval(timer) }
             }
         }
 
