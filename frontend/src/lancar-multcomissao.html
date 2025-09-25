@@ -234,19 +234,25 @@
         }
 
         function validarLinhasAntesDeSalvar(){
-            const linhas=[...document.querySelectorAll('#linhasMultiplo tr:not(.linha-simulacao-multiplo)')];
+            const linhas=[...document.querySelectorAll('#linhasMultiplo tr.linha-lancamento-multiplo')];
             let ok=true;
             linhas.forEach(tr=>{
-                const cliente=tr.querySelector('select[name="cliente[]"]').value;
-                const colaborador=tr.querySelector('select[name="colaborador[]"]').value;
-                const tipo=tr.querySelector('input[name="tipo[]"]').value;
-                const item=tr.querySelector('select[name="item[]"]').value;
-                const valorVenda=parseFloat(tr.querySelector('input[name="valor_venda[]"]').value)||0;
-                const percStr=(tr.querySelector('input[name="percentual[]"]').value||'0').replace(/\./g,'').replace(',','.');
+                const selCliente=tr.querySelector('select[name="cliente[]"]');
+                const selColab=tr.querySelector('select[name="colaborador[]"]');
+                const inpTipo=tr.querySelector('input[name="tipo[]"]');
+                const selItem=tr.querySelector('select[name="item[]"]');
+                const inpVenda=tr.querySelector('input[name="valor_venda[]"]');
+                const inpPerc=tr.querySelector('input[name="percentual[]"]');
+                const cliente=selCliente?selCliente.value:'';
+                const colaborador=selColab?selColab.value:'';
+                const tipo=inpTipo?inpTipo.value:'';
+                const item=selItem?selItem.value:'';
+                const valorVenda=inpVenda? (parseFloat(inpVenda.value)||0) : 0;
+                const percStr=(inpPerc && inpPerc.value? inpPerc.value : '0').replace(/\./g,'').replace(',','.');
                 const perc=parseFloat(percStr)||0;
                 const highlight=(el)=>{ if(el){ el.style.boxShadow='0 0 0 2px rgba(220,53,69,.2)'; el.style.borderColor='#dc3545'; setTimeout(()=>{el.style.boxShadow=''; el.style.borderColor='';}, 2000);} };
                 if(!cliente||!colaborador||!tipo||!item||!(valorVenda>0)){ ok=false; highlight(tr); }
-                if(perc<0 || perc>100){ ok=false; const p=tr.querySelector('input[name="percentual[]"]'); highlight(p); }
+                if(perc<0 || perc>100){ ok=false; const p=inpPerc; highlight(p); }
             });
             if(!ok) alert('Verifique os campos obrigatórios e se o percentual está entre 0 e 100.');
             if(ok) ok = verificarDuplicidadeColaboradorGlobal();
