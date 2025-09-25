@@ -200,6 +200,45 @@
 
         function calcularComissaoMultiplo(input, idx){ const tr=input.closest('tr'); const valorVenda=parseFloat(tr.querySelector('input[name="valor_venda[]"]').value)||0; const percentualStr=tr.querySelector('input[name="percentual[]"]').value||'0'; const percentualNumber=percentualStr.replace(/\./g,'').replace(',','.'); const used=parseFloat(percentualNumber)||0; const valorComissaoInput=tr.querySelector('input[name="valor_comissao[]"]').value= (valorVenda*used/100).toFixed(2); atualizarResumoMultiplo() }
 
+        function obterDatasSimulacao(){
+            const hoje=new Date();
+            const ano=hoje.getFullYear(); const mes=String(hoje.getMonth()+1).padStart(2,'0'); const dia=String(hoje.getDate()).padStart(2,'0');
+            const emissao=`${ano}-${mes}-${dia}`;
+            const vencimentoBase=new Date(hoje.getFullYear(),hoje.getMonth()+1,hoje.getDate());
+            const vAno=vencimentoBase.getFullYear(); const vMes=String(vencimentoBase.getMonth()+1).padStart(2,'0'); const vDia=String(vencimentoBase.getDate()).padStart(2,'0');
+            const primeiroVenc=`${vAno}-${vMes}-${vDia}`;
+            return { emissao, primeiroVenc };
+        }
+
+        function criarLinhaSimulacao(tr, parcelas, valorParcela){
+            const tbody=document.getElementById('linhasMultiplo');
+            const trSim=document.createElement('tr');
+            trSim.classList.add('linha-simulacao-multiplo');
+            const { emissao, primeiroVenc }=obterDatasSimulacao();
+            let colSpan=8; // ocupa as colunas principais
+            trSim.innerHTML=`
+                <td colspan="${colSpan}" style="text-align:left;background:#f8fafc;">
+                    <strong>Simulação de Títulos:</strong>
+                </td>
+                <td colspan="2" style="background:#f8fafc;">
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start;">
+                        ${Array.from({length:parcelas}).map((_,i)=>{
+                            const idx=i+1;
+                            return `<div style='display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:6px;'>
+                                        <span>${idx}ª</span>
+                                        <input type='date' value='${primeiroVenc}' style='height:32px;'>
+                                        <input type='text' value='${valorParcela}' style='width:100px;height:32px;' readonly>
+                                    </div>`
+                        }).join('')}
+                    </div>
+                </td>`;
+            tbody.insertBefore(trSim, tr.nextElementSibling);
+        }
+
+        function removerSimulacaoLinha(tr){ const next=tr.nextElementSibling; if(next && next.classList.contains('linha-simulacao-multiplo')) next.remove() }
+        function atualizarSimulacaoLinha(tr){ const next=tr.nextElementSibling; if(!(next && next.classList.contains('linha-simulacao-multiplo'))) return; const inputValorParcela=tr.querySelector('.input-valor-parcela'); const parcelas=parseInt(tr.querySelector('.input-parcelas').value)||0; if(parcelas<=0 || !inputValorParcela.value){ next.remove(); return } const valorParcela=inputValorParcela.value; next.remove(); criarLinhaSimulacao(tr, parcelas, valorParcela) }
+        function simularTitulosLinha(tr){ const parcelas=parseInt(tr.querySelector('.input-parcelas').value)||0; const valorParcela=tr.querySelector('.input-valor-parcela').value; if(parcelas<=0 || !valorParcela){ alert('Informe a quantidade de parcelas e calcule o valor da parcela.'); return } removerSimulacaoLinha(tr); criarLinhaSimulacao(tr, parcelas, valorParcela) }
+
         function atualizarTipoMultiplo(select, idx){ let td,itemSelect,tipo; if(select.tagName==='SELECT'){ td=select.closest('td'); itemSelect=td.parentElement.querySelector('select[name="item[]"]'); tipo=select.value } else { td=select.parentElement().nextElementSibling; itemSelect=td.querySelector('select[name="item[]"]'); tipo=select.value }
             const inputValor=td.parentElement.querySelector('input[name="valor_venda[]"]'); itemSelect.disabled=true; if(itemSelect.choicesInstance){itemSelect.choicesInstance.destroy(); itemSelect.choicesInstance=null}
             if(!tipo){ itemSelect.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:''}); return }
@@ -240,7 +279,7 @@
                         <input type='number' min='1' class='input-parcelas' style='width:60px;'>
                     </div>
                     <div class="group-valor-parcela">
-                        <input type='text' class='input-valor-parcela' style='width:60px;margin-left:2px;' readonly>
+                        <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
                     </div>
                     <button type=\"button\" class=\"btn-simular btn-secondary\" title=\"Simular títulos\" style=\"height:32px;\">Simular</button>
                 </div>
@@ -254,10 +293,10 @@
             const selectColaborador=tr.querySelector('select[name=\"colaborador[]\"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this) })
             const selectItem=tr.querySelector('select[name=\"item[]\"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''});
             const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name=\"valor_comissao[]\"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela');
-            const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; grpParcelas.style.display=isOpen?'none':'flex'; if(isOpen){ inputParcelas.value=''; inputValorParcela.value='' } });
-            function atualizarValorParcela(){ const v=parseFloat(inputValorComissao.value)||0; const p=parseInt(inputParcelas.value)||0; inputValorParcela.value=(v>0 && p>0)? formatarMoedaBR(v/p) : '' }
+            const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; grpParcelas.style.display=isOpen?'none':'flex'; if(isOpen){ inputParcelas.value=''; inputValorParcela.value=''; removerSimulacaoLinha(tr) } });
+            function atualizarValorParcela(){ const v=parseFloat(inputValorComissao.value)||0; const p=parseInt(inputParcelas.value)||0; inputValorParcela.value=(v>0 && p>0)? (v/p).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}) : ''; if(document.body.contains(tr.nextElementSibling) && tr.nextElementSibling && tr.nextElementSibling.classList.contains('linha-simulacao-multiplo')){ atualizarSimulacaoLinha(tr) } }
             inputParcelas.addEventListener('input', atualizarValorParcela); inputValorComissao.addEventListener('input', atualizarValorParcela);
-            const btnSimular=tr.querySelector('.btn-simular'); btnSimular.addEventListener('click', ()=>{ alert('Simulação de títulos por linha ainda não implementada nesta página.'); });
+            const btnSimular=tr.querySelector('.btn-simular'); btnSimular.addEventListener('click', ()=>{ simularTitulosLinha(tr) });
             if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo=\'${valores.tipo}\']`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name=\"descricao[]\"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name=\"valor_venda[]\"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name=\"percentual[]\"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name=\"valor_comissao[]\"]').value=valores.valor_comissao } }
             atualizarResumoMultiplo()
         }
