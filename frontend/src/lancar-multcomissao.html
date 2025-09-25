@@ -325,6 +325,8 @@
 
         function atualizarTipoMultiplo(select, idx){ let td,itemSelect,tipo; if(select.tagName==='SELECT'){ td=select.closest('td'); itemSelect=td.parentElement.querySelector('select[name="item[]"]'); tipo=select.value } else { td=select.parentElement().nextElementSibling; itemSelect=td.querySelector('select[name="item[]"]'); tipo=select.value }
             const inputValor=td.parentElement.querySelector('input[name="valor_venda[]"]'); itemSelect.disabled=true; if(itemSelect.choicesInstance){itemSelect.choicesInstance.destroy(); itemSelect.choicesInstance=null}
+            // Ao alterar o tipo, invalida qualquer simulação existente da linha
+            try{ const trRow=td.parentElement; removerSimulacaoLinha(trRow) }catch(_){ }
             if(!tipo){ itemSelect.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:''}); return }
             let source = tipo==='produto'? produtos : servicos; const choices = (source||[]).map(it=>({value:String(getItemPrimaryId(it)), label:getItemName(it), customProperties:{valor:getItemPrice(it)}}));
             itemSelect.innerHTML='';
@@ -334,7 +336,11 @@
             choices.forEach(c=>{ const o=document.createElement('option'); o.value=c.value; o.textContent=c.label; o.dataset.valor=c.customProperties.valor; itemSelect.appendChild(o) });
             itemSelect.disabled=false; itemSelect.value='';
             itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'});
-            itemSelect.addEventListener('change',function(){ const selectedOptions=Array.from(this.selectedOptions).filter(opt=>opt.value); if(selectedOptions.length===1){ const val=parseFloat(selectedOptions[0].dataset.valor||'0'); if(val>0){ inputValor.value=val.toFixed(2); calcularComissaoMultiplo(inputValor, idx) } } }) }
+            itemSelect.addEventListener('change',function(){
+                // Alterar o item invalida simulação
+                try{ const trRow=td.parentElement; removerSimulacaoLinha(trRow) }catch(_){ }
+                const selectedOptions=Array.from(this.selectedOptions).filter(opt=>opt.value); if(selectedOptions.length===1){ const val=parseFloat(selectedOptions[0].dataset.valor||'0'); if(val>0){ inputValor.value=val.toFixed(2); calcularComissaoMultiplo(inputValor, idx) } }
+            }) }
 
         function toggleTipoMultiplo(btn, idx){ const container=btn.parentElement; const buttons=container.querySelectorAll('.btn-tipo'); buttons.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const tipo=btn.dataset.tipo; container.querySelector('input[name="tipo[]"]').value=tipo; const tr=btn.closest('tr'); atualizarTipoMultiplo({ value: tipo, parentElement: ()=>btn.closest('td'), closest: tr.closest.bind(tr) }, idx) }
 
@@ -353,7 +359,7 @@
             <td><select name=\"item[]\" required disabled class=\"input-item\"><option value=\"\" disabled selected hidden>Selecione...</option></select></td>
             <td><input type=\"text\" name=\"descricao[]\" maxlength=\"100\" placeholder=\"Descrição\" class=\"input-descricao\"></td>
             <td><input type=\"number\" name=\"valor_venda[]\" step=\"0.01\" min=\"0\" required placeholder=\"0.00\" class=\"input-valor\" oninput=\"calcularComissaoMultiplo(this, ${idx})\"></td>
-            <td><input type=\"text\" name=\"percentual[]\" required placeholder=\"0,00\" inputmode=\"decimal\" class=\"input-percentual\" oninput=\"calcularComissaoMultiplo(this, ${idx})\"></td>
+            <td><input type=\"text\" name=\"percentual[]\" required placeholder=\"0,00\" inputmode=\"decimal\" class=\"input-percentual\" oninput=\"sanitizarPercentualMultiplo(this)\"></td>
             <td><input type=\"number\" name=\"valor_comissao[]\" step=\"0.01\" min=\"0\" readonly placeholder=\"0.00\" class=\"input-comissao\"></td>
             <td class=\"acao-multiplos\">
                 <div class=\"acoes-multiplos-wrapper\" style=\"display:flex;gap:6px;align-items:center;justify-content:center;\">
@@ -373,14 +379,17 @@
                 <button type=\"button\" class=\"btn-deletar btn-multiplos-acao\" title=\"Excluir linha\" onclick=\"excluirLinhaMultiplo(this)\"><i class=\"fas fa-trash\"></i></button>
             </td>`;
             tbody.appendChild(tr);
-            const selectCliente=tr.querySelector('select[name=\"cliente[]\"]'); preencherSelectClienteMultiplo(selectCliente);
-            const selectColaborador=tr.querySelector('select[name=\"colaborador[]\"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this) })
-            const selectItem=tr.querySelector('select[name=\"item[]\"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''});
+            const selectCliente=tr.querySelector('select[name=\"cliente[]\"]'); preencherSelectClienteMultiplo(selectCliente); selectCliente.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
+            const selectColaborador=tr.querySelector('select[name=\"colaborador[]\"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this); removerSimulacaoLinha(tr) })
+            const selectItem=tr.querySelector('select[name=\"item[]\"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''}); selectItem.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
             const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name=\"valor_comissao[]\"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela'); const grpValorParcela=tr.querySelector('.group-valor-parcela');
             const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; if(isOpen){ grpParcelas.style.display='none'; grpValorParcela.style.display='none'; inputParcelas.value=''; inputValorParcela.value=''; removerSimulacaoLinha(tr) } else { grpParcelas.style.display='flex'; grpValorParcela.style.display='block'; inputParcelas.min='2'; inputParcelas.value='2'; atualizarValorParcela() } });
             function atualizarValorParcela(){ let p=parseInt(inputParcelas.value)||0; if(p<2){ p=2; inputParcelas.value='2'; } const v=parseFloat(inputValorComissao.value)||0; inputValorParcela.value=(v>0 && p>0)? (v/p).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}) : ''; if(document.body.contains(tr.nextElementSibling) && tr.nextElementSibling && tr.nextElementSibling.classList.contains('linha-simulacao-multiplo')){ atualizarSimulacaoLinha(tr) } }
             inputParcelas.addEventListener('input', atualizarValorParcela); inputValorComissao.addEventListener('input', atualizarValorParcela);
             const btnSimular=tr.querySelector('.btn-simular'); btnSimular.addEventListener('click', ()=>{ simularTitulosLinha(tr) });
+            // Alterações que impactam a simulação: valor de venda e percentual
+            const inputValorVenda=tr.querySelector('input[name=\"valor_venda[]\"]'); inputValorVenda.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
+            const inputPercentual=tr.querySelector('input[name=\"percentual[]\"]'); inputPercentual.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
             if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo=\'${valores.tipo}\']`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name=\"descricao[]\"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name=\"valor_venda[]\"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name=\"percentual[]\"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name=\"valor_comissao[]\"]').value=valores.valor_comissao } }
             atualizarResumoMultiplo()
         }
