@@ -412,7 +412,13 @@
             try{ await gwPost('/movimento_comissoes', listaComissoes); alert('Comissões salvas com sucesso!'); form.reset(); document.getElementById('linhasMultiplo').innerHTML=''; atualizarResumoMultiplo() }catch(e){ console.error(e); alert('Erro ao salvar comissões. Tente novamente.') }
         }
 
-        document.getElementById('formMultiplo').addEventListener('submit', function(e){ if(!validarLinhasAntesDeSalvar()){ e.preventDefault(); return } salvarComissoesMultiplas(e) });
+        document.getElementById('formMultiplo').addEventListener('submit', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            if(!validarLinhasAntesDeSalvar()){ return }
+            try { salvarComissoesMultiplas(e) } catch(err){ console.error('Erro no envio múltiplos:', err) }
+            return false;
+        });
 
         document.addEventListener('DOMContentLoaded', async function(){ try{ document.getElementById('loader-multi').style.display='flex' }catch(_){}
             try{ window.clientes=await api.get('/clientes'); produtos=await api.get('/produtos'); servicos=await api.get('/servicos') }catch(e){ console.error('Falha ao carregar dados iniciais:', e) }
