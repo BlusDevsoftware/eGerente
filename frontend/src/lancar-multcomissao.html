@@ -221,20 +221,20 @@
                 <div class='simulacao-titulos-multiplo' style='padding:8px;'>
                     <table style='width:100%;border-collapse:collapse;'>
                         <tr>
-                            <th style='text-align:left;padding:6px;border-bottom:1px solid #e5e7eb;'>Nº Título</th>
-                            <th style='text-align:left;padding:6px;border-bottom:1px solid #e5e7eb;'>Parcela</th>
-                            <th style='text-align:left;padding:6px;border-bottom:1px solid #e5e7eb;'>Valor</th>
-                            <th style='text-align:left;padding:6px;border-bottom:1px solid #e5e7eb;'>Data de Emissão</th>
-                            <th style='text-align:left;padding:6px;border-bottom:1px solid #e5e7eb;'>Data de Vencimento</th>
+                            <th style='text-align:center;padding:6px;border-bottom:1px solid #e5e7eb;width:120px;'>Nº Título</th>
+                            <th style='text-align:center;padding:6px;border-bottom:1px solid #e5e7eb;width:80px;'>Parcela</th>
+                            <th style='text-align:center;padding:6px;border-bottom:1px solid #e5e7eb;width:120px;'>Valor</th>
+                            <th style='text-align:center;padding:6px;border-bottom:1px solid #e5e7eb;width:160px;'>Data de Emissão</th>
+                            <th style='text-align:center;padding:6px;border-bottom:1px solid #e5e7eb;width:160px;'>Data de Vencimento</th>
                         </tr>`;
             const valor = (typeof valorParcela === 'string') ? valorParcela : Number(valorParcela).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
             for(let i=1;i<=parcelas;i++){
                 html += `<tr>
-                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;'>Simulado-${i}/${parcelas}</td>
-                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;'>${i}</td>
-                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;'>R$ ${valor}</td>
-                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;'><input type='date' class='simulacao-emissao-parcela' style='height:32px;' value='${dataHoje}'></td>
-                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;'><input type='date' class='simulacao-vencimento-parcela' style='height:32px;'></td>
+                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:120px;'>Simulado-${i}/${parcelas}</td>
+                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:80px;'>${i}</td>
+                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:120px;'>R$ ${valor}</td>
+                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:160px;'><input type='date' class='simulacao-emissao-parcela' style='height:32px;width:150px;' value='${dataHoje}'></td>
+                    <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:160px;'><input type='date' class='simulacao-vencimento-parcela' style='height:32px;width:150px;'></td>
                 </tr>`;
             }
             html += `</table>`;
