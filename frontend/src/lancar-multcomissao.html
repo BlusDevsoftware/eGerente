@@ -612,7 +612,24 @@
                     const totalInformado = (vencInputs && vencInputs.length) ? [...vencInputs].filter(inp => inp.value && inp.value.trim() !== '').length : 0;
                     if (!temSimulacao || totalInformado < totalEsperado) {
                         houveCampoFaltando = true;
-                        motivos.push(`Linha ${idx+1}: informe data(s) de vencimento (${totalEsperado}).`);
+                        // Buscar nome do colaborador para mensagem mais clara
+                        let nomeColaborador = 'Colaborador';
+                        try {
+                            const colaboradorSelect = tr.querySelector('select[name="colaborador[]"]');
+                            if (colaboradorSelect && colaboradorSelect.value) {
+                                const colaboradorCodigo = colaboradorSelect.value;
+                                const colaborador = (colaboradoresCache || []).find(c => 
+                                    String(c.codigo) === String(colaboradorCodigo) || 
+                                    String(c.id) === String(colaboradorCodigo) ||
+                                    String(c.codigo_colaborador) === String(colaboradorCodigo) ||
+                                    String(c.matricula) === String(colaboradorCodigo)
+                                );
+                                if (colaborador) {
+                                    nomeColaborador = colaborador.nome || colaborador.descricao || nomeColaborador;
+                                }
+                            }
+                        } catch(_) {}
+                        motivos.push(`${nomeColaborador} sem data de vencimento.`);
                         return;
                     }
                 }
