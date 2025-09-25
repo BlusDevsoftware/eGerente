@@ -278,6 +278,7 @@
         }
         function finalizarModalLancamentoErro(msg){
             try{
+                const m=document.getElementById('modalLancamento');
                 const t=document.getElementById('modalLancamentoTitulo');
                 const s=document.getElementById('modalLancamentoSub');
                 const sp=document.getElementById('modalLancamentoSpinner');
@@ -291,6 +292,7 @@
                 act.style.display='flex';
                 ok.classList.remove('btn-ok');
                 ok.classList.add('btn-error');
+                m.style.display='flex';
             }catch(_){}
         }
         (function bindModalOk(){ try{ document.getElementById('btnModalOk').addEventListener('click', ()=>{ try{ document.getElementById('modalLancamento').style.display='none' }catch(_){ } }) }catch(_){ } })();
@@ -603,12 +605,14 @@
                     vencInputs = trSim.querySelectorAll('input.simulacao-vencimento-parcela');
                 }
                 
-                if (qtdParcelas > 1) {
-                    const vencOk = (vencInputs && vencInputs.length === qtdParcelas && 
-                                   [...vencInputs].every(inp => inp.value && inp.value.trim() !== ''));
-                    if (!vencOk) {
+                // Exigir data(s) de vencimento sempre: 1 parcela -> 1 data; N parcelas -> N datas
+                if (qtdParcelas >= 1) {
+                    const totalEsperado = qtdParcelas;
+                    const temSimulacao = !!(tr.nextElementSibling && tr.nextElementSibling.classList.contains('linha-simulacao-multiplo'));
+                    const totalInformado = (vencInputs && vencInputs.length) ? [...vencInputs].filter(inp => inp.value && inp.value.trim() !== '').length : 0;
+                    if (!temSimulacao || totalInformado < totalEsperado) {
                         houveCampoFaltando = true;
-                        motivos.push(`Linha ${idx+1}: informe todas as datas de vencimento das parcelas.`);
+                        motivos.push(`Linha ${idx+1}: informe data(s) de vencimento (${totalEsperado}).`);
                         return;
                     }
                 }
