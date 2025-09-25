@@ -195,7 +195,7 @@
         let produtos=[], servicos=[]; let colaboradoresCache=null, colaboradoresCallbacks=[];
         async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
         function preencherSelectColaborador(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; buscarColaboradores().then(colabs=>{ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; colabs.forEach(c=>{const o=document.createElement('option'); const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? ''); o.value=String(codigo); o.textContent=c.nome||c.descricao||String(codigo); select.appendChild(o)}); select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }) }
-        function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ let idValue=null; const rawId=(c && (c.id ?? null)); const rawCodigo=(c && (c.codigo ?? c.codigo_crm ?? null)); if(typeof rawId==='number'){ idValue=rawId } else if(typeof rawId==='string' && /^\d+$/.test(rawId)){ idValue=parseInt(rawId,10) } else if(typeof rawCodigo==='number'){ idValue=rawCodigo } else if(typeof rawCodigo==='string' && /^\d+$/.test(rawCodigo)){ idValue=parseInt(rawCodigo,10) } if(!(idValue>0)){ return } const o=document.createElement('option'); o.value=String(idValue); o.textContent=c.nome||String(idValue); select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }
+        function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const o=document.createElement('option'); o.value=codigoStr; o.textContent=c.nome||codigoStr; select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }
         function getItemPrimaryId(item){ return (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico)) }
         function getItemName(item){ return (item && (item.nome ?? item.descricao ?? item.nome_servico ?? item.nomeProduto ?? item.nomeServico)) || 'Item'}
         function getItemPrice(item){ const price=(item && (item.preco ?? item.valor ?? item.preco_venda ?? item.precoServico ?? item.preco_servico)); const parsed=parseFloat(price); return isNaN(parsed)?0:parsed }
@@ -444,10 +444,10 @@
                     return;
                 }
                 
-                const clienteId = parseInt(rawCliente, 10);
+                const clienteId = String(rawCliente).padStart(5,'0');
                 const colaboradorId = String(rawColab);
                 
-                if (!(clienteId > 0)) {
+                if (!clienteId || clienteId.length !== 5) {
                     houveCampoFaltando = true;
                     motivos.push(`Linha ${idx+1}: ID de cliente inválido.`);
                     return;
