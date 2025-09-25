@@ -5,6 +5,7 @@
 // Early redirect to avoid any flash before login
 (function earlyAuthRedirect(){
     try {
+        if (window && window.DEBUG_NO_REDIRECT === true) { return; }
         var LOGIN_PAGE = 'login.html';
         var currentPage = window.location.pathname.split('/').pop();
         // Treat every page except login as protected for the early guard
@@ -14,6 +15,7 @@
             var hasUser = !!sessionStorage.getItem('user');
             if (!hasToken || !hasUser) {
                 // Use replace to avoid creating a back entry
+                if (window && window.DEBUG_NO_REDIRECT === true) { return; }
                 window.location.replace(LOGIN_PAGE);
             }
         }
@@ -53,6 +55,9 @@ class AuthGuard {
     }
 
     async checkAuthentication() {
+        if (window && window.DEBUG_NO_REDIRECT === true) {
+            return true;
+        }
         if (!this.isAuthenticated()) {
             this.redirectToLogin();
             return false;
@@ -83,6 +88,7 @@ class AuthGuard {
     }
 
     redirectToLogin() {
+        if (window && window.DEBUG_NO_REDIRECT === true) { return; }
         const currentPage = window.location.pathname;
         if (currentPage !== `/${this.LOGIN_PAGE}`) {
             sessionStorage.setItem('redirectAfterLogin', currentPage);
@@ -122,6 +128,7 @@ class AuthGuard {
     }
 
     redirectAfterLogin() {
+        if (window && window.DEBUG_NO_REDIRECT === true) { return; }
         const savedPage = sessionStorage.getItem('redirectAfterLogin');
         if (savedPage && savedPage !== `/${this.LOGIN_PAGE}`) {
             sessionStorage.removeItem('redirectAfterLogin');
