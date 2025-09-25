@@ -193,6 +193,22 @@
         // Usando window.api direto para /movimento_comissoes
         function extrairNumeroBR(valor){if(!valor) return 0; const n=String(valor).replace(/[^0-9,.-]/g,'').replace(/\.(?=.*\.)/g,'').replace(',','.'); return parseFloat(n)||0}
         let produtos=[], servicos=[]; let colaboradoresCache=null, colaboradoresCallbacks=[];
+
+        function resolveUsuarioLancamento(){
+            try{
+                if (window.authGuard && typeof window.authGuard.getCurrentUser === 'function'){
+                    const u = window.authGuard.getCurrentUser();
+                    if (u) return u.nome || u.email || u.codigo || u.id || 'admin';
+                }
+            }catch(_){ }
+            try{
+                const raw = sessionStorage.getItem('user') || localStorage.getItem('user');
+                if (raw){ const u = JSON.parse(raw); return (u && (u.nome || u.email || u.codigo || u.id)) || 'admin'; }
+            }catch(_){ }
+            try{ if (window.usuarioLogado) return window.usuarioLogado }catch(_){ }
+            try{ if (localStorage.getItem('usuarioLogado')) return localStorage.getItem('usuarioLogado') }catch(_){ }
+            return 'admin';
+        }
         async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
         function preencherSelectColaborador(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; buscarColaboradores().then(colabs=>{ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; colabs.forEach(c=>{const o=document.createElement('option'); const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? ''); o.value=String(codigo); o.textContent=c.nome||c.descricao||String(codigo); select.appendChild(o)}); select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }) }
         function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const o=document.createElement('option'); o.value=codigoStr; o.textContent=c.nome||codigoStr; select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:''}) }
@@ -514,15 +530,8 @@
                     }
                 }
                 
-                // Obter usuário de lançamento
-                let usuarioLancamento = 'admin';
-                try {
-                    if (window.usuarioLogado) {
-                        usuarioLancamento = window.usuarioLogado;
-                    } else if (localStorage.getItem('usuarioLogado')) {
-                        usuarioLancamento = localStorage.getItem('usuarioLogado');
-                    }
-                } catch(_) {}
+                // Obter usuário de lançamento (preferir sessionStorage 'user')
+                const usuarioLancamento = resolveUsuarioLancamento();
                 
                 // Criar registros para cada parcela
                 for (let p = 0; p < qtdParcelas; p++) {
