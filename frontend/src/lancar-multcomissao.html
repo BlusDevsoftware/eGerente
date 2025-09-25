@@ -44,6 +44,8 @@
         .table-multiplos td .choices__placeholder{opacity:1;color:#666}
         .choices__list--dropdown{z-index:20}
         .table-multiplos td .btn-primary,.table-multiplos td .btn-secondary{padding:6px 10px;font-size:12px}
+        /* Delimitação visual: apenas a grade de simulação com borda externa azul */
+        .simulacao-titulos-multiplo{border:2px solid #90caf9;border-radius:8px;background:#ffffff}
         /* Botões seguem o padrão global do sistema (styles.css) */
         .btn-duplicar{background:#007bff;color:#fff;border:none;margin-right:4px;border-radius:5px;padding:6px 10px}
         .btn-duplicar:hover{background:#0056b3}
@@ -292,7 +294,7 @@
 
         function verificarColaboradorDuplicadoMultiplo(select){ const tr=select.closest('tr'); const selects=tr.querySelectorAll('select[name="colaborador[]"]'); const valores=[...selects].map(s=>s.value).filter(Boolean); const temDup= new Set(valores).size!==valores.length; if(temDup){ alert('Colaborador já selecionado nesta linha.'); select.value=''; if(select.choicesInstance){select.choicesInstance.setChoiceByValue('')} select.dispatchEvent(new Event('change')) } }
 
-        function adicionarLinhaMultiplo(valores=null){ const tbody=document.getElementById('linhasMultiplo'); const idx=tbody.children.length; const tr=document.createElement('tr'); tr.innerHTML=`
+        function adicionarLinhaMultiplo(valores=null){ const tbody=document.getElementById('linhasMultiplo'); const idx=tbody.children.length; const tr=document.createElement('tr'); tr.classList.add('linha-lancamento-multiplo'); tr.innerHTML=`
             <td style=\"width:200px;min-width:180px;\"><select name=\"cliente[]\" required class=\"input-cliente\" style=\"width:100%;min-width:180px;\"></select></td>
             <td style=\"width:200px;min-width:180px;\"><select name=\"colaborador[]\" required class=\"input-colaborador\" style=\"width:100%;min-width:180px;\"></select></td>
             <td>
