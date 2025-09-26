@@ -33,16 +33,40 @@
         .table-multiplos tbody tr:nth-child(even) td{background:#fcfdff}
         .table-multiplos tbody tr:hover td{background:#f1f7ff}
         .table-multiplos td{background:#fff;vertical-align:middle;min-height:40px;height:40px}
-        .table-multiplos td input,.table-multiplos td select{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
-        .table-multiplos td input:focus,.table-multiplos td select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
-        /* Força o cinza no campo descrição, sobrescrevendo estilos globais */
-        .table-multiplos td input.input-descricao{background:#f8f9fa !important}
-        .table-multiplos td input.input-descricao:focus{background:#f8f9fa !important}
+        /* CSS Individual por Campo */
+        
+        /* Cliente - Select com Choices */
+        .table-multiplos td .input-cliente{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
+        .table-multiplos td .input-cliente:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         .table-multiplos td .choices{background:#f8f9fa}
         .table-multiplos td .choices__inner{min-height:38px;height:38px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa}
         .table-multiplos td .choices.is-open .choices__inner{background:#f8f9fa}
         .table-multiplos td .choices.is-disabled .choices__inner{background:#f8f9fa}
         .table-multiplos td .choices__placeholder{opacity:1;color:#666}
+        
+        /* Colaborador - Select com Choices */
+        .table-multiplos td .input-colaborador{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
+        .table-multiplos td .input-colaborador:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        
+        /* Item - Select com Choices */
+        .table-multiplos td .input-item{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
+        .table-multiplos td .input-item:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        
+        /* Descrição - Input Text */
+        .table-multiplos td .input-descricao{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa !important}
+        .table-multiplos td .input-descricao:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa !important}
+        
+        /* Valor Venda - Input Number */
+        .table-multiplos td .input-valor{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa;text-align:right}
+        .table-multiplos td .input-valor:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        
+        /* Percentual - Input Text */
+        .table-multiplos td .input-percentual{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa;text-align:center}
+        .table-multiplos td .input-percentual:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        
+        /* Comissão - Input Number (Readonly) */
+        .table-multiplos td .input-comissao{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#e8f4fd;text-align:right;color:#0f172a;font-weight:600}
+        .table-multiplos td .input-comissao:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#e8f4fd}
         .choices__list--dropdown{z-index:20}
         .table-multiplos td .btn-primary,.table-multiplos td .btn-secondary{padding:6px 10px;font-size:12px}
         /* Delimitação visual: apenas a grade de simulação com borda externa azul */
