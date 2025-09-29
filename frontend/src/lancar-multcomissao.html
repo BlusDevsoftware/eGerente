@@ -50,6 +50,9 @@
         .table-multiplos td .choices__list--multiple{flex:1 1 auto;min-width:0;overflow:hidden}
         .table-multiplos td .choices__list--multiple .choices__item{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .table-multiplos td .choices__list--dropdown .choices__item{white-space:nowrap}
+        /* Fixar largura individual por campo (cliente, colaborador, item) e evitar crescimento */
+        select.input-cliente + .choices, select.input-colaborador + .choices, select.input-item + .choices{display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box}
+        select.input-cliente + .choices .choices__inner, select.input-colaborador + .choices .choices__inner, select.input-item + .choices .choices__inner{width:100%;box-sizing:border-box}
         
         /* Colaborador - Select com Choices */
         .table-multiplos td .input-colaborador{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
