@@ -554,9 +554,10 @@
                 return;
             }
             
-            // Vamos enviar um título por vez (registro individual) para o backend.
-            // Isso evita que títulos de linhas diferentes se agrupem e compartilhem a mesma sequência.
-            const listaTitulos = [];
+            // Vamos enviar por lote de linha: cada linha gera um array com N parcelas
+            // e esse array é enviado em UMA requisição. Assim o backend numera como 130-1/N, 130-2/N.
+            // Enviaremos um lote por vez para não agrupar linhas diferentes.
+            const listaLotes = [];
             let houveCampoFaltando = false;
             const motivos = [];
             
@@ -679,7 +680,8 @@
                 const usuarioLancamento = resolveUsuarioLancamento();
                 
                 // Criar registros para cada parcela desta linha (LOTE POR LINHA)
-                // Títulos individuais desta linha
+                // Títulos (parcelas) desta linha
+                const lote = [];
                 for (let p = 0; p < qtdParcelas; p++) {
                     let dataGeracao = new Date().toISOString().slice(0, 10);
                     let dataVencimento = new Date().toISOString().slice(0, 10);
@@ -691,7 +693,7 @@
                         dataVencimento = vencInputs[p].value;
                     }
                     
-                    listaTitulos.push({
+                    lote.push({
                         cliente_id: clienteId,
                         colaborador_id: colaboradorId,
                         tipo,
@@ -706,11 +708,11 @@
                         descricao
                     });
                 }
-                // fim títulos desta linha
+                if (lote.length > 0) listaLotes.push(lote);
             });
             
-            // Checagem: se nenhum título foi criado
-            const totalRegistros = listaTitulos.length;
+            // Checagem: se nenhum lote foi criado
+            const totalRegistros = listaLotes.reduce((acc, l) => acc + l.length, 0);
             if (totalRegistros === 0) {
                 const msg = motivos.length ? motivos.join('\n') : 'Preencha os dados obrigatórios das linhas.';
                 finalizarModalLancamentoErro(msg);
@@ -720,10 +722,10 @@
             abrirModalLancamento(totalRegistros);
             let contador=0; let total=totalRegistros; let timer=null;
             try {
-                // Enviar um título por vez
-                for (const titulo of listaTitulos) {
-                    await window.api.post('/movimento_comissoes', titulo);
-                    contador += 1;
+                // Enviar um lote (linha) por vez; dentro da requisição o backend numera as parcelas
+                for (const lote of listaLotes) {
+                    await window.api.post('/movimento_comissoes', lote);
+                    contador += lote.length;
                     atualizarModalLancamento(Math.min(contador,total), total);
                 }
                 atualizarModalLancamento(total,total);
