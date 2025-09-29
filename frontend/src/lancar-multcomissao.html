@@ -29,7 +29,7 @@
         .table-multiplos table{width:100%;min-width:1000px;border-collapse:separate;border-spacing:0;table-layout:fixed}
         .table-multiplos thead tr{height:44px}
         .table-multiplos thead th{position:sticky;top:0;z-index:2;background:#f8fafc;color:#0f172a;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:11px;box-shadow:0 1px 0 rgba(2,6,23,0.05);padding:0 8px;height:44px;line-height:44px;white-space:nowrap}
-        .table-multiplos th,.table-multiplos td{border-bottom:1px solid #eef2f7;padding:6px 6px;text-align:center;font-size:12px}
+        .table-multiplos th,.table-multiplos td{border-bottom:1px solid #eef2f7;padding:6px 4px;text-align:center;font-size:12px}
         .table-multiplos tbody tr:nth-child(even) td{background:#fcfdff}
         .table-multiplos tbody tr:hover td{background:#f1f7ff}
         .table-multiplos td{background:#fff;vertical-align:middle;min-height:40px;height:40px}
@@ -89,8 +89,9 @@
         .duplicar-excluir-multiplos .btn-multiplos-acao i{font-size:13px}
 
         /* Toggle de Tipo (Produto/Serviço) */
-        .tipo-toggle-multiplo{background:transparent;border:none;border-radius:0;padding:0;height:38px;align-items:center;position:relative;z-index:3001}
-        .tipo-toggle-multiplo .btn-tipo{background:#fff;border:1px solid #dce3ea;color:#1f2937;padding:0 12px;border-radius:8px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s;height:38px;line-height:normal;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;position:relative;z-index:3002}
+        .tipo-toggle-multiplo{background:transparent;border:none;border-radius:0;padding:0;height:38px;align-items:center;position:relative;z-index:1;display:flex;gap:6px;justify-content:center;width:100%;overflow:hidden}
+        .tipo-toggle-multiplo .btn-tipo{background:#fff;border:1px solid #dce3ea;color:#1f2937;padding:0 8px;border-radius:8px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s;height:38px;line-height:normal;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;position:relative;z-index:1;flex:1 1 0;min-width:0;max-width:calc(50% - 2px);overflow:hidden;text-overflow:ellipsis}
+        .tipo-toggle-multiplo .btn-tipo i{flex:0 0 auto;font-size:12px}
         .tipo-toggle-multiplo .btn-tipo:hover{background:#eaf2ff;color:#0f172a}
         .tipo-toggle-multiplo .btn-tipo.active{background:#007bff;color:#fff;border-color:#007bff}
         .tipo-toggle-multiplo .btn-tipo.active:hover{background:#0056b3;border-color:#0056b3}
@@ -108,7 +109,13 @@
         #barraInferiorMultiplo > div:last-child{justify-self:end}
 
         /* Ícones/labels das ações por linha */
-        .acao-multiplos .acoes-multiplos-wrapper{background:#f8fafc;border:1px dashed #e5e7eb;border-radius:10px;padding:6px}
+        .acao-multiplos .acoes-multiplos-wrapper{background:#f8fafc;border:1px dashed #e5e7eb;border-radius:10px;padding:6px;display:flex;flex-wrap:nowrap;gap:4px;justify-content:center;align-items:center}
+        .acao-multiplos .acoes-multiplos-wrapper > *{flex:0 1 auto;min-width:0}
+        .acao-multiplos .btn-secondary{padding:4px 8px;font-size:11px;height:32px;flex:0 0 auto}
+        .acao-multiplos .input-parcelas{height:32px;width:60px !important}
+        .acao-multiplos .btn-icon{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+        .acao-multiplos .input-valor-parcela{height:32px;width:60px !important}
+        .acao-multiplos .group-parcelas,.acao-multiplos .group-valor-parcela{flex:0 0 auto;min-width:0;position:relative;z-index:2}
         .acao-multiplos label{color:#475569}
         .checkbox-parcelado{width:16px;height:16px}
         .input-parcelas{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
@@ -201,16 +208,16 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width:200px;min-width:180px;">Cliente</th>
-                                    <th style="width:200px;min-width:180px;">Colaborador</th>
+                                    <th style="width:170px;min-width:160px;">Cliente</th>
+                                    <th style="width:170px;min-width:160px;">Colaborador</th>
                                     <th style="width:100px;min-width:80px;">Tipo</th>
-                                    <th style="width:150px;min-width:120px;">Produto/Serviço</th>
+                                    <th style="width:170px;min-width:160px;">Produto/Serviço</th>
                                     <th style="width:120px;min-width:100px;">Descrição</th>
-                                    <th style="width:100px;min-width:80px;">Valor Venda</th>
+                                    <th style="width:80px;min-width:70px;">Valor Venda</th>
                                     <th style="width:80px;min-width:70px;">%</th>
-                                    <th style="width:100px;min-width:80px;">Comissão</th>
-                                    <th style="width:120px;min-width:100px;">Ações</th>
-                                    <th style="width:80px;min-width:70px;">Duplicar/Excluir</th>
+                                    <th style="width:80px;min-width:70px;">Comissão</th>
+                                    <th style="width:180px;min-width:150px;">Ações</th>
+                                    <th style="width:80px;min-width:70px;"></th>
                                 </tr>
                             </thead>
                             <tbody id="linhasMultiplo"></tbody>
@@ -494,8 +501,8 @@
             <td style=\"width:200px;min-width:180px;\"><select name=\"colaborador[]\" required class=\"input-colaborador\" style=\"width:100%;min-width:180px;\"></select></td>
             <td>
                 <div class=\"tipo-toggle-multiplo\" style=\"display:flex;gap:6px;justify-content:center;\">
-                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"produto\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-box\"></i> Produto</button>
-                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"servico\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-cogs\"></i> Serviço</button>
+                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"produto\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-box\"></i> Prod.</button>
+                    <button type=\"button\" class=\"btn-tipo\" data-tipo=\"servico\" onclick=\"toggleTipoMultiplo(this, ${idx})\"><i class=\"fas fa-cogs\"></i> Serv.</button>
                     <input type=\"hidden\" name=\"tipo[]\" value=\"\">
                 </div>
             </td>
@@ -506,15 +513,14 @@
             <td><input type=\"number\" name=\"valor_comissao[]\" step=\"0.01\" min=\"0\" readonly placeholder=\"0.00\" class=\"input-comissao\"></td>
             <td class=\"acao-multiplos\">
                 <div class=\"acoes-multiplos-wrapper\" style=\"display:flex;gap:6px;align-items:center;justify-content:center;\">
-                    <button type=\"button\" class=\"btn-parcelar btn-secondary\" title=\"Parcelar venda\" style=\"height:32px;\"><i class='fas fa-receipt'></i> Parcelar</button>
+                    <button type=\"button\" class=\"btn-parcelar btn-secondary btn-icon\" title=\"Parcelar venda\" aria-label=\"Parcelar venda\"><i class='fas fa-receipt'></i></button>
                     <div class=\"group-parcelas\" style=\"display:none;gap:6px;align-items:center;\">
-                        <label style=\"font-size:0.95em;\"><i class='fas fa-list-ol'></i></label>
-                        <input type='number' min='2' class='input-parcelas' style='width:60px;'>
+                        <input type='number' min='2' class='input-parcelas' style='width:70px;'>
                     </div>
-                    <div class=\"group-valor-parcela\" style=\"display:none;\">
-                        <input type='text' class='input-valor-parcela' style='width:80px;margin-left:2px;' readonly>
+                    <div class="group-valor-parcela" style="display:none;">
+                        <input type='text' class='input-valor-parcela' style='width:60px;margin-left:2px;' readonly>
                     </div>
-                    <button type=\"button\" class=\"btn-simular btn-secondary\" title=\"Simular títulos\" style=\"height:32px;\">Simular</button>
+                    <button type=\"button\" class=\"btn-simular btn-secondary btn-icon\" title=\"Simular títulos\" aria-label=\"Simular títulos\"><i class='fas fa-calculator'></i></button>
                 </div>
             </td>
             <td class=\"duplicar-excluir-multiplos\" style=\"text-align:center;vertical-align:middle;\">
@@ -523,21 +529,21 @@
             </td>`;
             tbody.appendChild(tr);
             const selectCliente=tr.querySelector('select[name=\"cliente[]\"]'); preencherSelectClienteMultiplo(selectCliente); selectCliente.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
-            const selectColaborador=tr.querySelector('select[name=\"colaborador[]\"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this); removerSimulacaoLinha(tr) })
-            const selectItem=tr.querySelector('select[name=\"item[]\"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''}); selectItem.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
-            const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name=\"valor_comissao[]\"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela'); const grpValorParcela=tr.querySelector('.group-valor-parcela');
+            const selectColaborador=tr.querySelector('select[name="colaborador[]"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this); removerSimulacaoLinha(tr) })
+            const selectItem=tr.querySelector('select[name="item[]"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''}); selectItem.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
+            const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name="valor_comissao[]"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela'); const grpValorParcela=tr.querySelector('.group-valor-parcela');
             const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; if(isOpen){ grpParcelas.style.display='none'; grpValorParcela.style.display='none'; inputParcelas.value=''; inputValorParcela.value=''; removerSimulacaoLinha(tr) } else { grpParcelas.style.display='flex'; grpValorParcela.style.display='block'; inputParcelas.min='2'; inputParcelas.value='2'; atualizarValorParcela() } });
             function atualizarValorParcela(){ let p=parseInt(inputParcelas.value)||0; if(p<2){ p=2; inputParcelas.value='2'; } const v=parseFloat(inputValorComissao.value)||0; inputValorParcela.value=(v>0 && p>0)? (v/p).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}) : ''; if(document.body.contains(tr.nextElementSibling) && tr.nextElementSibling && tr.nextElementSibling.classList.contains('linha-simulacao-multiplo')){ atualizarSimulacaoLinha(tr) } }
             inputParcelas.addEventListener('input', atualizarValorParcela); inputValorComissao.addEventListener('input', atualizarValorParcela);
             const btnSimular=tr.querySelector('.btn-simular'); btnSimular.addEventListener('click', ()=>{ simularTitulosLinha(tr) });
             // Alterações que impactam a simulação: valor de venda e percentual
-            const inputValorVenda=tr.querySelector('input[name=\"valor_venda[]\"]'); inputValorVenda.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
-            const inputPercentual=tr.querySelector('input[name=\"percentual[]\"]'); inputPercentual.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
-            if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo=\'${valores.tipo}\']`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name=\"descricao[]\"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name=\"valor_venda[]\"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name=\"percentual[]\"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name=\"valor_comissao[]\"]').value=valores.valor_comissao } }
+            const inputValorVenda=tr.querySelector('input[name="valor_venda[]"]'); inputValorVenda.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
+            const inputPercentual=tr.querySelector('input[name="percentual[]"]'); inputPercentual.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
+            if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo=\'${valores.tipo}\']`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name="descricao[]"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name="valor_venda[]"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name="percentual[]"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name="valor_comissao[]"]').value=valores.valor_comissao } }
             atualizarResumoMultiplo()
         }
 
-        function duplicarLinhaMultiplo(btn){ const tr=btn.closest('tr'); const valores={ cliente: tr.querySelector('select[name=\"cliente[]\"]').value, colaborador: tr.querySelector('select[name=\"colaborador[]\"]').value, tipo: tr.querySelector('input[name=\"tipo[]\"]').value, item: tr.querySelector('select[name=\"item[]\"]').value, descricao: tr.querySelector('input[name=\"descricao[]\"]').value, valor_venda: tr.querySelector('input[name=\"valor_venda[]\"]').value, percentual: tr.querySelector('input[name=\"percentual[]\"]').value, valor_comissao: tr.querySelector('input[name=\"valor_comissao[]\"]').value }; adicionarLinhaMultiplo(valores) }
+        function duplicarLinhaMultiplo(btn){ const tr=btn.closest('tr'); const valores={ cliente: tr.querySelector('select[name="cliente[]"]').value, colaborador: tr.querySelector('select[name="colaborador[]"]').value, tipo: tr.querySelector('input[name="tipo[]"]').value, item: tr.querySelector('select[name="item[]"]').value, descricao: tr.querySelector('input[name="descricao[]"]').value, valor_venda: tr.querySelector('input[name="valor_venda[]"]').value, percentual: tr.querySelector('input[name="percentual[]"]').value, valor_comissao: tr.querySelector('input[name="valor_comissao[]"]').value }; adicionarLinhaMultiplo(valores) }
         function excluirLinhaMultiplo(btn){ const tr=btn.closest('tr'); const trSim=tr.nextElementSibling; tr.remove(); if(trSim && trSim.classList.contains('linha-simulacao-multiplo')) trSim.remove(); atualizarResumoMultiplo() }
         function limparTodasLinhas(){ document.getElementById('linhasMultiplo').innerHTML=''; atualizarResumoMultiplo() }
 
