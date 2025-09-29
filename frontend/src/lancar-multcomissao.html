@@ -134,6 +134,10 @@
         .simulacao-titulos-multiplo .choices{background:#f8f9fa;max-width:100%;width:150px}
         .simulacao-titulos-multiplo .choices__inner{min-height:32px;height:32px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center;overflow:hidden;width:100%;box-sizing:border-box}
         .simulacao-titulos-multiplo .choices.is-open .choices__inner{background:#f8f9fa}
+        /* Borda/sombra azul igual ao Cliente */
+        .simulacao-titulos-multiplo .choices.is-focused .choices__inner,
+        .simulacao-titulos-multiplo .choices.is-open .choices__inner{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
+        .simulacao-titulos-multiplo .choices.is-disabled .choices__inner{opacity:.7}
         .simulacao-titulos-multiplo .choices__list--single{width:100%;flex:1 1 auto;min-width:0;display:block}
         .simulacao-titulos-multiplo .choices__list--single .choices__item{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .simulacao-titulos-multiplo .choices__list--dropdown{z-index:2000}
