@@ -367,14 +367,7 @@
             calcularComissaoMultiplo(input, 0);
         }
 
-        function verificarDuplicidadeColaboradorGlobal(){
-            const selects=[...document.querySelectorAll('#linhasMultiplo select[name="colaborador[]"]')];
-            const valores=selects.map(s=>s.value).filter(Boolean);
-            const set=new Set(); let duplicado=false;
-            valores.forEach(v=>{ if(set.has(v)) duplicado=true; else set.add(v)});
-            if(duplicado){ alert('Há colaboradores duplicados em linhas diferentes. Ajuste antes de salvar.'); }
-            return !duplicado;
-        }
+        // Removido bloqueio de duplicidade de colaborador: agora é permitido lançar várias linhas para o mesmo colaborador
 
         function validarLinhasAntesDeSalvar(){
             const linhas=[...document.querySelectorAll('#linhasMultiplo tr.linha-lancamento-multiplo')];
@@ -396,7 +389,6 @@
                 if(perc<0 || perc>100){ ok=false; const p=inpPerc; highlight(p); }
             });
             if(!ok) alert('Verifique os campos obrigatórios e se o percentual está entre 0 e 100.');
-            if(ok) ok = verificarDuplicidadeColaboradorGlobal();
             return ok;
         }
 
@@ -534,7 +526,7 @@
             </td>`;
             tbody.appendChild(tr);
             const selectCliente=tr.querySelector('select[name=\"cliente[]\"]'); preencherSelectClienteMultiplo(selectCliente); selectCliente.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
-            const selectColaborador=tr.querySelector('select[name="colaborador[]"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ verificarColaboradorDuplicadoMultiplo(this); removerSimulacaoLinha(tr) })
+            const selectColaborador=tr.querySelector('select[name="colaborador[]"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ removerSimulacaoLinha(tr) })
             const selectItem=tr.querySelector('select[name="item[]"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''}); selectItem.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
             const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name="valor_comissao[]"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela'); const grpValorParcela=tr.querySelector('.group-valor-parcela');
             const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; if(isOpen){ grpParcelas.style.display='none'; grpValorParcela.style.display='none'; inputParcelas.value=''; inputValorParcela.value=''; removerSimulacaoLinha(tr) } else { grpParcelas.style.display='flex'; grpValorParcela.style.display='block'; inputParcelas.min='2'; inputParcelas.value='2'; atualizarValorParcela() } });
