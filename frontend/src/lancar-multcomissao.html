@@ -39,13 +39,16 @@
         .table-multiplos td .input-cliente{width:100%;height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
         .table-multiplos td .input-cliente:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         .table-multiplos td .choices{background:#f8f9fa;max-width:100%}
-        .table-multiplos td .choices__inner{min-height:38px;height:38px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center}
+        .table-multiplos td .choices__inner{min-height:38px;height:38px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center;overflow:hidden}
         .table-multiplos td .choices.is-open .choices__inner{background:#f8f9fa}
         .table-multiplos td .choices.is-disabled .choices__inner{background:#f8f9fa}
         .table-multiplos td .choices__placeholder{opacity:1;color:#666}
         /* Truncar texto dos selects com reticências */
-        .table-multiplos td .choices__list--single{width:100%}
+        .table-multiplos td .choices__list--single{width:100%;flex:1 1 auto;min-width:0}
         .table-multiplos td .choices__list--single .choices__item{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        /* Caso algum select permita múltipla seleção, manter truncamento nos chips também */
+        .table-multiplos td .choices__list--multiple{flex:1 1 auto;min-width:0;overflow:hidden}
+        .table-multiplos td .choices__list--multiple .choices__item{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .table-multiplos td .choices__list--dropdown .choices__item{white-space:nowrap}
         
         /* Colaborador - Select com Choices */
