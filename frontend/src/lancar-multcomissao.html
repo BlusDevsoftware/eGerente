@@ -122,28 +122,27 @@
         .input-parcelas:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         .input-valor-parcela{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa !important;text-align:right}
         .input-valor-parcela:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
-        /* Focus azul para o seletor de intervalo na simulação (idêntico ao Cliente) */
-        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus,
-        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus-visible,
-        .simulacao-titulos-multiplo .intervalo-vencimento-select:active{
-            border-color:var(--accent);
-            box-shadow:0 0 0 3px rgba(33,150,243,0.15);
-            outline:none
-        }
-        /* Estilo Choices dentro da simulação (idêntico aos selects da tabela) */
-        .simulacao-titulos-multiplo .choices{background:#f8f9fa;max-width:100%;width:150px}
-        .simulacao-titulos-multiplo .choices__inner{min-height:32px;height:32px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center;overflow:hidden;width:100%;box-sizing:border-box}
-        .simulacao-titulos-multiplo .choices.is-open .choices__inner{background:#f8f9fa}
-        /* Borda/sombra azul igual ao Cliente */
-        .simulacao-titulos-multiplo .choices.is-focused .choices__inner,
-        .simulacao-titulos-multiplo .choices.is-open .choices__inner{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
-        .simulacao-titulos-multiplo .choices.is-disabled .choices__inner{opacity:.7}
-        .simulacao-titulos-multiplo .choices__list--single{width:100%;flex:1 1 auto;min-width:0;display:block}
-        .simulacao-titulos-multiplo .choices__list--single .choices__item{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .simulacao-titulos-multiplo .choices__list--dropdown{z-index:2000}
+        /* CSS ESPECÍFICO do campo Intervalo entre títulos (separado dos demais) */
+        .intervalo-vencimento-select{height:32px;padding:4px 8px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s;width:150px !important;min-width:150px;max-width:150px;box-sizing:border-box}
+        .intervalo-vencimento-select:focus,
+        .intervalo-vencimento-select:focus-visible,
+        .intervalo-vencimento-select:active{border:1px solid var(--accent) !important;box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important;outline:none}
+        /* Estilo Choices para o campo de intervalo (lista igual aos demais) */
+        .intervalo-vencimento-select + .choices{background:#f8f9fa;width:150px !important;min-width:150px;max-width:150px;border-radius:8px !important;overflow:visible;box-sizing:border-box}
+        .intervalo-vencimento-select + .choices .choices__inner{min-height:32px;height:32px;padding:0 6px;border-radius:8px !important;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center;overflow:hidden;width:150px !important;box-sizing:border-box}
+        .intervalo-vencimento-select + .choices.is-focused .choices__inner,
+        .intervalo-vencimento-select + .choices.is-open .choices__inner{border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
+        .intervalo-vencimento-select + .choices .choices__list--dropdown{z-index:2000;border:1px solid #dce3ea;border-radius:8px !important;overflow:hidden !important;background:#fff;box-shadow:0 12px 24px rgba(2,6,23,0.1), 0 2px 8px rgba(2,6,23,0.06)}
+        /* Força cantos arredondados mesmo com CSS global do Choices */
+        .intervalo-vencimento-select + .choices .choices__list--dropdown .choices__item:first-child{border-top-left-radius:8px !important;border-top-right-radius:8px !important}
+        .intervalo-vencimento-select + .choices .choices__list--dropdown .choices__item:last-child{border-bottom-left-radius:8px !important;border-bottom-right-radius:8px !important}
+        .intervalo-vencimento-select + .choices.is-open .choices__list--dropdown{border-color:var(--accent)}
+        .intervalo-vencimento-select + .choices .choices__list--dropdown .choices__list{max-height:220px}
+        .intervalo-vencimento-select + .choices .choices__list--dropdown .choices__item{padding:10px 12px}
+        .intervalo-vencimento-select + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted{background:#f1f7ff}
+        .intervalo-vencimento-select + .choices .choices__list--single{width:100%;flex:1 1 auto;min-width:0;display:block}
+        .intervalo-vencimento-select + .choices .choices__item{white-space:nowrap}
         .simulacao-titulos-multiplo .choices__list--dropdown .choices__item{white-space:nowrap}
-        /* Aparência do seletor de intervalo igual aos selects padrão */
-        .simulacao-titulos-multiplo .intervalo-vencimento-select{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s}
         /* Modal de lançamento */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:9999}
         .modal-card{width:min(420px,92vw);background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:20px;text-align:center}
@@ -456,17 +455,13 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <td style='padding:6px; text-align:right;'><label style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label></td>
                     <td style='padding:6px; text-align:left;'>
-                        <div style='display:flex;align-items:center;gap:8px;justify-content:flex-start;'>
-                            <label style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label>
-                            <select class='intervalo-vencimento-select' disabled style='padding:4px 8px; height:32px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; width:150px;'>
-                                <option value='' selected disabled>Selecione...</option>
-                                <option value='10'>10 dias</option>
-                                <option value='20'>20 dias</option>
-                                <option value='30'>30 dias</option>
-                            </select>
-                        </div>
+                        <select class='intervalo-vencimento-select' disabled style='padding:4px 8px; height:32px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; width:150px;'>
+                            <option value='10'>10 dias</option>
+                            <option value='20'>20 dias</option>
+                            <option value='30'>30 dias</option>
+                        </select>
                     </td>
                 </tr>`;
             }
@@ -482,12 +477,30 @@
             const rowIntervalo = simulacaoDiv.querySelector('.row-intervalo-vencimento');
             const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
             if(vencInputs.length>1 && rowIntervalo && intervaloSelect){
+                // Inicializa Choices no seletor de intervalo para manter o mesmo layout do Cliente
+                try {
+                    if(intervaloSelect.choicesInstance){ intervaloSelect.choicesInstance.destroy(); intervaloSelect.choicesInstance = null }
+                    intervaloSelect.choicesInstance = new Choices(intervaloSelect, {
+                        searchEnabled: false,
+                        itemSelectText: '',
+                        shouldSort: false,
+                    });
+                } catch(_){ }
                 // Linha já aparece logo ao simular; apenas controla habilitação do select
-                intervaloSelect.disabled = !(vencInputs[0].value);
+                const temPrimeiraInicial = !!(vencInputs[0].value);
+                if(intervaloSelect.choicesInstance){
+                    if(temPrimeiraInicial){ intervaloSelect.choicesInstance.enable(); } else { intervaloSelect.choicesInstance.disable(); }
+                } else {
+                    intervaloSelect.disabled = !temPrimeiraInicial;
+                }
                 vencInputs[0].addEventListener('change', function(){
                     const temPrimeira = !!this.value;
-                    intervaloSelect.disabled = !temPrimeira;
-                    if(!temPrimeira){ intervaloSelect.value = ''; }
+                    if(intervaloSelect.choicesInstance){
+                        if(temPrimeira){ intervaloSelect.choicesInstance.enable(); } else { intervaloSelect.choicesInstance.disable(); intervaloSelect.value=''; }
+                    } else {
+                        intervaloSelect.disabled = !temPrimeira;
+                        if(!temPrimeira){ intervaloSelect.value = ''; }
+                    }
                 });
                 intervaloSelect.addEventListener('change', function(){
                     if(!this.value) return; const intervalo=parseInt(this.value); const primeira=vencInputs[0].value; if(!primeira) return;
