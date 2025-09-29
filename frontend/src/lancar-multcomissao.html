@@ -130,6 +130,14 @@
             box-shadow:0 0 0 3px rgba(33,150,243,0.15);
             outline:none
         }
+        /* Estilo Choices dentro da simulação (idêntico aos selects da tabela) */
+        .simulacao-titulos-multiplo .choices{background:#f8f9fa;max-width:100%;width:150px}
+        .simulacao-titulos-multiplo .choices__inner{min-height:32px;height:32px;padding:4px 8px;border-radius:8px;border:1px solid #dce3ea;box-shadow:none;background:#f8f9fa;display:flex;align-items:center;overflow:hidden;width:100%;box-sizing:border-box}
+        .simulacao-titulos-multiplo .choices.is-open .choices__inner{background:#f8f9fa}
+        .simulacao-titulos-multiplo .choices__list--single{width:100%;flex:1 1 auto;min-width:0;display:block}
+        .simulacao-titulos-multiplo .choices__list--single .choices__item{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .simulacao-titulos-multiplo .choices__list--dropdown{z-index:2000}
+        .simulacao-titulos-multiplo .choices__list--dropdown .choices__item{white-space:nowrap}
         /* Aparência do seletor de intervalo igual aos selects padrão */
         .simulacao-titulos-multiplo .intervalo-vencimento-select{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s}
         /* Modal de lançamento */
@@ -448,7 +456,7 @@
                     <td style='padding:6px; text-align:left;'>
                         <div style='display:flex;align-items:center;gap:8px;justify-content:flex-start;'>
                             <label style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label>
-                            <select class='intervalo-vencimento-select' disabled style='padding:6px 10px; height:38px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; width:160px;'>
+                            <select class='intervalo-vencimento-select' disabled style='padding:4px 8px; height:32px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; width:150px;'>
                                 <option value='' selected disabled>Selecione...</option>
                                 <option value='10'>10 dias</option>
                                 <option value='20'>20 dias</option>
