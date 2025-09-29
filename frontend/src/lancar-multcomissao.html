@@ -429,18 +429,23 @@
                     <td style='padding:6px;border-bottom:1px solid #f1f5f9;text-align:center;width:160px;'><input type='date' class='simulacao-vencimento-parcela' style='height:32px;width:150px;'></td>
                 </tr>`;
             }
-            html += `</table>`;
             if(parcelas>1){
-                html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'>
-                    <label style='font-weight:500;'>Intervalo entre títulos: </label>
-                    <select class='intervalo-vencimento-select' disabled style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
-                        <option value='' selected disabled>Selecione...</option>
-                        <option value='10'>10 dias</option>
-                        <option value='20'>20 dias</option>
-                        <option value='30'>30 dias</option>
-                    </select>
-                </div>`;
+                html += `<tr class='row-intervalo-vencimento' style='display:none;'>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style='text-align:right;padding:6px;'><label style='font-weight:500;'>Intervalo entre títulos:</label></td>
+                    <td style='text-align:center;padding:6px;'>
+                        <select class='intervalo-vencimento-select' disabled style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
+                            <option value='' selected disabled>Selecione...</option>
+                            <option value='10'>10 dias</option>
+                            <option value='20'>20 dias</option>
+                            <option value='30'>30 dias</option>
+                        </select>
+                    </td>
+                </tr>`;
             }
+            html += `</table>`;
             html += `</div></td>`;
             trSim.innerHTML = html;
             tbody.insertBefore(trSim, tr.nextElementSibling);
@@ -449,12 +454,12 @@
             const simulacaoDiv = trSim.querySelector('.simulacao-titulos-multiplo');
             const vencInputs = simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela');
             const emissaoInputs = simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela');
-            const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
+            const rowIntervalo = simulacaoDiv.querySelector('.row-intervalo-vencimento');
             const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
-            if(vencInputs.length>1 && intervaloContainer && intervaloSelect){
+            if(vencInputs.length>1 && rowIntervalo && intervaloSelect){
                 vencInputs[0].addEventListener('change', function(){
                     const temPrimeira = !!this.value;
-                    intervaloContainer.style.display = temPrimeira ? 'block' : 'none';
+                    rowIntervalo.style.display = temPrimeira ? '' : 'none';
                     intervaloSelect.disabled = !temPrimeira;
                     if(!temPrimeira){ intervaloSelect.value = ''; }
                 });
@@ -536,7 +541,22 @@
             // Alterações que impactam a simulação: valor de venda e percentual
             const inputValorVenda=tr.querySelector('input[name="valor_venda[]"]'); inputValorVenda.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
             const inputPercentual=tr.querySelector('input[name="percentual[]"]'); inputPercentual.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
-            if(valores){ if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}} if(valores.colaborador){selectColaborador.value=valores.colaborador; if(selectColaborador.choicesInstance){selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador))}} if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo=\'${valores.tipo}\']`); if(btn) btn.click(); } if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}} if(valores.descricao){ tr.querySelector('input[name="descricao[]"]').value=valores.descricao } if(valores.valor_venda){ tr.querySelector('input[name="valor_venda[]"]').value=valores.valor_venda } if(valores.percentual){ tr.querySelector('input[name="percentual[]"]').value=valores.percentual } if(valores.valor_comissao){ tr.querySelector('input[name="valor_comissao[]"]').value=valores.valor_comissao } }
+            if(valores){
+                if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}}
+                if(valores.colaborador){
+                    const aplicarColab = ()=>{
+                        if(selectColaborador.choicesInstance){ selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador)) }
+                        else { selectColaborador.value = valores.colaborador }
+                    };
+                    if(colaboradoresCache){ aplicarColab() } else { colaboradoresCallbacks.push(()=>aplicarColab()) }
+                }
+                if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo='${valores.tipo}']`); if(btn) btn.click(); }
+                if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}}
+                if(valores.descricao){ tr.querySelector('input[name="descricao[]"]').value=valores.descricao }
+                if(valores.valor_venda){ tr.querySelector('input[name="valor_venda[]"]').value=valores.valor_venda }
+                if(valores.percentual){ tr.querySelector('input[name="percentual[]"]').value=valores.percentual }
+                if(valores.valor_comissao){ tr.querySelector('input[name="valor_comissao[]"]').value=valores.valor_comissao }
+            }
             atualizarResumoMultiplo()
         }
 
