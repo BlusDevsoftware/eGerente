@@ -122,8 +122,14 @@
         .input-parcelas:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         .input-valor-parcela{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa !important;text-align:right}
         .input-valor-parcela:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
-        /* Focus azul para o seletor de intervalo na simulação */
-        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);outline:none}
+        /* Focus azul para o seletor de intervalo na simulação (idêntico ao Cliente) */
+        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus,
+        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus-visible,
+        .simulacao-titulos-multiplo .intervalo-vencimento-select:active{
+            border-color:var(--accent);
+            box-shadow:0 0 0 3px rgba(33,150,243,0.15);
+            outline:none
+        }
         /* Aparência do seletor de intervalo igual aos selects padrão */
         .simulacao-titulos-multiplo .intervalo-vencimento-select{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s}
         /* Modal de lançamento */
@@ -434,14 +440,15 @@
                 </tr>`;
             }
             if(parcelas>1){
-                html += `<tr class='row-intervalo-vencimento' style='display:none;'>
+                html += `<tr class='row-intervalo-vencimento'>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td colspan='2' style='padding:6px;'>
+                    <td></td>
+                    <td style='padding:6px; text-align:left;'>
                         <div style='display:flex;align-items:center;gap:8px;justify-content:flex-start;'>
                             <label style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label>
-                            <select class='intervalo-vencimento-select' disabled style='padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
+                            <select class='intervalo-vencimento-select' disabled style='padding:6px 10px; height:38px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; width:160px;'>
                                 <option value='' selected disabled>Selecione...</option>
                                 <option value='10'>10 dias</option>
                                 <option value='20'>20 dias</option>
@@ -463,9 +470,10 @@
             const rowIntervalo = simulacaoDiv.querySelector('.row-intervalo-vencimento');
             const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
             if(vencInputs.length>1 && rowIntervalo && intervaloSelect){
+                // Linha já aparece logo ao simular; apenas controla habilitação do select
+                intervaloSelect.disabled = !(vencInputs[0].value);
                 vencInputs[0].addEventListener('change', function(){
                     const temPrimeira = !!this.value;
-                    rowIntervalo.style.display = temPrimeira ? '' : 'none';
                     intervaloSelect.disabled = !temPrimeira;
                     if(!temPrimeira){ intervaloSelect.value = ''; }
                 });
