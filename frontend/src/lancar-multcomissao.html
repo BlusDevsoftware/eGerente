@@ -122,6 +122,10 @@
         .input-parcelas:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         .input-valor-parcela{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa !important;text-align:right}
         .input-valor-parcela:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        /* Focus azul para o seletor de intervalo na simulação */
+        .simulacao-titulos-multiplo .intervalo-vencimento-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);outline:none}
+        /* Aparência do seletor de intervalo igual aos selects padrão */
+        .simulacao-titulos-multiplo .intervalo-vencimento-select{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s}
         /* Modal de lançamento */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:9999}
         .modal-card{width:min(420px,92vw);background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:20px;text-align:center}
@@ -434,14 +438,16 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style='text-align:right;padding:6px;'><label style='font-weight:500;'>Intervalo entre títulos:</label></td>
-                    <td style='text-align:center;padding:6px;'>
-                        <select class='intervalo-vencimento-select' disabled style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
-                            <option value='' selected disabled>Selecione...</option>
-                            <option value='10'>10 dias</option>
-                            <option value='20'>20 dias</option>
-                            <option value='30'>30 dias</option>
-                        </select>
+                    <td colspan='2' style='padding:6px;'>
+                        <div style='display:flex;align-items:center;gap:8px;justify-content:flex-start;'>
+                            <label style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label>
+                            <select class='intervalo-vencimento-select' disabled style='padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
+                                <option value='' selected disabled>Selecione...</option>
+                                <option value='10'>10 dias</option>
+                                <option value='20'>20 dias</option>
+                                <option value='30'>30 dias</option>
+                            </select>
+                        </div>
                     </td>
                 </tr>`;
             }
