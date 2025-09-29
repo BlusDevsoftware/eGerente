@@ -101,8 +101,10 @@
         .acao-multiplos .acoes-multiplos-wrapper{background:#f8fafc;border:1px dashed #e5e7eb;border-radius:10px;padding:6px}
         .acao-multiplos label{color:#475569}
         .checkbox-parcelado{width:16px;height:16px}
-        .input-parcelas{border-radius:8px}
-        .input-valor-parcela{border-radius:8px;background:#eef6ff;color:#0f172a}
+        .input-parcelas{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa}
+        .input-parcelas:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
+        .input-valor-parcela{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;outline:none;transition:border .15s, box-shadow .15s;background:#f8f9fa !important;text-align:right}
+        .input-valor-parcela:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15);background:#f8f9fa}
         /* Modal de lançamento */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:9999}
         .modal-card{width:min(420px,92vw);background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:20px;text-align:center}
