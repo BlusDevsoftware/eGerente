@@ -554,7 +554,9 @@
                 return;
             }
             
-            const listaComissoes = [];
+            // Vamos enviar um título por vez (registro individual) para o backend.
+            // Isso evita que títulos de linhas diferentes se agrupem e compartilhem a mesma sequência.
+            const listaTitulos = [];
             let houveCampoFaltando = false;
             const motivos = [];
             
@@ -676,7 +678,8 @@
                 // Obter usuário de lançamento (preferir sessionStorage 'user')
                 const usuarioLancamento = resolveUsuarioLancamento();
                 
-                // Criar registros para cada parcela
+                // Criar registros para cada parcela desta linha (LOTE POR LINHA)
+                // Títulos individuais desta linha
                 for (let p = 0; p < qtdParcelas; p++) {
                     let dataGeracao = new Date().toISOString().slice(0, 10);
                     let dataVencimento = new Date().toISOString().slice(0, 10);
@@ -688,7 +691,7 @@
                         dataVencimento = vencInputs[p].value;
                     }
                     
-                    listaComissoes.push({
+                    listaTitulos.push({
                         cliente_id: clienteId,
                         colaborador_id: colaboradorId,
                         tipo,
@@ -703,19 +706,26 @@
                         descricao
                     });
                 }
+                // fim títulos desta linha
             });
             
-            if (listaComissoes.length === 0) {
+            // Checagem: se nenhum título foi criado
+            const totalRegistros = listaTitulos.length;
+            if (totalRegistros === 0) {
                 const msg = motivos.length ? motivos.join('\n') : 'Preencha os dados obrigatórios das linhas.';
                 finalizarModalLancamentoErro(msg);
                 return;
             }
             // Mostrar modal e progresso
-            abrirModalLancamento(listaComissoes.length);
-            let contador=0; let total=listaComissoes.length; let timer=null;
+            abrirModalLancamento(totalRegistros);
+            let contador=0; let total=totalRegistros; let timer=null;
             try {
-                timer=setInterval(()=>{ if(contador < total-1){ contador++; atualizarModalLancamento(contador,total) } }, 200);
-                await window.api.post('/movimento_comissoes', listaComissoes);
+                // Enviar um título por vez
+                for (const titulo of listaTitulos) {
+                    await window.api.post('/movimento_comissoes', titulo);
+                    contador += 1;
+                    atualizarModalLancamento(Math.min(contador,total), total);
+                }
                 atualizarModalLancamento(total,total);
                 finalizarModalLancamentoSucesso(total);
                 form.reset();
