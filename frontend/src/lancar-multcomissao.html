@@ -441,7 +441,7 @@
             if(parcelas>1){
                 html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'>
                     <label style='font-weight:500;'>Intervalo entre títulos: </label>
-                    <select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
+                    <select class='intervalo-vencimento-select' disabled style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important;'>
                         <option value='' selected disabled>Selecione...</option>
                         <option value='10'>10 dias</option>
                         <option value='20'>20 dias</option>
@@ -460,7 +460,12 @@
             const intervaloContainer = simulacaoDiv.querySelector('.intervalo-vencimento-container');
             const intervaloSelect = simulacaoDiv.querySelector('.intervalo-vencimento-select');
             if(vencInputs.length>1 && intervaloContainer && intervaloSelect){
-                vencInputs[0].addEventListener('change', function(){ intervaloContainer.style.display='block'; });
+                vencInputs[0].addEventListener('change', function(){
+                    const temPrimeira = !!this.value;
+                    intervaloContainer.style.display = temPrimeira ? 'block' : 'none';
+                    intervaloSelect.disabled = !temPrimeira;
+                    if(!temPrimeira){ intervaloSelect.value = ''; }
+                });
                 intervaloSelect.addEventListener('change', function(){
                     if(!this.value) return; const intervalo=parseInt(this.value); const primeira=vencInputs[0].value; if(!primeira) return;
                     let data=new Date(primeira); for(let i=1;i<vencInputs.length;i++){ data.setDate(data.getDate()+intervalo); vencInputs[i].value=data.toISOString().slice(0,10) }
