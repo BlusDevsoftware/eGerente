@@ -358,7 +358,28 @@
         }
         (function bindModalOk(){ try{ document.getElementById('btnModalOk').addEventListener('click', ()=>{ try{ document.getElementById('modalLancamento').style.display='none'; if(window.__lancamentoMultiploSucesso){ window.__lancamentoMultiploSucesso=false; window.location.reload(); } }catch(_){ } }) }catch(_){ } })();
         async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
-        function preencherSelectColaborador(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML=''; buscarColaboradores().then(colabs=>{ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML=''; colabs.forEach(c=>{const o=document.createElement('option'); const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? ''); const codigoStr=String(codigo); const nome=(c.nome||c.descricao||''); o.value=codigoStr; o.textContent=(codigoStr && nome)? `${codigoStr} - ${nome}` : (nome || codigoStr); select.appendChild(o)}); select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'}) }) }
+        function preencherSelectColaborador(select){
+            if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null}
+            const desired = select.dataset.preselectValue || select.value || '';
+            select.innerHTML='';
+            buscarColaboradores().then(colabs=>{
+                if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null}
+                select.innerHTML='';
+                colabs.forEach(c=>{
+                    const o=document.createElement('option');
+                    const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? '');
+                    const codigoStr=String(codigo);
+                    const nome=(c.nome||c.descricao||'');
+                    o.value=codigoStr;
+                    o.textContent=(codigoStr && nome)? `${codigoStr} - ${nome}` : (nome || codigoStr);
+                    if(desired && String(desired)===codigoStr){ o.selected = true }
+                    select.appendChild(o)
+                });
+                select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'});
+                if(desired){ try{ select.choicesInstance.setChoiceByValue(String(desired)) }catch(_){ } }
+                try{ delete select.dataset.preselectValue }catch(_){ }
+            })
+        }
         function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML=''; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const nome=(c && (c.nome||c.razao||c.fantasia||'')) || ''; const o=document.createElement('option'); o.value=codigoStr; o.textContent=(nome? `${codigoStr} - ${nome}` : codigoStr); select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'}) }
         function getItemPrimaryId(item){ return (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico)) }
         function getItemName(item){ return (item && (item.nome ?? item.descricao ?? item.nome_servico ?? item.nomeProduto ?? item.nomeServico)) || 'Item'}
@@ -568,7 +589,10 @@
             </td>`;
             tbody.appendChild(tr);
             const selectCliente=tr.querySelector('select[name=\"cliente[]\"]'); preencherSelectClienteMultiplo(selectCliente); selectCliente.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
-            const selectColaborador=tr.querySelector('select[name="colaborador[]"]'); preencherSelectColaborador(selectColaborador); selectColaborador.addEventListener('change', function(){ removerSimulacaoLinha(tr) })
+            const selectColaborador=tr.querySelector('select[name="colaborador[]"]');
+            if(valores && valores.colaborador){ selectColaborador.dataset.preselectValue = String(valores.colaborador) }
+            preencherSelectColaborador(selectColaborador);
+            selectColaborador.addEventListener('change', function(){ removerSimulacaoLinha(tr) })
             const selectItem=tr.querySelector('select[name="item[]"]'); if(selectItem.choicesInstance){selectItem.choicesInstance.destroy();selectItem.choicesInstance=null} selectItem.choicesInstance=new Choices(selectItem,{searchEnabled:true,itemSelectText:''}); selectItem.addEventListener('change', ()=>{ removerSimulacaoLinha(tr) });
             const grpParcelas=tr.querySelector('.group-parcelas'); const inputParcelas=tr.querySelector('.input-parcelas'); const inputValorComissao=tr.querySelector('input[name="valor_comissao[]"]'); const inputValorParcela=tr.querySelector('.input-valor-parcela'); const grpValorParcela=tr.querySelector('.group-valor-parcela');
             const btnParcelar=tr.querySelector('.btn-parcelar'); btnParcelar.addEventListener('click',()=>{ const isOpen=grpParcelas.style.display==='flex'; if(isOpen){ grpParcelas.style.display='none'; grpValorParcela.style.display='none'; inputParcelas.value=''; inputValorParcela.value=''; removerSimulacaoLinha(tr) } else { grpParcelas.style.display='flex'; grpValorParcela.style.display='block'; inputParcelas.min='2'; inputParcelas.value='2'; atualizarValorParcela() } });
@@ -580,13 +604,7 @@
             const inputPercentual=tr.querySelector('input[name="percentual[]"]'); inputPercentual.addEventListener('input', ()=>{ removerSimulacaoLinha(tr) });
             if(valores){
                 if(valores.cliente){selectCliente.value=valores.cliente; if(selectCliente.choicesInstance){selectCliente.choicesInstance.setChoiceByValue(String(valores.cliente))}}
-                if(valores.colaborador){
-                    const aplicarColab = ()=>{
-                        if(selectColaborador.choicesInstance){ selectColaborador.choicesInstance.setChoiceByValue(String(valores.colaborador)) }
-                        else { selectColaborador.value = valores.colaborador }
-                    };
-                    if(colaboradoresCache){ aplicarColab() } else { colaboradoresCallbacks.push(()=>aplicarColab()) }
-                }
+                if(valores.colaborador){ /* já pré-selecionado via dataset antes do preenchimento */ }
                 if(valores.tipo){ const container=tr.querySelector('.tipo-toggle-multiplo'); const btn=container.querySelector(`.btn-tipo[data-tipo='${valores.tipo}']`); if(btn) btn.click(); }
                 if(valores.item){ selectItem.value=valores.item; if(selectItem.choicesInstance){selectItem.choicesInstance.setChoiceByValue(String(valores.item))}}
                 if(valores.descricao){ tr.querySelector('input[name="descricao[]"]').value=valores.descricao }
