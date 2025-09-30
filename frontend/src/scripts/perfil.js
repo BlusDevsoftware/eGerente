@@ -77,6 +77,7 @@ function renderPermissionsMatrix(permissoes = {}, isEditMode = false) {
         { titulo: 'Cadastros/Serviços', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Cadastros/Perfis', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comissões/Lançar', acoes: ['ver','criar'] },
+        { titulo: 'Comissões/Lançar (Múltiplos)', acoes: ['ver','criar'] },
         { titulo: 'Comissões/Movimento', acoes: ['ver','criar','editar','excluir'] },
         { titulo: 'Comissões/Consulta', acoes: ['ver'] },
         { titulo: 'Comissões/Visualizar Todos os Títulos', acoes: ['ver'] },
@@ -159,6 +160,7 @@ function sectionKeyToTitle(sectionKey) {
         'cadastros_servicos': 'Cadastros/Serviços',
         'cadastros_perfis': 'Cadastros/Perfis',
         'comissoes_lancar': 'Comissões/Lançar',
+        'comissoes_lancar_multiplos': 'Comissões/Lançar (Múltiplos)',
         'comissoes_movimento': 'Comissões/Movimento',
         'comissoes_consulta': 'Comissões/Consulta',
         'comissoes_visualizar_todos_titulos': 'Comissões/Visualizar Todos os Títulos',
@@ -731,6 +733,9 @@ async function salvarPerfil(e) {
     // Comissões/Lançar
     permissoes.comissoes_lancar_ver = permissoesMapa['Comissões/Lançar']?.includes('ver') || false;
     permissoes.comissoes_lancar_criar = permissoesMapa['Comissões/Lançar']?.includes('criar') || false;
+    // Comissões/Lançar (Múltiplos)
+    permissoes.comissoes_lancar_multiplos_ver = permissoesMapa['Comissões/Lançar (Múltiplos)']?.includes('ver') || false;
+    permissoes.comissoes_lancar_multiplos_criar = permissoesMapa['Comissões/Lançar (Múltiplos)']?.includes('criar') || false;
     
     // Comissões/Movimento
     permissoes.comissoes_movimento_ver = permissoesMapa['Comissões/Movimento']?.includes('ver') || false;
