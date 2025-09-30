@@ -807,7 +807,17 @@
         });
 
         document.addEventListener('DOMContentLoaded', async function(){ try{ document.getElementById('loader-multi').style.display='flex' }catch(_){}
-            try{ window.clientes=await api.get('/clientes'); produtos=await api.get('/produtos'); servicos=await api.get('/servicos') }catch(e){ console.error('Falha ao carregar dados iniciais:', e) }
+            try{
+                window.clientes=await api.get('/clientes');
+                produtos=await api.get('/produtos');
+                servicos=await api.get('/servicos');
+                // Prefetch colaboradores para evitar delay no primeiro render do select
+                try{
+                    colaboradoresCache = await api.get('/colaboradores');
+                    try{ colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)) }catch(_){ }
+                    colaboradoresCallbacks = [];
+                }catch(e){ console.warn('Falha ao pré-carregar colaboradores:', e) }
+            }catch(e){ console.error('Falha ao carregar dados iniciais:', e) }
             adicionarLinhaMultiplo(); atualizarResumoMultiplo(); try{ document.getElementById('loader-multi').style.display='none' }catch(_){ }
         })
     </script>
