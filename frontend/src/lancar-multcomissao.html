@@ -281,6 +281,16 @@
         function extrairNumeroBR(valor){if(!valor) return 0; const n=String(valor).replace(/[^0-9,.-]/g,'').replace(/\.(?=.*\.)/g,'').replace(',','.'); return parseFloat(n)||0}
         let produtos=[], servicos=[]; let colaboradoresCache=null, colaboradoresCallbacks=[];
 
+        function entidadeAtiva(ent){
+            try{
+                const s = (ent && (ent.status || ent.situacao || ent.ativo || ent.isActive));
+                if (typeof s === 'boolean') return s === true;
+                if (s == null) return true; // se não houver status, considerar ativo
+                const str = String(s).toLowerCase();
+                return str.includes('ativo') || str === '1' || str === 'true' || str === 'enabled';
+            }catch(_){ return true }
+        }
+
         function resolveUsuarioLancamento(){
             try{
                 if (window.authGuard && typeof window.authGuard.getCurrentUser === 'function'){
@@ -359,7 +369,7 @@
             }catch(_){}
         }
         (function bindModalOk(){ try{ document.getElementById('btnModalOk').addEventListener('click', ()=>{ try{ document.getElementById('modalLancamento').style.display='none'; if(window.__lancamentoMultiploSucesso){ window.__lancamentoMultiploSucesso=false; window.location.reload(); } }catch(_){ } }) }catch(_){ } })();
-        async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ colaboradoresCache=await api.get('/colaboradores'); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
+        async function buscarColaboradores(){ if(colaboradoresCache) return colaboradoresCache; try{ const todos=await api.get('/colaboradores'); colaboradoresCache=(Array.isArray(todos)? todos.filter(entidadeAtiva):[]); colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)); return colaboradoresCache;}catch(e){console.error('Erro ao buscar colaboradores:',e); return []}}
         function preencherSelectColaborador(select){
             if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null}
             const desired = select.dataset.preselectValue || select.value || '';
@@ -367,7 +377,7 @@
             buscarColaboradores().then(colabs=>{
                 if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null}
                 select.innerHTML='';
-                colabs.forEach(c=>{
+                (colabs||[]).filter(entidadeAtiva).forEach(c=>{
                     const o=document.createElement('option');
                     const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? '');
                     const codigoStr=String(codigo);
@@ -382,7 +392,7 @@
                 try{ delete select.dataset.preselectValue }catch(_){ }
             })
         }
-        function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML=''; if(Array.isArray(window.clientes)){ window.clientes.forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const nome=(c && (c.nome||c.razao||c.fantasia||'')) || ''; const o=document.createElement('option'); o.value=codigoStr; o.textContent=(nome? `${codigoStr} - ${nome}` : codigoStr); select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'}) }
+        function preencherSelectClienteMultiplo(select){ if(select.choicesInstance){select.choicesInstance.destroy();select.choicesInstance=null} select.innerHTML=''; if(Array.isArray(window.clientes)){ window.clientes.filter(entidadeAtiva).forEach(c=>{ const codigo = (c && (c.codigo ?? c.id ?? c.codigo_crm ?? '')); if(!codigo){ return } const codigoStr = String(codigo).padStart(5,'0'); const nome=(c && (c.nome||c.razao||c.fantasia||'')) || ''; const o=document.createElement('option'); o.value=codigoStr; o.textContent=(nome? `${codigoStr} - ${nome}` : codigoStr); select.appendChild(o)}) } select.choicesInstance=new Choices(select,{searchEnabled:true,itemSelectText:'',placeholder:true,placeholderValue:'Selecione...'}) }
         function getItemPrimaryId(item){ return (item && (item.codigo ?? item.id ?? item.codigo_crm ?? item.cod ?? item.codigo_servico)) }
         function getItemName(item){ return (item && (item.nome ?? item.descricao ?? item.nome_servico ?? item.nomeProduto ?? item.nomeServico)) || 'Item'}
         function getItemPrice(item){ const price=(item && (item.preco ?? item.valor ?? item.preco_venda ?? item.precoServico ?? item.preco_servico)); const parsed=parseFloat(price); return isNaN(parsed)?0:parsed }
@@ -542,7 +552,7 @@
             // Ao alterar o tipo, invalida qualquer simulação existente da linha
             try{ const trRow=td.parentElement; removerSimulacaoLinha(trRow) }catch(_){ }
             if(!tipo){ itemSelect.innerHTML='<option value="" disabled selected hidden>Selecione...</option>'; itemSelect.choicesInstance=new Choices(itemSelect,{searchEnabled:true,itemSelectText:''}); return }
-            let source = tipo==='produto'? produtos : servicos; const choices = (source||[]).map(it=>{ const primary = String(getItemPrimaryId(it)||''); const value = (typeof it.id!=='undefined')? String(it.id) : primary; const codigoPad = primary && /^\d+$/.test(primary) ? primary.padStart(5,'0') : primary; const nome = getItemName(it); const displayLabel = (codigoPad && nome) ? `${codigoPad} - ${nome}` : (nome || codigoPad || 'Item'); return { value: value, label: displayLabel, customProperties:{valor:getItemPrice(it)} } });
+            let source = tipo==='produto'? produtos : servicos; source = (source||[]).filter(entidadeAtiva); const choices = (source||[]).map(it=>{ const primary = String(getItemPrimaryId(it)||''); const value = (typeof it.id!=='undefined')? String(it.id) : primary; const codigoPad = primary && /^\d+$/.test(primary) ? primary.padStart(5,'0') : primary; const nome = getItemName(it); const displayLabel = (codigoPad && nome) ? `${codigoPad} - ${nome}` : (nome || codigoPad || 'Item'); return { value: value, label: displayLabel, customProperties:{valor:getItemPrice(it)} } });
             itemSelect.innerHTML='';
             // Removido placeholder visível para não exibir "Selecione..."
             choices.forEach(c=>{ const o=document.createElement('option'); o.value=c.value; o.textContent=c.label; o.dataset.valor=c.customProperties.valor; itemSelect.appendChild(o) });
