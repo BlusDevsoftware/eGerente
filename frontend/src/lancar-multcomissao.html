@@ -545,7 +545,21 @@
             })();
         }
 
-        function removerSimulacaoLinha(tr){ const next=tr.nextElementSibling; if(next && next.classList.contains('linha-simulacao-multiplo')) next.remove() }
+        function removerSimulacaoLinha(tr){
+            const next=tr.nextElementSibling;
+            if(next && next.classList.contains('linha-simulacao-multiplo')) next.remove();
+            // Também fechar/limpar o painel de ações (parcelamento) ao invalidar a simulação
+            try{
+                const grpParcelas = tr.querySelector('.group-parcelas');
+                const grpValorParcela = tr.querySelector('.group-valor-parcela');
+                const inputParcelas = tr.querySelector('.input-parcelas');
+                const inputValorParcela = tr.querySelector('.input-valor-parcela');
+                if (grpParcelas) grpParcelas.style.display = 'none';
+                if (grpValorParcela) grpValorParcela.style.display = 'none';
+                if (inputParcelas) inputParcelas.value = '';
+                if (inputValorParcela) inputValorParcela.value = '';
+            }catch(_){ }
+        }
         function atualizarSimulacaoLinha(tr){ const next=tr.nextElementSibling; if(!(next && next.classList.contains('linha-simulacao-multiplo'))) return; const inputValorParcela=tr.querySelector('.input-valor-parcela'); const parcelas=parseInt(tr.querySelector('.input-parcelas').value)||0; if(parcelas<=0 || !inputValorParcela.value){ next.remove(); return } const valorParcela=inputValorParcela.value; next.remove(); criarLinhaSimulacao(tr, parcelas, valorParcela) }
         function simularTitulosLinha(tr){ let parcelas=parseInt(tr.querySelector('.input-parcelas').value)||0; if(parcelas<=0){ parcelas=1 } let valorParcela=tr.querySelector('.input-valor-parcela').value; if(!valorParcela){ const v=parseFloat(tr.querySelector('input[name="valor_comissao[]"]').value)||0; if(!(v>0)){ alert('Informe o valor da comissão para simular.'); return } valorParcela=(v/parcelas).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}) } removerSimulacaoLinha(tr); criarLinhaSimulacao(tr, parcelas, valorParcela) }
 
