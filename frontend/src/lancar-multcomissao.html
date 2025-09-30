@@ -283,11 +283,13 @@
 
         function entidadeAtiva(ent){
             try{
-                const s = (ent && (ent.status || ent.situacao || ent.ativo || ent.isActive));
+                const s = (ent && (ent.status ?? ent.situacao ?? ent.ativo ?? ent.isActive));
                 if (typeof s === 'boolean') return s === true;
-                if (s == null) return true; // se não houver status, considerar ativo
-                const str = String(s).toLowerCase();
-                return str.includes('ativo') || str === '1' || str === 'true' || str === 'enabled';
+                if (typeof s === 'number') return s === 1;
+                if (s == null) return false; // se não vier, não considerar ativo
+                const str = String(s).trim().toLowerCase();
+                // Seu modelo: apenas dois status: 'ativo' ou 'inativo'
+                return str === 'ativo';
             }catch(_){ return true }
         }
 
@@ -838,12 +840,16 @@
 
         document.addEventListener('DOMContentLoaded', async function(){ try{ document.getElementById('loader-multi').style.display='flex' }catch(_){}
             try{
-                window.clientes=await api.get('/clientes');
-                produtos=await api.get('/produtos');
-                servicos=await api.get('/servicos');
+                window.clientes=(await api.get('/clientes'))||[];
+                try{ window.clientes = window.clientes.filter(entidadeAtiva) }catch(_){ }
+                produtos=(await api.get('/produtos'))||[];
+                try{ produtos = produtos.filter(entidadeAtiva) }catch(_){ }
+                servicos=(await api.get('/servicos'))||[];
+                try{ servicos = servicos.filter(entidadeAtiva) }catch(_){ }
                 // Prefetch colaboradores para evitar delay no primeiro render do select
                 try{
-                    colaboradoresCache = await api.get('/colaboradores');
+                    const _all = await api.get('/colaboradores');
+                    colaboradoresCache = (Array.isArray(_all)? _all.filter(entidadeAtiva) : []);
                     try{ colaboradoresCallbacks.forEach(cb=>cb(colaboradoresCache)) }catch(_){ }
                     colaboradoresCallbacks = [];
                 }catch(e){ console.warn('Falha ao pré-carregar colaboradores:', e) }
