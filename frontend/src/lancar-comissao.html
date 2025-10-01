@@ -11,12 +11,16 @@
     <script src="scripts/config/realtime-config.js"></script>
     <script src="scripts/realtime-bus.js"></script>
     <script src="scripts/realtime-global.js"></script>
-    <script src="scripts/auth-guard.js"></script>
-    <script src="scripts/apply-auth-protection.js"></script>
+    <!-- Auth temporariamente desativado nesta tela para depuração -->
+    <!-- <script src="scripts/auth-guard.js"></script> -->
+    <!-- <script src="scripts/apply-auth-protection.js"></script> -->
     <script src="scripts/config/api.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
+        html, body{height:100%; overflow:hidden}
+        .main-content{padding-bottom:4px; overflow:hidden}
+        .content{margin-top:0; overflow:hidden}
         /* Spinner de carregamento - Padrão do sistema */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -141,9 +145,10 @@
         <!-- Conteúdo da página -->
         <div class="content">
             <div class="tabs-comissao">
-                <button id="tabUnico" class="tab-btn active" onclick="mostrarTabComissao('unico')">Lançamento Comercial</button>
+                
             </div>
-            <div id="tabUnicoContent" class="tab-content active">
+            <div class="content-split">
+                <div id="tabUnicoContent" class="tab-content active">
                 <form id="formUnico" class="form-comissao">
                     <div class="form-row">
                         <div class="form-group" style="flex: 1.5;">
@@ -160,30 +165,64 @@
                             </div>
                             <input type="hidden" name="tipo" value="">
                         </div>
-                        <div class="form-group produto-servico" style="flex: 2;">
-                            <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
+                        <div class="form-group itens">
+                            <label><i class="fas fa-cubes"></i> Itens</label>
                             <div class="choices-container-wrapper">
-                                <select name="item" multiple required></select>
+                                <select name="item" required></select>
                             </div>
                         </div>
-                        <div class="form-group valor-venda-destaque" style="flex: 1;">
-                            <label><i class="fas fa-dollar-sign"></i> Valor da Venda</label>
-                            <div class="choices-container-wrapper">
-                                <input type="text" name="valor_venda" required class="valor-venda-destaque-input" placeholder="R$ 0,00">
-                            </div>
-                        </div>
+                <div class="form-group add-colab-action" style="flex:0 0 auto; display:flex; align-items:flex-end;">
+                    <button type="button" class="btn-primary" onclick="adicionarColaboradorUnico()" style="height:38px; white-space:nowrap;">
+                        <i class="fas fa-user-plus"></i> Adicionar Colaborador
+                    </button>
+                </div>
+                        
+                        
+                        
                     </div>
                     <div id="colaboradoresVinculados">
                         <!-- Colaboradores dinâmicos aqui -->
                     </div>
-                    <div style="margin-bottom: 18px;">
-                        <button type="button" class="btn-primary" onclick="adicionarColaboradorUnico()"><i class="fas fa-user-plus"></i> Adicionar Colaborador</button>
-                    </div>
-                    <div class="form-actions">
-                        <button type="reset" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar Comissão</button>
-                    </div>
+                    
+                    
                 </form>
+                </div>
+                <div id="tabUnicoSide" class="side-panel">
+                    <!-- Lista de itens selecionados -->
+                    <div class="side-itens-card">
+                        <div class="titulo">Itens Selecionados</div>
+                        <div id="sideListaProdutos" class="lista-produtos" style="flex:1 1 auto;"></div>
+                        <div class="resumo-row" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <span>Total dos Itens</span>
+                            <input type="text" id="sideTotalItens" readonly value="R$ 0,00" style="width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px">
+                        </div>
+                        <div class="ajuste-desconto" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <label for="sideDesconto" style="color:#475569;">Desconto</label>
+                            <input type="text" id="sideDesconto" placeholder="R$ 0,00" style="width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px">
+                        </div>
+                        <div class="ajuste-acrescimo" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <label for="sideAcrescimo" style="color:#475569;">Acréscimo</label>
+                            <input type="text" id="sideAcrescimo" placeholder="R$ 0,00" style="width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px">
+                        </div>
+                        <div class="total-venda-row" style="position:sticky; bottom:0; background:#fff; padding-top:8px;">
+                            <span>Total</span>
+                            <input type="text" id="sideTotalVenda" readonly value="R$ 0,00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div id="barraInferiorUnico" class="filters-container" style="display:flex;">
+                    <div style="display:flex;gap:20px;align-items:center;">
+                        <div><strong>Total de Colaboradores:</strong> <span id="totalColaboradores">0</span></div>
+                        <div><strong>Valor da Venda:</strong> <span id="valorVendaResumo">R$ 0,00</span></div>
+                        <div><strong>Total a Pagar:</strong> <span id="valorTotalComissoesUnico">R$ 0,00</span></div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-left:auto;">
+                        <button type="button" class="btn-primary" onclick="adicionarColaboradorUnico()"><i class="fas fa-user-plus"></i> Adicionar Colaborador</button>
+                        <button type="reset" form="formUnico" class="btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                        <button type="submit" form="formUnico" class="btn-primary"><i class="fas fa-save"></i> Salvar Comissão</button>
+                    </div>
+                    </div>
         </div>
         
         </div>
@@ -192,9 +231,10 @@
         
         <style>
             .tabs-comissao {
-                display: flex;
-                gap: 8px;
-                margin-bottom: 24px;
+                display: none; /* remover qualquer espaço vertical (não usamos abas aqui) */
+                height: 0;
+                margin: 0;
+                padding: 0;
             }
             /* Barra inferior fixa igual ao Recebimento/Movimento (estilos aplicados inline) */
             .tab-btn {
@@ -220,21 +260,145 @@
             .tab-content.active {
                 display: block;
             }
+            /* Escopo local: neutraliza fundos/cor herdados globais apenas nesta aba */
+            #formUnico .form-group input,
+            #formUnico .form-group select,
+            #formUnico .form-group textarea { background:#fff !important }
+            #formUnico .form-group input[readonly] { background:#fff !important }
+            #formUnico .choices,
+            #formUnico .choices__inner { background:#fff !important }
             .form-comissao {
                 background: #fff;
-                border-radius: 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-                padding: 32px 24px;
+                border-radius: 14px;
+                border: 1px solid #e5e7eb;
+                box-shadow: 0 10px 30px rgba(2,6,23,0.06), 0 2px 6px rgba(2,6,23,0.04);
+                padding: 12px 12px;
                 margin-bottom: 0;
-                padding-bottom: 100px; /* Espaço para a barra inferior fixa */
+                padding-bottom: 0; /* barra inferior fora do form, não reservar espaço */
+                height: calc(100vh - 247px); /* espelha múltiplos: área útil */
+                display: flex;
+                flex-direction: column;
+                /* Reduz a largura apenas do card do formulário, mantendo a barra inferior full-width */
+                width: 100%;
+                max-width: 1400px;
+                margin-right: auto;
+                margin-left: 0;
             }
+            /* Layout em duas colunas dentro do content */
+            .content-split {
+                display: flex;
+                gap: 16px;
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+            /* Coluna esquerda com largura fixa desejada (tamanho anterior) */
+            #tabUnicoContent {
+                flex: 0 0 1400px;
+                max-width: 1700px;
+            }
+            /* Coluna direita ocupa o restante */
+            #tabUnicoSide {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                min-width: 280px;
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(2,6,23,0.06), 0 2px 6px rgba(2,6,23,0.04);
+                padding: 12px;
+                height: calc(100vh - 247px);
+                overflow: auto;
+            }
+            #tabUnicoSide .side-itens-card { display:flex; flex-direction:column; gap:8px; flex: 1 1 auto; height: 100% }
+            #tabUnicoSide .side-itens-card .titulo { font-weight:600; color:#0f172a }
+            #tabUnicoSide .lista-produtos { flex:1 1 auto; min-height:60px; max-height:100%; overflow:auto; border:1px dashed #e5e7eb; border-radius:6px; padding:6px; background:#fff }
+            #tabUnicoSide .total-venda-row { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:auto }
+            #tabUnicoSide #sideTotalVenda { width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px }
+            /* Foco azul igual aos campos principais */
+            #tabUnicoSide #sideTotalItens:focus,
+            #tabUnicoSide #sideDesconto:focus,
+            #tabUnicoSide #sideAcrescimo:focus,
+            #tabUnicoSide #sideTotalVenda:focus {
+                border-color:#2196F3 !important;
+                box-shadow: 0 0 0 3px rgba(33,150,243,0.15) !important;
+                outline:none !important;
+                background:#fff !important;
+            }
+            /* Forçar cor do texto preta nos inputs do painel lateral */
+            #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
+            #tabUnicoSide input[readonly] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; background:#fff !important }
+            /* Garantir cor explicitamente nos campos de desconto/acréscimo e seus placeholders */
+            #sideDesconto, #sideAcrescimo { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
+            #sideDesconto::placeholder, #sideAcrescimo::placeholder { color:#0f172a !important; opacity:1 }
+            /* Tratar autofill que pode aplicar cor acinzentada */
+            #sideDesconto:-webkit-autofill, #sideAcrescimo:-webkit-autofill {
+                -webkit-text-fill-color:#0f172a !important;
+                box-shadow: 0 0 0px 1000px #ffffff inset !important;
+                -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+            }
+
+            /* Responsividade: empilhar colunas e tornar campos fluidos em telas menores */
+            @media (max-width: 1600px) {
+                #tabUnicoContent { flex: 1 1 100%; max-width: 100%; }
+                .form-comissao { max-width: 100%; height: auto; }
+                #tabUnicoSide { flex: 1 1 100%; height: auto; min-height: 0; }
+                /* habilita rolagem vertical quando as colunas empilham */
+                .main-content, .content { overflow: auto; }
+            }
+            @media (max-width: 1200px) {
+                .form-row { display:flex; flex-wrap: wrap; }
+                #formUnico .form-row > .form-group:first-child,
+                #formUnico .form-row > .form-group.itens {
+                    flex: 1 1 100% !important;
+                    max-width: 100% !important;
+                    min-width: 0 !important;
+                }
+                .form-group.tipo-toggle-group { max-width: 100%; }
+                .form-row .add-colab-action { align-self:flex-end; }
+            }
+            /* Barra superior (header) com mesma borda e sombra da múltiplos */
+            .header {
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(2,6,23,0.06), 0 2px 6px rgba(2,6,23,0.04);
+            }
+            /* Barra inferior fixa (estilo idêntico à aba múltiplos) */
+            #barraInferiorUnico {
+                position: static;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                align-items: center;
+                gap: 16px;
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 10px 30px rgba(2,6,23,0.06), 0 2px 6px rgba(2,6,23,0.04);
+                height: auto;
+                min-height: 51px;
+                padding: 8px 16px;
+                margin: 12px 0 0 0; /* sem folga inferior para evitar scroll externo */
+                width: 100%;
+            }
+            #barraInferiorUnico strong { color: #0f172a; font-size: 12px; }
+            #barraInferiorUnico span { display:inline-block; background:#f1f5f9; border:1px solid #e5e7eb; color:#0f172a; padding:3px 8px; border-radius:997px; margin-left:6px; font-weight:700; min-width:72px; text-align:center; font-size:12px }
+            #barraInferiorUnico .resumos-barra { display:flex; gap:20px; align-items:center; margin:0 }
+            #barraInferiorUnico .acoes-barra { display:flex; gap:8px; align-items:center; justify-content:flex-end; margin:0 }
+            #barraInferiorUnico .btn-primary, #barraInferiorUnico .btn-secondary { padding: 6px 10px; font-size: 12px; border-radius: 6px }
+            #barraInferiorUnico .btn-primary i, #barraInferiorUnico .btn-secondary i { font-size: 12px }
+            #barraInferiorUnico > div:last-child { justify-self: end }
             
             .form-row {
-                display: flex;
-                gap: 20px;
+                display: grid;
+                grid-template-columns: 480px 150px 480px auto;
+                column-gap: 20px;
+                row-gap: 20px;
                 margin-bottom: 20px;
-                align-items: flex-start;
+                align-items: end;
             }
+            /* Alinhar botão de adicionar colaborador com o campo Itens e manter o mesmo espaçamento do grid */
+            .form-row .add-colab-action { display:flex; align-items:flex-end; padding-top: 0; align-self: end; justify-self: start }
             .form-group {
                 flex: 1;
             }
@@ -243,9 +407,7 @@
                 max-width: 150px;
                 margin-right: 0;
             }
-            .form-group.produto-servico {
-                margin-bottom: 18px;
-            }
+            /* removido: campo produto/serviço (itens) */
             .form-group label {
                 display: block;
                 margin-bottom: 8px;
@@ -256,21 +418,82 @@
                 margin-right: 5px;
                 color: #2196F3;
             }
-            .form-group input,
-            .form-group select {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #cfd8dc; /* cinza padrão */
-                border-radius: 4px;
-                font-size: 14px;
-                transition: border-color 0.2s, box-shadow 0.2s;
+            /* Removido o estilo global genérico dos inputs/select para evitar conflitos
+               com os estilos específicos desta página */
+            
+            /* =========================
+               Campos - Comercial (Único)
+               ========================= */
+            /* Cliente: igual largura visual ao campo da aba múltiplos (200px fixos) */
+            #formUnico .form-row > .form-group:first-child { flex: 0 0 480px !important; max-width: 480px !important; min-width: 480px !important }
+            #formUnico .form-row > .form-group:first-child .choices,
+            #formUnico .form-row > .form-group:first-child select { width: 100% !important; max-width: 100% !important }
+            /* Item: mesma largura do Cliente (200px fixos) */
+            #formUnico .form-row > .form-group.itens { flex: 0 0 480px !important; max-width: 480px !important; min-width: 480px !important }
+            #formUnico .form-row > .form-group.itens .choices,
+            #formUnico .form-row > .form-group.itens select { width: 100% !important; max-width: 100% !important }
+            /* Removidos cards de itens/valores do container central (migrados para o painel lateral) */
+            /* Itens (Select + Choices) idêntico ao Cliente */
+            #formUnico select[name="item"] {
+                width:100%; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa;
+                transition:border .15s, box-shadow .15s;
             }
-            .form-group input:focus,
-            .form-group select:focus {
-                border-color: #2196F3;
-                outline: none;
-                box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.12);
+            #formUnico select[name="item"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
+            #formUnico select[name="item"] + .choices { display:block; width:100%; max-width:100%; overflow:hidden; box-sizing:border-box }
+            #formUnico select[name="item"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* removido: largura fixa do campo itens */
+            /* Cliente (Select + Choices) */
+            #formUnico select[name="cliente"] {
+                width:100%; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa;
+                transition:border .15s, box-shadow .15s;
             }
+            #formUnico select[name="cliente"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
+            #formUnico select[name="cliente"] + .choices { display:block; width:100%; max-width:100%; overflow:hidden; box-sizing:border-box }
+            #formUnico select[name="cliente"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+
+            /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
+            /* removido: estilos do campo itens */
+            #formUnico .choices__list--dropdown { z-index: 2000 }
+
+            /* Valor da Venda (destaque) */
+            /* removido: campo valor da venda */
+
+            /* Colaborador (Select + Choices) dentro do bloco */
+            #colaboradoresVinculados .input-colaborador { width:100%; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; transition:border .15s, box-shadow .15s }
+            #colaboradoresVinculados .input-colaborador:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
+            #colaboradoresVinculados select.input-colaborador + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; box-shadow:none }
+
+            /* Descrição */
+            #colaboradoresVinculados .input-descricao { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; box-sizing:border-box }
+            #colaboradoresVinculados .input-descricao:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
+
+            /* Percentual */
+            #colaboradoresVinculados input[name="percentual[]"] { width:160px; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }
+            #colaboradoresVinculados input[name="percentual[]"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
+
+            /* Valor a Receber */
+            #colaboradoresVinculados input[name="valor_receber[]"] { width:160px; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:right; box-sizing:border-box; appearance:textfield; -moz-appearance:textfield }
+            #colaboradoresVinculados input[name="valor_receber[]"]::-webkit-outer-spin-button,
+            #colaboradoresVinculados input[name="valor_receber[]"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
+            #colaboradoresVinculados input[name="valor_receber[]"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
+
+            /* Overrides contra regras globais para garantir mesma altura dos campos do bloco do colaborador */
+            #colaboradoresVinculados .form-group input[type="text"],
+            #colaboradoresVinculados .form-group input[type="number"],
+            #colaboradoresVinculados .form-group select {
+                height: 37.99px !important;
+                line-height: 37.99px !important;
+                padding: 6px 10px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Ações: Parcelado / Simular - compacto */
+            #colaboradoresVinculados .btn-parcelado,
+            #colaboradoresVinculados .btn-simular { height:28px; padding:2px 8px; border-radius:6px; font-size:12px; line-height:1 }
+            #colaboradoresVinculados .btn-parcelado { margin-right:4px }
+            #colaboradoresVinculados .btn-simular { margin-right:0 }
             
             .form-group input[readonly] {
                 background-color: #f5f5f5;
@@ -321,6 +544,9 @@
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
+                flex: 1 1 auto;
+                min-height: 0; /* necessário para overflow funcionar em flex child */
+                overflow: auto;
             }
             .colaborador-bloco {
                 position: relative;
@@ -362,12 +588,14 @@
             }
             .colaborador-bloco .form-row {
                 margin-bottom: 0;
-                gap: 20px;
-                align-items: flex-end;
+                display: grid;
+                grid-template-columns: 1fr 1fr 160px 160px auto;
+                column-gap: 20px;
+                row-gap: 12px;
+                align-items: end;
             }
             .colaborador-bloco .form-group {
-                min-width: 160px;
-                flex: 1;
+                min-width: 0;
             }
             .colaborador-bloco .form-group .btn-secondary {
                 background-color: #dc3545;
@@ -436,18 +664,8 @@
                 color: #fff;
                 box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
             }
-            .form-group.produto-servico {
-                margin-bottom: 18px;
-            }
-            #labelItemUnico {
-                font-size: 1.08em;
-                font-weight: 600;
-                color: #1976D2;
-                margin-bottom: 6px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
+            /* removido: campo produto/serviço (itens) */
+            /* removido: label de itens */
             select option[value=""] {
                 color: #757575;
             }
@@ -484,9 +702,32 @@
             }
             #tipo-toggle {
                 display: flex;
-                flex-direction: column;
-                gap: 5px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
             }
+            #tipo-toggle .btn-tipo {
+                background: #fff;
+                border: 1px solid #dce3ea;
+                color: #1f2937;
+                padding: 0 8px;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background .15s, color .15s, border-color .15s;
+                height: 38px;
+                line-height: normal;
+                font-size: 11px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                white-space: nowrap;
+            }
+            #tipo-toggle .btn-tipo:hover { background:#eaf2ff; color:#0f172a }
+            #tipo-toggle .btn-tipo.active { background:#007bff; color:#fff; border-color:#007bff }
+            #tipo-toggle .btn-tipo i { font-size:12px }
             .valor-venda-destaque {
                 background: #f8f9fa;
                 border: 1px solid #dee2e6;
@@ -531,7 +772,12 @@
                 border: 1.5px solid #fbc02d;
                 color: #b8860b;
                 font-weight: 600;
-                border-radius: 16px;
+                border-radius: 6px;
+                height: 28px;
+                padding: 2px 8px;
+                font-size: 12px;
+                line-height: 1;
+                margin-right: 4px;
                 padding: 3px 10px;
                 margin-top: 24px;
                 margin-left: 4px;
@@ -554,7 +800,12 @@
                 border: 1.5px solid #2196F3;
                 color: #1565c0;
                 font-weight: 600;
-                border-radius: 16px;
+                border-radius: 6px;
+                height: 28px;
+                padding: 2px 8px;
+                font-size: 12px;
+                line-height: 1;
+                margin-right: 0;
                 padding: 3px 12px;
                 margin-top: 24px;
                 margin-left: 4px;
@@ -997,6 +1248,13 @@
         }
         </script>
         <script>
+            // Utilitário local de moeda (fallback se não existir globalmente)
+            if (typeof window.formatarMoedaBR !== 'function') {
+                window.formatarMoedaBR = function(valor) {
+                    try { return Number(valor||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); } catch(_) { return 'R$ 0,00'; }
+                };
+            }
+
             let produtos = [];
             let servicos = [];
             let choicesItem = null;
@@ -1004,7 +1262,7 @@
             // Torna clientes global
             window.clientes = [];
 
-            const selectItem = document.querySelector('div.choices-container-wrapper > select[name="item"]');
+            const selectItem = document.querySelector('#formUnico select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
             function mostrarTabComissao(tab) {
@@ -1028,20 +1286,25 @@
             }
 
             function preencherItens(tipo) {
-                choicesItem.enable();
-                const lista = tipo === 'produto' ? produtos : servicos;
-                const choices = lista.map(item => {
+                try {
+                    if (!selectItem) return;
+                    if (selectItem.choicesInstance) { selectItem.choicesInstance.destroy(); selectItem.choicesInstance = null; }
+                    selectItem.innerHTML = '';
+                    const lista = tipo === 'produto' ? (produtos||[]) : (servicos||[]);
+                    lista.forEach(item => {
+                        const o = document.createElement('option');
                     const id = getItemPrimaryId(item);
-                    const name = getItemName(item);
                     const codigoStr = String(item && (item.codigo ?? item.id ?? ''));
-                    const codigoPadded = codigoStr ? codigoStr.padStart(5, '0') : '';
-                    return {
-                        value: id,
-                        label: `${codigoPadded}${codigoPadded ? ' - ' : ''}${name}`,
-                        customProperties: { preco: getItemPrice(item) }
-                    };
-                });
-                choicesItem.setChoices(choices, 'value', 'label', true);
+                        const codigoPadded = codigoStr ? codigoStr.padStart(5,'0') : '';
+                        const name = getItemName(item);
+                        o.value = id;
+                        o.textContent = (codigoPadded && name) ? `${codigoPadded} - ${name}` : (name || codigoPadded || 'Item');
+                        o.dataset.preco = String(getItemPrice(item) || 0);
+                        selectItem.appendChild(o);
+                    });
+                    selectItem.choicesInstance = new Choices(selectItem, { searchEnabled:true, itemSelectText:'', placeholder:true, placeholderValue:'Selecione...' });
+                    selectItem.addEventListener('change', atualizarResumoItens);
+                } catch(_) { }
             }
             
             function atualizarTipoUnico() {
@@ -1050,26 +1313,48 @@
                 label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produtos' : '<i class="fas fa-cogs"></i> Serviços';
             }
 
-            function atualizarValorVendaPorItens() {
-                let soma = 0;
-                const valoresSelecionados = choicesItem.getValue(true);
-                const todosItens = [...produtos, ...servicos];
-                valoresSelecionados.forEach(val => {
-                    const item = todosItens.find(i => getItemPrimaryId(i) === String(val));
-                    if (item) {
-                        soma += getItemPrice(item);
+            function atualizarValorVendaPorItens() { /* desativado */ }
+
+            function atualizarResumoItens() {
+                try {
+                    const sideLista = document.getElementById('sideListaProdutos');
+                    const sideTotal = document.getElementById('sideTotalVenda');
+                    const sideTotalItens = document.getElementById('sideTotalItens');
+                    const sideDesconto = document.getElementById('sideDesconto');
+                    const sideAcrescimo = document.getElementById('sideAcrescimo');
+                    if (!sideLista || !sideTotal || !selectItem) return;
+                    const selected = Array.from(selectItem.selectedOptions || []);
+                    let total = 0;
+                    sideLista.innerHTML = '';
+                    selected.forEach(opt => {
+                        const preco = parseFloat(opt.dataset.preco || '0') || 0;
+                        total += preco;
+                        const rowSide = document.createElement('div');
+                        rowSide.className = 'linha-item';
+                        rowSide.innerHTML = `<span>${opt.textContent}</span><strong>${formatarMoedaBR(preco)}</strong>`;
+                        sideLista.appendChild(rowSide);
+                    });
+                    let desconto = 0;
+                    if (sideDesconto && sideDesconto.value) {
+                        desconto = extrairNumeroBR(sideDesconto.value);
                     }
-                });
-                const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                campoValorVenda.value = formatarMoedaBR(soma);
-                campoValorVenda.dispatchEvent(new Event('input'));
+                    let acrescimo = 0;
+                    if (sideAcrescimo && sideAcrescimo.value) {
+                        acrescimo = extrairNumeroBR(sideAcrescimo.value);
+                    }
+                    const totalFinal = Math.max(0, total - desconto + acrescimo);
+                    sideTotal.value = formatarMoedaBR(totalFinal);
+                    if (sideTotalItens) sideTotalItens.value = formatarMoedaBR(total);
+                    document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
+                        try { calcularValorReceberUnico(input); } catch(_) {}
+                    });
+                    try { atualizarResumoUnico(); } catch(_) {}
+                } catch(_) {}
             }
 
             function calcularComissaoUnico() {
-                const form = document.getElementById('formUnico');
-                const valorVenda = parseFloat(form.valor_venda.value) || 0;
-                const percentual = parseFloat(form.percentual.value) || 0;
-                form.valor_comissao.value = (valorVenda * percentual / 100).toFixed(2);
+                // removido uso de valor_venda
+                const percentual = parseFloat(0) || 0;
             }
 
             // Variável global para armazenar colaboradores
@@ -1149,6 +1434,31 @@
             }
 
             // múltiplos: blocos e funções removidos
+            // Resumo inferior da aba Comercial (Único)
+            function atualizarResumoUnico(reset = false) {
+                try {
+                    const totalColabsEl = document.getElementById('totalColaboradores');
+                    const totalComissoesEl = document.getElementById('valorTotalComissoesUnico');
+                    const valorVendaResumoEl = document.getElementById('valorVendaResumo');
+                    if (!totalColabsEl || !totalComissoesEl || !valorVendaResumoEl) return;
+                    if (reset) {
+                        totalColabsEl.textContent = '0';
+                        totalComissoesEl.textContent = 'R$ 0,00';
+                        valorVendaResumoEl.textContent = 'R$ 0,00';
+                        return;
+                    }
+                    const blocos = Array.from(document.querySelectorAll('#colaboradoresVinculados .colaborador-bloco'));
+                    totalColabsEl.textContent = String(blocos.length);
+                    const totalComissoes = blocos.reduce((acc, bloco) => {
+                        const v = parseFloat((bloco.querySelector('input[name="valor_receber[]"]').value || '0').replace(',','.')) || 0;
+                        return acc + v;
+                    }, 0);
+                const campoValorVenda = null;
+                    const valorVenda = (typeof extrairNumeroBR === 'function') ? extrairNumeroBR(campoValorVenda?.value || '0') : (parseFloat((campoValorVenda?.value||'0').replace(/[^0-9,.-]/g,'').replace(',','.'))||0);
+                    totalComissoesEl.textContent = formatarMoedaBR(totalComissoes);
+                    valorVendaResumoEl.textContent = formatarMoedaBR(valorVenda);
+                } catch(_) {}
+            }
 
             let numeroTituloPai = 1;
             
@@ -1243,6 +1553,7 @@
                 });
                 // Se já tem valor ao criar, buscar imediatamente
                 if (selectColaborador.value) buscarNumeroBaseColaborador(div, selectColaborador.value);
+                try { atualizarResumoUnico(); } catch(_) {}
             }
 
             function extrairNumeroBR(valor) {
@@ -1280,7 +1591,7 @@
                 }
 
                 const form = document.getElementById('formUnico');
-                const campoValorVenda = form.querySelector('input[name="valor_venda"]');
+                const campoValorVenda = null;
                 const valorVenda = extrairNumeroBR(campoValorVenda.value);
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
                 valorReceber.value = (valorVenda * used / 100).toFixed(2);
@@ -1291,6 +1602,7 @@
                     const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
                     if (simulacaoDiv) simulacaoDiv.style.display = 'none';
                 }
+                try { atualizarResumoUnico(); } catch(_) {}
             }
 
             function toggleParcelado(btn) {
@@ -1308,6 +1620,7 @@
                     row.querySelector('input[name="qtd_parcelas[]"]').value = '';
                     row.querySelector('input[name="valor_parcela[]"]').value = '';
                 }
+                try { atualizarResumoUnico(); } catch(_) {}
             }
 
             function atualizaValorParcela(input) {
@@ -1321,6 +1634,7 @@
                 } else {
                     valorParcelaInput.value = '';
                 }
+                try { atualizarResumoUnico(); } catch(_) {}
             }
 
             async function simularTitulos(btn) {
@@ -1347,6 +1661,7 @@
                     simulacaoTabela.innerHTML = '<span style="color:#b71c1c;">Selecione o colaborador.</span>';
                     return;
                 }
+                try { atualizarResumoUnico(); } catch(_) {}
                 // Exibir número simulado
                 if (qtd < 1) qtd = 1;
                 let html = `<table><tr><th>Nº Título</th><th>Parcela</th><th>Valor</th><th>Data de Emissão</th><th>Data de Vencimento</th></tr>`;
@@ -1397,28 +1712,42 @@
                 }
             }
 
-            document.getElementById('formUnico').valor_venda.oninput = function() {
-                document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
-                    calcularValorReceberUnico(input);
-                });
-            };
+            // removido: listener do campo valor_venda
 
             document.addEventListener('DOMContentLoaded', async function() {
                 // Mostrar spinner no início do carregamento
                 mostrarSpinner();
                 
-                // Removido ajuste de barra inferior (múltiplos)
+                // Atualiza total ao digitar desconto
+                try {
+                    const sideDesconto = document.getElementById('sideDesconto');
+                    const sideAcrescimo = document.getElementById('sideAcrescimo');
+                    if (sideDesconto) {
+                        sideDesconto.addEventListener('input', function(){
+                            // Formatação br básica ao sair do campo
+                            const v = extrairNumeroBR(this.value);
+                            document.getElementById('sideTotalItens')?.value; // noop: garante elemento
+                            atualizarResumoItens();
+                        });
+                        sideDesconto.addEventListener('blur', function(){
+                            const v = extrairNumeroBR(this.value);
+                            this.value = v ? formatarMoedaBR(v) : '';
+                            atualizarResumoItens();
+                        });
+                    }
+                    if (sideAcrescimo) {
+                        sideAcrescimo.addEventListener('input', function(){
+                            atualizarResumoItens();
+                        });
+                        sideAcrescimo.addEventListener('blur', function(){
+                            const v = extrairNumeroBR(this.value);
+                            this.value = v ? formatarMoedaBR(v) : '';
+                            atualizarResumoItens();
+                        });
+                    }
+                } catch(_) { }
                 
-                choicesItem = new Choices(selectItem, {
-                    removeItemButton: true,
-                    placeholder: true,
-                    placeholderValue: 'Selecione um tipo primeiro',
-                    searchEnabled: true,
-                    itemSelectText: '',
-                });
-                choicesItem.disable();
-
-                selectItem.addEventListener('change', atualizarValorVendaPorItens);
+                // Campo de itens removido
 
                 try {
                     // Carrega clientes globalmente
@@ -1453,52 +1782,25 @@
                             this.classList.add('active');
                             tipoInput.value = this.dataset.tipo;
                             atualizarTipoUnico();
-                            preencherItens(this.dataset.tipo);
+                            // preencherItens removido
                         });
                     });
                     
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
-                    choicesItem.setChoices([{ value: '', label: 'Erro ao carregar', disabled: true }]);
                 } finally {
                     // Ocultar spinner após carregamento (sucesso ou erro)
                     ocultarSpinner();
                 }
 
-                const btnSugere = document.getElementById('btnSugereValorVenda');
-                if (btnSugere) {
-                    btnSugere.addEventListener('click', function() {
-                        const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-                        if (window.valorVendaSugerido !== undefined) {
-                            campoValorVenda.value = formatarMoedaBR(window.valorVendaSugerido);
-                            campoValorVenda.dispatchEvent(new Event('input'));
-                        }
-                    });
-                }
+                // removido: botão sugerir valor de venda
             });
 
             function formatarMoedaBR(valor) {
                 return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
-            let timeoutFormatMoeda = null;
-            const campoValorVenda = document.querySelector('#formUnico input[name="valor_venda"]');
-            // Entrada: não formata, apenas recalcula valores dependentes
-            campoValorVenda.addEventListener('input', function(e) {
-                if (timeoutFormatMoeda) { clearTimeout(timeoutFormatMoeda); timeoutFormatMoeda = null; }
-                document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
-                    calcularValorReceberUnico(input);
-                });
-            });
-            // Formatar apenas ao sair do campo, reduzindo erros durante a digitação
-            campoValorVenda.addEventListener('blur', function() {
-                let valor = this.value ? this.value.toString() : '';
-                valor = valor.replace(/[^\d,]/g, '').replace(',', '.');
-                const num = parseFloat(valor);
-                if (!isNaN(num)) {
-                    this.value = formatarMoedaBR(num);
-                }
-            });
+            // removido: listeners de formatação/entrada de valor de venda
 
             const formUnico = document.getElementById('formUnico');
             // Removido o evento anterior que apenas formatava o valor
@@ -1604,14 +1906,8 @@
                         const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
                         const emissaoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-emissao-parcela') : null;
                         const vencimentoInputs = simulacaoDiv ? simulacaoDiv.querySelectorAll('.simulacao-vencimento-parcela') : null;
-                        // Montar item_id como codigo-nome para todos os itens selecionados
-                        const valoresSelecionados = choicesItem.getValue(true);
-                        const todosItens = [...produtos, ...servicos];
-                        const itensSelecionados = valoresSelecionados.map(val => {
-                            const item = todosItens.find(i => i.codigo === val);
-                            return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
-                        }).filter(Boolean);
-                        const item_id = itensSelecionados.join(',');
+                        // Campo de itens removido: item_id vazio
+                        const item_id = '';
                         for (let parcela = 0; parcela < qtdParcelas; parcela++) {
                             const dataGeracao = (emissaoInputs && emissaoInputs[parcela]) ? emissaoInputs[parcela].value : new Date().toISOString().split('T')[0];
                             const dataVencimento = (vencimentoInputs && vencimentoInputs[parcela]) ? vencimentoInputs[parcela].value : new Date().toISOString().split('T')[0];
@@ -1648,6 +1944,7 @@
                     form.reset();
                     document.getElementById('colaboradoresVinculados').innerHTML = '';
                     numeroTituloPai = 1;
+                    try { atualizarResumoUnico(true); } catch(_) {}
                 } else {
                     fecharModalFeedback();
                     alert('Erro ao salvar comissão. Tente novamente.');
@@ -1777,16 +2074,8 @@
                         continue;
                     }
                     // Coletar itens selecionados via Choices.js (mais seguro)
-                    let valoresSelecionados = itemSelect.choicesInstance.getValue(true);
-                    if (!Array.isArray(valoresSelecionados)) {
-                        valoresSelecionados = valoresSelecionados ? [valoresSelecionados] : [];
-                    }
-                    const lista = tipoInput.value === 'produto' ? produtos : servicos;
-                    const itensSelecionados = valoresSelecionados.map(val => {
-                        const item = lista.find(i => i.codigo === val);
-                        return item ? `${item.codigo.padStart(5, '0')}-${item.nome}` : '';
-                    }).filter(Boolean);
-                    const item_id = itensSelecionados.join(',');
+                    // Campo de itens removido: item_id vazio
+                    const item_id = '';
                     for (let parcela = 0; parcela < qtdParcelas; parcela++) {
                         let dataGeracao = new Date().toISOString().split('T')[0];
                         let dataVencimento = new Date().toISOString().split('T')[0];

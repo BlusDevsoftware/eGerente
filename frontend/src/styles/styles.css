@@ -662,25 +662,6 @@ textarea {
     font-weight: 500;
 }
 
-/* Global: campos com fundo cinza padrão (inputs, selects, textareas, Choices) */
-input,
-select,
-textarea {
-    background: #f8f9fa;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    background: #f8f9fa;
-}
-
-input[readonly],
-select[readonly],
-textarea[readonly] {
-    background: #f8f9fa;
-}
-
 /* Choices.js containers */
 .choices,
 .choices__inner {
@@ -2068,11 +2049,12 @@ tr:hover {
 }
 
 .form-group input.input-descricao,
-.form-group select.input-colaborador,
-.form-group input[name="valor_receber[]"],
-.form-group input[name="percentual[]"],
-.form-group input[name="qtd_parcelas[]"],
-.form-group input[name="valor_parcela[]"] {
+/* Restringe alturas 49.22px a páginas simples; não aplica na aba comercial */
+#formSimples .form-group select.input-colaborador,
+#formSimples .form-group input[name="valor_receber[]"],
+#formSimples .form-group input[name="percentual[]"],
+#formSimples .form-group input[name="qtd_parcelas[]"],
+#formSimples .form-group input[name="valor_parcela[]"] {
     height: 49.22px !important;
     min-height: 49.22px !important;
     max-height: 49.22px !important;
