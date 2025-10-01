@@ -15,7 +15,7 @@
     <!-- <script src="scripts/auth-guard.js"></script> -->
     <!-- <script src="scripts/apply-auth-protection.js"></script> -->
     <script src="scripts/config/api.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
         html, body{height:100%; overflow:hidden}
@@ -278,27 +278,26 @@
                 height: calc(100vh - 247px); /* espelha múltiplos: área útil */
                 display: flex;
                 flex-direction: column;
-                /* Reduz a largura apenas do card do formulário, mantendo a barra inferior full-width */
+                /* Faz o formulário ocupar toda a coluna disponível do grid */
                 width: 100%;
-                max-width: 1400px;
-                margin-right: auto;
+                max-width: none;
+                margin-right: 0;
                 margin-left: 0;
             }
             /* Layout em duas colunas dentro do content */
+            /* Layout com Grid: gap fixo, colunas estáveis */
             .content-split {
-                display: flex;
-                gap: 16px;
-                align-items: flex-start;
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 340px; /* garante que a coluna principal ocupe todo o espaço disponível */
+                gap: 12px; /* espaçamento fixo entre colunas */
+                align-items: start;
+                width: 100%;
+                box-sizing: border-box;
             }
-            /* Coluna esquerda com largura fixa desejada (tamanho anterior) */
-            #tabUnicoContent {
-                flex: 0 0 1400px;
-                max-width: 1700px;
-            }
+            /* Coluna esquerda (grid): ocupa 1fr */
+            #tabUnicoContent { min-width: 0; max-width: 100%; }
             /* Coluna direita ocupa o restante */
             #tabUnicoSide {
-                flex: 1 1 auto;
                 display: flex;
                 flex-direction: column;
                 min-width: 280px;
@@ -339,11 +338,10 @@
             }
 
             /* Responsividade: empilhar colunas e tornar campos fluidos em telas menores */
-            @media (max-width: 1600px) {
-                #tabUnicoContent { flex: 1 1 100%; max-width: 100%; }
+            @media (max-width: 1440px) {
+                .content-split { grid-template-columns: 1fr; gap: 12px }
                 .form-comissao { max-width: 100%; height: auto; }
-                #tabUnicoSide { flex: 1 1 100%; height: auto; min-height: 0; }
-                /* habilita rolagem vertical quando as colunas empilham */
+                #tabUnicoSide { height: auto; min-height: 0; }
                 .main-content, .content { overflow: auto; }
             }
             @media (max-width: 1200px) {
@@ -391,10 +389,10 @@
             
             .form-row {
                 display: grid;
-                grid-template-columns: 480px 150px 480px auto;
-                column-gap: 20px;
-                row-gap: 20px;
-                margin-bottom: 20px;
+                grid-template-columns: minmax(240px, 1fr) 150px minmax(240px, 1fr) auto; /* campos fluídos dentro do container */
+                column-gap: 12px;
+                row-gap: 12px;
+                margin-bottom: 12px;
                 align-items: end;
             }
             /* Alinhar botão de adicionar colaborador com o campo Itens e manter o mesmo espaçamento do grid */
@@ -424,12 +422,11 @@
             /* =========================
                Campos - Comercial (Único)
                ========================= */
-            /* Cliente: igual largura visual ao campo da aba múltiplos (200px fixos) */
-            #formUnico .form-row > .form-group:first-child { flex: 0 0 480px !important; max-width: 480px !important; min-width: 480px !important }
+            /* Cliente e Itens: ocupam a largura disponível do grid, sem travar em 480px */
+            #formUnico .form-row > .form-group:first-child { flex: 1 1 auto !important; max-width: 100% !important; min-width: 0 !important }
             #formUnico .form-row > .form-group:first-child .choices,
             #formUnico .form-row > .form-group:first-child select { width: 100% !important; max-width: 100% !important }
-            /* Item: mesma largura do Cliente (200px fixos) */
-            #formUnico .form-row > .form-group.itens { flex: 0 0 480px !important; max-width: 480px !important; min-width: 480px !important }
+            #formUnico .form-row > .form-group.itens { flex: 1 1 auto !important; max-width: 100% !important; min-width: 0 !important }
             #formUnico .form-row > .form-group.itens .choices,
             #formUnico .form-row > .form-group.itens select { width: 100% !important; max-width: 100% !important }
             /* Removidos cards de itens/valores do container central (migrados para o painel lateral) */
@@ -460,34 +457,61 @@
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
 
-            /* Colaborador (Select + Choices) dentro do bloco */
-            #colaboradoresVinculados .input-colaborador { width:100%; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; transition:border .15s, box-shadow .15s }
-            #colaboradoresVinculados .input-colaborador:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
-            #colaboradoresVinculados select.input-colaborador + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; background:#f8f9fa; box-shadow:none }
+            /* Removido: estilos de Colaborador (será recriado depois) */
 
-            /* Descrição */
-            #colaboradoresVinculados .input-descricao { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; box-sizing:border-box }
-            #colaboradoresVinculados .input-descricao:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
+            /* Removido CSS antigo de Descrição - será recriado abaixo */
+            /* Descrição (escopo local, sem depender de CSS global) */
+            #colaboradoresVinculados input.input-descricao-colab {
+                width: 100%;
+                height: 37.99px;
+                line-height: 37.99px;
+                padding: 6px 10px;
+                border: 1px solid #dce3ea;
+                border-radius: 8px;
+                outline: none;
+                background: #f8f9fa;
+                box-sizing: border-box;
+            }
+            #colaboradoresVinculados input.input-descricao-colab:focus {
+                border-color: #2196F3;
+                box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
+            }
+            /* Colaborador (select nativo) com altura idêntica à descrição */
+            #colaboradoresVinculados .colab-field select.input-colaborador-colab {
+                width: 100% !important;
+                height: 37.99px !important;
+                line-height: 37.99px !important;
+                padding: 0 10px !important; /* zera top/bottom para não somar altura */
+                border: 1px solid #dce3ea !important;
+                border-radius: 8px !important;
+                outline: none !important;
+                background: #f8f9fa !important;
+                box-sizing: border-box !important;
+                appearance: none !important;
+                -moz-appearance: none !important;
+                -webkit-appearance: none !important;
+                font-size: 14px !important;
+            }
+            #colaboradoresVinculados .colab-field select.input-colaborador-colab:focus {
+                border-color: #2196F3 !important;
+                box-shadow: 0 0 0 3px rgba(33,150,243,0.15) !important;
+                background: #f8f9fa !important;
+            }
+            /* Remove seta default no IE/Edge legado */
+            #colaboradoresVinculados .colab-field select.input-colaborador-colab::-ms-expand { display: none }
+            /* Removido: ajustes locais do Choices para Colaborador */
 
             /* Percentual */
-            #colaboradoresVinculados input[name="percentual[]"] { width:160px; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }
+            #colaboradoresVinculados input[name="percentual[]"] { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }
             #colaboradoresVinculados input[name="percentual[]"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
 
             /* Valor a Receber */
-            #colaboradoresVinculados input[name="valor_receber[]"] { width:160px; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:right; box-sizing:border-box; appearance:textfield; -moz-appearance:textfield }
+            #colaboradoresVinculados input[name="valor_receber[]"] { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:right; box-sizing:border-box; appearance:textfield; -moz-appearance:textfield }
             #colaboradoresVinculados input[name="valor_receber[]"]::-webkit-outer-spin-button,
             #colaboradoresVinculados input[name="valor_receber[]"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0 }
             #colaboradoresVinculados input[name="valor_receber[]"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
 
-            /* Overrides contra regras globais para garantir mesma altura dos campos do bloco do colaborador */
-            #colaboradoresVinculados .form-group input[type="text"],
-            #colaboradoresVinculados .form-group input[type="number"],
-            #colaboradoresVinculados .form-group select {
-                height: 37.99px !important;
-                line-height: 37.99px !important;
-                padding: 6px 10px !important;
-                box-sizing: border-box !important;
-            }
+
 
             /* Ações: Parcelado / Simular - compacto */
             #colaboradoresVinculados .btn-parcelado,
@@ -589,14 +613,45 @@
             .colaborador-bloco .form-row {
                 margin-bottom: 0;
                 display: grid;
-                grid-template-columns: 1fr 1fr 160px 160px auto;
-                column-gap: 20px;
-                row-gap: 12px;
+                /* Tornar colunas mais flexíveis e permitir encolher sem overflow */
+                grid-template-columns: minmax(220px, 2fr) minmax(300px, 3fr) 100px 100px minmax(0, 2fr);
+                column-gap: 8px;
+                row-gap: 8px;
                 align-items: end;
             }
             .colaborador-bloco .form-group {
                 min-width: 0;
             }
+            /* Garantir que os botões Parcelado e Simular fiquem lado a lado (5º grupo da linha) */
+            .colaborador-bloco .form-row > .form-group:nth-child(5) {
+                display: inline-flex;
+                flex-direction: row;
+                align-items: flex-end; /* alinhar pela base do input */
+                justify-content: flex-start;
+                gap: 8px;
+                padding-top: 0;
+                align-self: end;
+                min-width: 0; /* permitir encolher dentro da coluna sem estourar */
+            }
+            /* Caixa de ações como na aba múltiplos: container envolvendo os botões */
+            .colaborador-bloco .acoes-colab-box {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                background: #f8fafc;
+                border: 1.5px dashed #e2e8f0;
+                border-radius: 14px;
+                padding: 0 12px; /* apenas padding horizontal para não alterar a altura */
+                height: 37.99px; /* exatamente a mesma altura dos campos */
+                box-sizing: border-box;
+                width: 100%; /* ocupar toda a coluna para acompanhar responsividade */
+                max-width: 100%;
+                overflow: hidden; /* impede que transborde ao reduzir zoom */
+            }
+            /* Remover deslocamento vertical extra apenas para os botões dentro do 5º grupo */
+            .colaborador-bloco .form-row > .form-group:nth-child(5) .btn-parcelado,
+            .colaborador-bloco .form-row > .form-group:nth-child(5) .btn-simular { margin-top: 0 }
             .colaborador-bloco .form-group .btn-secondary {
                 background-color: #dc3545;
                 color: #fff;
@@ -767,57 +822,31 @@
             .btn-deletar:hover {
                 background-color: #b71c1c;
             }
-            .btn-parcelado {
-                background: #fffbe6;
-                border: 1.5px solid #fbc02d;
-                color: #b8860b;
-                font-weight: 600;
-                border-radius: 6px;
-                height: 28px;
-                padding: 2px 8px;
-                font-size: 12px;
-                line-height: 1;
-                margin-right: 4px;
-                padding: 3px 10px;
-                margin-top: 24px;
-                margin-left: 4px;
-                cursor: pointer;
-                font-size: 0.92em;
-                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
-                box-shadow: 0 1px 4px rgba(251,192,45,0.08);
-            }
-            .btn-parcelado.active {
-                background: #ffe082;
-                border-color: #fbc02d;
-                box-shadow: 0 2px 8px rgba(251,192,45,0.18);
-            }
-            .btn-parcelado:hover {
-                background: #fff8e1;
-                border-color: #ffd54f;
-            }
+            /* Botões de ação (Parcelado / Simular) - estilo neutro, quadrado com ícone */
+            .btn-parcelado,
             .btn-simular {
-                background: #e3f2fd;
-                border: 1.5px solid #2196F3;
-                color: #1565c0;
-                font-weight: 600;
-                border-radius: 6px;
-                height: 28px;
-                padding: 2px 8px;
-                font-size: 12px;
-                line-height: 1;
-                margin-right: 0;
-                padding: 3px 12px;
-                margin-top: 24px;
-                margin-left: 4px;
+                width: 37.99px; /* igual aos inputs */
+                height: 37.99px; /* igual aos inputs */
+                padding: 0;
+                border-radius: 8px;
+                background: #f1f5f9;
+                border: 1px solid #e5e7eb;
+                color: #334155;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
                 cursor: pointer;
-                font-size: 0.92em;
-                transition: background 0.2s, border 0.2s, box-shadow 0.2s;
-                box-shadow: 0 1px 4px rgba(33,150,243,0.08);
+                transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+                margin-top: 0;
+                margin-left: 4px;
             }
-            .btn-simular:hover {
-                background: #bbdefb;
-                border-color: #1976d2;
-            }
+            .btn-parcelado:hover,
+            .btn-simular:hover { background: #e2e8f0; border-color: #cbd5e1 }
+            .btn-parcelado:active,
+            .btn-simular:active { background: #e5e7eb; border-color: #cbd5e1 }
+            .btn-parcelado i,
+            .btn-simular i { font-size: 16px; line-height: 1 }
+            .btn-parcelado.active { background: #e2e8f0; border-color: #cbd5e1 }
             /* Ajuste visual dos campos da tabela múltiplos lançamentos para igualar ao campo colaborador */
             .table-multiplos select.input-colaborador,
             .table-multiplos select.input-item,
@@ -1492,8 +1521,7 @@
             function adicionarColaboradorUnico() {
                 const container = document.getElementById('colaboradoresVinculados');
                 // Bloquear se já existe bloco para o mesmo colaborador
-                const selects = container.querySelectorAll('select[name="colaborador[]"]');
-                const colaboradoresExistentes = Array.from(selects).map(s => s.value).filter(Boolean);
+                
                 // Cria o bloco normalmente
                 let blocoCount = container.querySelectorAll('.colaborador-bloco').length;
                 blocoCount++;
@@ -1504,33 +1532,32 @@
                 div.innerHTML = `
                     <button type="button" class="btn-excluir-bloco" title="Remover colaborador" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-times"></i></button>
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group colab-field">
                             <label><i class="fas fa-user"></i> Colaborador</label>
-                            <select name="colaborador[]" required class="input-colaborador"></select>
+                            <select name="colaborador[]" required class="input-colaborador-colab"></select>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-align-left"></i> Descrição</label>
-                            <input type="text" name="descricao_colaborador[]" maxlength="100" placeholder="Observação ou função..." class="input-descricao">
+                            <input type="text" name="descricao_colaborador[]" maxlength="100" placeholder="Observação ou função..." class="input-descricao-colab">
                         </div>
+                        
                         <div class="form-group">
-                            <label><i class="fas fa-percent"></i> % Comissão</label>
+                            <label><i class="fas fa-percent"></i> Comissão</label>
                             <input type="text" name="percentual[]" required placeholder="0,00" inputmode="decimal" oninput="calcularValorReceberUnico(this)">
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-coins"></i> Valor a Receber</label>
+                            <label><i class="fas fa-coins"></i> Total</label>
                             <input type="number" name="valor_receber[]" step="0.01" min="0" readonly>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn-parcelado" onclick="toggleParcelado(this)">Parcelado</button>
-                            <button type="button" class="btn-simular" onclick="simularTitulos(this)">Simular</button>
-                        </div>
-                        <div class="form-group group-parcelas" style="display:none;">
-                            <label><i class="fas fa-list-ol"></i> Qtd. Parcelas</label>
-                            <input type="number" name="qtd_parcelas[]" min="2" step="1" oninput="atualizaValorParcela(this)">
-                        </div>
-                        <div class="form-group group-valor-parcela" style="display:none;">
-                            <label><i class="fas fa-money-bill-wave"></i> Valor da Parcela</label>
-                            <input type="text" name="valor_parcela[]" readonly>
+                            <div class="acoes-colab-box">
+                                <button type="button" class="btn-parcelado" title="Parcelado" onclick="toggleParcelado(this)"><i class="fas fa-receipt"></i></button>
+                                <div class="acoes-parcelas-inline" style="display:none; align-items:center; gap:8px;">
+                                    <input type="number" class="input-qtd-parcelas-inline" min="2" step="1" oninput="atualizaValorParcela(this)" style="width:70px; height:30px; line-height:30px; border:1px solid #cbd5e1; border-radius:6px; padding:0 8px;">
+                                    <input type="text" class="input-valor-parcela-inline" readonly style="width:70px; height:30px; line-height:30px; border:1px solid #cbd5e1; border-radius:6px; padding:0 8px; text-align:right;">
+                                </div>
+                                <button type="button" class="btn-simular" title="Simular títulos" onclick="simularTitulos(this)"><i class="fas fa-calculator"></i></button>
+                            </div>
                         </div>
                     </div>
                     <div class="simulacao-titulos" style="display:none;">
@@ -1538,21 +1565,26 @@
                     </div>
                 `;
                 container.appendChild(div);
-                
-                // Carregar colaboradores no select recém-criado
-                const selectColaborador = div.querySelector('select[name="colaborador[]"]');
-                preencherSelectColaborador(selectColaborador);
-                selectColaborador.addEventListener('change', function() {
-                    // Bloquear se já existe bloco para o mesmo colaborador
-                    if (this.value && colaboradoresExistentes.includes(this.value)) {
-                        mostrarModalAlerta('O colaborador ja foi adicionado nesse lançamento');
-                        div.remove();
-                        return;
+                // Popular colaborador (select nativo)
+                try {
+                    const selectColab = div.querySelector('select[name="colaborador[]"]');
+                    if (selectColab) {
+                        selectColab.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                        buscarColaboradores().then(colabs => {
+                            (colabs || []).forEach(c => {
+                                const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? '');
+                                const nome = (c.nome ?? c.descricao ?? '');
+                                if (!codigo && !nome) return;
+                                const opt = document.createElement('option');
+                                opt.value = String(codigo);
+                                opt.textContent = codigo && nome ? `${codigo} - ${nome}` : (nome || String(codigo));
+                                selectColab.appendChild(opt);
+                            });
+                        });
                     }
-                    if (this.value) buscarNumeroBaseColaborador(div, this.value);
-                });
-                // Se já tem valor ao criar, buscar imediatamente
-                if (selectColaborador.value) buscarNumeroBaseColaborador(div, selectColaborador.value);
+                } catch(_) {}
+                
+                
                 try { atualizarResumoUnico(); } catch(_) {}
             }
 
@@ -1607,18 +1639,19 @@
 
             function toggleParcelado(btn) {
                 const row = btn.closest('.form-row');
-                const groupParcelas = row.querySelector('.group-parcelas');
-                const groupValorParcela = row.querySelector('.group-valor-parcela');
-                if (groupParcelas.style.display === 'none') {
-                    groupParcelas.style.display = '';
-                    groupValorParcela.style.display = '';
-                    btn.classList.add('active');
-                } else {
-                    groupParcelas.style.display = 'none';
-                    groupValorParcela.style.display = 'none';
-                    btn.classList.remove('active');
-                    row.querySelector('input[name="qtd_parcelas[]"]').value = '';
-                    row.querySelector('input[name="valor_parcela[]"]').value = '';
+                const inline = row.querySelector('.acoes-parcelas-inline');
+                if (inline) {
+                    if (inline.style.display === 'none' || inline.style.display === '') {
+                        inline.style.display = 'inline-flex';
+                        btn.classList.add('active');
+                    } else {
+                        inline.style.display = 'none';
+                        btn.classList.remove('active');
+                        const qtd = inline.querySelector('.input-qtd-parcelas-inline');
+                        const val = inline.querySelector('.input-valor-parcela-inline');
+                        if (qtd) qtd.value = '';
+                        if (val) val.value = '';
+                    }
                 }
                 try { atualizarResumoUnico(); } catch(_) {}
             }
@@ -1627,12 +1660,15 @@
                 const row = input.closest('.form-row');
                 const qtd = parseInt(input.value);
                 const valorReceber = parseFloat(row.querySelector('input[name="valor_receber[]"]').value.replace(',','.'));
-                const valorParcelaInput = row.querySelector('input[name="valor_parcela[]"]');
-                if (qtd > 1 && valorReceber > 0) {
-                    const valorParcela = valorReceber / qtd;
-                    valorParcelaInput.value = valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                } else {
-                    valorParcelaInput.value = '';
+                const inline = row.querySelector('.acoes-parcelas-inline');
+                const valorParcelaInput = inline ? inline.querySelector('.input-valor-parcela-inline') : null;
+                if (valorParcelaInput) {
+                    if (qtd > 1 && valorReceber > 0) {
+                        const valorParcela = valorReceber / qtd;
+                        valorParcelaInput.value = valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    } else {
+                        valorParcelaInput.value = '';
+                    }
                 }
                 try { atualizarResumoUnico(); } catch(_) {}
             }
