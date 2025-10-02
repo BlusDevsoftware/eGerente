@@ -2043,7 +2043,6 @@
                 const bloco = btn.closest('.colaborador-bloco');
                 const colaboradorSelect = bloco.querySelector('select[name="colaborador[]"]');
                 const colaboradorId = colaboradorSelect ? colaboradorSelect.value : null;
-                const qtdInput = row.querySelector('input[name="qtd_parcelas[]"]');
                 const valorReceberInput = row.querySelector('input[name="valor_receber[]"]');
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
                 const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
@@ -2053,9 +2052,16 @@
                 const acoesParcelas = row.querySelector('.acoes-parcelas-inline');
                 const parceladoAtivo = acoesParcelas && acoesParcelas.style.display === 'inline-flex';
                 
-                if (parceladoAtivo && qtdInput && qtdInput.value && parseInt(qtdInput.value) > 1) {
-                    // Se parcelamento está ativo, usar a quantidade definida
-                    qtd = parseInt(qtdInput.value);
+                if (parceladoAtivo) {
+                    // Buscar o input correto de quantidade de parcelas
+                    const qtdInput = acoesParcelas.querySelector('.input-qtd-parcelas-inline');
+                    if (qtdInput && qtdInput.value && parseInt(qtdInput.value) > 1) {
+                        // Se parcelamento está ativo, usar a quantidade definida
+                        qtd = parseInt(qtdInput.value);
+                    } else {
+                        // Se não há valor definido no parcelamento, usar 1
+                        qtd = 1;
+                    }
                 } else {
                     // Se parcelamento não está ativo, gerar apenas 1 parcela
                     qtd = 1;
