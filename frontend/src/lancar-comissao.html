@@ -458,10 +458,18 @@
                 border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
                 display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
             }
+            /* Forçar estado padrão sem destaque */
+            #formUnico select[name="cliente"] + .choices .choices__inner {
+                border-color:#dce3ea !important; 
+                box-shadow:none !important; 
+                background:#f8f9fa !important;
+            }
             /* Destaque apenas quando focado/ativo */
             #formUnico select[name="cliente"] + .choices.is-focused .choices__inner,
             #formUnico select[name="cliente"] + .choices.is-open .choices__inner {
-                border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa;
+                border-color:#2196F3 !important; 
+                box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
+                background:#f8f9fa !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
@@ -1317,8 +1325,8 @@
                     selectCliente.choicesInstance = null;
                 }
                 
-                // Limpar e popular select
-                selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                // Limpar e popular select (sem placeholder)
+                selectCliente.innerHTML = '';
                 if (Array.isArray(window.clientes)) {
                     window.clientes.forEach(cliente => {
                         const option = document.createElement('option');
@@ -1334,8 +1342,21 @@
                     itemSelectText: '',
                     placeholder: false,
                     shouldSort: false,
-                    silent: true
+                    silent: true,
+                    searchPlaceholderValue: null,
+                    loadingText: 'Carregando...',
+                    noResultsText: 'Nenhum resultado encontrado',
+                    noChoicesText: 'Sem opções disponíveis'
                 });
+                
+                // Forçar remoção do foco inicial
+                setTimeout(() => {
+                    const choicesContainer = selectCliente.parentElement.querySelector('.choices');
+                    if (choicesContainer) {
+                        choicesContainer.classList.remove('is-focused', 'is-open');
+                        choicesContainer.blur();
+                    }
+                }, 50);
                 
                 // Remover placeholder option
                 const phCli = selectCliente.querySelector('option[value=""]');
@@ -1871,7 +1892,6 @@
                     ocultarSpinner();
                 }
 
-                // removido: botão sugerir valor de venda
             });
 
             function formatarMoedaBR(valor) {
@@ -1881,7 +1901,7 @@
             // removido: listeners de formatação/entrada de valor de venda
 
             const formUnico = document.getElementById('formUnico');
-            // Removido o evento anterior que apenas formatava o valor
+            
             // Agora o evento de submit está na função salvarComissaoUnica
             
             // Função para salvar comissão única
