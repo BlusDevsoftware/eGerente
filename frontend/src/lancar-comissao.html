@@ -452,7 +452,17 @@
             #formUnico select[name="cliente"] + .choices {
                 display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
             }
-            #formUnico select[name="cliente"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            /* Estilo padrão do campo Cliente (sem destaque inicial) */
+            #formUnico select[name="cliente"] + .choices .choices__inner { 
+                min-height:38px; height:38px; padding:2px 6px; border-radius:8px; 
+                border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
+                display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
+            }
+            /* Destaque apenas quando focado/ativo */
+            #formUnico select[name="cliente"] + .choices.is-focused .choices__inner,
+            #formUnico select[name="cliente"] + .choices.is-open .choices__inner {
+                border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa;
+            }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
@@ -1322,8 +1332,7 @@
                 selectCliente.choicesInstance = new Choices(selectCliente, {
                     searchEnabled: true,
                     itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: 'Selecione...',
+                    placeholder: false,
                     shouldSort: false,
                     silent: true
                 });
