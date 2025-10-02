@@ -452,24 +452,11 @@
             #formUnico select[name="cliente"] + .choices {
                 display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
             }
-            /* Estilo padrão do campo Cliente (sem destaque inicial) */
+            /* Estilo do campo Cliente igual múltiplos */
             #formUnico select[name="cliente"] + .choices .choices__inner { 
                 min-height:38px; height:38px; padding:2px 6px; border-radius:8px; 
                 border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
                 display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
-            }
-            /* Forçar estado padrão sem destaque */
-            #formUnico select[name="cliente"] + .choices .choices__inner {
-                border-color:#dce3ea !important; 
-                box-shadow:none !important; 
-                background:#f8f9fa !important;
-            }
-            /* Destaque apenas quando focado/ativo */
-            #formUnico select[name="cliente"] + .choices.is-focused .choices__inner,
-            #formUnico select[name="cliente"] + .choices.is-open .choices__inner {
-                border-color:#2196F3 !important; 
-                box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
-                background:#f8f9fa !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
@@ -1314,53 +1301,41 @@
             // Torna clientes global
             window.clientes = [];
 
-            // Função para inicializar select de cliente (igual múltiplos)
+            // Função para inicializar select de cliente (EXATAMENTE igual múltiplos)
             function inicializarSelectCliente() {
                 const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
                 if (!selectCliente) return;
                 
-                // Verificar se já foi inicializado
+                // Destruir instância existente (igual múltiplos)
                 if (selectCliente.choicesInstance) {
                     selectCliente.choicesInstance.destroy();
                     selectCliente.choicesInstance = null;
                 }
                 
-                // Limpar e popular select (sem placeholder)
+                // Limpar select completamente (igual múltiplos)
                 selectCliente.innerHTML = '';
+                
+                // Popular com clientes (igual múltiplos)
                 if (Array.isArray(window.clientes)) {
                     window.clientes.forEach(cliente => {
+                        const codigo = (cliente && (cliente.codigo ?? cliente.id ?? cliente.codigo_crm ?? ''));
+                        if (!codigo) return;
+                        const codigoStr = String(codigo).padStart(5, '0');
+                        const nome = (cliente && (cliente.nome || cliente.razao || cliente.fantasia || '')) || '';
                         const option = document.createElement('option');
-                        option.value = cliente.id || cliente.codigo;
-                        option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
+                        option.value = codigoStr;
+                        option.textContent = (nome ? `${codigoStr} - ${nome}` : codigoStr);
                         selectCliente.appendChild(option);
                     });
                 }
                 
-                // Inicializar Choices (igual múltiplos) - sem foco automático
+                // Inicializar Choices EXATAMENTE igual múltiplos
                 selectCliente.choicesInstance = new Choices(selectCliente, {
                     searchEnabled: true,
                     itemSelectText: '',
-                    placeholder: false,
-                    shouldSort: false,
-                    silent: true,
-                    searchPlaceholderValue: null,
-                    loadingText: 'Carregando...',
-                    noResultsText: 'Nenhum resultado encontrado',
-                    noChoicesText: 'Sem opções disponíveis'
+                    placeholder: true,
+                    placeholderValue: 'Selecione...'
                 });
-                
-                // Forçar remoção do foco inicial
-                setTimeout(() => {
-                    const choicesContainer = selectCliente.parentElement.querySelector('.choices');
-                    if (choicesContainer) {
-                        choicesContainer.classList.remove('is-focused', 'is-open');
-                        choicesContainer.blur();
-                    }
-                }, 50);
-                
-                // Remover placeholder option
-                const phCli = selectCliente.querySelector('option[value=""]');
-                if (phCli) phCli.remove();
             }
 
             const selectItem = document.querySelector('#formUnico select[name="item"]');
