@@ -1545,28 +1545,32 @@
                 };
                 itensSelecionados.push(novoItem);
 
-                // Limpar seleção atual - método mais eficaz
+                // Limpar seleção atual mantendo última seleção visível
                 if (selectItem.choicesInstance) {
-                    // Usar clearStore() para limpar completamente
-                    selectItem.choicesInstance.clearStore();
-                    selectItem.choicesInstance.clearInput();
-                    
-                    // Também tentar setChoiceByValue como backup
-                    try {
-                        selectItem.choicesInstance.setChoiceByValue('');
-                    } catch(e) {
-                        // Ignorar erro se não conseguir
+                    const lastLabel = itemText; // manter rótulo visível
+                    // Remove o item ativo sem remover as opções
+                    try { selectItem.choicesInstance.removeActiveItems(); } catch(_) {}
+                    try { selectItem.choicesInstance.clearInput(); } catch(_) {}
+                    // Definir placeholder visual como última escolha (sem valor)
+                    const choicesContainer = selectItem.nextElementSibling;
+                    if (choicesContainer && choicesContainer.classList.contains('choices')) {
+                        const single = choicesContainer.querySelector('.choices__list--single');
+                        if (single) {
+                            single.innerHTML = `<div class="choices__item choices__item--selectable" data-item data-id="" data-value="" aria-selected="true">${lastLabel}</div>`;
+                        }
                     }
+                } else {
+                    // Select nativo: limpar valor mas manter o texto selecionado visível no label do select
+                    const idx = selectItem.selectedIndex;
+                    const txt = idx >= 0 ? selectItem.options[idx].text : '';
+                    selectItem.value = '';
+                    selectItem.selectedIndex = 0;
+                    // Tentar atualizar title para refletir última seleção
+                    if (txt) selectItem.title = txt;
                 }
                 
-                // Limpar valor do select nativo (sempre fazer)
-                selectItem.value = '';
-                selectItem.selectedIndex = 0;
-                
-                // Forçar atualização visual
-                setTimeout(() => {
-                    selectItem.dispatchEvent(new Event('change', { bubbles: true }));
-                }, 50);
+                // Disparar change para sincronizar lógicas dependentes
+                setTimeout(() => { try { selectItem.dispatchEvent(new Event('change', { bubbles: true })); } catch(_) {} }, 30);
 
                 // Atualizar exibição
                 atualizarExibicaoItensSelecionados();
