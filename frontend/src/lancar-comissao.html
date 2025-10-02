@@ -1545,17 +1545,28 @@
                 };
                 itensSelecionados.push(novoItem);
 
-                // Limpar seleção atual
+                // Limpar seleção atual - método mais eficaz
                 if (selectItem.choicesInstance) {
-                    selectItem.choicesInstance.setChoiceByValue('');
-                } else {
-                    // Fallback para select nativo
-                    selectItem.value = '';
-                    selectItem.selectedIndex = 0;
+                    // Usar clearStore() para limpar completamente
+                    selectItem.choicesInstance.clearStore();
+                    selectItem.choicesInstance.clearInput();
+                    
+                    // Também tentar setChoiceByValue como backup
+                    try {
+                        selectItem.choicesInstance.setChoiceByValue('');
+                    } catch(e) {
+                        // Ignorar erro se não conseguir
+                    }
                 }
                 
+                // Limpar valor do select nativo (sempre fazer)
+                selectItem.value = '';
+                selectItem.selectedIndex = 0;
+                
                 // Forçar atualização visual
-                selectItem.dispatchEvent(new Event('change', { bubbles: true }));
+                setTimeout(() => {
+                    selectItem.dispatchEvent(new Event('change', { bubbles: true }));
+                }, 50);
 
                 // Atualizar exibição
                 atualizarExibicaoItensSelecionados();
