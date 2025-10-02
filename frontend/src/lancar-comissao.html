@@ -438,7 +438,12 @@
             }
             #formUnico select[name="item"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
             #formUnico select[name="item"] + .choices { display:block; width:100%; max-width:100%; overflow:hidden; box-sizing:border-box }
-            #formUnico select[name="item"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            #formUnico select[name="item"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea !important; box-shadow:none !important; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            /* Destaque apenas quando focado/ativo para campo item */
+            #formUnico select[name="item"] + .choices.is-focused .choices__inner,
+            #formUnico select[name="item"] + .choices.is-open .choices__inner {
+                border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
+            }
             #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
@@ -452,11 +457,21 @@
             #formUnico select[name="cliente"] + .choices {
                 display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
             }
-            /* Estilo do campo Cliente igual múltiplos */
+            /* Estilo padrão do campo Cliente (sem destaque inicial) */
             #formUnico select[name="cliente"] + .choices .choices__inner { 
                 min-height:38px; height:38px; padding:2px 6px; border-radius:8px; 
                 border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
                 display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
+            }
+            /* Remover destaque azul padrão do Choices.js para o campo cliente */
+            #formUnico select[name="cliente"] + .choices .choices__inner {
+                border: 1px solid #dce3ea !important;
+                box-shadow: none !important;
+            }
+            /* Destaque apenas quando focado/ativo */
+            #formUnico select[name="cliente"] + .choices.is-focused .choices__inner,
+            #formUnico select[name="cliente"] + .choices.is-open .choices__inner {
+                border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
@@ -1301,41 +1316,40 @@
             // Torna clientes global
             window.clientes = [];
 
-            // Função para inicializar select de cliente (EXATAMENTE igual múltiplos)
+            // Função para inicializar select de cliente (igual múltiplos)
             function inicializarSelectCliente() {
                 const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
                 if (!selectCliente) return;
                 
-                // Destruir instância existente (igual múltiplos)
+                // Verificar se já foi inicializado
                 if (selectCliente.choicesInstance) {
                     selectCliente.choicesInstance.destroy();
                     selectCliente.choicesInstance = null;
                 }
                 
-                // Limpar select completamente (igual múltiplos)
-                selectCliente.innerHTML = '';
-                
-                // Popular com clientes (igual múltiplos)
+                // Limpar e popular select
+                selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
                 if (Array.isArray(window.clientes)) {
                     window.clientes.forEach(cliente => {
-                        const codigo = (cliente && (cliente.codigo ?? cliente.id ?? cliente.codigo_crm ?? ''));
-                        if (!codigo) return;
-                        const codigoStr = String(codigo).padStart(5, '0');
-                        const nome = (cliente && (cliente.nome || cliente.razao || cliente.fantasia || '')) || '';
                         const option = document.createElement('option');
-                        option.value = codigoStr;
-                        option.textContent = (nome ? `${codigoStr} - ${nome}` : codigoStr);
+                        option.value = cliente.id || cliente.codigo;
+                        option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
                         selectCliente.appendChild(option);
                     });
                 }
                 
-                // Inicializar Choices EXATAMENTE igual múltiplos
+                // Inicializar Choices (igual múltiplos) - sem foco automático
                 selectCliente.choicesInstance = new Choices(selectCliente, {
                     searchEnabled: true,
                     itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: 'Selecione...'
+                    placeholder: false,
+                    shouldSort: false,
+                    silent: true
                 });
+                
+                // Remover placeholder option
+                const phCli = selectCliente.querySelector('option[value=""]');
+                if (phCli) phCli.remove();
             }
 
             const selectItem = document.querySelector('#formUnico select[name="item"]');
