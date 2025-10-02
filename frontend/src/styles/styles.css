@@ -691,12 +691,7 @@ textarea {
     outline: none !important;
 }
 
-/* Choices: realce azul ao focar, igual aos inputs */
-.choices.is-focused .choices__inner,
-.choices.is-open .choices__inner {
-    border-color: #2196F3 !important;
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15) !important;
-}
+/* Choices: realce azul removido globalmente - será aplicado apenas onde necessário */
 
 /* Choices: espaçamento entre o campo e a lista (dropdown não colado) */
 .choices__list--dropdown {
@@ -2024,20 +2019,7 @@ tr:hover {
     padding: 8px 16px;
 }
 
-.table-multiplos input.input-descricao,
-.table-multiplos input.input-descricao:focus,
-.table-multiplos input.input-descricao:-webkit-autofill,
-.table-multiplos input.input-descricao:-webkit-autofill:focus,
-.form-group input.input-descricao,
-.form-group input.input-descricao:focus,
-.form-group input.input-descricao:-webkit-autofill,
-.form-group input.input-descricao:-webkit-autofill:focus {
-    background: #f8f9fa !important;
-    color: #333 !important;
-    box-shadow: 0 0 0 1000px #f8f9fa inset !important;
-    -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
+/* Removido: CSS global para input.input-descricao para não afetar páginas específicas */
 
 .intervalo-vencimento-container {
     display: flex !important;
@@ -2054,43 +2036,20 @@ tr:hover {
 #formSimples .form-group input[name="valor_receber[]"],
 #formSimples .form-group input[name="percentual[]"],
 #formSimples .form-group input[name="qtd_parcelas[]"],
-#formSimples .form-group input[name="valor_parcela[]"] {
+#formSimples .form-group input[name="valor_parcela[]"],
+#tabSimplesContent .choices.input-colaborador,
+#tabSimplesContent .choices__inner {
     height: 49.22px !important;
     min-height: 49.22px !important;
     max-height: 49.22px !important;
     box-sizing: border-box;
 }
 
-.form-group select.input-colaborador,
-.form-group .choices.input-colaborador {
-    height: 65px !important;
-    min-height: 65px !important;
-    max-height: 65px !important;
-    box-sizing: border-box;
-}
+/* Removido: altura global do input-colaborador para não afetar outras abas */
 
-.form-group .choices.input-colaborador .choices__inner {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    line-height: 65px !important;
-}
+/* Removido: ajustes globais do Choices para input-colaborador */
 
-.form-group .choices.input-colaborador .choices__item--selectable {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 65px !important;
-    line-height: 65px !important;
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #222;
-    padding-left: 0 !important;
-    width: 100%;
-    text-align: center;
-}
+/* Removido: ajustes globais do item selecionável do Choices para input-colaborador */
 
 #formUnico .valor-venda-destaque,
 #formUnico .valor-venda-destaque .choices-container-wrapper {
