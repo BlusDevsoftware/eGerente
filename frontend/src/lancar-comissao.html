@@ -1349,7 +1349,7 @@
                     searchEnabled: true,
                     itemSelectText: '',
                     placeholder: true,
-                    placeholderValue: 'Digite para buscar cliente...',
+                    placeholderValue: 'Selecione',
                     shouldSort: false,
                     silent: true
                 });
@@ -1460,7 +1460,25 @@
                         selectItem.appendChild(o);
                     });
                     
-                    const placeholder = validarPreRequisitosItens() ? 'Selecione...' : 'Informe cliente e tipo primeiro';
+                    let placeholder;
+                    const selectCliente = document.querySelector('select[name="cliente"]');
+                    const tipoSelecionado = tipoInput.value;
+                    const clienteSelecionado = selectCliente && selectCliente.value;
+                    
+                    if (!tipoSelecionado) {
+                        placeholder = 'Selecione o tipo...';
+                    } else if (!clienteSelecionado) {
+                        placeholder = 'Selecione o cliente...';
+                    } else {
+                        // Placeholder baseado no tipo selecionado
+                        if (tipoSelecionado === 'produto') {
+                            placeholder = 'Selecione o produto';
+                        } else if (tipoSelecionado === 'servico') {
+                            placeholder = 'Selecione o serviço';
+                        } else {
+                            placeholder = 'Selecione...';
+                        }
+                    }
                     selectItem.choicesInstance = new Choices(selectItem, { 
                         searchEnabled:true, 
                         itemSelectText:'', 
@@ -1948,6 +1966,17 @@
                             // preencherItens removido
                         });
                     });
+                    
+                    // Inicializar campo de itens com placeholder inicial
+                    if (selectItem) {
+                        selectItem.innerHTML = '';
+                        selectItem.choicesInstance = new Choices(selectItem, { 
+                            searchEnabled:true, 
+                            itemSelectText:'', 
+                            placeholder:true, 
+                            placeholderValue: 'Selecione o tipo...'
+                        });
+                    }
                     
                     // Inicializar select de cliente após carregar dados (com delay para evitar abertura automática)
                     setTimeout(() => {
