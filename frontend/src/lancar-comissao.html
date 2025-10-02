@@ -590,26 +590,26 @@
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            /* FORÇA MÁXIMA - Sobrescrever TUDO do Choices.js CDN */
+            /* Corrigir dropdowns - manter posicionamento normal mas z-index alto */
             .choices__list--dropdown,
             .choices[data-type*="select-one"] .choices__list--dropdown,
             .choices[data-type*="select-multiple"] .choices__list--dropdown {
                 z-index: 99999 !important;
-                position: fixed !important;
+                position: absolute !important;
                 background: white !important;
                 border: 1px solid #ddd !important;
                 border-radius: 4px !important;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
                 max-height: 200px !important;
                 overflow-y: auto !important;
-                width: auto !important;
-                min-width: 200px !important;
+                width: 100% !important;
                 display: block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
                 transform: none !important;
-                top: auto !important;
-                left: auto !important;
+                top: 100% !important;
+                left: 0 !important;
+                margin-top: 2px !important;
             }
             
             /* Container do choices */
@@ -648,15 +648,22 @@
                 color: #333 !important;
             }
             
-            /* FORÇA TOTAL - Todos os containers devem permitir overflow */
+            /* Permitir overflow apenas onde necessário */
             .form-comissao,
             .form-row,
             .form-group,
-            .choices-container-wrapper,
-            #formUnico,
-            #tabUnicoContent {
+            .choices-container-wrapper {
                 overflow: visible !important;
-                position: static !important;
+            }
+            
+            /* Manter positioning correto dos containers principais */
+            #formUnico {
+                position: relative;
+            }
+            
+            #tabUnicoContent {
+                position: relative;
+                overflow: visible !important;
             }
 
             /* Valor da Venda (destaque) */
