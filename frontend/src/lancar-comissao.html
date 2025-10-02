@@ -2002,6 +2002,13 @@
                     if (inline.style.display === 'none' || inline.style.display === '') {
                         inline.style.display = 'inline-flex';
                         btn.classList.add('active');
+                        // Definir valor padrão de 2 parcelas ao abrir
+                        const qtd = inline.querySelector('.input-qtd-parcelas-inline');
+                        if (qtd && !qtd.value) {
+                            qtd.value = '2';
+                            // Atualizar valor da parcela automaticamente
+                            atualizaValorParcela(qtd);
+                        }
                     } else {
                         inline.style.display = 'none';
                         btn.classList.remove('active');
@@ -2041,8 +2048,17 @@
                 const simulacaoDiv = row.parentElement.querySelector('.simulacao-titulos');
                 const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
                 let qtd = 1;
-                if (qtdInput && qtdInput.closest('.group-parcelas') && qtdInput.closest('.group-parcelas').style.display !== 'none' && qtdInput.value && parseInt(qtdInput.value) > 1) {
+                
+                // Verificar se o parcelamento está ativo (campos de parcela visíveis)
+                const acoesParcelas = row.querySelector('.acoes-parcelas-inline');
+                const parceladoAtivo = acoesParcelas && acoesParcelas.style.display === 'inline-flex';
+                
+                if (parceladoAtivo && qtdInput && qtdInput.value && parseInt(qtdInput.value) > 1) {
+                    // Se parcelamento está ativo, usar a quantidade definida
                     qtd = parseInt(qtdInput.value);
+                } else {
+                    // Se parcelamento não está ativo, gerar apenas 1 parcela
+                    qtd = 1;
                 }
                 const valorReceber = parseFloat(valorReceberInput.value.replace(',', '.'));
                 if (!valorReceber || valorReceber <= 0) {
