@@ -1333,8 +1333,8 @@
                     selectCliente.choicesInstance = null;
                 }
                 
-                // Limpar e popular select
-                selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                // Limpar e popular select (sem opção "Selecione...")
+                selectCliente.innerHTML = '';
                 if (Array.isArray(window.clientes)) {
                     window.clientes.forEach(cliente => {
                         const option = document.createElement('option');
@@ -1344,11 +1344,12 @@
                     });
                 }
                 
-                // Inicializar Choices (igual múltiplos) - sem foco automático
+                // Inicializar Choices com placeholder personalizado
                 selectCliente.choicesInstance = new Choices(selectCliente, {
                     searchEnabled: true,
                     itemSelectText: '',
-                    placeholder: false,
+                    placeholder: true,
+                    placeholderValue: 'Digite para buscar cliente...',
                     shouldSort: false,
                     silent: true
                 });
@@ -1366,9 +1367,7 @@
                     }
                 });
                 
-                // Remover placeholder option
-                const phCli = selectCliente.querySelector('option[value=""]');
-                if (phCli) phCli.remove();
+                // Placeholder option removido - não é mais necessário
             }
 
             const selectItem = document.querySelector('#formUnico select[name="item"]');
