@@ -1802,10 +1802,28 @@
                         const v = parseFloat((bloco.querySelector('input[name="valor_receber[]"]').value || '0').replace(',','.')) || 0;
                         return acc + v;
                     }, 0);
-                const campoValorVenda = null;
-                    const valorVenda = (typeof extrairNumeroBR === 'function') ? extrairNumeroBR(campoValorVenda?.value || '0') : (parseFloat((campoValorVenda?.value||'0').replace(/[^0-9,.-]/g,'').replace(',','.'))||0);
-                    totalComissoesEl.textContent = formatarMoedaBR(totalComissoes);
-                    valorVendaResumoEl.textContent = formatarMoedaBR(valorVenda);
+                // Calcular valor total da venda baseado nos itens selecionados
+                let valorTotalItens = 0;
+                itensSelecionados.forEach(item => {
+                    valorTotalItens += item.precoEditado;
+                });
+                
+                // Aplicar desconto/acréscimo se houver
+                const sideDesconto = document.getElementById('sideDesconto');
+                const sideAcrescimo = document.getElementById('sideAcrescimo');
+                let desconto = 0;
+                let acrescimo = 0;
+                
+                if (sideDesconto && sideDesconto.value) {
+                    desconto = extrairNumeroBR(sideDesconto.value);
+                }
+                if (sideAcrescimo && sideAcrescimo.value) {
+                    acrescimo = extrairNumeroBR(sideAcrescimo.value);
+                }
+                
+                const valorVendaFinal = Math.max(0, valorTotalItens - desconto + acrescimo);
+                totalComissoesEl.textContent = formatarMoedaBR(totalComissoes);
+                valorVendaResumoEl.textContent = formatarMoedaBR(valorVendaFinal);
                 } catch(_) {}
             }
 
@@ -1943,10 +1961,30 @@
                 }
 
                 const form = document.getElementById('formUnico');
-                const campoValorVenda = null;
-                const valorVenda = extrairNumeroBR(campoValorVenda.value);
+                
+                // Calcular valor total da venda baseado nos itens selecionados
+                let valorTotalItens = 0;
+                itensSelecionados.forEach(item => {
+                    valorTotalItens += item.precoEditado;
+                });
+                
+                // Aplicar desconto/acréscimo se houver
+                const sideDesconto = document.getElementById('sideDesconto');
+                const sideAcrescimo = document.getElementById('sideAcrescimo');
+                let desconto = 0;
+                let acrescimo = 0;
+                
+                if (sideDesconto && sideDesconto.value) {
+                    desconto = extrairNumeroBR(sideDesconto.value);
+                }
+                if (sideAcrescimo && sideAcrescimo.value) {
+                    acrescimo = extrairNumeroBR(sideAcrescimo.value);
+                }
+                
+                const valorVendaFinal = Math.max(0, valorTotalItens - desconto + acrescimo);
                 const valorReceber = bloco.querySelector('input[name="valor_receber[]"]');
-                valorReceber.value = (valorVenda * used / 100).toFixed(2);
+                const valorComissao = (valorVendaFinal * used / 100);
+                valorReceber.value = valorComissao.toFixed(2);
                 
                 // Invalidar simulação do bloco se percentual foi alterado após simulação
                 if (bloco && bloco.dataset.simulado === 'true') {
