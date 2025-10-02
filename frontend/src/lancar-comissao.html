@@ -439,6 +439,12 @@
                 margin-bottom: 12px;
                 align-items: end;
             }
+            /* Força truncamento nos form-groups */
+            .form-row .form-group {
+                min-width: 0 !important;
+                overflow: hidden !important;
+                max-width: 100% !important;
+            }
             /* Alinhar botão de adicionar colaborador com o campo Itens e manter o mesmo espaçamento do grid */
             .form-row .add-colab-action { display:flex; align-items:flex-end; padding-top: 0; align-self: end; justify-self: start }
             .form-group {
@@ -498,7 +504,13 @@
             }
             #formUnico select[name="cliente"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
             /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
-            .choices-container-wrapper { position: relative; overflow: visible }
+            .choices-container-wrapper { 
+                position: relative; 
+                overflow: hidden !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
             #formUnico select[name="cliente"] + .choices {
                 display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: hidden;
             }
@@ -524,9 +536,43 @@
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
             }
-            /* Truncamento específico para campo cliente - igual múltiplos lançamentos */
-            #formUnico select[name="cliente"] + .choices .choices__list--single { width:100%; flex:1 1 auto; min-width:0; display:block }
-            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0 }
+            /* FORÇA TOTAL - Truncamento do campo cliente sobrescrevendo CDN */
+            #formUnico select[name="cliente"] + .choices,
+            #formUnico .choices-container-wrapper .choices {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
+            }
+            #formUnico select[name="cliente"] + .choices .choices__inner,
+            #formUnico .choices-container-wrapper .choices .choices__inner {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
+            }
+            #formUnico select[name="cliente"] + .choices .choices__list--single,
+            #formUnico .choices-container-wrapper .choices .choices__list--single { 
+                width: 100% !important; 
+                max-width: 100% !important;
+                flex: 1 1 auto !important; 
+                min-width: 0 !important; 
+                display: block !important;
+                overflow: hidden !important;
+            }
+            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item,
+            #formUnico .choices-container-wrapper .choices .choices__list--single .choices__item { 
+                display: block !important; 
+                width: 100% !important;
+                max-width: 100% !important; 
+                overflow: hidden !important; 
+                text-overflow: ellipsis !important; 
+                white-space: nowrap !important; 
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+            }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
