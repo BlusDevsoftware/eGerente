@@ -1353,6 +1353,19 @@
                     silent: true
                 });
                 
+                // Adicionar evento para controlar campo de itens quando cliente mudar
+                selectCliente.addEventListener('change', function() {
+                    try {
+                        controlarEstadoCampoItens();
+                        // Se tipo já foi selecionado, recarregar itens
+                        if (tipoInput && tipoInput.value) {
+                            preencherItens(tipoInput.value);
+                        }
+                    } catch(e) {
+                        console.error('Erro ao controlar campo itens:', e);
+                    }
+                });
+                
                 // Remover placeholder option
                 const phCli = selectCliente.querySelector('option[value=""]');
                 if (phCli) phCli.remove();
@@ -1381,11 +1394,60 @@
                 return Number(price) || 0;
             }
 
+            function validarPreRequisitosItens() {
+                const selectCliente = document.querySelector('select[name="cliente"]');
+                const tipoSelecionado = tipoInput.value;
+                const clienteSelecionado = selectCliente && selectCliente.value;
+                
+                return clienteSelecionado && tipoSelecionado;
+            }
+            
+            function controlarEstadoCampoItens() {
+                const podeHabilitar = validarPreRequisitosItens();
+                const selectItemWrapper = selectItem?.closest('.form-group');
+                const choicesContainer = selectItem?.nextElementSibling;
+                
+                if (!podeHabilitar) {
+                    // Desabilitar campo de itens
+                    if (selectItem) {
+                        selectItem.disabled = true;
+                        if (selectItem.choicesInstance) {
+                            selectItem.choicesInstance.disable();
+                        }
+                    }
+                    if (choicesContainer && choicesContainer.classList.contains('choices')) {
+                        choicesContainer.classList.add('is-disabled');
+                        const inner = choicesContainer.querySelector('.choices__inner');
+                        if (inner) {
+                            inner.style.opacity = '0.6';
+                            inner.style.cursor = 'not-allowed';
+                        }
+                    }
+                } else {
+                    // Habilitar campo de itens
+                    if (selectItem) {
+                        selectItem.disabled = false;
+                        if (selectItem.choicesInstance) {
+                            selectItem.choicesInstance.enable();
+                        }
+                    }
+                    if (choicesContainer && choicesContainer.classList.contains('choices')) {
+                        choicesContainer.classList.remove('is-disabled');
+                        const inner = choicesContainer.querySelector('.choices__inner');
+                        if (inner) {
+                            inner.style.opacity = '1';
+                            inner.style.cursor = 'pointer';
+                        }
+                    }
+                }
+            }
+
             function preencherItens(tipo) {
                 try {
                     if (!selectItem) return;
                     if (selectItem.choicesInstance) { selectItem.choicesInstance.destroy(); selectItem.choicesInstance = null; }
                     selectItem.innerHTML = '';
+                    
                     const lista = tipo === 'produto' ? (produtos||[]) : (servicos||[]);
                     lista.forEach(item => {
                         const o = document.createElement('option');
@@ -1398,8 +1460,18 @@
                         o.dataset.preco = String(getItemPrice(item) || 0);
                         selectItem.appendChild(o);
                     });
-                    selectItem.choicesInstance = new Choices(selectItem, { searchEnabled:true, itemSelectText:'', placeholder:true, placeholderValue:'Selecione...' });
+                    
+                    const placeholder = validarPreRequisitosItens() ? 'Selecione...' : 'Informe cliente e tipo primeiro';
+                    selectItem.choicesInstance = new Choices(selectItem, { 
+                        searchEnabled:true, 
+                        itemSelectText:'', 
+                        placeholder:true, 
+                        placeholderValue: placeholder
+                    });
                     selectItem.addEventListener('change', atualizarResumoItens);
+                    
+                    // Controlar estado após preencher
+                    controlarEstadoCampoItens();
                 } catch(_) { }
             }
             
@@ -1410,7 +1482,10 @@
                     label.innerHTML = tipo === 'produto' ? '<i class="fas fa-box"></i> Produtos' : '<i class="fas fa-cogs"></i> Serviços';
                 }
                 // Preencher itens de acordo com o tipo selecionado
-                try { preencherItens(tipo); } catch(_) {}
+                try { 
+                    preencherItens(tipo); 
+                    controlarEstadoCampoItens();
+                } catch(_) {}
             }
 
             function atualizarValorVendaPorItens() { /* desativado */ }
@@ -1878,6 +1953,8 @@
                     // Inicializar select de cliente após carregar dados (com delay para evitar abertura automática)
                     setTimeout(() => {
                         inicializarSelectCliente();
+                        // Controlar estado inicial do campo de itens (desabilitado)
+                        controlarEstadoCampoItens();
                     }, 100);
                     
                 } catch (e) {
