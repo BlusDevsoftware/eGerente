@@ -329,17 +329,32 @@
                 width: 100%;
                 box-sizing: border-box;
             }
-            /* Estilos para itens na lista - truncar texto longo */
+            /* Estilos para itens na lista - truncar texto longo (igual múltiplos lançamentos) */
             #tabUnicoSide .lista-produtos .linha-item {
-                max-width: 100%;
-                overflow: hidden;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 4px 0 !important;
+                border-bottom: 1px solid #f0f0f0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
             }
-            #tabUnicoSide .lista-produtos .linha-item span {
+            #tabUnicoSide .lista-produtos .linha-item .item-nome {
+                flex: 1 1 auto !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 white-space: nowrap !important;
-                max-width: 150px !important;
-                display: inline-block !important;
+                min-width: 0 !important;
+                font-size: 12px !important;
+                margin-right: 8px !important;
+            }
+            #tabUnicoSide .lista-produtos .linha-item .item-actions {
+                flex: 0 0 auto !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
             }
             #tabUnicoSide .total-venda-row { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:auto }
             #tabUnicoSide #sideTotalVenda { width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px }
@@ -1599,14 +1614,13 @@
 
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'linha-item';
-                    itemDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0;';
                     
                     itemDiv.innerHTML = `
-                        <span style="flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;" title="${item.texto}">${item.texto}</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="item-nome" title="${item.texto}">${item.texto}</span>
+                        <div class="item-actions">
                             <strong style="font-size: 12px; white-space: nowrap;">${formatarMoedaBR(item.preco)}</strong>
                             <button type="button" onclick="removerItemSelecionado('${item.id}')" 
-                                    style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                                    style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
                                     title="Remover item">
                                 ×
                             </button>
