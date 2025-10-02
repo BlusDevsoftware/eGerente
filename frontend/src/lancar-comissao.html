@@ -506,7 +506,7 @@
             /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
             .choices-container-wrapper { 
                 position: relative; 
-                overflow: hidden !important;
+                overflow: visible !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
@@ -542,8 +542,9 @@
                 width: 100% !important;
                 max-width: 100% !important;
                 min-width: 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 box-sizing: border-box !important;
+                position: relative !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__inner,
             #formUnico .choices-container-wrapper .choices .choices__inner {
@@ -576,7 +577,15 @@
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            #formUnico .choices__list--dropdown { z-index: 2000 }
+            /* Z-index para dropdowns aparecerem por cima de tudo */
+            #formUnico .choices__list--dropdown,
+            .choices__list--dropdown {
+                z-index: 9999 !important;
+                position: absolute !important;
+            }
+            .choices[data-type*="select-one"].is-open .choices__inner {
+                z-index: 9998 !important;
+            }
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
