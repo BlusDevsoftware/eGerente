@@ -493,9 +493,7 @@
             #formUnico select[name="item"] + .choices.is-open .choices__inner {
                 border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
             }
-            /* Truncamento específico para campo itens - igual múltiplos lançamentos */
-            #formUnico select[name="item"] + .choices .choices__list--single { width:100%; flex:1 1 auto; min-width:0; display:block }
-            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0 }
+            /* Removido: duplicado - já coberto pelos estilos gerais acima */
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
             #formUnico select[name="cliente"] {
@@ -536,55 +534,65 @@
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
             }
-            /* FORÇA TOTAL - Truncamento do campo cliente sobrescrevendo CDN */
+            /* Replicar EXATAMENTE o comportamento da aba múltiplos */
+            #formUnico .choices {
+                background: #f8f9fa;
+                max-width: 100%;
+                width: 100%;
+                min-width: 0;
+                overflow: visible;
+                box-sizing: border-box;
+                display: block;
+            }
+            #formUnico .choices__inner {
+                min-height: 38px;
+                height: 38px;
+                padding: 2px 6px;
+                border-radius: 8px;
+                border: 1px solid #dce3ea;
+                box-shadow: none;
+                background: #f8f9fa;
+                display: flex;
+                align-items: center;
+                overflow: hidden;
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            #formUnico .choices__list--single {
+                width: 100%;
+                flex: 1 1 auto;
+                min-width: 0;
+                display: block;
+            }
+            #formUnico .choices__list--single .choices__item {
+                display: block;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+            /* Fixar largura e evitar crescimento - igual múltiplos */
             #formUnico select[name="cliente"] + .choices,
-            #formUnico .choices-container-wrapper .choices {
-                width: 100% !important;
-                max-width: 100% !important;
-                min-width: 0 !important;
-                overflow: visible !important;
-                box-sizing: border-box !important;
-                position: relative !important;
+            #formUnico select[name="item"] + .choices {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                overflow: visible;
+                box-sizing: border-box;
             }
             #formUnico select[name="cliente"] + .choices .choices__inner,
-            #formUnico .choices-container-wrapper .choices .choices__inner {
-                width: 100% !important;
-                max-width: 100% !important;
-                min-width: 0 !important;
-                overflow: hidden !important;
-                box-sizing: border-box !important;
-            }
-            #formUnico select[name="cliente"] + .choices .choices__list--single,
-            #formUnico .choices-container-wrapper .choices .choices__list--single { 
-                width: 100% !important; 
-                max-width: 100% !important;
-                flex: 1 1 auto !important; 
-                min-width: 0 !important; 
-                display: block !important;
-                overflow: hidden !important;
-            }
-            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item,
-            #formUnico .choices-container-wrapper .choices .choices__list--single .choices__item { 
-                display: block !important; 
-                width: 100% !important;
-                max-width: 100% !important; 
-                overflow: hidden !important; 
-                text-overflow: ellipsis !important; 
-                white-space: nowrap !important; 
-                min-width: 0 !important;
-                box-sizing: border-box !important;
+            #formUnico select[name="item"] + .choices .choices__inner {
+                width: 100%;
+                box-sizing: border-box;
             }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            /* Z-index para dropdowns aparecerem por cima de tudo */
-            #formUnico .choices__list--dropdown,
+            /* Z-index igual à aba múltiplos */
             .choices__list--dropdown {
-                z-index: 9999 !important;
-                position: absolute !important;
-            }
-            .choices[data-type*="select-one"].is-open .choices__inner {
-                z-index: 9998 !important;
+                z-index: 2000;
             }
 
             /* Valor da Venda (destaque) */
