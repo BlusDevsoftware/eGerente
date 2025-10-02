@@ -487,7 +487,9 @@
             #formUnico select[name="item"] + .choices.is-open .choices__inner {
                 border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
             }
-            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* Truncamento específico para campo itens - igual múltiplos lançamentos */
+            #formUnico select[name="item"] + .choices .choices__list--single { width:100%; flex:1 1 auto; min-width:0; display:block }
+            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0 }
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
             #formUnico select[name="cliente"] {
@@ -498,7 +500,7 @@
             /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
             .choices-container-wrapper { position: relative; overflow: visible }
             #formUnico select[name="cliente"] + .choices {
-                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
+                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: hidden;
             }
             /* Estilo padrão do campo Cliente (sem destaque inicial) */
             #formUnico select[name="cliente"] + .choices .choices__inner { 
@@ -522,7 +524,9 @@
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
             }
-            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* Truncamento específico para campo cliente - igual múltiplos lançamentos */
+            #formUnico select[name="cliente"] + .choices .choices__list--single { width:100%; flex:1 1 auto; min-width:0; display:block }
+            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0 }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
