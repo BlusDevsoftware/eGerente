@@ -463,10 +463,29 @@
                 border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
                 display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
             }
-            /* Remover destaque azul padrão do Choices.js para o campo cliente */
+            /* Remover destaque azul padrão do Choices.js para o campo cliente - força sobrescrever CDN */
             #formUnico select[name="cliente"] + .choices .choices__inner {
                 border: 1px solid #dce3ea !important;
                 box-shadow: none !important;
+            }
+            /* Força remover qualquer estilo padrão do Choices.js CDN */
+            #formUnico .choices .choices__inner {
+                border: 1px solid #dce3ea !important;
+                box-shadow: none !important;
+            }
+            /* Sobrescrever TODOS os possíveis estilos do Choices.js CDN */
+            #formUnico .choices:not(.is-focused):not(.is-open) .choices__inner {
+                border: 1px solid #dce3ea !important;
+                box-shadow: none !important;
+                outline: none !important;
+            }
+            /* FORÇA TOTAL - Remove qualquer borda azul independente do estado */
+            #formUnico .choices .choices__inner,
+            #formUnico .choices.is-active .choices__inner,
+            #formUnico .choices.is-disabled .choices__inner {
+                border: 1px solid #dce3ea !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
             /* Destaque apenas quando focado/ativo */
             #formUnico select[name="cliente"] + .choices.is-focused .choices__inner,
