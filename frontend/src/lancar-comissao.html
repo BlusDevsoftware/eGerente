@@ -169,7 +169,7 @@
                         <div class="form-group itens">
                             <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
                             <div class="choices-container-wrapper">
-                                <select name="item" required></select>
+                                <select name="item" multiple required></select>
                             </div>
                         </div>
                 <div class="form-group add-colab-action" style="flex:0 0 auto; display:flex; align-items:flex-end;">
@@ -478,6 +478,51 @@
                 border-color:#2196F3 !important; 
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
+            }
+            
+            /* Estilos para seleção múltipla de itens */
+            #formUnico .choices__list--multiple .choices__item {
+                background-color: #e3f2fd !important;
+                border: 1px solid #2196F3 !important;
+                border-radius: 20px !important;
+                color: #1976D2 !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+                margin: 2px !important;
+                padding: 4px 8px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 4px !important;
+            }
+            
+            /* Botão de remoção dos itens selecionados */
+            #formUnico .choices__list--multiple .choices__button {
+                background: none !important;
+                border: none !important;
+                color: #1976D2 !important;
+                cursor: pointer !important;
+                font-size: 14px !important;
+                font-weight: bold !important;
+                margin-left: 4px !important;
+                padding: 0 !important;
+                width: 16px !important;
+                height: 16px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                transition: background-color 0.2s !important;
+            }
+            
+            #formUnico .choices__list--multiple .choices__button:hover {
+                background-color: rgba(25, 118, 210, 0.1) !important;
+            }
+            
+            /* Ícone personalizado para o botão de remoção */
+            #formUnico .choices__list--multiple .choices__button::before {
+                content: "×" !important;
+                font-size: 14px !important;
+                line-height: 1 !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
@@ -1483,7 +1528,15 @@
                         searchEnabled:true, 
                         itemSelectText:'', 
                         placeholder:true, 
-                        placeholderValue: placeholder
+                        placeholderValue: placeholder,
+                        removeItemButton: true,
+                        duplicateItemsAllowed: false,
+                        addItemText: (value) => {
+                            return `Pressione Enter para adicionar <b>"${value}"</b>`;
+                        },
+                        maxItemText: (maxItemCount) => {
+                            return `Apenas ${maxItemCount} itens podem ser adicionados`;
+                        }
                     });
                     selectItem.addEventListener('change', atualizarResumoItens);
                     
@@ -1967,14 +2020,19 @@
                         });
                     });
                     
-                    // Inicializar campo de itens com placeholder inicial
+                    // Inicializar campo de itens com placeholder inicial e seleção múltipla
                     if (selectItem) {
                         selectItem.innerHTML = '';
                         selectItem.choicesInstance = new Choices(selectItem, { 
                             searchEnabled:true, 
                             itemSelectText:'', 
                             placeholder:true, 
-                            placeholderValue: 'Selecione o tipo...'
+                            placeholderValue: 'Selecione o tipo...',
+                            removeItemButton: true,
+                            duplicateItemsAllowed: false,
+                            addItemText: (value) => {
+                                return `Pressione Enter para adicionar <b>"${value}"</b>`;
+                            }
                         });
                     }
                     
