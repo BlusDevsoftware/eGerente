@@ -168,8 +168,13 @@
                         </div>
                         <div class="form-group itens">
                             <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
-                            <div class="choices-container-wrapper">
-                                <select name="item" multiple required></select>
+                            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                                <div class="choices-container-wrapper" style="flex: 1;">
+                                    <select name="item" required></select>
+                                </div>
+                                <button type="button" id="btnAdicionarItem" class="btn-primary" onclick="adicionarItemSelecionado()" style="height: 38px; white-space: nowrap;">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
                             </div>
                         </div>
                 <div class="form-group add-colab-action" style="flex:0 0 auto; display:flex; align-items:flex-end;">
@@ -478,51 +483,6 @@
                 border-color:#2196F3 !important; 
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
-            }
-            
-            /* Estilos para seleção múltipla de itens */
-            #formUnico .choices__list--multiple .choices__item {
-                background-color: #e3f2fd !important;
-                border: 1px solid #2196F3 !important;
-                border-radius: 20px !important;
-                color: #1976D2 !important;
-                font-size: 12px !important;
-                font-weight: 500 !important;
-                margin: 2px !important;
-                padding: 4px 8px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                gap: 4px !important;
-            }
-            
-            /* Botão de remoção dos itens selecionados */
-            #formUnico .choices__list--multiple .choices__button {
-                background: none !important;
-                border: none !important;
-                color: #1976D2 !important;
-                cursor: pointer !important;
-                font-size: 14px !important;
-                font-weight: bold !important;
-                margin-left: 4px !important;
-                padding: 0 !important;
-                width: 16px !important;
-                height: 16px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 50% !important;
-                transition: background-color 0.2s !important;
-            }
-            
-            #formUnico .choices__list--multiple .choices__button:hover {
-                background-color: rgba(25, 118, 210, 0.1) !important;
-            }
-            
-            /* Ícone personalizado para o botão de remoção */
-            #formUnico .choices__list--multiple .choices__button::before {
-                content: "×" !important;
-                font-size: 14px !important;
-                line-height: 1 !important;
             }
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
@@ -1363,6 +1323,7 @@
             let produtos = [];
             let servicos = [];
             let choicesItem = null;
+            let itensSelecionados = []; // Array para armazenar itens selecionados
 
             // Torna clientes global
             window.clientes = [];
@@ -1528,17 +1489,9 @@
                         searchEnabled:true, 
                         itemSelectText:'', 
                         placeholder:true, 
-                        placeholderValue: placeholder,
-                        removeItemButton: true,
-                        duplicateItemsAllowed: false,
-                        addItemText: (value) => {
-                            return `Pressione Enter para adicionar <b>"${value}"</b>`;
-                        },
-                        maxItemText: (maxItemCount) => {
-                            return `Apenas ${maxItemCount} itens podem ser adicionados`;
-                        }
+                        placeholderValue: placeholder
                     });
-                    selectItem.addEventListener('change', atualizarResumoItens);
+                    // Event listener removido - agora usamos o botão Adicionar
                     
                     // Controlar estado após preencher
                     controlarEstadoCampoItens();
@@ -1560,25 +1513,111 @@
 
             function atualizarValorVendaPorItens() { /* desativado */ }
 
+            // Função para adicionar item selecionado à lista
+            function adicionarItemSelecionado() {
+                const selectItem = document.querySelector('#formUnico select[name="item"]');
+                if (!selectItem || !selectItem.value) {
+                    alert('Selecione um item primeiro.');
+                    return;
+                }
+
+                const selectedOption = selectItem.querySelector(`option[value="${selectItem.value}"]`);
+                if (!selectedOption) return;
+
+                const itemId = selectItem.value;
+                const itemText = selectedOption.textContent;
+                const itemPrice = parseFloat(selectedOption.dataset.preco || '0');
+
+                // Verificar se o item já foi adicionado
+                const jaAdicionado = itensSelecionados.find(item => item.id === itemId);
+                if (jaAdicionado) {
+                    alert('Este item já foi adicionado.');
+                    return;
+                }
+
+                // Adicionar item ao array
+                const novoItem = {
+                    id: itemId,
+                    texto: itemText,
+                    preco: itemPrice
+                };
+                itensSelecionados.push(novoItem);
+
+                // Limpar seleção atual
+                if (selectItem.choicesInstance) {
+                    selectItem.choicesInstance.setChoiceByValue('');
+                }
+
+                // Atualizar exibição
+                atualizarExibicaoItensSelecionados();
+            }
+
+            // Função para remover item da lista
+            function removerItemSelecionado(itemId) {
+                itensSelecionados = itensSelecionados.filter(item => item.id !== itemId);
+                atualizarExibicaoItensSelecionados();
+            }
+
+            // Função para atualizar a exibição dos itens selecionados
+            function atualizarExibicaoItensSelecionados() {
+                const sideLista = document.getElementById('sideListaProdutos');
+                const sideTotalItens = document.getElementById('sideTotalItens');
+                
+                if (!sideLista) return;
+
+                // Limpar lista atual
+                sideLista.innerHTML = '';
+
+                let totalItens = 0;
+
+                // Adicionar cada item selecionado
+                itensSelecionados.forEach(item => {
+                    totalItens += item.preco;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'linha-item';
+                    itemDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0;';
+                    
+                    itemDiv.innerHTML = `
+                        <span style="flex: 1; font-size: 12px;">${item.texto}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 12px;">${formatarMoedaBR(item.preco)}</strong>
+                            <button type="button" onclick="removerItemSelecionado('${item.id}')" 
+                                    style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                    title="Remover item">
+                                ×
+                            </button>
+                        </div>
+                    `;
+                    
+                    sideLista.appendChild(itemDiv);
+                });
+
+                // Atualizar total
+                if (sideTotalItens) {
+                    sideTotalItens.value = formatarMoedaBR(totalItens);
+                }
+
+                // Atualizar resumo geral
+                atualizarResumoItens();
+            }
+
             function atualizarResumoItens() {
                 try {
-                    const sideLista = document.getElementById('sideListaProdutos');
                     const sideTotal = document.getElementById('sideTotalVenda');
                     const sideTotalItens = document.getElementById('sideTotalItens');
                     const sideDesconto = document.getElementById('sideDesconto');
                     const sideAcrescimo = document.getElementById('sideAcrescimo');
-                    if (!sideLista || !sideTotal || !selectItem) return;
-                    const selected = Array.from(selectItem.selectedOptions || []);
-                    let total = 0;
-                    sideLista.innerHTML = '';
-                    selected.forEach(opt => {
-                        const preco = parseFloat(opt.dataset.preco || '0') || 0;
-                        total += preco;
-                        const rowSide = document.createElement('div');
-                        rowSide.className = 'linha-item';
-                        rowSide.innerHTML = `<span>${opt.textContent}</span><strong>${formatarMoedaBR(preco)}</strong>`;
-                        sideLista.appendChild(rowSide);
+                    
+                    if (!sideTotal) return;
+                    
+                    // Calcular total dos itens selecionados
+                    let totalItens = 0;
+                    itensSelecionados.forEach(item => {
+                        totalItens += item.preco;
                     });
+                    
+                    // Calcular desconto e acréscimo
                     let desconto = 0;
                     if (sideDesconto && sideDesconto.value) {
                         desconto = extrairNumeroBR(sideDesconto.value);
@@ -1587,9 +1626,13 @@
                     if (sideAcrescimo && sideAcrescimo.value) {
                         acrescimo = extrairNumeroBR(sideAcrescimo.value);
                     }
-                    const totalFinal = Math.max(0, total - desconto + acrescimo);
+                    
+                    // Calcular total final
+                    const totalFinal = Math.max(0, totalItens - desconto + acrescimo);
                     sideTotal.value = formatarMoedaBR(totalFinal);
-                    if (sideTotalItens) sideTotalItens.value = formatarMoedaBR(total);
+                    if (sideTotalItens) sideTotalItens.value = formatarMoedaBR(totalItens);
+                    
+                    // Atualizar cálculos dos colaboradores
                     document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]').forEach(input => {
                         try { calcularValorReceberUnico(input); } catch(_) {}
                     });
@@ -2020,19 +2063,14 @@
                         });
                     });
                     
-                    // Inicializar campo de itens com placeholder inicial e seleção múltipla
+                    // Inicializar campo de itens com placeholder inicial
                     if (selectItem) {
                         selectItem.innerHTML = '';
                         selectItem.choicesInstance = new Choices(selectItem, { 
                             searchEnabled:true, 
                             itemSelectText:'', 
                             placeholder:true, 
-                            placeholderValue: 'Selecione o tipo...',
-                            removeItemButton: true,
-                            duplicateItemsAllowed: false,
-                            addItemText: (value) => {
-                                return `Pressione Enter para adicionar <b>"${value}"</b>`;
-                            }
+                            placeholderValue: 'Selecione o tipo...'
                         });
                     }
                     
