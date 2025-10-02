@@ -20,8 +20,8 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
         html, body{height:100%; overflow:hidden}
-        .main-content{padding-bottom:4px; overflow:visible}
-        .content{margin-top:0; overflow:visible}
+        .main-content{padding-bottom:4px; overflow:hidden}
+        .content{margin-top:0; overflow:hidden}
         /* Spinner de carregamento - Padrão do sistema */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -317,45 +317,7 @@
             }
             #tabUnicoSide .side-itens-card { display:flex; flex-direction:column; gap:8px; flex: 1 1 auto; height: 100% }
             #tabUnicoSide .side-itens-card .titulo { font-weight:600; color:#0f172a }
-            #tabUnicoSide .lista-produtos { 
-                flex:1 1 auto; 
-                min-height:60px; 
-                max-height:100%; 
-                overflow:auto; 
-                border:1px dashed #e5e7eb; 
-                border-radius:6px; 
-                padding:6px; 
-                background:#fff;
-                width: 100%;
-                box-sizing: border-box;
-            }
-            /* Estilos para itens na lista - truncar texto longo (igual múltiplos lançamentos) */
-            #tabUnicoSide .lista-produtos .linha-item {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                padding: 4px 0 !important;
-                border-bottom: 1px solid #f0f0f0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                overflow: hidden !important;
-                box-sizing: border-box !important;
-            }
-            #tabUnicoSide .lista-produtos .linha-item .item-nome {
-                flex: 1 1 auto !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                white-space: nowrap !important;
-                min-width: 0 !important;
-                font-size: 12px !important;
-                margin-right: 8px !important;
-            }
-            #tabUnicoSide .lista-produtos .linha-item .item-actions {
-                flex: 0 0 auto !important;
-                display: flex !important;
-                align-items: center !important;
-                gap: 8px !important;
-            }
+            #tabUnicoSide .lista-produtos { flex:1 1 auto; min-height:60px; max-height:100%; overflow:auto; border:1px dashed #e5e7eb; border-radius:6px; padding:6px; background:#fff }
             #tabUnicoSide .total-venda-row { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:auto }
             #tabUnicoSide #sideTotalVenda { width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px }
             /* Foco azul igual aos campos principais */
@@ -439,12 +401,6 @@
                 margin-bottom: 12px;
                 align-items: end;
             }
-            /* Força truncamento nos form-groups */
-            .form-row .form-group {
-                min-width: 0 !important;
-                overflow: hidden !important;
-                max-width: 100% !important;
-            }
             /* Alinhar botão de adicionar colaborador com o campo Itens e manter o mesmo espaçamento do grid */
             .form-row .add-colab-action { display:flex; align-items:flex-end; padding-top: 0; align-self: end; justify-self: start }
             .form-group {
@@ -493,7 +449,7 @@
             #formUnico select[name="item"] + .choices.is-open .choices__inner {
                 border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
             }
-            /* Removido: duplicado - já coberto pelos estilos gerais acima */
+            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
             #formUnico select[name="cliente"] {
@@ -502,15 +458,9 @@
             }
             #formUnico select[name="cliente"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
             /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
-            .choices-container-wrapper { 
-                position: relative; 
-                overflow: visible !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-            }
+            .choices-container-wrapper { position: relative; overflow: visible }
             #formUnico select[name="cliente"] + .choices {
-                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: hidden;
+                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
             }
             /* Estilo padrão do campo Cliente (sem destaque inicial) */
             #formUnico select[name="cliente"] + .choices .choices__inner { 
@@ -534,137 +484,11 @@
                 box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
                 background:#f8f9fa !important;
             }
-            /* Replicar EXATAMENTE o comportamento da aba múltiplos */
-            #formUnico .choices {
-                background: #f8f9fa;
-                max-width: 100%;
-                width: 100%;
-                min-width: 0;
-                overflow: visible;
-                box-sizing: border-box;
-                display: block;
-            }
-            #formUnico .choices__inner {
-                min-height: 38px;
-                height: 38px;
-                padding: 2px 6px;
-                border-radius: 8px;
-                border: 1px solid #dce3ea;
-                box-shadow: none;
-                background: #f8f9fa;
-                display: flex;
-                align-items: center;
-                overflow: hidden;
-                width: 100%;
-                min-width: 0;
-                box-sizing: border-box;
-            }
-            #formUnico .choices__list--single {
-                width: 100%;
-                flex: 1 1 auto;
-                min-width: 0;
-                display: block;
-            }
-            #formUnico .choices__list--single .choices__item {
-                display: block;
-                max-width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-            }
-            /* Fixar largura e evitar crescimento - igual múltiplos */
-            #formUnico select[name="cliente"] + .choices,
-            #formUnico select[name="item"] + .choices {
-                display: block;
-                width: 100%;
-                max-width: 100%;
-                overflow: visible;
-                box-sizing: border-box;
-            }
-            #formUnico select[name="cliente"] + .choices .choices__inner,
-            #formUnico select[name="item"] + .choices .choices__inner {
-                width: 100%;
-                box-sizing: border-box;
-            }
+            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            /* Corrigir dropdowns - manter posicionamento normal mas z-index alto */
-            .choices__list--dropdown,
-            .choices[data-type*="select-one"] .choices__list--dropdown,
-            .choices[data-type*="select-multiple"] .choices__list--dropdown {
-                z-index: 99999 !important;
-                position: absolute !important;
-                background: white !important;
-                border: 1px solid #ddd !important;
-                border-radius: 4px !important;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
-                max-height: 200px !important;
-                overflow-y: auto !important;
-                width: 100% !important;
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                transform: none !important;
-                top: 100% !important;
-                left: 0 !important;
-                margin-top: 2px !important;
-            }
-            
-            /* Container do choices */
-            .choices,
-            .choices[data-type*="select-one"],
-            .choices[data-type*="select-multiple"] {
-                position: relative !important;
-                z-index: 1 !important;
-            }
-            
-            /* Quando aberto, aumentar z-index */
-            .choices.is-open,
-            .choices[data-type*="select-one"].is-open,
-            .choices[data-type*="select-multiple"].is-open {
-                z-index: 99998 !important;
-                position: relative !important;
-            }
-            
-            /* Forçar visibilidade dos itens do dropdown */
-            .choices__list--dropdown .choices__item,
-            .choices[data-type*="select-one"] .choices__list--dropdown .choices__item,
-            .choices[data-type*="select-multiple"] .choices__list--dropdown .choices__item {
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                background: white !important;
-                padding: 8px 12px !important;
-                border: none !important;
-                color: #333 !important;
-            }
-            
-            /* Hover nos itens */
-            .choices__list--dropdown .choices__item:hover,
-            .choices[data-type*="select-one"] .choices__list--dropdown .choices__item:hover {
-                background: #f0f0f0 !important;
-                color: #333 !important;
-            }
-            
-            /* Permitir overflow apenas onde necessário */
-            .form-comissao,
-            .form-row,
-            .form-group,
-            .choices-container-wrapper {
-                overflow: visible !important;
-            }
-            
-            /* Manter positioning correto dos containers principais */
-            #formUnico {
-                position: relative;
-            }
-            
-            #tabUnicoContent {
-                position: relative;
-                overflow: visible !important;
-            }
+            #formUnico .choices__list--dropdown { z-index: 2000 }
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
@@ -1752,11 +1576,12 @@
 
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'linha-item';
+                    itemDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0;';
                     
                     itemDiv.innerHTML = `
-                        <span class="item-nome" title="${item.texto}">${item.texto}</span>
-                        <div class="item-actions">
-                            <strong style="font-size: 12px; white-space: nowrap;">${formatarMoedaBR(item.preco)}</strong>
+                        <span style="flex: 1; font-size: 12px;">${item.texto}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="font-size: 12px;">${formatarMoedaBR(item.preco)}</strong>
                             <button type="button" onclick="removerItemSelecionado('${item.id}')" 
                                     style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
                                     title="Remover item">
