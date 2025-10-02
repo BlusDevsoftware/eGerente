@@ -1539,7 +1539,9 @@
                 const novoItem = {
                     id: itemId,
                     texto: itemText,
-                    preco: itemPrice
+                    preco: itemPrice,
+                    precoOriginal: itemPrice, // Guardar preço original
+                    precoEditado: itemPrice   // Preço atual (editável)
                 };
                 itensSelecionados.push(novoItem);
 
@@ -1555,7 +1557,57 @@
             // Função para remover item da lista
             function removerItemSelecionado(itemId) {
                 itensSelecionados = itensSelecionados.filter(item => item.id !== itemId);
+                calcularAjustesAutomaticos();
                 atualizarExibicaoItensSelecionados();
+            }
+
+            // Função para editar preço de um item específico
+            function editarPrecoItem(itemId, novoValor) {
+                const valorNumerico = extrairNumeroBR(novoValor);
+                if (valorNumerico < 0) {
+                    alert('O valor não pode ser negativo.');
+                    atualizarExibicaoItensSelecionados();
+                    return;
+                }
+
+                // Encontrar e atualizar o item
+                const item = itensSelecionados.find(i => i.id === itemId);
+                if (item) {
+                    item.precoEditado = valorNumerico;
+                    calcularAjustesAutomaticos();
+                    atualizarExibicaoItensSelecionados();
+                }
+            }
+
+            // Função para calcular ajustes automáticos de desconto/acréscimo
+            function calcularAjustesAutomaticos() {
+                let totalOriginal = 0;
+                let totalEditado = 0;
+
+                itensSelecionados.forEach(item => {
+                    totalOriginal += item.precoOriginal;
+                    totalEditado += item.precoEditado;
+                });
+
+                const diferenca = totalEditado - totalOriginal;
+                const sideDesconto = document.getElementById('sideDesconto');
+                const sideAcrescimo = document.getElementById('sideAcrescimo');
+
+                if (!sideDesconto || !sideAcrescimo) return;
+
+                if (diferenca > 0) {
+                    // Valor maior = acréscimo
+                    sideAcrescimo.value = formatarMoedaBR(diferenca);
+                    sideDesconto.value = '';
+                } else if (diferenca < 0) {
+                    // Valor menor = desconto
+                    sideDesconto.value = formatarMoedaBR(Math.abs(diferenca));
+                    sideAcrescimo.value = '';
+                } else {
+                    // Valores iguais = sem ajuste
+                    sideDesconto.value = '';
+                    sideAcrescimo.value = '';
+                }
             }
 
             // Função para atualizar a exibição dos itens selecionados
@@ -1572,21 +1624,30 @@
 
                 // Adicionar cada item selecionado
                 itensSelecionados.forEach(item => {
-                    totalItens += item.preco;
+                    totalItens += item.precoEditado;
 
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'linha-item';
-                    itemDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0;';
+                    itemDiv.style.cssText = 'display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px solid #f0f0f0; gap: 4px;';
                     
                     itemDiv.innerHTML = `
-                        <span style="flex: 1; font-size: 12px;">${item.texto}</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <strong style="font-size: 12px;">${formatarMoedaBR(item.preco)}</strong>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="flex: 1; font-size: 12px; font-weight: 500;">${item.texto}</span>
                             <button type="button" onclick="removerItemSelecionado('${item.id}')" 
                                     style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
                                     title="Remover item">
                                 ×
                             </button>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px;">
+                            <span style="color: #666;">Original: ${formatarMoedaBR(item.precoOriginal)}</span>
+                            <span style="color: #666;">→</span>
+                            <input type="text" 
+                                   value="${formatarMoedaBR(item.precoEditado)}" 
+                                   onchange="editarPrecoItem('${item.id}', this.value)"
+                                   onblur="this.value = formatarMoedaBR(extrairNumeroBR(this.value) || 0)"
+                                   style="width: 80px; font-size: 11px; padding: 2px 4px; border: 1px solid #ddd; border-radius: 4px; text-align: right;"
+                                   title="Clique para editar o preço">
                         </div>
                     `;
                     
@@ -1611,10 +1672,10 @@
                     
                     if (!sideTotal) return;
                     
-                    // Calcular total dos itens selecionados
+                    // Calcular total dos itens selecionados (valores editados)
                     let totalItens = 0;
                     itensSelecionados.forEach(item => {
-                        totalItens += item.preco;
+                        totalItens += item.precoEditado;
                     });
                     
                     // Calcular desconto e acréscimo
