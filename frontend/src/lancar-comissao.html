@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="assets/images/logo2.png">
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="scripts/config/realtime-config.js"></script>
     <script src="scripts/realtime-bus.js"></script>
@@ -1300,6 +1301,12 @@
                 const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
                 if (!selectCliente) return;
                 
+                // Verificar se já foi inicializado
+                if (selectCliente.choicesInstance) {
+                    selectCliente.choicesInstance.destroy();
+                    selectCliente.choicesInstance = null;
+                }
+                
                 // Limpar e popular select
                 selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
                 if (Array.isArray(window.clientes)) {
@@ -1311,12 +1318,14 @@
                     });
                 }
                 
-                // Inicializar Choices (igual múltiplos)
-                new Choices(selectCliente, {
+                // Inicializar Choices (igual múltiplos) - sem foco automático
+                selectCliente.choicesInstance = new Choices(selectCliente, {
                     searchEnabled: true,
                     itemSelectText: '',
                     placeholder: true,
-                    placeholderValue: 'Selecione...'
+                    placeholderValue: 'Selecione...',
+                    shouldSort: false,
+                    silent: true
                 });
                 
                 // Remover placeholder option
@@ -1841,8 +1850,10 @@
                         });
                     });
                     
-                    // Inicializar select de cliente após carregar dados (igual múltiplos)
-                    inicializarSelectCliente();
+                    // Inicializar select de cliente após carregar dados (com delay para evitar abertura automática)
+                    setTimeout(() => {
+                        inicializarSelectCliente();
+                    }, 100);
                     
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
