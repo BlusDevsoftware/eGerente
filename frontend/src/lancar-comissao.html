@@ -1548,7 +1548,14 @@
                 // Limpar seleção atual
                 if (selectItem.choicesInstance) {
                     selectItem.choicesInstance.setChoiceByValue('');
+                } else {
+                    // Fallback para select nativo
+                    selectItem.value = '';
+                    selectItem.selectedIndex = 0;
                 }
+                
+                // Forçar atualização visual
+                selectItem.dispatchEvent(new Event('change', { bubbles: true }));
 
                 // Atualizar exibição
                 atualizarExibicaoItensSelecionados();
@@ -2016,6 +2023,18 @@
                         const val = inline.querySelector('.input-valor-parcela-inline');
                         if (qtd) qtd.value = '';
                         if (val) val.value = '';
+                        
+                        // Limpar simulação quando parcelamento for desativado
+                        const bloco = btn.closest('.colaborador-bloco');
+                        if (bloco) {
+                            bloco.dataset.simulado = 'false';
+                            const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
+                            if (simulacaoDiv) {
+                                simulacaoDiv.style.display = 'none';
+                                const simulacaoTabela = simulacaoDiv.querySelector('.simulacao-tabela');
+                                if (simulacaoTabela) simulacaoTabela.innerHTML = '';
+                            }
+                        }
                     }
                 }
                 try { atualizarResumoUnico(); } catch(_) {}
@@ -2035,6 +2054,20 @@
                         valorParcelaInput.value = '';
                     }
                 }
+                
+                // Atualizar simulação automaticamente se já existe uma simulação ativa
+                const bloco = row.closest('.colaborador-bloco');
+                if (bloco && bloco.dataset.simulado === 'true') {
+                    const simulacaoDiv = bloco.querySelector('.simulacao-titulos');
+                    if (simulacaoDiv && simulacaoDiv.style.display === 'block') {
+                        // Encontrar o botão simular para re-executar a simulação
+                        const btnSimular = row.querySelector('.btn-simular');
+                        if (btnSimular) {
+                            simularTitulos(btnSimular);
+                        }
+                    }
+                }
+                
                 try { atualizarResumoUnico(); } catch(_) {}
             }
 
