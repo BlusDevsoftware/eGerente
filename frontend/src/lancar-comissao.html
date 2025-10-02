@@ -20,8 +20,8 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
         html, body{height:100%; overflow:hidden}
-        .main-content{padding-bottom:4px; overflow:hidden}
-        .content{margin-top:0; overflow:hidden}
+        .main-content{padding-bottom:4px; overflow:visible}
+        .content{margin-top:0; overflow:visible}
         /* Spinner de carregamento - Padrão do sistema */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -590,9 +590,25 @@
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            /* Z-index igual à aba múltiplos */
+            /* Z-index mais alto para dropdowns aparecerem por cima */
             .choices__list--dropdown {
-                z-index: 2000;
+                z-index: 10000 !important;
+                position: absolute !important;
+                background: white !important;
+                border: 1px solid #ddd !important;
+                border-radius: 4px !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+            }
+            
+            /* Garantir que o container do choices tenha position relative */
+            .choices {
+                position: relative !important;
+            }
+            
+            /* Garantir que dropdowns apareçam por cima do form */
+            .choices.is-open {
+                z-index: 10001 !important;
+                position: relative !important;
             }
 
             /* Valor da Venda (destaque) */
