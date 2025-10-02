@@ -317,7 +317,30 @@
             }
             #tabUnicoSide .side-itens-card { display:flex; flex-direction:column; gap:8px; flex: 1 1 auto; height: 100% }
             #tabUnicoSide .side-itens-card .titulo { font-weight:600; color:#0f172a }
-            #tabUnicoSide .lista-produtos { flex:1 1 auto; min-height:60px; max-height:100%; overflow:auto; border:1px dashed #e5e7eb; border-radius:6px; padding:6px; background:#fff }
+            #tabUnicoSide .lista-produtos { 
+                flex:1 1 auto; 
+                min-height:60px; 
+                max-height:100%; 
+                overflow:auto; 
+                border:1px dashed #e5e7eb; 
+                border-radius:6px; 
+                padding:6px; 
+                background:#fff;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            /* Estilos para itens na lista - truncar texto longo */
+            #tabUnicoSide .lista-produtos .linha-item {
+                max-width: 100%;
+                overflow: hidden;
+            }
+            #tabUnicoSide .lista-produtos .linha-item span {
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+                max-width: 150px !important;
+                display: inline-block !important;
+            }
             #tabUnicoSide .total-venda-row { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:auto }
             #tabUnicoSide #sideTotalVenda { width:120px; text-align:right; background:#fff; border:1px solid #dce3ea; border-radius:8px; height:32px; padding:4px 8px }
             /* Foco azul igual aos campos principais */
@@ -1579,11 +1602,11 @@
                     itemDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0;';
                     
                     itemDiv.innerHTML = `
-                        <span style="flex: 1; font-size: 12px;">${item.texto}</span>
+                        <span style="flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;" title="${item.texto}">${item.texto}</span>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <strong style="font-size: 12px;">${formatarMoedaBR(item.preco)}</strong>
+                            <strong style="font-size: 12px; white-space: nowrap;">${formatarMoedaBR(item.preco)}</strong>
                             <button type="button" onclick="removerItemSelecionado('${item.id}')" 
-                                    style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                                    style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
                                     title="Remover item">
                                 ×
                             </button>
