@@ -450,6 +450,16 @@
                 border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
             }
             #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
+            #formUnico .choices__list--dropdown {
+                max-height: 280px !important;
+                overflow: hidden !important;
+            }
+            #formUnico .choices__list--dropdown .choices__list {
+                max-height: 240px !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain;
+            }
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
             #formUnico select[name="cliente"] {
@@ -467,6 +477,18 @@
                 min-height:38px; height:38px; padding:2px 6px; border-radius:8px; 
                 border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
                 display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
+            }
+            /* Ajuste de altura do dropdown do cliente */
+            #formUnico .choices.input-cliente .choices__list--dropdown,
+            #formUnico .choices.input-colaborador .choices__list--dropdown {
+                max-height: 280px !important;
+                overflow: hidden !important;
+            }
+            #formUnico .choices.input-cliente .choices__list--dropdown .choices__list,
+            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__list {
+                max-height: 240px !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain;
             }
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
