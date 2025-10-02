@@ -1295,6 +1295,35 @@
             // Torna clientes global
             window.clientes = [];
 
+            // Função para inicializar select de cliente (igual múltiplos)
+            function inicializarSelectCliente() {
+                const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
+                if (!selectCliente) return;
+                
+                // Limpar e popular select
+                selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                if (Array.isArray(window.clientes)) {
+                    window.clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.id || cliente.codigo;
+                        option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
+                        selectCliente.appendChild(option);
+                    });
+                }
+                
+                // Inicializar Choices (igual múltiplos)
+                new Choices(selectCliente, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'Selecione...'
+                });
+                
+                // Remover placeholder option
+                const phCli = selectCliente.querySelector('option[value=""]');
+                if (phCli) phCli.remove();
+            }
+
             const selectItem = document.querySelector('#formUnico select[name="item"]');
             const tipoInput = document.querySelector('#formUnico input[name="tipo"]');
 
@@ -1794,24 +1823,9 @@
                 // Campo de itens removido
 
                 try {
-                    // Carrega clientes globalmente
+                    // Carrega clientes globalmente (igual múltiplos)
                     window.clientes = await api.get('/clientes');
-                    const selectCliente = document.querySelector('div.choices-container-wrapper > select[name="cliente"]');
-                    selectCliente.innerHTML = '<option value="" disabled selected hidden>Selecione um cliente...</option>';
-                    window.clientes.forEach(cliente => {
-                        const option = document.createElement('option');
-                        option.value = cliente.id || cliente.codigo;
-                        option.textContent = (cliente.codigo_crm ? cliente.codigo_crm + ' - ' : '') + cliente.nome;
-                        selectCliente.appendChild(option);
-                    });
-                    new Choices(selectCliente, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'Selecione...'
-                    });
-                    const phCli = selectCliente.querySelector('option[value=""]');
-                    if (phCli) phCli.remove();
+                    // NÃO inicializar Choices aqui - será feito depois quando necessário
 
                     produtos = await api.get('/produtos');
                     servicos = await api.get('/servicos');
@@ -1826,6 +1840,9 @@
                             // preencherItens removido
                         });
                     });
+                    
+                    // Inicializar select de cliente após carregar dados (igual múltiplos)
+                    inicializarSelectCliente();
                     
                 } catch (e) {
                     console.error('Erro ao carregar dados:', e);
