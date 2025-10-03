@@ -59,6 +59,14 @@
             font-weight: 500;
             text-align: center;
         }
+        /* Estilo do select de Colaborador igual ao de múltiplos lançamentos */
+        .colaborador-bloco select.input-colaborador-colab + .choices{display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box}
+        .colaborador-bloco select.input-colaborador-colab + .choices .choices__inner{width:100%;box-sizing:border-box}
+        .colaborador-bloco .choices{width:100%}
+        .colaborador-bloco .choices .choices__inner{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa}
+        .colaborador-bloco .choices.is-focused .choices__inner{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
+        .colaborador-bloco .choices__list--dropdown{border-radius:8px;border:1px solid #dce3ea}
+        .colaborador-bloco .choices__item--selectable{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     </style>
     <script>
         // Funções para controlar o spinner centralizado
@@ -1979,7 +1987,7 @@
                 div.setAttribute('data-numero-pai', numeroTituloPai.toString().padStart(5, '0'));
                 numeroTituloPai++;
                 div.innerHTML = `
-                    <button type="button" class="btn-excluir-bloco" title="Remover colaborador" onclick="this.closest('.colaborador-bloco').remove()"><i class="fas fa-times"></i></button>
+                    <button type="button" class="btn-excluir-bloco" title="Remover colaborador" onclick="removeColaboradorBloco(this)"><i class="fas fa-times"></i></button>
                     <div class="form-row">
                         <div class="form-group colab-field">
                             <label><i class="fas fa-user"></i> Colaborador</label>
@@ -2030,11 +2038,69 @@
                                 selectColab.appendChild(opt);
                             });
                         });
+                        // Deduplicação e numeração-base ao alterar colaborador
+                        selectColab.addEventListener('change', async function() {
+                            if (!this.value) return;
+                            if (!verificarColaboradorDuplicadoUnico(this)) {
+                                this.value = '';
+                                return;
+                            }
+                            try { await buscarNumeroBaseColaborador(div, this.value); } catch(_) {}
+                            try { atualizarResumoUnico(); } catch(_) {}
+                        });
+                    }
+                } catch(_) {}
+                
+                // Validar soma de percentuais ao digitar
+                try {
+                    const percInput = div.querySelector('input[name="percentual[]"]');
+                    if (percInput) {
+                        percInput.addEventListener('input', function(){
+                            try { validarSomaPercentuaisMax100(); } catch(_) {}
+                        });
                     }
                 } catch(_) {}
                 
                 
                 try { atualizarResumoUnico(); } catch(_) {}
+            }
+
+            // Remove bloco e atualiza resumo
+            function removeColaboradorBloco(btn) {
+                const bloco = btn.closest('.colaborador-bloco');
+                if (bloco) bloco.remove();
+                try { atualizarResumoUnico(); } catch(_) {}
+                try { validarSomaPercentuaisMax100(); } catch(_) {}
+            }
+
+            // Impede duplicar o mesmo colaborador em múltiplos blocos
+            function verificarColaboradorDuplicadoUnico(selectEl) {
+                const valor = selectEl.value;
+                if (!valor) return true;
+                const container = document.getElementById('colaboradoresVinculados');
+                const repetidos = Array.from(container.querySelectorAll('select[name="colaborador[]"]'))
+                    .filter(s => s !== selectEl && s.value === valor);
+                if (repetidos.length > 0) {
+                    try { mostrarModalFeedbackAviso('Este colaborador já foi adicionado.'); } catch(_) { alert('Este colaborador já foi adicionado.'); }
+                    return false;
+                }
+                return true;
+            }
+
+            // Valida soma de percentuais (máx 100%). Retorna true se OK.
+            function validarSomaPercentuaisMax100() {
+                const inputs = document.querySelectorAll('.colaborador-bloco input[name="percentual[]"]');
+                let soma = 0;
+                inputs.forEach(i => {
+                    const raw = (i.value || '').replace(/[^\d,\.]/g, '').replace(/\./g, ',');
+                    const v = parseFloat(raw.replace(',', '.')) || 0;
+                    soma += v;
+                });
+                if (soma > 100.0001) { // tolerância pequena
+                    try { mostrarModalFeedbackAviso('A soma dos percentuais não pode exceder 100%.'); } catch(_) { alert('A soma dos percentuais não pode exceder 100%.'); }
+                    return false;
+                }
+                return true;
             }
 
             function extrairNumeroBR(valor) {
