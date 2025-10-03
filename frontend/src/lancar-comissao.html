@@ -2031,27 +2031,24 @@
                     </div>
                 `;
                 container.appendChild(div);
-                // Popular colaborador (select nativo)
+                // Popular colaborador com Choices (idêntico ao cliente/múltiplos)
                 try {
                     const selectColab = div.querySelector('select[name="colaborador[]"]');
                     if (selectColab) {
-                        selectColab.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
-                        buscarColaboradores().then(colabs => {
-                            (colabs || []).forEach(c => {
-                                const codigo = (c.codigo ?? c.id ?? c.codigo_colaborador ?? c.matricula ?? '');
-                                const nome = (c.nome ?? c.descricao ?? '');
-                                if (!codigo && !nome) return;
-                                const opt = document.createElement('option');
-                                opt.value = String(codigo);
-                                opt.textContent = codigo && nome ? `${codigo} - ${nome}` : (nome || String(codigo));
-                                selectColab.appendChild(opt);
-                            });
-                        });
+                        preencherSelectColaborador(selectColab);
+                        // Adicionar classe no wrapper para herdar estilos de cliente
+                        setTimeout(() => {
+                            const wrapper = selectColab.nextElementSibling;
+                            if (wrapper && wrapper.classList.contains('choices')) {
+                                wrapper.classList.add('input-colaborador');
+                            }
+                        }, 0);
                         // Deduplicação e numeração-base ao alterar colaborador
                         selectColab.addEventListener('change', async function() {
                             if (!this.value) return;
                             if (!verificarColaboradorDuplicadoUnico(this)) {
                                 this.value = '';
+                                if (this.choicesInstance) { try { this.choicesInstance.setChoiceByValue(''); } catch(_) {} }
                                 return;
                             }
                             try { await buscarNumeroBaseColaborador(div, this.value); } catch(_) {}
