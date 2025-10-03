@@ -494,6 +494,18 @@
                 padding-bottom: 12px; /* espaço extra para o final do scroll */
                 box-sizing: border-box;
             }
+            /* Garantir mesmo tamanho do dropdown para o seletor de colaborador dos blocos */
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown {
+                max-height: 320px !important;
+                overflow: hidden !important;
+            }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__list {
+                max-height: 280px !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain;
+                padding-bottom: 12px;
+                box-sizing: border-box;
+            }
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
             #formUnico .choices:not(.is-focused):not(.is-open) .choices__inner,
