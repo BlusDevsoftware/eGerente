@@ -533,6 +533,27 @@
                 line-height: 20px;
                 white-space: nowrap;
             }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+                background:#eaf2ff;
+                color:#0f172a;
+            }
+            /* Truncar valor selecionado como nos múltiplos */
+            #formUnico select.input-colaborador-colab + .choices .choices__list--single,
+            #formUnico .choices.input-colaborador .choices__list--single {
+                width:100%;
+                flex:1 1 auto;
+                min-width:0;
+                display:block;
+            }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--single .choices__item,
+            #formUnico .choices.input-colaborador .choices__list--single .choices__item {
+                display:block;
+                max-width:100%;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+                min-width:0;
+            }
             #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item[data-value=""]{
                 display: none;
             }
