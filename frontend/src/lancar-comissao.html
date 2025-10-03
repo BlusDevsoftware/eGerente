@@ -459,6 +459,8 @@
                 max-height: 280px !important;
                 overflow-y: auto !important;
                 overscroll-behavior: contain;
+                padding-bottom: 12px; /* espaço extra para não cortar a seta do scroll */
+                box-sizing: border-box;
             }
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
@@ -489,6 +491,8 @@
                 max-height: 280px !important;
                 overflow-y: auto !important;
                 overscroll-behavior: contain;
+                padding-bottom: 12px; /* espaço extra para o final do scroll */
+                box-sizing: border-box;
             }
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
