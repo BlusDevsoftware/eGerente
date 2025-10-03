@@ -485,6 +485,9 @@
             #formUnico .choices.input-colaborador .choices__list--dropdown {
                 max-height: 320px !important;
                 overflow: hidden !important;
+                border: 1px solid #dce3ea;
+                border-radius: 8px;
+                box-shadow: 0 10px 24px rgba(2,6,23,0.08), 0 2px 6px rgba(2,6,23,0.06);
             }
             #formUnico .choices.input-cliente .choices__list--dropdown .choices__list,
             #formUnico .choices.input-colaborador .choices__list--dropdown .choices__list {
@@ -494,10 +497,26 @@
                 padding-bottom: 12px; /* espaço extra para o final do scroll */
                 box-sizing: border-box;
             }
+            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__item,
+            #formUnico .choices.input-cliente .choices__list--dropdown .choices__item {
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                padding: 6px 10px;
+                line-height: 20px;
+                white-space: nowrap;
+            }
+            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__item[data-value=""],
+            #formUnico .choices.input-cliente .choices__list--dropdown .choices__item[data-value=""] {
+                display: none;
+            }
             /* Garantir mesmo tamanho do dropdown para o seletor de colaborador dos blocos */
             #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown {
                 max-height: 320px !important;
                 overflow: hidden !important;
+                border: 1px solid #dce3ea;
+                border-radius: 8px;
+                box-shadow: 0 10px 24px rgba(2,6,23,0.08), 0 2px 6px rgba(2,6,23,0.06);
             }
             #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__list {
                 max-height: 280px !important;
@@ -505,6 +524,17 @@
                 overscroll-behavior: contain;
                 padding-bottom: 12px;
                 box-sizing: border-box;
+            }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item {
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                padding: 6px 10px;
+                line-height: 20px;
+                white-space: nowrap;
+            }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item[data-value=""]{
+                display: none;
             }
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
