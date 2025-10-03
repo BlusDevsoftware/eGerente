@@ -1868,13 +1868,15 @@
                     selectElement.choicesInstance.destroy();
                     selectElement.choicesInstance = null;
                 }
-                selectElement.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                // Não adicionar placeholder como opção
+                selectElement.innerHTML = '';
                 buscarColaboradores().then(colaboradores => {
                     if (selectElement.choicesInstance) {
                         selectElement.choicesInstance.destroy();
                         selectElement.choicesInstance = null;
                     }
-                    selectElement.innerHTML = '<option value="" disabled selected hidden>Selecione...</option>';
+                    // Não adicionar placeholder como opção
+                    selectElement.innerHTML = '';
                     colaboradores.forEach(colaborador => {
                         const option = document.createElement('option');
                         option.value = colaborador.codigo;
@@ -1885,7 +1887,7 @@
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: 'Selecione...',
+                        placeholderValue: '',
                         shouldSort: false,
                         allowHTML: true,
                         renderChoiceLimit: -1,
@@ -1901,12 +1903,6 @@
                         if (wrapper) wrapper.classList.remove('is-focused', 'is-open');
                         selectElement.blur();
                     }, 0);
-                    // Remover a opção placeholder do dropdown para não ser selecionável
-                    const removePlaceholderOption = () => {
-                        const pl = selectElement.querySelector('option[value=""]');
-                        if (pl) pl.remove();
-                    };
-                    removePlaceholderOption();
                 });
             }
 
@@ -2296,18 +2292,30 @@
                 for (let i = 1; i <= qtd; i++) {
                     html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
-                html += '</table>';
                 if (qtd > 1) {
-                    html += `<div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'><label style='font-weight:500;'>Intervalo entre títulos: </label> <select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'><option value='' selected disabled>Selecione...</option><option value='10'>10 dias</option><option value='20'>20 dias</option><option value='30'>30 dias</option></select></div>`;
+                    html += `<tr class='linha-intervalo-vencimento'>
+                        <td colspan='5' style='text-align:left;'>
+                            <div class='intervalo-vencimento-container' style='display:none; margin-top:8px;'>
+                                <label style='font-weight:500;'>Intervalo entre títulos: </label>
+                                <select class='intervalo-vencimento-select' style='margin-left:6px; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; width:140px !important; max-width:140px; min-width:140px; display:inline-block;'>
+                                    <option value='' selected disabled>Selecione...</option>
+                                    <option value='10'>10 dias</option>
+                                    <option value='20'>20 dias</option>
+                                    <option value='30'>30 dias</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>`;
                 }
+                html += '</table>';
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
                 // Marca bloco como simulado
                 if (bloco) bloco.dataset.simulado = 'true';
                 // Restaurar eventos para intervalo e datas
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
-                const intervaloContainer = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-container');
-                const intervaloSelect = simulacaoTabela.parentElement.querySelector('.intervalo-vencimento-select');
+                const intervaloContainer = simulacaoTabela.querySelector('.intervalo-vencimento-container');
+                const intervaloSelect = simulacaoTabela.querySelector('.intervalo-vencimento-select');
                 if (vencInputs.length > 1 && intervaloContainer && intervaloSelect) {
                     vencInputs[0].addEventListener('change', function() {
                         intervaloContainer.style.display = 'block';
