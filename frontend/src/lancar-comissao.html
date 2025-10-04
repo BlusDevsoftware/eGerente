@@ -2288,13 +2288,48 @@
                 for (let i = 1; i <= qtd; i++) {
                     html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
+                if (qtd > 1) {
+                    html += `<tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td style='padding:6px; text-align:left;'>
+                            <select class='intervalo-vencimento-select' disabled style='width:160px; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; background:#f8f9fa; outline:none; transition:border .15s, box-shadow .15s;'>
+                                <option value='' selected disabled hidden>Selecione intervalo...</option>
+                                <option value='10'>10 dias</option>
+                                <option value='15'>15 dias</option>
+                                <option value='20'>20 dias</option>
+                                <option value='30'>30 dias</option>
+                            </select>
+                        </td>
+                    </tr>`;
+                }
                 html += '</table>';
                 simulacaoDiv.style.display = 'block';
                 simulacaoTabela.innerHTML = html;
                 // Marca bloco como simulado
                 if (bloco) bloco.dataset.simulado = 'true';
-                // Restaurar eventos para datas
+                // Restaurar eventos para datas e intervalo
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
+                const intervaloSelect = simulacaoTabela.querySelector('.intervalo-vencimento-select');
+                if (vencInputs.length > 1 && intervaloSelect) {
+                    vencInputs[0].addEventListener('change', function() {
+                        intervaloSelect.disabled = false;
+                    });
+                    intervaloSelect.addEventListener('change', function() {
+                        if (!this.value) return;
+                        const intervalo = parseInt(this.value);
+                        const primeiraData = vencInputs[0].value;
+                        if (primeiraData) {
+                            let data = new Date(primeiraData);
+                            for (let i = 1; i < vencInputs.length; i++) {
+                                data.setDate(data.getDate() + intervalo);
+                                vencInputs[i].value = data.toISOString().slice(0,10);
+                            }
+                        }
+                    });
+                }
                 const emissaoInputs = simulacaoTabela.querySelectorAll('.simulacao-emissao-parcela');
                 if (emissaoInputs.length > 1) {
                     emissaoInputs[0].addEventListener('change', function() {
