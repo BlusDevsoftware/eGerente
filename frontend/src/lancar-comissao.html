@@ -67,6 +67,18 @@
         .colaborador-bloco .choices.is-focused .choices__inner{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
         .colaborador-bloco .choices__list--dropdown{border-radius:8px;border:1px solid #dce3ea}
         .colaborador-bloco .choices__item--selectable{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        
+        /* Intervalo (escopo local da simulação) - igual ao múltiplos */
+        .simulacao-titulos .intervalo-local-row{display:table-row}
+        .simulacao-titulos .intervalo-local-cell-field{padding:6px; text-align:center; position:relative}
+        /* Centralizar o select exatamente na coluna de vencimento e manter o texto ao lado sem deslocá-lo */
+        .simulacao-titulos .intervalo-local-select-wrap{width:150px;margin:0 auto}
+        .simulacao-titulos .intervalo-local-label{position:absolute;top:50%;left:calc(50% - 75px);transform:translate(-100%,-50%);margin-left:-8px;white-space:nowrap;font-weight:500;z-index:2}
+        .simulacao-titulos .intervalo-local-select{height:32px;padding:4px 8px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa;outline:none;transition:border .15s, box-shadow .15s;width:150px;min-width:150px;max-width:150px;box-sizing:border-box}
+        .simulacao-titulos .intervalo-local-select:focus{border:1px solid var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
+        /* Quando usando Choices para o select de intervalo, garantir mesma largura e bordas arredondadas */
+        .simulacao-titulos .intervalo-local-select-wrap .choices{width:150px;max-width:150px;min-width:150px}
+        .simulacao-titulos .intervalo-local-select-wrap .choices__inner{min-height:32px;height:32px;border-radius:8px}
     </style>
     <script>
         // Funções para controlar o spinner centralizado
@@ -2293,15 +2305,16 @@
                     html += `<tr><td>Simulado-${i}/${qtd}</td><td>${i}</td><td>R$ ${valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td><td><input type='date' class='simulacao-emissao-parcela' style='width:160px;' value='${dataHoje}'></td><td><input type='date' class='simulacao-vencimento-parcela' style='width:160px;'></td></tr>`;
                 }
                 if (qtd > 1) {
-                    html += `<tr class='linha-intervalo-vencimento'>
+                    html += `<tr class='intervalo-local-row'>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td style='text-align:left; padding:0; margin:0;'>
-                            <div class='intervalo-vencimento-container' style='display:none; margin-top:8px; padding:0; margin-left:0;'>
-                                <select class='intervalo-vencimento-select' style='width:160px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; transition:border .15s, box-shadow .15s; margin:0;'>
-                                    <option value='' selected disabled>Selecione...</option>
+                        <td class='intervalo-local-cell-field'>
+                            <label class='intervalo-local-label' style='font-weight:500;white-space:nowrap;'>Intervalo entre títulos:</label>
+                            <div class='intervalo-local-select-wrap'>
+                                <select class='intervalo-local-select' disabled>
+                                    <option value='' selected disabled hidden>Selecione...</option>
                                     <option value='10'>10 dias</option>
                                     <option value='20'>20 dias</option>
                                     <option value='30'>30 dias</option>
@@ -2317,11 +2330,10 @@
                 if (bloco) bloco.dataset.simulado = 'true';
                 // Restaurar eventos para intervalo e datas
                 const vencInputs = simulacaoTabela.querySelectorAll('.simulacao-vencimento-parcela');
-                const intervaloContainer = simulacaoTabela.querySelector('.intervalo-vencimento-container');
-                const intervaloSelect = simulacaoTabela.querySelector('.intervalo-vencimento-select');
-                if (vencInputs.length > 1 && intervaloContainer && intervaloSelect) {
+                const intervaloSelect = simulacaoTabela.querySelector('.intervalo-local-select');
+                if (vencInputs.length > 1 && intervaloSelect) {
                     vencInputs[0].addEventListener('change', function() {
-                        intervaloContainer.style.display = 'block';
+                        intervaloSelect.disabled = false;
                     });
                     intervaloSelect.addEventListener('change', function() {
                         if (!this.value) return;
