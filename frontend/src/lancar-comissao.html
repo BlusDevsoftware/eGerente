@@ -650,6 +650,8 @@
                 top: auto !important;
                 bottom: calc(100% + 6px) !important;
             }
+            /* Portal fixo quando teleportado para o body (garante ficar acima de tudo e sem recorte) */
+            .choices-dropdown-portal{ position: fixed !important; z-index: 99999 !important; left: 0; top: 0; }
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
@@ -2117,28 +2119,43 @@
                                 try {
                                     const bloco = wrapper.closest('.colaborador-bloco');
                                     const inputInner = wrapper.querySelector('.choices__inner');
-                                    const recalc = () => {
-                                        setTimeout(() => {
-                                            try {
-                                                const isOpen = wrapper.classList.contains('is-open');
-                                                if (bloco) bloco.classList.toggle('bloco-dropdown-open', isOpen);
-                                                if (!isOpen) { wrapper.classList.remove('is-flipped'); return; }
-                                                const rect = wrapper.getBoundingClientRect();
-                                                const viewportH = window.innerHeight || document.documentElement.clientHeight;
-                                                const spaceBelow = viewportH - rect.bottom;
-                                                const estimatedDropdownH = Math.min(viewportH * 0.6, 320);
-                                                if (spaceBelow < estimatedDropdownH + 16) wrapper.classList.add('is-flipped');
-                                                else wrapper.classList.remove('is-flipped');
-                                            } catch(_) {}
-                                        }, 0);
+                                    const dropdown = () => wrapper.querySelector('.choices__list--dropdown');
+                                    const toPortal = () => {
+                                        try{
+                                            const dd = dropdown(); if(!dd) return;
+                                            const rect = wrapper.getBoundingClientRect();
+                                            dd.classList.add('choices-dropdown-portal');
+                                            document.body.appendChild(dd);
+                                            dd.style.left = rect.left + 'px';
+                                            // abre para baixo como padrão
+                                            dd.style.top = (rect.bottom + 6) + 'px';
+                                            dd.style.width = rect.width + 'px';
+                                            // flip se necessário
+                                            const viewportH = window.innerHeight || document.documentElement.clientHeight;
+                                            const spaceBelow = viewportH - rect.bottom;
+                                            const estH = Math.min(viewportH * 0.6, 320);
+                                            if (spaceBelow < estH + 16) dd.style.top = (Math.max(0, rect.top - estH - 6)) + 'px';
+                                        }catch(_){ }
                                     };
-                                    inputInner && inputInner.addEventListener('click', recalc);
-                                    document.addEventListener('click', (ev)=>{
-                                        if (!wrapper.contains(ev.target)) {
-                                            wrapper.classList.remove('is-flipped');
-                                            if (bloco) bloco.classList.remove('bloco-dropdown-open');
-                                        }
+                                    const fromPortal = () => {
+                                        try{
+                                            const dd = document.querySelector('.choices-dropdown-portal');
+                                            if(!dd) return;
+                                            dd.classList.remove('choices-dropdown-portal');
+                                            // retornar para dentro do wrapper
+                                            const menu = dd;
+                                            const host = wrapper.querySelector('.choices');
+                                            if (host) host.appendChild(menu);
+                                        }catch(_){ }
+                                    };
+                                    const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); toPortal(); }catch(_){}} ,0)};
+                                    const onClose = () => { setTimeout(()=>{ try{ fromPortal(); if (bloco) bloco.classList.remove('bloco-dropdown-open'); }catch(_){}} ,0)};
+                                    inputInner && inputInner.addEventListener('click', ()=>{
+                                        setTimeout(()=>{ wrapper.classList.contains('is-open') ? onOpen() : onClose() }, 0);
                                     });
+                                    document.addEventListener('click', (ev)=>{ if (!wrapper.contains(ev.target)) onClose(); });
+                                    window.addEventListener('scroll', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() }, true);
+                                    window.addEventListener('resize', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() });
                                 } catch(_) {}
                             }
                         }, 0);
