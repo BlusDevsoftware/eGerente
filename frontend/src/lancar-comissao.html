@@ -2496,13 +2496,20 @@
                 const form = event.target;
                 const formData = new FormData(form);
                 
-                // Validar Valor da Venda sem alterar o campo exibido
-                const campoValorVenda = form.querySelector('input[name="valor_venda"]');
-                const valorVendaNumber = extrairNumeroBR(campoValorVenda.value);
+                // Calcular Valor da Venda a partir dos itens selecionados (campo removido)
+                let valorTotalItensSubmit = 0;
+                try { (itensSelecionados||[]).forEach(i => { valorTotalItensSubmit += (i.precoEditado||0) }); } catch(_) {}
+                let descontoSubmit = 0, acrescimoSubmit = 0;
+                try {
+                    const sd = document.getElementById('sideDesconto');
+                    const sa = document.getElementById('sideAcrescimo');
+                    if (sd && sd.value) descontoSubmit = extrairNumeroBR(sd.value);
+                    if (sa && sa.value) acrescimoSubmit = extrairNumeroBR(sa.value);
+                } catch(_) {}
+                const valorVendaNumber = Math.max(0, valorTotalItensSubmit - descontoSubmit + acrescimoSubmit);
                 if (!valorVendaNumber || valorVendaNumber <= 0) {
                     if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
-                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Informe um Valor da Venda válido (maior que 0).');
-                    try { form.querySelector('input[name="valor_venda"]').focus(); } catch(_) {}
+                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Informe ao menos um item com valor válido (maior que 0).');
                     return;
                 }
 
@@ -2563,7 +2570,7 @@
                         }
                     }
                 } catch (e) {
-                    // Se der erro, começa do zero
+                    // Falha de auth/401: segue sem bloquear o salvamento (backend numerará)
                     ultimoNumero = 0;
                 }
                 // Reservar faixa de números para todos os colaboradores
@@ -2710,6 +2717,7 @@
                         }
                     }
                 } catch (e) {
+                    // Falha de auth/401: segue sem bloquear (backend numerará)
                     ultimoNumero = 0;
                 }
                 // Reservar faixa de números para todas as linhas
