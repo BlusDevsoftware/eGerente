@@ -1666,7 +1666,8 @@
                     texto: itemText,
                     preco: itemPrice,
                     precoOriginal: itemPrice, // Guardar preço original
-                    precoEditado: itemPrice   // Preço atual (editável)
+                    precoEditado: itemPrice,  // Preço atual (editável)
+                    tipo: (typeof tipoInput !== 'undefined' && tipoInput && tipoInput.value) ? tipoInput.value : 'produto'
                 };
                 itensSelecionados.push(novoItem);
 
@@ -1777,9 +1778,13 @@
                     itemDiv.className = 'linha-item';
                     itemDiv.style.cssText = 'display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px solid #f0f0f0; gap: 4px;';
                     
+                    const corTarja = (item.tipo === 'servico') ? '#ff6b00' : '#2196F3';
                     itemDiv.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="flex: 1; font-size: 12px; font-weight: 500;">${item.texto}</span>
+                            <span style="flex: 1; font-size: 12px; font-weight: 500; display:flex; align-items:center; gap:6px;">
+                                <span aria-hidden="true" style="display:inline-block; width:10px; height:10px; border-radius:3px; background:${corTarja}"></span>
+                                ${item.texto}
+                            </span>
                             <button type="button" onclick="removerItemSelecionado('${item.id}')" 
                                     style="background: #ff4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
                                     title="Remover item">
