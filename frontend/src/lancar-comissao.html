@@ -635,6 +635,19 @@
             /* Quando aberto, o wrapper e o dropdown sobem acima de qualquer elemento */
             #formUnico .choices.is-open{ z-index: 10000 !important }
             #formUnico .choices.is-open .choices__list--dropdown{ z-index: 10001 !important }
+            /* Posição básica do dropdown (abaixo) e modo invertido (acima) para colaborador */
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown{
+                position: absolute !important;
+                top: calc(100% + 6px) !important;
+                bottom: auto !important;
+                left: 0 !important;
+                right: auto !important;
+                width: 100% !important;
+            }
+            #formUnico select.input-colaborador-colab + .choices.is-flipped .choices__list--dropdown{
+                top: auto !important;
+                bottom: calc(100% + 6px) !important;
+            }
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
@@ -2097,6 +2110,26 @@
                             const wrapper = selectColab.nextElementSibling;
                             if (wrapper && wrapper.classList.contains('choices')) {
                                 wrapper.classList.add('input-colaborador');
+                                // Flip dinâmico: abre para cima se não houver espaço suficiente abaixo
+                                try {
+                                    const inputInner = wrapper.querySelector('.choices__inner');
+                                    inputInner && inputInner.addEventListener('click', () => {
+                                        setTimeout(() => {
+                                            try {
+                                                if (!wrapper.classList.contains('is-open')) return;
+                                                const rect = wrapper.getBoundingClientRect();
+                                                const viewportH = window.innerHeight || document.documentElement.clientHeight;
+                                                const spaceBelow = viewportH - rect.bottom;
+                                                const estimatedDropdownH = Math.min(viewportH * 0.6, 320); // mesmo limite da CSS
+                                                if (spaceBelow < estimatedDropdownH + 16) {
+                                                    wrapper.classList.add('is-flipped');
+                                                } else {
+                                                    wrapper.classList.remove('is-flipped');
+                                                }
+                                            } catch(_) {}
+                                        }, 0);
+                                    });
+                                } catch(_) {}
                             }
                         }, 0);
                         // Deduplicação e numeração-base ao alterar colaborador
