@@ -572,6 +572,12 @@
                 background:#eaf2ff;
                 color:#0f172a;
             }
+            /* Garantir que o dropdown do colaborador não fique escondido ao adicionar múltiplos blocos */
+            #formUnico .colaborador-bloco { overflow: visible; }
+            #formUnico .colaborador-bloco .colab-field { position: relative; overflow: visible; z-index: 1; }
+            #formUnico select.input-colaborador-colab + .choices { position: relative; overflow: visible; }
+            #formUnico select.input-colaborador-colab + .choices.is-open { z-index: 3000 !important; }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { z-index: 4000 !important; }
             /* Truncar valor selecionado como nos múltiplos */
             #formUnico select.input-colaborador-colab + .choices .choices__list--single,
             #formUnico .choices.input-colaborador .choices__list--single {
