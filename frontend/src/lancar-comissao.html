@@ -196,7 +196,7 @@
                             <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
                             <div style="display: flex; gap: 8px; align-items: flex-end;">
                                 <div class="choices-container-wrapper" style="flex: 1;">
-                                    <select name="item" required></select>
+                                    <select name="item"></select>
                                 </div>
                                 <button type="button" id="btnAdicionarItem" class="btn-primary" onclick="adicionarItemSelecionado()" style="height: 38px; white-space: nowrap;">
                                     <i class="fas fa-plus"></i> Adicionar
@@ -2506,6 +2506,14 @@
                     return;
                 }
 
+                // Bloquear se nenhum item foi selecionado (pois removemos 'required' do select)
+                if (!Array.isArray(itensSelecionados) || itensSelecionados.length === 0) {
+                    if (typeof fecharModalFeedback === 'function') fecharModalFeedback();
+                    if (typeof mostrarModalFeedbackAviso === 'function') mostrarModalFeedbackAviso('Adicione pelo menos um item antes de salvar.');
+                    try { document.querySelector('#formUnico select[name="item"]').focus(); } catch(_) {}
+                    return;
+                }
+
                 // Exigir simulação e datas de vencimento preenchidas por bloco
                 const blocosUnico = Array.from(document.querySelectorAll('.colaborador-bloco'));
                 for (const bloco of blocosUnico) {
@@ -2916,11 +2924,13 @@
                 });
             }
             // Substituir sobrescrita de adicionarLinhaMultiplo para chamar atribuirVerificacaoColaboradorMultiplo
-            const originalAdicionarLinhaMultiplo = adicionarLinhaMultiplo;
-            adicionarLinhaMultiplo = function(valores = null) {
-                originalAdicionarLinhaMultiplo(valores);
-                atribuirVerificacaoColaboradorMultiplo();
-            };
+            if (typeof adicionarLinhaMultiplo === 'function') {
+                const originalAdicionarLinhaMultiplo = adicionarLinhaMultiplo;
+                adicionarLinhaMultiplo = function(valores = null) {
+                    originalAdicionarLinhaMultiplo(valores);
+                    atribuirVerificacaoColaboradorMultiplo();
+                };
+            }
         </script>
     </div>
 
