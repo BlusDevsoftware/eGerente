@@ -481,12 +481,12 @@
             #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
             /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
             #formUnico .choices__list--dropdown {
-                max-height: 320px !important;
+                max-height: 60vh !important; /* usar viewport para caber na tela */
                 overflow: hidden !important; /* evita scroll duplo no container */
             }
             /* Scroll apenas na lista interna (evita scroll duplo) */
             #formUnico .choices__list--dropdown .choices__list { 
-                max-height: 280px !important; 
+                max-height: calc(60vh - 40px) !important; 
                 overflow-y: auto !important; 
             }
             #formUnico .choices__list--dropdown .choices__list {
