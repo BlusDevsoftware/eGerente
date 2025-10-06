@@ -19,9 +19,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <style>
-        html, body{height:100%; overflow:hidden}
-        .main-content{padding-bottom:4px; overflow:hidden}
-        .content{margin-top:0; overflow:hidden}
+        html, body{height:100%; overflow:auto}
+        .main-content{padding-bottom:4px; overflow:auto}
+        .content{margin-top:0; overflow:visible}
         /* Spinner de carregamento - Padrão do sistema */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -60,7 +60,7 @@
             text-align: center;
         }
         /* Estilo do select de Colaborador igual ao de múltiplos lançamentos */
-        .colaborador-bloco select.input-colaborador-colab + .choices{display:block;width:100%;max-width:100%;overflow:hidden;box-sizing:border-box}
+        .colaborador-bloco select.input-colaborador-colab + .choices{display:block;width:100%;max-width:100%;overflow:visible;box-sizing:border-box}
         .colaborador-bloco select.input-colaborador-colab + .choices .choices__inner{width:100%;box-sizing:border-box}
         .colaborador-bloco .choices{width:100%}
         .colaborador-bloco .choices .choices__inner{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa}
@@ -479,7 +479,7 @@
             /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
             #formUnico .choices__list--dropdown {
                 max-height: 320px !important;
-                overflow: hidden !important;
+                overflow: auto !important;
             }
             #formUnico .choices__list--dropdown .choices__list {
                 max-height: 280px !important;
