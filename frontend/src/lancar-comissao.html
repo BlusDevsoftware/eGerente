@@ -577,16 +577,16 @@
                 background:#eaf2ff;
                 color:#0f172a;
             }
-            /* Garantir que o dropdown do colaborador não fique escondido: usa portal fixo no topo */
-            #formUnico select.input-colaborador-colab + .choices { position: static; overflow: visible; }
+            /* Garantir que o dropdown do colaborador fique acima dos blocos adjacentes */
+            #formUnico .colaborador-bloco { position: relative; z-index: 1; overflow: visible; }
+            #formUnico select.input-colaborador-colab + .choices { position: relative; overflow: visible; }
+            #formUnico select.input-colaborador-colab + .choices.is-open { z-index: 5000 !important; }
             #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { 
-                position: fixed !important; 
-                top: auto !important; 
-                left: 16px !important; 
-                right: 16px !important; 
+                position: absolute !important; 
+                left: 0 !important; 
+                right: 0 !important; 
                 width: auto !important; 
-                max-width: calc(100vw - 32px) !important;
-                z-index: 5000 !important; 
+                max-width: none !important;
             }
             /* Truncar valor selecionado como nos múltiplos */
             #formUnico select.input-colaborador-colab + .choices .choices__list--single,
