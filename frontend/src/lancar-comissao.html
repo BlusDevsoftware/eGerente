@@ -582,6 +582,8 @@
             }
             /* Garantir que o dropdown do colaborador fique acima dos blocos adjacentes */
             #formUnico .colaborador-bloco { position: relative; z-index: 1; overflow: visible; }
+            /* Elevar bloco ativo para que o dropdown não fique atrás do bloco de baixo */
+            #formUnico .colaborador-bloco.bloco-dropdown-open { z-index: 9999; }
             #formUnico select.input-colaborador-colab + .choices { position: relative; overflow: visible; }
             #formUnico select.input-colaborador-colab + .choices.is-open { z-index: 5000 !important; }
             #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { 
@@ -2113,22 +2115,29 @@
                                 wrapper.classList.add('input-colaborador');
                                 // Flip dinâmico: abre para cima se não houver espaço suficiente abaixo
                                 try {
+                                    const bloco = wrapper.closest('.colaborador-bloco');
                                     const inputInner = wrapper.querySelector('.choices__inner');
-                                    inputInner && inputInner.addEventListener('click', () => {
+                                    const recalc = () => {
                                         setTimeout(() => {
                                             try {
-                                                if (!wrapper.classList.contains('is-open')) return;
+                                                const isOpen = wrapper.classList.contains('is-open');
+                                                if (bloco) bloco.classList.toggle('bloco-dropdown-open', isOpen);
+                                                if (!isOpen) { wrapper.classList.remove('is-flipped'); return; }
                                                 const rect = wrapper.getBoundingClientRect();
                                                 const viewportH = window.innerHeight || document.documentElement.clientHeight;
                                                 const spaceBelow = viewportH - rect.bottom;
-                                                const estimatedDropdownH = Math.min(viewportH * 0.6, 320); // mesmo limite da CSS
-                                                if (spaceBelow < estimatedDropdownH + 16) {
-                                                    wrapper.classList.add('is-flipped');
-                                                } else {
-                                                    wrapper.classList.remove('is-flipped');
-                                                }
+                                                const estimatedDropdownH = Math.min(viewportH * 0.6, 320);
+                                                if (spaceBelow < estimatedDropdownH + 16) wrapper.classList.add('is-flipped');
+                                                else wrapper.classList.remove('is-flipped');
                                             } catch(_) {}
                                         }, 0);
+                                    };
+                                    inputInner && inputInner.addEventListener('click', recalc);
+                                    document.addEventListener('click', (ev)=>{
+                                        if (!wrapper.contains(ev.target)) {
+                                            wrapper.classList.remove('is-flipped');
+                                            if (bloco) bloco.classList.remove('bloco-dropdown-open');
+                                        }
                                     });
                                 } catch(_) {}
                             }
