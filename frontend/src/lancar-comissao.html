@@ -479,7 +479,12 @@
             /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
             #formUnico .choices__list--dropdown {
                 max-height: 320px !important;
-                overflow: auto !important;
+                overflow: hidden !important; /* evita scroll duplo no container */
+            }
+            /* Scroll apenas na lista interna (evita scroll duplo) */
+            #formUnico .choices__list--dropdown .choices__list { 
+                max-height: 280px !important; 
+                overflow-y: auto !important; 
             }
             #formUnico .choices__list--dropdown .choices__list {
                 max-height: 280px !important;
@@ -572,12 +577,17 @@
                 background:#eaf2ff;
                 color:#0f172a;
             }
-            /* Garantir que o dropdown do colaborador não fique escondido ao adicionar múltiplos blocos */
-            #formUnico .colaborador-bloco { overflow: visible; }
-            #formUnico .colaborador-bloco .colab-field { position: relative; overflow: visible; z-index: 1; }
-            #formUnico select.input-colaborador-colab + .choices { position: relative; overflow: visible; }
-            #formUnico select.input-colaborador-colab + .choices.is-open { z-index: 3000 !important; }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { z-index: 4000 !important; }
+            /* Garantir que o dropdown do colaborador não fique escondido: usa portal fixo no topo */
+            #formUnico select.input-colaborador-colab + .choices { position: static; overflow: visible; }
+            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { 
+                position: fixed !important; 
+                top: auto !important; 
+                left: 16px !important; 
+                right: 16px !important; 
+                width: auto !important; 
+                max-width: calc(100vw - 32px) !important;
+                z-index: 5000 !important; 
+            }
             /* Truncar valor selecionado como nos múltiplos */
             #formUnico select.input-colaborador-colab + .choices .choices__list--single,
             #formUnico .choices.input-colaborador .choices__list--single {
