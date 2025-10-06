@@ -22,6 +22,9 @@
         html, body{height:100%; overflow:auto}
         .main-content{padding-bottom:4px; overflow:auto}
         .content{margin-top:0; overflow:visible}
+        /* Garantir que containers não recortem dropdowns */
+        .form-comissao{overflow: visible}
+        .content-split{overflow: visible}
         /* Spinner de carregamento - Padrão do sistema */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -629,6 +632,9 @@
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
             #formUnico .choices__list--dropdown { z-index: 2000 }
+            /* Quando aberto, o wrapper e o dropdown sobem acima de qualquer elemento */
+            #formUnico .choices.is-open{ z-index: 10000 !important }
+            #formUnico .choices.is-open .choices__list--dropdown{ z-index: 10001 !important }
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
