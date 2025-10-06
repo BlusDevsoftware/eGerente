@@ -2587,10 +2587,11 @@
                     const percentualInput = bloco.querySelector('input[name="percentual[]"]');
                     const valorReceberInput = bloco.querySelector('input[name="valor_receber[]"]');
                     const descricaoInput = bloco.querySelector('input[name="descricao_colaborador[]"]');
-                    const qtdParcelasInput = bloco.querySelector('input[name="qtd_parcelas[]"]');
+                    // Determinar quantidade de parcelas: prioriza input inline; senão, usa quantidade de vencimentos simulados
                     let qtdParcelas = 1;
-                    if (qtdParcelasInput && qtdParcelasInput.value && parseInt(qtdParcelasInput.value) > 1) {
-                        qtdParcelas = parseInt(qtdParcelasInput.value);
+                    const qtdParcelasInline = bloco.querySelector('.input-qtd-parcelas-inline');
+                    if (qtdParcelasInline && qtdParcelasInline.value && parseInt(qtdParcelasInline.value) > 1) {
+                        qtdParcelas = parseInt(qtdParcelasInline.value);
                     }
                     if (colaboradorSelect.value && percentualInput.value) {
                         let usuarioLancamento = 'admin';
@@ -2613,7 +2614,7 @@
                                 colaborador_id: colaboradorSelect.value,
                                 item_id: item_id,
                                 tipo: formData.get('tipo'),
-                                valor_venda: extrairNumeroBR(formData.get('valor_venda')),
+                                valor_venda: valorVendaNumber,
                                 percentual_comissao: parseFloat(percentualInput.value),
                                 valor: parseFloat(valorReceberInput.value) / qtdParcelas,
                                 data_geracao: dataGeracao,
