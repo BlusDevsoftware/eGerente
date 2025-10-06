@@ -310,7 +310,7 @@
                 padding: 12px 12px;
                 margin-bottom: 0;
                 padding-bottom: 0; /* barra inferior fora do form, não reservar espaço */
-                height: calc(100vh - 247px); /* espelha múltiplos: área útil */
+                height: calc(100vh - 247px); /* altura base (1 bloco) */
                 display: flex;
                 flex-direction: column;
                 /* Faz o formulário ocupar toda a coluna disponível do grid */
@@ -319,6 +319,8 @@
                 margin-right: 0;
                 margin-left: 0;
             }
+            /* Quando houver 2+ blocos, permitir crescimento e scroll da página */
+            .form-comissao.form-comissao--auto { height: auto; min-height: calc(100vh - 247px); overflow: visible }
             /* Layout em duas colunas dentro do content */
             /* Layout com Grid: gap fixo, colunas estáveis */
             .content-split {
@@ -2100,6 +2102,14 @@
                     </div>
                 `;
                 container.appendChild(div);
+                // Se houver 2+ blocos, permitir que o formulário cresça (libera scroll da página)
+                try {
+                    const formRoot = document.getElementById('formUnico');
+                    const total = container.querySelectorAll('.colaborador-bloco').length;
+                    if (formRoot && total >= 2) {
+                        formRoot.classList.add('form-comissao--auto');
+                    }
+                } catch(_) {}
                 // Popular colaborador com Choices (idêntico ao cliente/múltiplos)
                 try {
                     const selectColab = div.querySelector('select[name="colaborador[]"]');
@@ -2166,6 +2176,14 @@
                 if (bloco) bloco.remove();
                 try { atualizarResumoUnico(); } catch(_) {}
                 try { validarSomaPercentuaisMax100(); } catch(_) {}
+                try {
+                    const container = document.getElementById('colaboradoresVinculados');
+                    const formRoot = document.getElementById('formUnico');
+                    const total = container ? container.querySelectorAll('.colaborador-bloco').length : 0;
+                    if (formRoot && total < 2) {
+                        formRoot.classList.remove('form-comissao--auto');
+                    }
+                } catch(_) {}
             }
 
             // Impede duplicar o mesmo colaborador em múltiplos blocos
