@@ -1887,15 +1887,29 @@
                     selectElement.choicesInstance.destroy();
                     selectElement.choicesInstance = null;
                 }
-                // Não adicionar placeholder como opção
+                // Adiciona um placeholder vazio para evitar seleção automática do primeiro item
                 selectElement.innerHTML = '';
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = '';
+                placeholder.disabled = true;
+                placeholder.selected = true;
+                placeholder.hidden = true;
+                selectElement.appendChild(placeholder);
                 buscarColaboradores().then(colaboradores => {
                     if (selectElement.choicesInstance) {
                         selectElement.choicesInstance.destroy();
                         selectElement.choicesInstance = null;
                     }
-                    // Não adicionar placeholder como opção
-                    selectElement.innerHTML = '';
+                    // Garante placeholder como primeira opção
+                    while (selectElement.firstChild) { selectElement.removeChild(selectElement.firstChild) }
+                    const pl = document.createElement('option');
+                    pl.value = '';
+                    pl.textContent = '';
+                    pl.disabled = true;
+                    pl.selected = true;
+                    pl.hidden = true;
+                    selectElement.appendChild(pl);
                     colaboradores.forEach(colaborador => {
                         const option = document.createElement('option');
                         option.value = colaborador.codigo;
@@ -1906,7 +1920,7 @@
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: '',
+                        placeholderValue: 'Selecione...',
                         shouldSort: false,
                         allowHTML: true,
                         renderChoiceLimit: -1,
@@ -2409,6 +2423,17 @@
 
                     produtos = await api.get('/produtos');
                     servicos = await api.get('/servicos');
+                    // Prefetch de colaboradores (mesmo comportamento da aba de múltiplos)
+                    try {
+                        colaboradoresCache = await api.get('/colaboradores');
+                        if (!Array.isArray(colaboradoresCache)) colaboradoresCache = [];
+                        if (colaboradoresCallbacks && colaboradoresCallbacks.length) {
+                            try { colaboradoresCallbacks.forEach(cb => cb(colaboradoresCache)); } catch (_) {}
+                            colaboradoresCallbacks = [];
+                        }
+                    } catch (_) {
+                        colaboradoresCache = [];
+                    }
                     
                     const tipoToggle = document.getElementById('tipo-toggle');
                     tipoToggle.querySelectorAll('.btn-tipo').forEach(btn => {
