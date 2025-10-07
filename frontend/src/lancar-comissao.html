@@ -293,8 +293,7 @@
             #formUnico .form-group select,
             #formUnico .form-group textarea { background:#fff !important }
             #formUnico .form-group input[readonly] { background:#fff !important }
-            #formUnico .choices,
-            #formUnico .choices__inner { background:#fff !important }
+            /* removido: estilização global de choices no formulário (teste) */
             .form-comissao {
                 background: #fff;
                 border-radius: 14px;
@@ -457,10 +456,11 @@
                ========================= */
             /* Cliente e Itens: ocupam a largura disponível do grid, sem travar em 480px */
             #formUnico .form-row > .form-group:first-child { flex: 1 1 auto !important; max-width: 100% !important; min-width: 0 !important }
-            #formUnico .form-row > .form-group:first-child .choices,
+            /* removido: largura forçada de choices */
+            /* #formUnico .form-row > .form-group:first-child .choices, */
             #formUnico .form-row > .form-group:first-child select { width: 100% !important; max-width: 100% !important }
             #formUnico .form-row > .form-group.itens { flex: 1 1 auto !important; max-width: 100% !important; min-width: 0 !important }
-            #formUnico .form-row > .form-group.itens .choices,
+            /* #formUnico .form-row > .form-group.itens .choices, */
             #formUnico .form-row > .form-group.itens select { width: 100% !important; max-width: 100% !important }
             /* Removidos cards de itens/valores do container central (migrados para o painel lateral) */
             /* Itens (Select + Choices) idêntico ao Cliente */
@@ -469,31 +469,14 @@
                 transition:border .15s, box-shadow .15s;
             }
             #formUnico select[name="item"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
-            #formUnico select[name="item"] + .choices { display:block; width:100%; max-width:100%; overflow:hidden; box-sizing:border-box }
-            #formUnico select[name="item"] + .choices .choices__inner { min-height:38px; height:38px; padding:2px 6px; border-radius:8px; border:1px solid #dce3ea !important; box-shadow:none !important; background:#f8f9fa; display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box }
+            /* removido: estilos de choices do campo item (teste)
+            #formUnico select[name="item"] + .choices { ... }
+            #formUnico select[name="item"] + .choices .choices__inner { ... }
+            */
             /* Destaque apenas quando focado/ativo para campo item */
-            #formUnico select[name="item"] + .choices.is-focused .choices__inner,
-            #formUnico select[name="item"] + .choices.is-open .choices__inner {
-                border-color:#2196F3 !important; box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; background:#f8f9fa !important;
-            }
-            #formUnico select[name="item"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* removido: foco/estilos choices item (teste) */
             /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
-            #formUnico .choices__list--dropdown {
-                max-height: 60vh !important; /* usar viewport para caber na tela */
-                overflow: hidden !important; /* evita scroll duplo no container */
-            }
-            /* Scroll apenas na lista interna (evita scroll duplo) */
-            #formUnico .choices__list--dropdown .choices__list { 
-                max-height: calc(60vh - 40px) !important; 
-                overflow-y: auto !important; 
-            }
-            #formUnico .choices__list--dropdown .choices__list {
-                max-height: 280px !important;
-                overflow-y: auto !important;
-                overscroll-behavior: contain;
-                padding-bottom: 12px; /* espaço extra para não cortar a seta do scroll */
-                box-sizing: border-box;
-            }
+            /* removido: limites/scroll do dropdown global choices (teste) */
             /* removido: largura fixa do campo itens */
             /* Cliente (Select + Choices) */
             #formUnico select[name="cliente"] {
@@ -503,45 +486,9 @@
             #formUnico select[name="cliente"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
             /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
             .choices-container-wrapper { position: relative; overflow: visible }
-            #formUnico select[name="cliente"] + .choices {
-                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
-            }
-            /* Estilo padrão do campo Cliente (sem destaque inicial) */
-            #formUnico select[name="cliente"] + .choices .choices__inner { 
-                min-height:38px; height:38px; padding:2px 6px; border-radius:8px; 
-                border:1px solid #dce3ea; box-shadow:none; background:#f8f9fa; 
-                display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
-            }
+            /* removido: estilos de choices do cliente (teste) */
             /* Ajuste de altura do dropdown do cliente */
-            #formUnico .choices.input-cliente .choices__list--dropdown,
-            #formUnico .choices.input-colaborador .choices__list--dropdown {
-                max-height: 320px !important;
-                overflow: hidden !important;
-                border: 1px solid #dce3ea;
-                border-radius: 8px;
-                box-shadow: 0 10px 24px rgba(2,6,23,0.08), 0 2px 6px rgba(2,6,23,0.06);
-            }
-            #formUnico .choices.input-cliente .choices__list--dropdown .choices__list,
-            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__list {
-                max-height: 280px !important;
-                overflow-y: auto !important;
-                overscroll-behavior: contain;
-                padding-bottom: 12px; /* espaço extra para o final do scroll */
-                box-sizing: border-box;
-            }
-            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__item,
-            #formUnico .choices.input-cliente .choices__list--dropdown .choices__item {
-                min-height: 32px;
-                display: flex;
-                align-items: center;
-                padding: 6px 10px;
-                line-height: 20px;
-                white-space: nowrap;
-            }
-            #formUnico .choices.input-colaborador .choices__list--dropdown .choices__item[data-value=""],
-            #formUnico .choices.input-cliente .choices__list--dropdown .choices__item[data-value=""] {
-                display: none;
-            }
+            /* removido: estilos de dropdown/itens choices (cliente/colaborador) (teste) */
             /* removido: estilos específicos de Choices para colaborador (teste) */
             /* Garantir que o dropdown do colaborador fique acima dos blocos adjacentes */
             #formUnico .colaborador-bloco { position: relative; z-index: 1; overflow: visible; }
@@ -550,29 +497,18 @@
             /* removido: truncamento/placeholder do Choices do colaborador (teste) */
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
-            #formUnico .choices:not(.is-focused):not(.is-open) .choices__inner,
-            #formUnico .choices.is-active:not(.is-focused):not(.is-open) .choices__inner,
-            #formUnico .choices.is-disabled .choices__inner {
-                border: 1px solid #dce3ea !important;
-                box-shadow: none !important;
-                outline: none !important;
-            }
+            /* removido: borda/estado padrão choices (teste) */
             /* Destaque azul quando focado/ativo - TODOS os campos choices */
-            #formUnico .choices.is-focused .choices__inner,
-            #formUnico .choices.is-open .choices__inner {
-                border-color:#2196F3 !important; 
-                box-shadow:0 0 0 3px rgba(33,150,243,0.15) !important; 
-                background:#f8f9fa !important;
-            }
+            /* removido: foco/aberto choices (teste) */
             #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
-            #formUnico .choices__list--dropdown { z-index: 2000 }
+            /* removido: z-index global de dropdown choices (teste) */
             /* Quando aberto, o wrapper e o dropdown sobem acima de qualquer elemento */
             /* removido: z-index e flip do dropdown do colaborador (teste) */
             /* Portal fixo quando teleportado para o body (garante ficar acima de tudo e sem recorte) */
-            .choices-dropdown-portal{ position: fixed !important; z-index: 99999 !important; left: 0; top: 0; }
+            /* removido: portal choices (teste) */
 
             /* Valor da Venda (destaque) */
             /* removido: campo valor da venda */
@@ -822,37 +758,10 @@
             select option[value=""] {
                 color: #757575;
             }
-            .choices__inner {
-                min-height: 30px !important;
-                border-radius: 6px !important;
-                background: #fff !important;
-                border: 1.5px solid #2196F3 !important;
-                box-shadow: 0 1px 3px rgba(33,150,243,0.06) !important;
-                font-size: 0.92em !important;
-                padding: 4px 8px !important;
-            }
+            /* removido: estilização global .choices__inner (teste) */
             
             /* Global Choices dropdown styles */
-            .choices__list--dropdown {
-                z-index: 9999 !important;
-                position: absolute !important; /* relativo ao .choices (position:relative) */
-                top: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-                background: #fff !important;
-                border: 1px solid #ddd !important;
-                border-radius: 4px !important;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
-                max-height: 200px !important;
-                overflow: hidden !important;
-            }
-            .choices__list--dropdown .choices__list {
-                max-height: 180px !important;
-                overflow-y: auto !important;
-            }
-            .choices.is-open {
-                z-index: 9999 !important;
-            }
+            /* removido: estilização global do dropdown choices (teste) */
             #tipo-toggle {
                 display: flex;
                 flex-direction: row;
