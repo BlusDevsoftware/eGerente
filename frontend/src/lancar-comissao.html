@@ -62,14 +62,7 @@
             font-weight: 500;
             text-align: center;
         }
-        /* Estilo do select de Colaborador igual ao de múltiplos lançamentos */
-        .colaborador-bloco select.input-colaborador-colab + .choices{display:block;width:100%;max-width:100%;overflow:visible;box-sizing:border-box}
-        .colaborador-bloco select.input-colaborador-colab + .choices .choices__inner{width:100%;box-sizing:border-box}
-        .colaborador-bloco .choices{width:100%}
-        .colaborador-bloco .choices .choices__inner{height:38px;padding:6px 10px;border:1px solid #dce3ea;border-radius:8px;background:#f8f9fa}
-        .colaborador-bloco .choices.is-focused .choices__inner{border-color:var(--accent);box-shadow:0 0 0 3px rgba(33,150,243,0.15)}
-        .colaborador-bloco .choices__list--dropdown{border-radius:8px;border:1px solid #dce3ea}
-        .colaborador-bloco .choices__item--selectable{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        /* removido: estilos específicos do select de Colaborador (teste) */
         
         /* Estilo do campo de intervalo entre parcelas */
         .intervalo-vencimento-select {
@@ -549,75 +542,12 @@
             #formUnico .choices.input-cliente .choices__list--dropdown .choices__item[data-value=""] {
                 display: none;
             }
-            /* Garantir mesmo tamanho do dropdown para o seletor de colaborador dos blocos */
-            #formUnico select.input-colaborador-colab + .choices {
-                display:block; width:100%; max-width:100%; box-sizing:border-box; position: relative; overflow: visible;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__inner {
-                min-height:38px; height:38px; padding:2px 6px; border-radius:8px;
-                border:1px solid #dce3ea !important; box-shadow:none !important; background:#f8f9fa;
-                display:flex; align-items:center; overflow:hidden; width:100%; min-width:0; box-sizing:border-box;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown {
-                max-height: 320px !important;
-                overflow: hidden !important;
-                border: 1px solid #dce3ea;
-                border-radius: 8px;
-                box-shadow: 0 10px 24px rgba(2,6,23,0.08), 0 2px 6px rgba(2,6,23,0.06);
-                margin-top: 6px;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__list {
-                max-height: 280px !important;
-                overflow-y: auto !important;
-                overscroll-behavior: contain;
-                padding-bottom: 12px;
-                box-sizing: border-box;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item {
-                min-height: 32px;
-                display: flex;
-                align-items: center;
-                padding: 6px 10px;
-                line-height: 20px;
-                white-space: nowrap;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
-                background:#eaf2ff;
-                color:#0f172a;
-            }
+            /* removido: estilos específicos de Choices para colaborador (teste) */
             /* Garantir que o dropdown do colaborador fique acima dos blocos adjacentes */
             #formUnico .colaborador-bloco { position: relative; z-index: 1; overflow: visible; }
-            /* Elevar bloco ativo para que o dropdown não fique atrás do bloco de baixo */
-            #formUnico .colaborador-bloco.bloco-dropdown-open { z-index: 9999; }
-            #formUnico select.input-colaborador-colab + .choices { position: relative; overflow: visible; }
-            #formUnico select.input-colaborador-colab + .choices.is-open { z-index: 5000 !important; }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown { 
-                position: absolute !important; 
-                left: 0 !important; 
-                right: 0 !important; 
-                width: auto !important; 
-                max-width: none !important;
-            }
+            /* removido: elevação e posicionamento específicos do Choices do colaborador (teste) */
             /* Truncar valor selecionado como nos múltiplos */
-            #formUnico select.input-colaborador-colab + .choices .choices__list--single,
-            #formUnico .choices.input-colaborador .choices__list--single {
-                width:100%;
-                flex:1 1 auto;
-                min-width:0;
-                display:block;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--single .choices__item,
-            #formUnico .choices.input-colaborador .choices__list--single .choices__item {
-                display:block;
-                max-width:100%;
-                overflow:hidden;
-                text-overflow:ellipsis;
-                white-space:nowrap;
-                min-width:0;
-            }
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown .choices__item[data-value=""]{
-                display: none;
-            }
+            /* removido: truncamento/placeholder do Choices do colaborador (teste) */
             /* Controle completo dos estilos Choices.js - sobrescrever CDN */
             /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
             #formUnico .choices:not(.is-focused):not(.is-open) .choices__inner,
@@ -640,21 +570,7 @@
             /* removido: estilos do campo itens */
             #formUnico .choices__list--dropdown { z-index: 2000 }
             /* Quando aberto, o wrapper e o dropdown sobem acima de qualquer elemento */
-            #formUnico .choices.is-open{ z-index: 10000 !important }
-            #formUnico .choices.is-open .choices__list--dropdown{ z-index: 10001 !important }
-            /* Posição básica do dropdown (abaixo) e modo invertido (acima) para colaborador */
-            #formUnico select.input-colaborador-colab + .choices .choices__list--dropdown{
-                position: absolute !important;
-                top: calc(100% + 6px) !important;
-                bottom: auto !important;
-                left: 0 !important;
-                right: auto !important;
-                width: 100% !important;
-            }
-            #formUnico select.input-colaborador-colab + .choices.is-flipped .choices__list--dropdown{
-                top: auto !important;
-                bottom: calc(100% + 6px) !important;
-            }
+            /* removido: z-index e flip do dropdown do colaborador (teste) */
             /* Portal fixo quando teleportado para o body (garante ficar acima de tudo e sem recorte) */
             .choices-dropdown-portal{ position: fixed !important; z-index: 99999 !important; left: 0; top: 0; }
 
@@ -680,29 +596,7 @@
                 border-color: #2196F3;
                 box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
             }
-            /* Colaborador (select nativo) com altura idêntica à descrição */
-            #colaboradoresVinculados .colab-field select.input-colaborador-colab {
-                width: 100% !important;
-                height: 37.99px !important;
-                line-height: 37.99px !important;
-                padding: 0 10px !important; /* zera top/bottom para não somar altura */
-                border: 1px solid #dce3ea !important;
-                border-radius: 8px !important;
-                outline: none !important;
-                background: #f8f9fa !important;
-                box-sizing: border-box !important;
-                appearance: none !important;
-                -moz-appearance: none !important;
-                -webkit-appearance: none !important;
-                font-size: 14px !important;
-            }
-            #colaboradoresVinculados .colab-field select.input-colaborador-colab:focus {
-                border-color: #2196F3 !important;
-                box-shadow: 0 0 0 3px rgba(33,150,243,0.15) !important;
-                background: #f8f9fa !important;
-            }
-            /* Remove seta default no IE/Edge legado */
-            #colaboradoresVinculados .colab-field select.input-colaborador-colab::-ms-expand { display: none }
+            /* removido: estilo do select nativo de colaborador (teste) */
             /* Removido: ajustes locais do Choices para Colaborador */
 
             /* Percentual */
