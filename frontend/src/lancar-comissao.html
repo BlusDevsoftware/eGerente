@@ -635,6 +635,29 @@
                 border-radius: 8px !important;
             }
             
+            /* Regras mais específicas para forçar altura do colaborador */
+            .colaborador-bloco .input-colaborador-colab {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
+            .colaborador-bloco .colab-field select {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Regra com máxima especificidade para o colaborador */
+            body #formUnico .colaborador-bloco .colab-field .input-colaborador-colab {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
             .colaborador-bloco select[name="colaborador[]"] + .choices {
                 height: 38px !important;
                 min-height: 38px !important;
@@ -2006,9 +2029,48 @@
                     }
                     
                     // Aplicar altura periodicamente para garantir que seja mantida
-                    setInterval(aplicarAlturaColaborador, 100);
+                    setInterval(aplicarAlturaColaborador, 50);
+                    
+                    // Aplicar altura imediatamente também
+                    aplicarAlturaColaborador();
                 });
             }
+            
+            // Função global para aplicar altura em todos os campos de colaborador
+            function aplicarAlturaTodosColaboradores() {
+                const todosColaboradores = document.querySelectorAll('.colaborador-bloco select[name="colaborador[]"]');
+                todosColaboradores.forEach(select => {
+                    // Aplicar no select original
+                    select.style.setProperty('height', '38px', 'important');
+                    select.style.setProperty('min-height', '38px', 'important');
+                    select.style.setProperty('max-height', '38px', 'important');
+                    select.style.setProperty('border-radius', '8px', 'important');
+                    
+                    // Aplicar no Choices
+                    const choicesElement = select.nextElementSibling;
+                    if (choicesElement && choicesElement.classList.contains('choices')) {
+                        choicesElement.style.setProperty('height', '38px', 'important');
+                        choicesElement.style.setProperty('min-height', '38px', 'important');
+                        choicesElement.style.setProperty('max-height', '38px', 'important');
+                        choicesElement.style.setProperty('border-radius', '8px', 'important');
+                        
+                        const choicesInner = choicesElement.querySelector('.choices__inner');
+                        if (choicesInner) {
+                            choicesInner.style.setProperty('height', '38px', 'important');
+                            choicesInner.style.setProperty('min-height', '38px', 'important');
+                            choicesInner.style.setProperty('max-height', '38px', 'important');
+                            choicesInner.style.setProperty('line-height', '38px', 'important');
+                            choicesInner.style.setProperty('padding', '0 10px', 'important');
+                            choicesInner.style.setProperty('display', 'flex', 'important');
+                            choicesInner.style.setProperty('align-items', 'center', 'important');
+                            choicesInner.style.setProperty('border-radius', '8px', 'important');
+                        }
+                    }
+                });
+            }
+            
+            // Aplicar altura em todos os colaboradores periodicamente
+            setInterval(aplicarAlturaTodosColaboradores, 200);
 
             // múltiplos: blocos e funções removidos
             // Resumo inferior da aba Comercial (Único)
@@ -2100,7 +2162,7 @@
                     <div class="form-row">
                         <div class="form-group colab-field">
                             <label><i class="fas fa-user"></i> Colaborador</label>
-                            <select name="colaborador[]" required class="input-colaborador-colab"></select>
+                            <select name="colaborador[]" required class="input-colaborador-colab" style="height: 38px !important; min-height: 38px !important; max-height: 38px !important; border-radius: 8px !important;"></select>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-align-left"></i> Descrição</label>
