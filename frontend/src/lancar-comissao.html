@@ -350,9 +350,9 @@
                 outline:none !important;
                 background:#fff !important;
             }
-            /* Garantir que a área de simulação nunca sobreponha dropdowns */
-            #formUnico .simulacao-titulos { position: relative; z-index: 1; overflow: visible }
-            #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
+            /* Garantir que a área de simulação fique atrás do dropdown do colaborador */
+            #formUnico .simulacao-titulos { position: relative; z-index: 0; overflow: visible }
+            #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 0; overflow: visible }
 
             /* Forçar cor do texto preta nos inputs do painel lateral */
             #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
@@ -446,8 +446,6 @@
                 margin-right: 5px;
                 color: #2196F3;
             }
-            /* Removido o estilo global genérico dos inputs/select para evitar conflitos
-               com os estilos específicos desta página */
             
             /* =========================
                Campos - Comercial (Único)
@@ -460,18 +458,6 @@
             #formUnico .form-row > .form-group.itens { flex: 1 1 auto !important; max-width: 100% !important; min-width: 0 !important }
             /* #formUnico .form-row > .form-group.itens .choices, */
             #formUnico .form-row > .form-group.itens select { width: 100% !important; max-width: 100% !important }
-            /* Removidos cards de itens/valores do container central (migrados para o painel lateral) */
-            /* Removidos estilos de itens - usar padrão do Choices */
-            /* removido: estilos de choices do campo item (teste)
-            #formUnico select[name="item"] + .choices { ... }
-            #formUnico select[name="item"] + .choices .choices__inner { ... }
-            */
-            /* Destaque apenas quando focado/ativo para campo item */
-            /* removido: foco/estilos choices item (teste) */
-            /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
-            /* removido: limites/scroll do dropdown global choices (teste) */
-            /* removido: largura fixa do campo itens */
-            /* Removidos todos os estilos de cliente, produtos e colaborador - usar padrão do Choices */
             /* Descrição (escopo local, sem depender de CSS global) */
             #colaboradoresVinculados input.input-descricao-colab {
                 width: 100%;
