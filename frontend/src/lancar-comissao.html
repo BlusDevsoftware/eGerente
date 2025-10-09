@@ -176,7 +176,7 @@
                         <div class="form-group" style="flex: 1.5;">
                             <label><i class="fas fa-user-tie"></i> Cliente</label>
                             <div class="choices-container-wrapper">
-                                <select name="cliente" required style="height: 38px !important; min-height: 38px !important; max-height: 38px !important;"></select>
+                                <select name="cliente" required style="height: 38px !important; min-height: 38px !important; max-height: 38px !important; border-radius: 8px !important;"></select>
                             </div>
                         </div>
                         <div class="form-group tipo-toggle-group" style="flex: 1;">
@@ -581,6 +581,50 @@
                 height: 38px !important;
                 min-height: 38px !important;
                 max-height: 38px !important;
+            }
+            
+            /* Aplicar bordas arredondadas no campo de cliente */
+            .choices-container-wrapper select[name="cliente"] {
+                border-radius: 8px !important;
+            }
+            
+            .choices-container-wrapper .choices {
+                border-radius: 8px !important;
+            }
+            
+            .choices-container-wrapper .choices .choices__inner {
+                border-radius: 8px !important;
+            }
+            
+            /* Bordas arredondadas com máxima especificidade */
+            body #formUnico .form-group .choices-container-wrapper select[name="cliente"] {
+                border-radius: 8px !important;
+            }
+            
+            body #formUnico .form-group .choices-container-wrapper .choices {
+                border-radius: 8px !important;
+            }
+            
+            body #formUnico .form-group .choices-container-wrapper .choices .choices__inner {
+                border-radius: 8px !important;
+            }
+            
+            /* Bordas arredondadas no dropdown do Choices */
+            .choices-container-wrapper .choices .choices__list--dropdown {
+                border-radius: 8px !important;
+                overflow: hidden !important;
+            }
+            
+            .choices-container-wrapper .choices .choices__list--dropdown .choices__item {
+                border-radius: 0 !important;
+            }
+            
+            .choices-container-wrapper .choices .choices__list--dropdown .choices__item:first-child {
+                border-radius: 8px 8px 0 0 !important;
+            }
+            
+            .choices-container-wrapper .choices .choices__list--dropdown .choices__item:last-child {
+                border-radius: 0 0 8px 8px !important;
             }
 
             /* Percentual */
@@ -1388,13 +1432,14 @@
                     }
                 }, 50);
                 
-                // Função para aplicar altura forçada
+                // Função para aplicar altura forçada e bordas arredondadas
                 function aplicarAlturaChoices() {
                     const choicesElement = selectCliente.nextElementSibling;
                     if (choicesElement && choicesElement.classList.contains('choices')) {
                         choicesElement.style.setProperty('height', '38px', 'important');
                         choicesElement.style.setProperty('min-height', '38px', 'important');
                         choicesElement.style.setProperty('max-height', '38px', 'important');
+                        choicesElement.style.setProperty('border-radius', '8px', 'important');
                         
                         const choicesInner = choicesElement.querySelector('.choices__inner');
                         if (choicesInner) {
@@ -1405,6 +1450,7 @@
                             choicesInner.style.setProperty('padding', '0 10px', 'important');
                             choicesInner.style.setProperty('display', 'flex', 'important');
                             choicesInner.style.setProperty('align-items', 'center', 'important');
+                            choicesInner.style.setProperty('border-radius', '8px', 'important');
                         }
                     }
                 }
