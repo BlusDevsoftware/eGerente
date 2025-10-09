@@ -363,6 +363,8 @@
             #formUnico .choices__list--dropdown {
                 border-radius: 8px !important;
             }
+            /* Dropdown portalizado para o body deve ficar acima de tudo */
+            .choices-dropdown-portal { position: fixed !important; z-index: 2147483647 !important; }
             /* Forçar altura 38px para Choices do cliente */
             #formUnico select[name="cliente"] + .choices,
             #formUnico select[name="cliente"] + .choices .choices__inner,
@@ -1987,6 +1989,8 @@
                                             const rect = wrapper.getBoundingClientRect();
                                             dd.classList.add('choices-dropdown-portal');
                                             document.body.appendChild(dd);
+                                            dd.style.position = 'fixed';
+                                            dd.style.zIndex = '2147483647';
                                             dd.style.left = rect.left + 'px';
                                             // abre para baixo como padrão
                                             dd.style.top = (rect.bottom + 6) + 'px';
