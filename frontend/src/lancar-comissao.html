@@ -658,6 +658,41 @@
                 border-radius: 8px !important;
             }
             
+            /* Sobrescrever qualquer CSS global que possa estar interferindo */
+            html body #formUnico .colaborador-bloco .colab-field .input-colaborador-colab,
+            html body #formUnico .colaborador-bloco .colab-field select[name="colaborador[]"],
+            html body #formUnico .colaborador-bloco select[name="colaborador[]"] {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+                line-height: 38px !important;
+                padding: 0 10px !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Forçar altura no Choices do colaborador com máxima especificidade */
+            html body #formUnico .colaborador-bloco .colab-field .input-colaborador-colab + .choices,
+            html body #formUnico .colaborador-bloco select[name="colaborador[]"] + .choices {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
+            html body #formUnico .colaborador-bloco .colab-field .input-colaborador-colab + .choices .choices__inner,
+            html body #formUnico .colaborador-bloco select[name="colaborador[]"] + .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+            
             .colaborador-bloco select[name="colaborador[]"] + .choices {
                 height: 38px !important;
                 min-height: 38px !important;
@@ -2040,37 +2075,57 @@
             function aplicarAlturaTodosColaboradores() {
                 const todosColaboradores = document.querySelectorAll('.colaborador-bloco select[name="colaborador[]"]');
                 todosColaboradores.forEach(select => {
-                    // Aplicar no select original
-                    select.style.setProperty('height', '38px', 'important');
-                    select.style.setProperty('min-height', '38px', 'important');
-                    select.style.setProperty('max-height', '38px', 'important');
-                    select.style.setProperty('border-radius', '8px', 'important');
+                    // Aplicar no select original com verificação de altura atual
+                    const alturaAtual = select.offsetHeight;
+                    if (alturaAtual !== 38) {
+                        select.style.setProperty('height', '38px', 'important');
+                        select.style.setProperty('min-height', '38px', 'important');
+                        select.style.setProperty('max-height', '38px', 'important');
+                        select.style.setProperty('border-radius', '8px', 'important');
+                        select.style.setProperty('line-height', '38px', 'important');
+                        select.style.setProperty('padding', '0 10px', 'important');
+                        select.style.setProperty('box-sizing', 'border-box', 'important');
+                    }
                     
                     // Aplicar no Choices
                     const choicesElement = select.nextElementSibling;
                     if (choicesElement && choicesElement.classList.contains('choices')) {
-                        choicesElement.style.setProperty('height', '38px', 'important');
-                        choicesElement.style.setProperty('min-height', '38px', 'important');
-                        choicesElement.style.setProperty('max-height', '38px', 'important');
-                        choicesElement.style.setProperty('border-radius', '8px', 'important');
-                        
-                        const choicesInner = choicesElement.querySelector('.choices__inner');
-                        if (choicesInner) {
-                            choicesInner.style.setProperty('height', '38px', 'important');
-                            choicesInner.style.setProperty('min-height', '38px', 'important');
-                            choicesInner.style.setProperty('max-height', '38px', 'important');
-                            choicesInner.style.setProperty('line-height', '38px', 'important');
-                            choicesInner.style.setProperty('padding', '0 10px', 'important');
-                            choicesInner.style.setProperty('display', 'flex', 'important');
-                            choicesInner.style.setProperty('align-items', 'center', 'important');
-                            choicesInner.style.setProperty('border-radius', '8px', 'important');
+                        const alturaChoices = choicesElement.offsetHeight;
+                        if (alturaChoices !== 38) {
+                            choicesElement.style.setProperty('height', '38px', 'important');
+                            choicesElement.style.setProperty('min-height', '38px', 'important');
+                            choicesElement.style.setProperty('max-height', '38px', 'important');
+                            choicesElement.style.setProperty('border-radius', '8px', 'important');
+                            
+                            const choicesInner = choicesElement.querySelector('.choices__inner');
+                            if (choicesInner) {
+                                const alturaInner = choicesInner.offsetHeight;
+                                if (alturaInner !== 38) {
+                                    choicesInner.style.setProperty('height', '38px', 'important');
+                                    choicesInner.style.setProperty('min-height', '38px', 'important');
+                                    choicesInner.style.setProperty('max-height', '38px', 'important');
+                                    choicesInner.style.setProperty('line-height', '38px', 'important');
+                                    choicesInner.style.setProperty('padding', '0 10px', 'important');
+                                    choicesInner.style.setProperty('display', 'flex', 'important');
+                                    choicesInner.style.setProperty('align-items', 'center', 'important');
+                                    choicesInner.style.setProperty('border-radius', '8px', 'important');
+                                    choicesInner.style.setProperty('box-sizing', 'border-box', 'important');
+                                }
+                            }
                         }
                     }
                 });
             }
             
             // Aplicar altura em todos os colaboradores periodicamente
-            setInterval(aplicarAlturaTodosColaboradores, 200);
+            setInterval(aplicarAlturaTodosColaboradores, 100);
+            
+            // Aplicar altura imediatamente quando a página carregar
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(aplicarAlturaTodosColaboradores, 100);
+                setTimeout(aplicarAlturaTodosColaboradores, 500);
+                setTimeout(aplicarAlturaTodosColaboradores, 1000);
+            });
 
             // múltiplos: blocos e funções removidos
             // Resumo inferior da aba Comercial (Único)
