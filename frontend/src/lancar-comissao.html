@@ -176,7 +176,7 @@
                         <div class="form-group" style="flex: 1.5;">
                             <label><i class="fas fa-user-tie"></i> Cliente</label>
                             <div class="choices-container-wrapper">
-                                <select name="cliente" required></select>
+                                <select name="cliente" required style="height: 38px;"></select>
                             </div>
                         </div>
                         <div class="form-group tipo-toggle-group" style="flex: 1;">
@@ -191,7 +191,7 @@
                             <label id="labelItemUnico"><i class="fas fa-cubes"></i> Itens</label>
                             <div style="display: flex; gap: 8px; align-items: flex-end;">
                                 <div class="choices-container-wrapper" style="flex: 1;">
-                                    <select name="item"></select>
+                                    <select name="item" style="height: 38px;"></select>
                                 </div>
                                 <button type="button" id="btnAdicionarItem" class="btn-primary" onclick="adicionarItemSelecionado()" style="height: 38px; white-space: nowrap;">
                                     <i class="fas fa-plus"></i> Adicionar
@@ -473,60 +473,6 @@
             #colaboradoresVinculados input.input-descricao-colab:focus {
                 border-color: #2196F3;
                 box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
-            }
-
-            /* Cliente (Select + Choices) - altura 38px */
-            #formUnico select[name="cliente"] {
-                width: 100% !important;
-                height: 38px !important;
-                padding: 6px 10px !important;
-                border: 1px solid #dce3ea !important;
-                border-radius: 8px !important;
-                outline: none !important;
-                background: #ffffff !important;
-                transition: border .15s, box-shadow .15s;
-            }
-            #formUnico select[name="cliente"]:focus {
-                border-color: #2196F3;
-                box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
-                background: #ffffff;
-            }
-
-            /* Itens (Select + Choices) - altura 38px */
-            #formUnico select[name="item"] {
-                width: 100% !important;
-                height: 38px !important;
-                padding: 6px 10px !important;
-                border: 1px solid #dce3ea !important;
-                border-radius: 8px !important;
-                outline: none !important;
-                background: #ffffff !important;
-                transition: border .15s, box-shadow .15s;
-            }
-            #formUnico select[name="item"]:focus {
-                border-color: #2196F3;
-                box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
-                background: #ffffff;
-            }
-
-            /* Estilos para o Choices do cliente */
-            #formUnico select[name="cliente"] + .choices,
-            #formUnico select[name="cliente"] + .choices .choices__inner {
-                height: 38px !important;
-                min-height: 38px !important;
-                background: #ffffff !important;
-                border: 1px solid #dce3ea !important;
-                border-radius: 8px !important;
-            }
-
-            /* Estilos para o Choices dos itens */
-            #formUnico select[name="item"] + .choices,
-            #formUnico select[name="item"] + .choices .choices__inner {
-                height: 38px !important;
-                min-height: 38px !important;
-                background: #ffffff !important;
-                border: 1px solid #dce3ea !important;
-                border-radius: 8px !important;
             }
 
             /* Percentual */
