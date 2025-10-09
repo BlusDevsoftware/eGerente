@@ -18,6 +18,7 @@
     <script src="scripts/config/api.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    
     <style>
         html, body{height:100%; overflow:auto}
         .main-content{padding-bottom:4px; overflow:auto}
@@ -1268,6 +1269,32 @@
                     shouldSort: false,
                     silent: true
                 });
+                
+                // Aplicar altura de 38px diretamente no Choices de cliente
+                setTimeout(() => {
+                    const choicesElement = selectCliente.nextElementSibling;
+                    if (choicesElement && choicesElement.classList.contains('choices')) {
+                        // Definir altura de 38px no container principal
+                        choicesElement.style.height = '38px';
+                        choicesElement.style.minHeight = '38px';
+                        
+                        // Aplicar altura no elemento interno
+                        const innerElement = choicesElement.querySelector('.choices__inner');
+                        if (innerElement) {
+                            innerElement.style.height = '38px';
+                            innerElement.style.minHeight = '38px';
+                            innerElement.style.padding = '6px 10px';
+                        }
+                        
+                        // Aplicar altura nos itens da lista dropdown
+                        const listItems = choicesElement.querySelectorAll('.choices__item');
+                        listItems.forEach(item => {
+                            item.style.height = '36px';
+                            item.style.lineHeight = '36px';
+                            item.style.padding = '6px 10px';
+                        });
+                    }
+                }, 10);
                 
                 // Adicionar evento para controlar campo de itens quando cliente mudar
                 selectCliente.addEventListener('change', function() {
