@@ -363,10 +363,29 @@
             }
             /* Forçar altura 38px para Choices do cliente */
             #formUnico select[name="cliente"] + .choices,
-            #formUnico select[name="cliente"] + .choices .choices__inner {
+            #formUnico select[name="cliente"] + .choices .choices__inner,
+            #formUnico .choices-container-wrapper .choices,
+            #formUnico .choices-container-wrapper .choices .choices__inner {
                 height: 38px !important;
                 min-height: 38px !important;
                 max-height: 38px !important;
+                line-height: 38px !important;
+            }
+            /* Forçar altura 38px para todos os campos Choices no formulário */
+            #formUnico .choices,
+            #formUnico .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+            }
+            /* Sobrescrever estilos padrão do Choices.js CDN */
+            #formUnico .choices__item--selectable,
+            #formUnico .choices__placeholder {
+                line-height: 38px !important;
+                height: 38px !important;
+                display: flex !important;
+                align-items: center !important;
             }
             /* Forçar cor do texto preta nos inputs do painel lateral */
             #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
