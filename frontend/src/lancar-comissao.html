@@ -658,7 +658,6 @@
                 overflow: auto;
             }
             .colaborador-bloco {
-                position: relative;
                 padding-top: 18px;
                 padding-right: 44px;
                 padding-left: 22px;
@@ -669,12 +668,14 @@
                 background: #f7fbff;
                 box-shadow: 0 2px 10px rgba(33,150,243,0.06);
                 transition: border 0.2s, box-shadow 0.2s, background 0.2s;
-                z-index: 1; /* base para empilhamento controlado */
             }
             /* Quando o dropdown do Choices está aberto dentro do bloco, elevar o bloco acima dos outros */
             .colaborador-bloco.bloco-dropdown-open { z-index: 99999 !important; }
             /* Garantir que dropdowns de colaborador sempre fiquem acima de outros blocos */
             #colaboradoresVinculados .choices__list--dropdown { z-index: 99999 !important; }
+            .colaborador-bloco {
+                position: relative; /* apenas para o botão de excluir */
+            }
             .btn-excluir-bloco {
                 position: absolute;
                 top: 10px;
@@ -1984,8 +1985,35 @@
                                     const bloco = wrapper.closest('.colaborador-bloco');
                                     const inputInner = wrapper.querySelector('.choices__inner');
                                     const dropdown = () => wrapper.querySelector('.choices__list--dropdown');
-                                    const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); }catch(_){}} ,0)};
-                                    const onClose = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.remove('bloco-dropdown-open'); }catch(_){}} ,0)};
+                                    const toPortal = () => {
+                                        try{
+                                            const dd = dropdown(); if(!dd) return;
+                                            const rect = wrapper.getBoundingClientRect();
+                                            dd.classList.add('choices-dropdown-portal');
+                                            document.body.appendChild(dd);
+                                            dd.style.position = 'fixed';
+                                            dd.style.zIndex = '99999';
+                                            dd.style.left = rect.left + 'px';
+                                            dd.style.top = (rect.bottom + 6) + 'px';
+                                            dd.style.width = rect.width + 'px';
+                                        }catch(_){ }
+                                    };
+                                    const fromPortal = () => {
+                                        try{
+                                            const dd = document.querySelector('.choices-dropdown-portal');
+                                            if(!dd) return;
+                                            dd.classList.remove('choices-dropdown-portal');
+                                            const host = wrapper.querySelector('.choices');
+                                            if (host) host.appendChild(dd);
+                                            dd.style.position = '';
+                                            dd.style.zIndex = '';
+                                            dd.style.left = '';
+                                            dd.style.top = '';
+                                            dd.style.width = '';
+                                        }catch(_){ }
+                                    };
+                                    const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); toPortal(); }catch(_){}} ,0)};
+                                    const onClose = () => { setTimeout(()=>{ try{ fromPortal(); if (bloco) bloco.classList.remove('bloco-dropdown-open'); }catch(_){}} ,0)};
                                     inputInner && inputInner.addEventListener('click', ()=>{
                                         setTimeout(()=>{ wrapper.classList.contains('is-open') ? onOpen() : onClose() }, 0);
                                     });
