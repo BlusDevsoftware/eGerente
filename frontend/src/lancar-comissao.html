@@ -475,6 +475,16 @@
                 box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
             }
 
+            /* Forçar altura 38px nos campos Choices após inicialização */
+            #formUnico select[name="cliente"] + .choices,
+            #formUnico select[name="cliente"] + .choices .choices__inner,
+            #formUnico select[name="item"] + .choices,
+            #formUnico select[name="item"] + .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+
             /* Percentual */
             #colaboradoresVinculados input[name="percentual[]"] { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }
             #colaboradoresVinculados input[name="percentual[]"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15) }
