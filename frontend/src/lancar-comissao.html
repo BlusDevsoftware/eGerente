@@ -176,7 +176,7 @@
                         <div class="form-group" style="flex: 1.5;">
                             <label><i class="fas fa-user-tie"></i> Cliente</label>
                             <div class="choices-container-wrapper">
-                                <select name="cliente" required style="height: 38px;"></select>
+                                <select name="cliente" required style="height: 38px !important; min-height: 38px !important; max-height: 38px !important;"></select>
                             </div>
                         </div>
                         <div class="form-group tipo-toggle-group" style="flex: 1;">
@@ -526,6 +526,58 @@
             .form-group select[name="cliente"] + .choices .choices__inner,
             .form-group select[name="cliente"] + .choices .choices__list--single,
             .form-group select[name="cliente"] + .choices .choices__item--selectable {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            /* Regra mais específica para forçar altura do Choices */
+            .choices-container-wrapper .choices,
+            .choices-container-wrapper .choices .choices__inner,
+            .choices-container-wrapper .choices .choices__list--single,
+            .choices-container-wrapper .choices .choices__item--selectable {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+            }
+            
+            /* Forçar altura específica para o Choices do cliente */
+            #formUnico .choices-container-wrapper .choices {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            #formUnico .choices-container-wrapper .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            
+            /* Regra com máxima especificidade para o Choices do cliente */
+            body #formUnico .form-group .choices-container-wrapper .choices {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            body #formUnico .form-group .choices-container-wrapper .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            
+            /* Forçar altura no select original também */
+            body #formUnico .form-group .choices-container-wrapper select[name="cliente"] {
                 height: 38px !important;
                 min-height: 38px !important;
                 max-height: 38px !important;
@@ -1314,6 +1366,51 @@
                     shouldSort: false,
                     silent: true
                 });
+                
+                // Forçar altura de 38px após inicialização do Choices
+                setTimeout(() => {
+                    const choicesElement = selectCliente.nextElementSibling;
+                    if (choicesElement && choicesElement.classList.contains('choices')) {
+                        choicesElement.style.height = '38px';
+                        choicesElement.style.minHeight = '38px';
+                        choicesElement.style.maxHeight = '38px';
+                        
+                        const choicesInner = choicesElement.querySelector('.choices__inner');
+                        if (choicesInner) {
+                            choicesInner.style.height = '38px';
+                            choicesInner.style.minHeight = '38px';
+                            choicesInner.style.maxHeight = '38px';
+                            choicesInner.style.lineHeight = '38px';
+                            choicesInner.style.padding = '0 10px';
+                            choicesInner.style.display = 'flex';
+                            choicesInner.style.alignItems = 'center';
+                        }
+                    }
+                }, 50);
+                
+                // Função para aplicar altura forçada
+                function aplicarAlturaChoices() {
+                    const choicesElement = selectCliente.nextElementSibling;
+                    if (choicesElement && choicesElement.classList.contains('choices')) {
+                        choicesElement.style.setProperty('height', '38px', 'important');
+                        choicesElement.style.setProperty('min-height', '38px', 'important');
+                        choicesElement.style.setProperty('max-height', '38px', 'important');
+                        
+                        const choicesInner = choicesElement.querySelector('.choices__inner');
+                        if (choicesInner) {
+                            choicesInner.style.setProperty('height', '38px', 'important');
+                            choicesInner.style.setProperty('min-height', '38px', 'important');
+                            choicesInner.style.setProperty('max-height', '38px', 'important');
+                            choicesInner.style.setProperty('line-height', '38px', 'important');
+                            choicesInner.style.setProperty('padding', '0 10px', 'important');
+                            choicesInner.style.setProperty('display', 'flex', 'important');
+                            choicesInner.style.setProperty('align-items', 'center', 'important');
+                        }
+                    }
+                }
+                
+                // Aplicar altura periodicamente para garantir que seja mantida
+                setInterval(aplicarAlturaChoices, 100);
                 
                 // Adicionar evento para controlar campo de itens quando cliente mudar
                 selectCliente.addEventListener('change', function() {
