@@ -461,12 +461,7 @@
             /* #formUnico .form-row > .form-group.itens .choices, */
             #formUnico .form-row > .form-group.itens select { width: 100% !important; max-width: 100% !important }
             /* Removidos cards de itens/valores do container central (migrados para o painel lateral) */
-            /* Itens (Select + Choices) idêntico ao Cliente */
-            #formUnico select[name="item"] {
-                width:100%; height:38px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa;
-                transition:border .15s, box-shadow .15s;
-            }
-            #formUnico select[name="item"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
+            /* Removidos estilos de itens - usar padrão do Choices */
             /* removido: estilos de choices do campo item (teste)
             #formUnico select[name="item"] + .choices { ... }
             #formUnico select[name="item"] + .choices .choices__inner { ... }
@@ -476,44 +471,7 @@
             /* Ajuste de altura do dropdown para evitar scroll maior que a lista */
             /* removido: limites/scroll do dropdown global choices (teste) */
             /* removido: largura fixa do campo itens */
-            /* Cliente (Select + Choices) */
-            #formUnico select[name="cliente"] {
-                width:100% !important; height:38px !important; padding:6px 10px !important; border:1px solid #dce3ea !important; border-radius:8px !important; outline:none !important; background:#f8f9fa !important;
-                transition:border .15s, box-shadow .15s;
-            }
-            #formUnico select[name="cliente"]:focus { border-color:#2196F3; box-shadow:0 0 0 3px rgba(33,150,243,0.15); background:#f8f9fa }
-            /* Garantir que o dropdown do Choices abra ancorado ao campo (e não no fim da página) */
-            .choices-container-wrapper { position: relative; overflow: visible }
-            /* removido: estilos de choices do cliente (teste) */
-            /* Ajuste de altura do dropdown do cliente */
-            /* removido: estilos de dropdown/itens choices (cliente/colaborador) (teste) */
-            /* removido: estilos específicos de Choices para colaborador (teste) */
-            /* Garantir que o dropdown do colaborador fique acima dos blocos adjacentes */
-            #formUnico .colaborador-bloco { position: relative; z-index: 1; overflow: visible; }
-            /* removido: elevação e posicionamento específicos do Choices do colaborador (teste) */
-            /* Truncar valor selecionado como nos múltiplos */
-            /* removido: truncamento/placeholder do Choices do colaborador (teste) */
-            /* Controle completo dos estilos Choices.js - sobrescrever CDN */
-            /* FORÇA TOTAL - Remove qualquer borda azul APENAS quando NÃO focado */
-            /* removido: borda/estado padrão choices (teste) */
-            /* Destaque azul quando focado/ativo - TODOS os campos choices */
-            /* removido: foco/aberto choices (teste) */
-            /* Removido estilo de choices__list--single */
-
-            /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
-            /* removido: estilos do campo itens */
-            /* removido: z-index global de dropdown choices (teste) */
-            /* Quando aberto, o wrapper e o dropdown sobem acima de qualquer elemento */
-            /* removido: z-index e flip do dropdown do colaborador (teste) */
-            /* Portal fixo quando teleportado para o body (garante ficar acima de tudo e sem recorte) */
-            /* removido: portal choices (teste) */
-
-            /* Valor da Venda (destaque) */
-            /* removido: campo valor da venda */
-
-            /* Removido: estilos de Colaborador (será recriado depois) */
-
-            /* Removido CSS antigo de Descrição - será recriado abaixo */
+            /* Removidos todos os estilos de cliente, produtos e colaborador - usar padrão do Choices */
             /* Descrição (escopo local, sem depender de CSS global) */
             #colaboradoresVinculados input.input-descricao-colab {
                 width: 100%;
@@ -530,8 +488,6 @@
                 border-color: #2196F3;
                 box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
             }
-            /* removido: estilo do select nativo de colaborador (teste) */
-            /* Removido: ajustes locais do Choices para Colaborador */
 
             /* Percentual */
             #colaboradoresVinculados input[name="percentual[]"] { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }

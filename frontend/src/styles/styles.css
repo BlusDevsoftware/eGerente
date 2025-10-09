@@ -662,16 +662,6 @@ textarea {
     font-weight: 500;
 }
 
-/* Choices.js containers */
-.choices,
-.choices__inner {
-    background: #f8f9fa;
-}
-
-.choices.is-open .choices__inner,
-.choices.is-disabled .choices__inner {
-    background: #f8f9fa;
-}
 
 /* Choices: remover borda/realce azul da barra de pesquisa interna */
 .choices__list--dropdown .choices__input,
@@ -2037,13 +2027,7 @@ tr:hover {
 #formSimples .form-group input[name="percentual[]"],
 #formSimples .form-group input[name="qtd_parcelas[]"],
 #formSimples .form-group input[name="valor_parcela[]"],
-#tabSimplesContent .choices.input-colaborador,
-#tabSimplesContent .choices__inner {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box;
-}
+/* Removidos estilos específicos de colaborador - usar padrão do Choices */
 
 /* Removido: altura global do input-colaborador para não afetar outras abas */
 
@@ -2174,74 +2158,15 @@ tr:hover {
     opacity: 1 !important;
 }
 
-#formSimples .choices.input-colaborador,
-#formSimples .choices__inner.input-colaborador {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box;
-}
-#formSimples .choices.input-colaborador .choices__inner,
-#formSimples .choices__inner.input-colaborador {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    line-height: 49.22px !important;
-}
-#formSimples .choices.input-colaborador .choices__item--selectable,
-#formSimples .choices__inner.input-colaborador .choices__item--selectable {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 49.22px !important;
-    line-height: 49.22px !important;
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #222;
-    padding-left: 0 !important;
-    width: 100%;
-    text-align: center;
-}
+/* Removidos estilos de colaborador do formSimples */
+/* Removidos estilos internos de colaborador do formSimples */
+/* Removidos estilos de item selecionável de colaborador do formSimples */
 
-#formSimples .form-group .choices.input-colaborador,
-#formSimples .form-group .choices__inner.input-colaborador,
-#formSimples .form-group .choices.input-colaborador .choices__inner {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box !important;
-}
+/* Removidos estilos de grupo de colaborador do formSimples */
 
-#tabSimplesContent .choices.input-colaborador,
-#tabSimplesContent .choices__inner {
-    height: 49.22px !important;
-    min-height: 49.22px !important;
-    max-height: 49.22px !important;
-    box-sizing: border-box !important;
-}
-#tabSimplesContent .choices.input-colaborador .choices__inner {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    line-height: 49.22px !important;
-}
-#tabSimplesContent .choices.input-colaborador .choices__item--selectable {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 49.22px !important;
-    line-height: 49.22px !important;
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #222;
-    padding-left: 0 !important;
-    width: 100%;
-    text-align: center;
-}
+/* Removidos estilos de colaborador do tabSimplesContent */
+/* Removidos estilos internos de colaborador do tabSimplesContent */
+/* Removidos estilos de item selecionável de colaborador do tabSimplesContent */
 .selected-row {
     background-color: #e3f2fd !important;
     transition: background 0.2s;
