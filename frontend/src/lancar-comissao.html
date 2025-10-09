@@ -356,6 +356,12 @@
             #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
             /* Elevar dropdowns globalmente acima da simulação */
             #formUnico .choices__list--dropdown { z-index: 20000 !important }
+            /* Bordas arredondadas para Choices (cliente/colaborador/itens) */
+            #formUnico .choices,
+            #formUnico .choices .choices__inner,
+            #formUnico .choices__list--dropdown {
+                border-radius: 8px !important;
+            }
             /* Forçar cor do texto preta nos inputs do painel lateral */
             #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
             #tabUnicoSide input[readonly] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; background:#fff !important }
