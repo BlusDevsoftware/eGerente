@@ -3,3 +3,8 @@ Author: BlusDevsoftware <bluedevdesenvolvimento@gmail.com>
 Date:   Thu Jun 12 14:41:47 2025 -0300
 
     fix: corrige mensagem de erro ao criar colaborador
+[33mda7ec5a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m chore: trigger deploy
+[33m3a4ce09[m feat(frontend): arredonda bordas do Choices no lançamento comercial
+[33m3a2efd8[m chore: empty commit to trigger deploy
+[33m865f443[m test(choices): remover todas as regras CSS do Choices nesta página para isolar estilo
+[33mc96d02b[m test(colaborador): remover todo CSS específico do campo de colaborador na aba de lançamento para isolar causa de sobreposição
