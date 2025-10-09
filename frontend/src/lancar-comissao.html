@@ -626,6 +626,50 @@
             .choices-container-wrapper .choices .choices__list--dropdown .choices__item:last-child {
                 border-radius: 0 0 8px 8px !important;
             }
+            
+            /* Aplicar altura de 38px e bordas arredondadas no campo de colaborador */
+            .colaborador-bloco select[name="colaborador[]"] {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
+            .colaborador-bloco select[name="colaborador[]"] + .choices {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                border-radius: 8px !important;
+            }
+            
+            .colaborador-bloco select[name="colaborador[]"] + .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Bordas arredondadas no dropdown do colaborador */
+            .colaborador-bloco .choices .choices__list--dropdown {
+                border-radius: 8px !important;
+                overflow: hidden !important;
+            }
+            
+            .colaborador-bloco .choices .choices__list--dropdown .choices__item {
+                border-radius: 0 !important;
+            }
+            
+            .colaborador-bloco .choices .choices__list--dropdown .choices__item:first-child {
+                border-radius: 8px 8px 0 0 !important;
+            }
+            
+            .colaborador-bloco .choices .choices__list--dropdown .choices__item:last-child {
+                border-radius: 0 0 8px 8px !important;
+            }
 
             /* Percentual */
             #colaboradoresVinculados input[name="percentual[]"] { width:100%; height:37.99px; line-height:37.99px; padding:6px 10px; border:1px solid #dce3ea; border-radius:8px; outline:none; background:#f8f9fa; text-align:center; box-sizing:border-box }
@@ -1914,6 +1958,55 @@
                         if (wrapper) wrapper.classList.remove('is-focused', 'is-open');
                         selectElement.blur();
                     }, 0);
+                    
+                    // Aplicar altura de 38px e bordas arredondadas após inicialização do Choices
+                    setTimeout(() => {
+                        const choicesElement = selectElement.nextElementSibling;
+                        if (choicesElement && choicesElement.classList.contains('choices')) {
+                            choicesElement.style.setProperty('height', '38px', 'important');
+                            choicesElement.style.setProperty('min-height', '38px', 'important');
+                            choicesElement.style.setProperty('max-height', '38px', 'important');
+                            choicesElement.style.setProperty('border-radius', '8px', 'important');
+                            
+                            const choicesInner = choicesElement.querySelector('.choices__inner');
+                            if (choicesInner) {
+                                choicesInner.style.setProperty('height', '38px', 'important');
+                                choicesInner.style.setProperty('min-height', '38px', 'important');
+                                choicesInner.style.setProperty('max-height', '38px', 'important');
+                                choicesInner.style.setProperty('line-height', '38px', 'important');
+                                choicesInner.style.setProperty('padding', '0 10px', 'important');
+                                choicesInner.style.setProperty('display', 'flex', 'important');
+                                choicesInner.style.setProperty('align-items', 'center', 'important');
+                                choicesInner.style.setProperty('border-radius', '8px', 'important');
+                            }
+                        }
+                    }, 50);
+                    
+                    // Função para aplicar altura e bordas forçadas no colaborador
+                    function aplicarAlturaColaborador() {
+                        const choicesElement = selectElement.nextElementSibling;
+                        if (choicesElement && choicesElement.classList.contains('choices')) {
+                            choicesElement.style.setProperty('height', '38px', 'important');
+                            choicesElement.style.setProperty('min-height', '38px', 'important');
+                            choicesElement.style.setProperty('max-height', '38px', 'important');
+                            choicesElement.style.setProperty('border-radius', '8px', 'important');
+                            
+                            const choicesInner = choicesElement.querySelector('.choices__inner');
+                            if (choicesInner) {
+                                choicesInner.style.setProperty('height', '38px', 'important');
+                                choicesInner.style.setProperty('min-height', '38px', 'important');
+                                choicesInner.style.setProperty('max-height', '38px', 'important');
+                                choicesInner.style.setProperty('line-height', '38px', 'important');
+                                choicesInner.style.setProperty('padding', '0 10px', 'important');
+                                choicesInner.style.setProperty('display', 'flex', 'important');
+                                choicesInner.style.setProperty('align-items', 'center', 'important');
+                                choicesInner.style.setProperty('border-radius', '8px', 'important');
+                            }
+                        }
+                    }
+                    
+                    // Aplicar altura periodicamente para garantir que seja mantida
+                    setInterval(aplicarAlturaColaborador, 100);
                 });
             }
 
