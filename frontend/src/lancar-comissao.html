@@ -2011,6 +2011,12 @@
                                             const menu = dd;
                                             const host = wrapper.querySelector('.choices');
                                             if (host) host.appendChild(menu);
+                                            // limpar estilos inline para evitar posições travadas
+                                            menu.style.left = '';
+                                            menu.style.top = '';
+                                            menu.style.width = '';
+                                            menu.style.position = '';
+                                            menu.style.zIndex = '';
                                         }catch(_){ }
                                     };
                                     const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); toPortal(); }catch(_){}} ,0)};
@@ -2018,9 +2024,25 @@
                                     inputInner && inputInner.addEventListener('click', ()=>{
                                         setTimeout(()=>{ wrapper.classList.contains('is-open') ? onOpen() : onClose() }, 0);
                                     });
+                                    // Capturar abertura/fechamento por qualquer meio (teclado, seta, API)
+                                    try {
+                                        const mo = new MutationObserver(()=>{
+                                            if (wrapper.classList.contains('is-open')) {
+                                                onOpen();
+                                            } else {
+                                                onClose();
+                                            }
+                                        });
+                                        mo.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+                                    } catch(_) {}
                                     document.addEventListener('click', (ev)=>{ if (!wrapper.contains(ev.target)) onClose(); });
                                     window.addEventListener('scroll', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() }, true);
                                     window.addEventListener('resize', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() });
+                                    // Escutar eventos nativos do Choices (showDropdown/hideDropdown)
+                                    try {
+                                        selectColab.addEventListener('showDropdown', onOpen);
+                                        selectColab.addEventListener('hideDropdown', onClose);
+                                    } catch(_) {}
                                 } catch(_) {}
                             }
                         }, 0);
