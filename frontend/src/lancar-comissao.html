@@ -353,26 +353,8 @@
             /* Garantir que a área de simulação nunca sobreponha dropdowns */
             #formUnico .simulacao-titulos { position: relative; z-index: 1; overflow: visible }
             #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
-            /* Elevar dropdowns globalmente acima da simulação - mesmo z-index da aba múltiplos */
-            .choices__list--dropdown { z-index: 2000 !important }
-            #formUnico .choices__list--dropdown { z-index: 2000 !important }
-            /* Bordas arredondadas para Choices (cliente/itens) - removido colaborador */
-            #formUnico select[name="cliente"] + .choices,
-            #formUnico select[name="cliente"] + .choices .choices__inner,
-            #formUnico select[name="item"] + .choices,
-            #formUnico select[name="item"] + .choices .choices__inner {
-                border-radius: 8px !important;
-            }
-            /* Forçar altura 38px apenas para cliente e itens */
-            #formUnico select[name="cliente"] + .choices,
-            #formUnico select[name="cliente"] + .choices .choices__inner,
-            #formUnico select[name="item"] + .choices,
-            #formUnico select[name="item"] + .choices .choices__inner {
-                height: 38px !important;
-                min-height: 38px !important;
-                max-height: 38px !important;
-                line-height: 38px !important;
-            }
+            /* Removidos estilos de dropdown - usar padrão do Choices */
+            /* Removidos todos os estilos específicos de Choices - usar padrão do CDN */
             /* Forçar cor do texto preta nos inputs do painel lateral */
             #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
             #tabUnicoSide input[readonly] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; background:#fff !important }
