@@ -353,8 +353,9 @@
             /* Garantir que a área de simulação nunca sobreponha dropdowns */
             #formUnico .simulacao-titulos { position: relative; z-index: 1; overflow: visible }
             #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
-            /* Elevar dropdowns globalmente acima da simulação */
-            #formUnico .choices__list--dropdown { z-index: 20000 !important }
+            /* Elevar dropdowns globalmente acima da simulação - mesmo z-index da aba múltiplos */
+            .choices__list--dropdown { z-index: 2000 !important }
+            #formUnico .choices__list--dropdown { z-index: 2000 !important }
             /* Garantir que o container de colaboradores tenha z-index adequado */
             #colaboradoresVinculados { position: relative; z-index: 10; }
             /* Bordas arredondadas para Choices (cliente/colaborador/itens) */
@@ -364,7 +365,7 @@
                 border-radius: 8px !important;
             }
             /* Dropdown portalizado para o body deve ficar acima de tudo */
-            .choices-dropdown-portal { position: fixed !important; z-index: 2147483647 !important; }
+            .choices-dropdown-portal { position: fixed !important; z-index: 2000 !important; }
             /* Forçar altura 38px para Choices do cliente */
             #formUnico select[name="cliente"] + .choices,
             #formUnico select[name="cliente"] + .choices .choices__inner,
@@ -1983,66 +1984,12 @@
                                     const bloco = wrapper.closest('.colaborador-bloco');
                                     const inputInner = wrapper.querySelector('.choices__inner');
                                     const dropdown = () => wrapper.querySelector('.choices__list--dropdown');
-                                    const toPortal = () => {
-                                        try{
-                                            const dd = dropdown(); if(!dd) return;
-                                            const rect = wrapper.getBoundingClientRect();
-                                            dd.classList.add('choices-dropdown-portal');
-                                            document.body.appendChild(dd);
-                                            dd.style.position = 'fixed';
-                                            dd.style.zIndex = '2147483647';
-                                            dd.style.left = rect.left + 'px';
-                                            // abre para baixo como padrão
-                                            dd.style.top = (rect.bottom + 6) + 'px';
-                                            dd.style.width = rect.width + 'px';
-                                            // flip se necessário
-                                            const viewportH = window.innerHeight || document.documentElement.clientHeight;
-                                            const spaceBelow = viewportH - rect.bottom;
-                                            const estH = Math.min(viewportH * 0.6, 320);
-                                            if (spaceBelow < estH + 16) dd.style.top = (Math.max(0, rect.top - estH - 6)) + 'px';
-                                        }catch(_){ }
-                                    };
-                                    const fromPortal = () => {
-                                        try{
-                                            const dd = document.querySelector('.choices-dropdown-portal');
-                                            if(!dd) return;
-                                            dd.classList.remove('choices-dropdown-portal');
-                                            // retornar para dentro do wrapper
-                                            const menu = dd;
-                                            const host = wrapper.querySelector('.choices');
-                                            if (host) host.appendChild(menu);
-                                            // limpar estilos inline para evitar posições travadas
-                                            menu.style.left = '';
-                                            menu.style.top = '';
-                                            menu.style.width = '';
-                                            menu.style.position = '';
-                                            menu.style.zIndex = '';
-                                        }catch(_){ }
-                                    };
-                                    const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); toPortal(); }catch(_){}} ,0)};
-                                    const onClose = () => { setTimeout(()=>{ try{ fromPortal(); if (bloco) bloco.classList.remove('bloco-dropdown-open'); }catch(_){}} ,0)};
+                                    const onOpen = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.add('bloco-dropdown-open'); }catch(_){}} ,0)};
+                                    const onClose = () => { setTimeout(()=>{ try{ if (bloco) bloco.classList.remove('bloco-dropdown-open'); }catch(_){}} ,0)};
                                     inputInner && inputInner.addEventListener('click', ()=>{
                                         setTimeout(()=>{ wrapper.classList.contains('is-open') ? onOpen() : onClose() }, 0);
                                     });
-                                    // Capturar abertura/fechamento por qualquer meio (teclado, seta, API)
-                                    try {
-                                        const mo = new MutationObserver(()=>{
-                                            if (wrapper.classList.contains('is-open')) {
-                                                onOpen();
-                                            } else {
-                                                onClose();
-                                            }
-                                        });
-                                        mo.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
-                                    } catch(_) {}
                                     document.addEventListener('click', (ev)=>{ if (!wrapper.contains(ev.target)) onClose(); });
-                                    window.addEventListener('scroll', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() }, true);
-                                    window.addEventListener('resize', ()=>{ if (wrapper.classList.contains('is-open')) onOpen() });
-                                    // Escutar eventos nativos do Choices (showDropdown/hideDropdown)
-                                    try {
-                                        selectColab.addEventListener('showDropdown', onOpen);
-                                        selectColab.addEventListener('hideDropdown', onClose);
-                                    } catch(_) {}
                                 } catch(_) {}
                             }
                         }, 0);
