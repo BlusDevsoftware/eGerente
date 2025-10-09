@@ -353,8 +353,7 @@
             /* Garantir que a área de simulação nunca sobreponha dropdowns */
             #formUnico .simulacao-titulos { position: relative; z-index: 1; overflow: visible }
             #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
-            /* Removidos estilos de dropdown - usar padrão do Choices */
-            /* Removidos todos os estilos específicos de Choices - usar padrão do CDN */
+
             /* Forçar cor do texto preta nos inputs do painel lateral */
             #tabUnicoSide input[type="text"] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; caret-color:#0f172a }
             #tabUnicoSide input[readonly] { color:#0f172a !important; -webkit-text-fill-color:#0f172a !important; background:#fff !important }
@@ -499,7 +498,7 @@
             /* removido: borda/estado padrão choices (teste) */
             /* Destaque azul quando focado/ativo - TODOS os campos choices */
             /* removido: foco/aberto choices (teste) */
-            #formUnico select[name="cliente"] + .choices .choices__list--single .choices__item { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+            /* Removido estilo de choices__list--single */
 
             /* Item (Select múltiplo + Choices) - mesma altura visual do Cliente (38px) */ 
             /* removido: estilos do campo itens */
@@ -1079,14 +1078,7 @@
                 display: flex !important;
                 align-items: center !important;
             }
-            .table-multiplos td .choices.input-cliente .choices__list--single .choices__item,
-            .table-multiplos td .choices.input-colaborador .choices__list--single .choices__item {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                width: 100% !important;
-                display: block !important;
-            }
+            /* Removidos estilos de choices__list--single da tabela múltiplos */
             .table-multiplos .choices__item--selectable {
                 white-space: nowrap !important;
                 overflow: hidden !important;
@@ -1119,16 +1111,7 @@
                 align-items: center !important;
                 overflow: hidden !important;
             }
-            .table-multiplos tbody td:nth-child(1) .choices__list--single .choices__item,
-            .table-multiplos tbody td:nth-child(2) .choices__list--single .choices__item,
-            .table-multiplos tbody td:nth-child(1) .choices__placeholder,
-            .table-multiplos tbody td:nth-child(2) .choices__placeholder {
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                width: 100% !important;
-                display: block !important;
-            }
+            /* Removidos estilos de choices__list--single e placeholder da tabela múltiplos */
             
             /* Use global Choices styles for table-multiplos */
             .table-multiplos .choices {
