@@ -18,7 +18,6 @@
     <script src="scripts/config/api.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    
     <style>
         html, body{height:100%; overflow:auto}
         .main-content{padding-bottom:4px; overflow:auto}
@@ -481,6 +480,52 @@
             #formUnico select[name="cliente"] + .choices .choices__inner,
             #formUnico select[name="item"] + .choices,
             #formUnico select[name="item"] + .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            /* Garantir altura específica para o campo de cliente */
+            .choices-container-wrapper select[name="cliente"] {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            .choices-container-wrapper select[name="cliente"] + .choices {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+            }
+            
+            .choices-container-wrapper select[name="cliente"] + .choices .choices__inner {
+                height: 38px !important;
+                min-height: 38px !important;
+                max-height: 38px !important;
+                line-height: 38px !important;
+            }
+            
+            /* Garantir que o texto fique centralizado verticalmente */
+            .choices-container-wrapper select[name="cliente"] + .choices .choices__list--single {
+                height: 38px !important;
+                line-height: 38px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            
+            .choices-container-wrapper select[name="cliente"] + .choices .choices__item--selectable {
+                height: 38px !important;
+                line-height: 38px !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            
+            /* Garantir altura em todos os estados do campo de cliente */
+            .form-group select[name="cliente"],
+            .form-group select[name="cliente"] + .choices,
+            .form-group select[name="cliente"] + .choices .choices__inner,
+            .form-group select[name="cliente"] + .choices .choices__list--single,
+            .form-group select[name="cliente"] + .choices .choices__item--selectable {
                 height: 38px !important;
                 min-height: 38px !important;
                 max-height: 38px !important;
@@ -1269,32 +1314,6 @@
                     shouldSort: false,
                     silent: true
                 });
-                
-                // Aplicar altura de 38px diretamente no Choices de cliente
-                setTimeout(() => {
-                    const choicesElement = selectCliente.nextElementSibling;
-                    if (choicesElement && choicesElement.classList.contains('choices')) {
-                        // Definir altura de 38px no container principal
-                        choicesElement.style.height = '38px';
-                        choicesElement.style.minHeight = '38px';
-                        
-                        // Aplicar altura no elemento interno
-                        const innerElement = choicesElement.querySelector('.choices__inner');
-                        if (innerElement) {
-                            innerElement.style.height = '38px';
-                            innerElement.style.minHeight = '38px';
-                            innerElement.style.padding = '6px 10px';
-                        }
-                        
-                        // Aplicar altura nos itens da lista dropdown
-                        const listItems = choicesElement.querySelectorAll('.choices__item');
-                        listItems.forEach(item => {
-                            item.style.height = '36px';
-                            item.style.lineHeight = '36px';
-                            item.style.padding = '6px 10px';
-                        });
-                    }
-                }, 10);
                 
                 // Adicionar evento para controlar campo de itens quando cliente mudar
                 selectCliente.addEventListener('change', function() {

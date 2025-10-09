@@ -663,32 +663,7 @@ textarea {
 }
 
 
-/* Choices: remover borda/realce azul da barra de pesquisa interna */
-.choices__list--dropdown .choices__input,
-.choices__input,
-.choices__input--cloned {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    background: #f8f9fa !important;
-}
-
-.choices__list--dropdown .choices__input:focus,
-.choices__input:focus,
-.choices__input--cloned:focus {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* Choices: realce azul removido globalmente - será aplicado apenas onde necessário */
-
-/* Choices: espaçamento entre o campo e a lista (dropdown não colado) */
-.choices__list--dropdown {
-    margin-top: 5px !important;
-    border-radius: 8px !important;
-    box-shadow: 0 10px 24px rgba(2,6,23,0.12) !important;
-}
+/* Removidos estilos globais que afetavam a lista suspensa do Choices */
 
 /* Ações na Tabela */
 .btn-action {
