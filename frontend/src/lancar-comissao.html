@@ -355,6 +355,8 @@
             #formUnico .simulacao-titulos .simulacao-tabela { position: relative; z-index: 1; overflow: visible }
             /* Elevar dropdowns globalmente acima da simulação */
             #formUnico .choices__list--dropdown { z-index: 20000 !important }
+            /* Garantir que o container de colaboradores tenha z-index adequado */
+            #colaboradoresVinculados { position: relative; z-index: 10; }
             /* Bordas arredondadas para Choices (cliente/colaborador/itens) */
             #formUnico .choices,
             #formUnico .choices .choices__inner,
@@ -667,7 +669,9 @@
                 z-index: 1; /* base para empilhamento controlado */
             }
             /* Quando o dropdown do Choices está aberto dentro do bloco, elevar o bloco acima dos outros */
-            .colaborador-bloco.bloco-dropdown-open { z-index: 9999; }
+            .colaborador-bloco.bloco-dropdown-open { z-index: 99999 !important; }
+            /* Garantir que dropdowns de colaborador sempre fiquem acima de outros blocos */
+            #colaboradoresVinculados .choices__list--dropdown { z-index: 99999 !important; }
             .btn-excluir-bloco {
                 position: absolute;
                 top: 10px;
